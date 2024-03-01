@@ -130,3 +130,5 @@ dist
 .pnp.*
 
 .env
+.env.stable
+.env.demo
