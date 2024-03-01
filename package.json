@@ -1,8 +1,20 @@
 {
-  "name": "Groot",
+  "name": "groot",
   "version": "1.0.0",
+  "description": "",
   "main": "index.js",
   "repository": "https://github.com/thisisarchimedes/Groot.git",
-  "author": "tomerXarchimedes <tomer@archimedesfi.com>",
-  "license": "MIT"
+  "scripts": {
+    "start": "ts-node ./src/main.ts"
+  },
+  "dependencies": {
+    "some-package": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.0.0",
+    "ts-node": "^9.0.0",
+    "@types/node": "^14.0.0"
+  },
+  "author": "",
+  "license": "ISC"
 }
