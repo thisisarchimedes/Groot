@@ -1,0 +1,8 @@
+{
+  "name": "Groot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/thisisarchimedes/Groot.git",
+  "author": "tomerXarchimedes <tomer@archimedesfi.com>",
+  "license": "MIT"
+}
