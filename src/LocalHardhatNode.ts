@@ -1,4 +1,5 @@
 import { Web3 } from 'web3';
+import Docker from 'dockerode';
 
 export class LocalHardhatNode {
     private web3: Web3;
@@ -17,50 +18,79 @@ export class LocalHardhatNode {
         return blockNumber;
     }
 
-    public async resetHardhatNode() {
+    public async launchNodeContainer(hostPort = 8545, containerPort = 8545) {
+        const imageName = 'archimedes-node:latest';
+        const containerName = 'archimedes-node-alchemy';
+        const docker = new Docker({socketPath: '/var/run/docker.sock'});
 
-        await this.sendJsonRpcRequest(this.rpcUrl, 'hardhat_reset', [{
-                forking: {
-                    jsonRpcUrl: 'https://eth-mainnet.g.alchemy.com/v2/pPpHjtxSDGQxVHCjatsahkR0Ie79w_Qu',
-                },
-            }] as any); 
-
-        while (true) {
-            if (await this.isNodeReady()) {
-                console.log('Node is ready.');
-                break;
+        let container;
+        try {
+            // Attempt to get the container if it already exists
+            container = docker.getContainer(containerName);
+            const containerInfo = await container.inspect();
+            
+            // If the container exists but is not running, start it
+            if (!containerInfo.State.Running) {
+                console.log(`Starting existing container ${containerName}...`);
+                await container.start();
+                console.log(`Container ${containerName} started successfully.`);
             } else {
-                console.log('Waiting for the node to be ready...');
-                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second before retrying
+                console.log(`Container ${containerName} is already running.`);
             }
+        } catch (error) {
+            // If the container does not exist, create and start a new one
+            if (error.statusCode === 404) {
+                console.log(`Container ${containerName} does not exist. Creating a new one...`);
+                try {
+                    container = await docker.createContainer({
+                        Image: imageName,
+                        name: containerName,
+                        ExposedPorts: {
+                            [`${containerPort}/tcp`]: {}
+                        },
+                        HostConfig: {
+                            PortBindings: {
+                                [`${containerPort}/tcp`]: [{ HostPort: `${hostPort.toString()}` }]
+                            }
+                        },
+                    });
+    
+                    await container.start();
+                    console.log(`Container ${containerName} created and started successfully with port mapping ${hostPort}:${containerPort}`);
+                } catch (creationError) {
+                    console.error('Error creating and starting new container:', creationError);
+                }
+            } else {
+                // Handle other errors
+                console.error('Error checking for existing container:', error);
             }
+        }
     }
 
-    private async  sendJsonRpcRequest(url: string, method: string, params = []) {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            jsonrpc: '2.0',
-            method: method,
-            params: params,
-            id: new Date().getTime() // Use timestamp for a unique ID
-          }),
-        });
-      
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-      
-        return response.json();
-      }
-
-      private async isNodeReady() {
-        try {
-          await this.sendJsonRpcRequest(this.rpcUrl, 'eth_chainId');
-          return true; // Node responded successfully
-        } catch (error) {
-          return false; // Node response indicated not ready
-        }
-      }
+    public async waitForContainerToBeReady(maxAttempts = 5, interval = 3000) {
+        let attempts = 0;
+    
+        const checkReady = async () => {
+            try {
+                // Attempt to get the current block number
+                const blockNumber = await this.getBlockNumber();
+                console.log(`Blockchain is ready. Current block number is ${blockNumber}.`);
+                return true; // If successful, the container is ready
+            } catch (error) {
+                console.log(`Waiting for blockchain to be ready... Attempt ${attempts + 1}/${maxAttempts}`);
+                attempts++;
+                if (attempts < maxAttempts) {
+                    // If we have not exceeded max attempts, wait and try again
+                    await new Promise(resolve => setTimeout(resolve, interval));
+                    return checkReady();
+                } else {
+                    // Max attempts reached, throw an error
+                    throw new Error('Blockchain node is not ready after maximum attempts.');
+                }
+            }
+        };
+    
+        await checkReady();
+    }
+    
 }
