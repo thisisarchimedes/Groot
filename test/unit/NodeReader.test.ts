@@ -16,7 +16,7 @@ describe('Check that we work with local Hardhat node correctly', function () {
 
     it('should spin a new docker and read current block number directly from node', async function () {
         this.timeout(120000); 
-        
+
         const rpc_url = 'http://127.0.0.1:8545';
         const localNode = new LocalHardhatNode(rpc_url);
         await localNode.launchNodeContainer();
@@ -24,9 +24,4 @@ describe('Check that we work with local Hardhat node correctly', function () {
         const blockNumber = await localNode.getBlockNumber();
         expect(blockNumber > 1934000n).to.be.true;
     });
-
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
 });
