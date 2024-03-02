@@ -1,12 +1,17 @@
+import { Web3 } from 'web3';
+
 export class LocalHardhatNode {
-    private readonly rpc_url: string;
-    
+    private readonly web3: Web3;
+
     constructor(rpc_url: string) {
-        this.rpc_url = rpc_url;
+        this.web3 = new Web3(rpc_url);
     }
 
-    public getBlockNumber(): number {
-        // Assuming this is a placeholder return value
-        return 1934001;
+    public async getBlockNumber(): Promise<bigint> {
+        let blockNumber: Promise<bigint>;
+        
+        blockNumber = this.web3.eth.getBlockNumber();
+        
+        return blockNumber;
     }
 }
