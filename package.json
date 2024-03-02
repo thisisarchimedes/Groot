@@ -13,9 +13,11 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "test": "tsx node_modules/.bin/mocha -r ts-node/register 'test/**/*.test.ts'"
+    "test": "mocha --import=tsx test/**/*.test.ts"
   },
   "dependencies": {
-    "@types/node": "^20.11.24"
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.11.24",
+    "tsx": "^3.11.0"
   }
 }
