@@ -1,28 +1,21 @@
 {
   "name": "groot",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
-  "repository": "https://github.com/thisisarchimedes/Groot.git",
-  "scripts": {
-    "start": "ts-node ./src/main.ts"
-  },
+  "license": "MIT",
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.2.3",
-    "@nomiclabs/hardhat-waffle": "^2.0.6",
+    "@types/chai": "^4.3.12",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.11.24",
     "chai": "^5.1.0",
-    "ethereum-waffle": "^4.0.10",
-    "ethers": "^6.11.1",
-    "hardhat": "^2.20.1",
     "mocha": "^10.3.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.7.1",
     "typescript": "^5.3.3"
   },
-  "author": "tomerXarchimedes <tomer@archimedesfi.com>",
-  "license": "ISC",
+  "scripts": {
+    "test": "tsx node_modules/.bin/mocha -r ts-node/register 'test/**/*.spec.ts'"
+  },
   "dependencies": {
-    "@types/chai": "^4.3.12"
+    "@types/node": "^20.11.24"
   }
 }
