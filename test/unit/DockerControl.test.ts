@@ -7,7 +7,7 @@ chai.use(chaiAsPromised);
 
 const {expect} = chai;
 
-describe('Check that we work with local Hardhat node correctly', function() {
+describe('Check that we able to launch and stop docker containers', function() {
   it('should fail connecting to RPC', async function() {
     const localNode = new LocalHardhatNode(1234, 'invalid-container', 'invalid-container');
     await localNode.stopNodeContainer();
@@ -19,9 +19,12 @@ describe('Check that we work with local Hardhat node correctly', function() {
 
     const localNode = new LocalHardhatNode(8545, 'archimedes-node:latest', 'archimedes-node-alchemy');
     await localNode.stopNodeContainer();
+
     await localNode.startNodeContainer();
-    await localNode.waitForContainerToBeReady();
+    await localNode.waitForNodeToBeReady();
     const blockNumber = await localNode.getBlockNumber();
     expect(blockNumber > 1934000n).to.be.true;
+
+    await localNode.stopNodeContainer();
   });
 });

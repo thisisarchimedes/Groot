@@ -4,14 +4,14 @@ import Docker from 'dockerode';
 export class LocalHardhatNode {
   private readonly web3: Web3;
   private readonly docker: Docker = new Docker({socketPath: '/var/run/docker.sock'});
-  private readonly rpcUrl: string;
+  private readonly localRpcUrl: string;
   private readonly containerPort: number;
   private readonly imageName: string;
   private readonly containerName: string;
 
   constructor(port: number, imageName: string, containerName: string) {
-    this.rpcUrl = `http://127.0.0.1:${port}`;
-    this.web3 = new Web3(this.rpcUrl);
+    this.localRpcUrl = `http://127.0.0.1:${port}`;
+    this.web3 = new Web3(this.localRpcUrl);
     this.containerPort = port;
     this.imageName = imageName;
     this.containerName = containerName;
@@ -51,6 +51,43 @@ export class LocalHardhatNode {
     }
   }
 
+  public async resetNode(externalProviderRpcUrl: string) {
+    let response: Response;
+    try {
+         response = await fetch(this.localRpcUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                jsonrpc: '2.0',
+                method: 'hardhat_reset',
+                params: [{
+                    forking: {
+                        jsonRpcUrl: externalProviderRpcUrl,
+                    },
+                }],
+                id: 1,
+            }),
+        });
+
+    } catch (error) {
+        console.error(`Failed to reset node: ${error.message}`);
+        throw error; // Rethrow the error after logging
+    }
+        const data = await response.json();
+        
+        // Check if the response contains an error
+        if (data.error) {
+            const msg = `RPC Error: ${data.error.message}`
+            console.error(msg);
+            throw new Error(msg);
+        } else {
+            console.log('Node reset successfully.');
+        }
+    
+}
+
   private async checkContainerExists(): Promise<boolean> {
     try {
       const container = this.docker.getContainer(this.containerName);
@@ -88,7 +125,7 @@ export class LocalHardhatNode {
     console.log(`Container ${this.containerName} created with ports ${this.containerPort}:${this.containerPort}.`);
   }
 
-  public async waitForContainerToBeReady(maxAttempts = 8, interval = 3000) {
+  public async waitForNodeToBeReady(maxAttempts = 8, interval = 3000) {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const blockNumber = await this.getBlockNumber();
