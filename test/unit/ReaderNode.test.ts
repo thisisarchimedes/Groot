@@ -14,6 +14,7 @@ describe('Check that we work with local Hardhat node correctly', function() {
 
   before(async function() {
     localNode = new LocalHardhatNode(8545, 'archimedes-node:latest', 'archimedes-node-alchemy');
+    await localNode.stopNodeContainer();
     await localNode.startNodeContainer();
     await localNode.waitForNodeToBeReady();
   });

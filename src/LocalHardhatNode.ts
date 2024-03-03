@@ -61,39 +61,46 @@ export class LocalHardhatNode {
     }
   }
 
-  public async resetNode(externalProviderRpcUrl: string) {
-    let response: Response;
+  public async resetNode(externalProviderRpcUrl: string): Promise<void> {
     try {
-      response = await fetch(this.localRpcUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          method: 'hardhat_reset',
-          params: [{
-            forking: {
-              jsonRpcUrl: externalProviderRpcUrl,
-            },
-          }],
-          id: 1,
-        }),
-      });
+      const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
+      this.handleResetResponse(responseData);
     } catch (error) {
-      console.error(`Failed to reset node: ${error.message}`);
-      throw error;
+      this.logAndThrowResetError(error);
     }
-    const data = await response.json();
+  }
 
-    // Check if the response contains an error
+  private async performResetRpcCall(externalProviderRpcUrl: string): Promise<any> {
+    const response = await fetch(this.localRpcUrl, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: 'hardhat_reset',
+        params: [{forking: {jsonRpcUrl: externalProviderRpcUrl}}],
+        id: 1,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  private handleResetResponse(data: any): void {
     if (data.error) {
       const msg = `RPC Error: ${data.error.message}`;
-      console.error(msg);
       throw new LocalHardhatNodeResetError(msg);
-    } else {
-      console.log('Node reset successfully.');
     }
+
+    console.log('Node reset successfully.');
+  }
+
+  private logAndThrowResetError(error: Error): never {
+    console.error(`Failed to reset node: ${error.message}`);
+    throw error instanceof LocalHardhatNodeResetError ? error : new LocalHardhatNodeResetError(error.message);
   }
 
   private async checkContainerExists(): Promise<boolean> {
