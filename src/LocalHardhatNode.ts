@@ -32,11 +32,11 @@ export class LocalHardhatNode {
   }
 
   public async callViewFunction(
-    contractAddress: string, 
-    abi: any[], 
-    functionName: string,
-    params: any[] = []
-    ): Promise<any> {
+      contractAddress: string,
+      abi: any[],
+      functionName: string,
+      params: any[] = [],
+  ): Promise<any> {
     const contract = new this.web3.eth.Contract(abi, contractAddress);
 
     try {

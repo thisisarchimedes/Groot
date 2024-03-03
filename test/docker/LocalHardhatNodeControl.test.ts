@@ -50,8 +50,10 @@ describe('Check that we work with local Hardhat node correctly', function() {
   }
 
   it('Should be able to invoke aribtrary view on-chain method', async function() {
-    const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
+    // eslint-disable-next-line max-len
     const abi = [{'inputs': [], 'name': 'decimals', 'outputs': [{'internalType': 'uint8', 'name': '', 'type': 'uint8'}], 'stateMutability': 'view', 'type': 'function'}];
+    const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
+
     const res = Number(await localNode.callViewFunction(usdcContractAddress, abi, 'decimals'));
 
     expect(res).to.be.equal(6);
