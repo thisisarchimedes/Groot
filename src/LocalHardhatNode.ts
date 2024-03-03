@@ -51,7 +51,6 @@ export class LocalHardhatNode {
     }
   }
 
-
   private async checkContainerExists(): Promise<boolean> {
     try {
       const container = this.docker.getContainer(this.containerName);
