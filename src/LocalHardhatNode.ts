@@ -30,6 +30,28 @@ export class LocalHardhatNode {
     }
   }
 
+  public async stopContainer() {
+    try {
+      const container = this.docker.getContainer(this.containerName);
+      const containerInfo = await container.inspect();
+
+      if (containerInfo.State.Running) {
+        console.log(`Stopping container ${this.containerName}...`);
+        await container.stop();
+        console.log(`Container ${this.containerName} has been stopped.`);
+      } else {
+        console.log(`Container ${this.containerName} is not running.`);
+      }
+    } catch (error) {
+      if (error.statusCode === 404) {
+        console.log(`Container ${this.containerName} does not exist.`);
+      } else {
+        console.error(`Error stopping container ${this.containerName}:`, error);
+      }
+    }
+  }
+
+
   private async checkContainerExists(): Promise<boolean> {
     try {
       const container = this.docker.getContainer(this.containerName);
