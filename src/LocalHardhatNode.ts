@@ -31,6 +31,16 @@ export class LocalHardhatNode {
     return this.web3.eth.getBlockNumber();
   }
 
+  public async resetNode(externalProviderRpcUrl: string): Promise<void> {
+    try {
+      const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
+      this.handleResetResponse(responseData);
+    } catch (error) {
+      console.error(`Failed to reset node: ${error.message}`);
+      throw error instanceof LocalHardhatNodeResetError ? error : new LocalHardhatNodeResetError(error.message);
+    }
+  }
+
   public async startNodeContainer() {
     const containerExists = await this.checkContainerExists();
     if (containerExists) {
@@ -60,16 +70,6 @@ export class LocalHardhatNode {
       }
     }
   }
-
-  public async resetNode(externalProviderRpcUrl: string): Promise<void> {
-    try {
-      const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
-      this.handleResetResponse(responseData);
-    } catch (error) {
-      this.logAndThrowResetError(error);
-    }
-  }
-
   private async performResetRpcCall(externalProviderRpcUrl: string): Promise<any> {
     const response = await fetch(this.localRpcUrl, {
       method: 'POST',
@@ -96,11 +96,6 @@ export class LocalHardhatNode {
     }
 
     console.log('Node reset successfully.');
-  }
-
-  private logAndThrowResetError(error: Error): never {
-    console.error(`Failed to reset node: ${error.message}`);
-    throw error instanceof LocalHardhatNodeResetError ? error : new LocalHardhatNodeResetError(error.message);
   }
 
   private async checkContainerExists(): Promise<boolean> {
