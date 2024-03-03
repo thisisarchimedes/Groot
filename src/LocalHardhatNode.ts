@@ -30,7 +30,7 @@ export class LocalHardhatNode {
     }
   }
 
-  public async stopContainer() {
+  public async stopNodeContainer() {
     try {
       const container = this.docker.getContainer(this.containerName);
       const containerInfo = await container.inspect();
