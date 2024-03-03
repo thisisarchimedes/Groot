@@ -142,7 +142,7 @@ export class LocalHardhatNode {
         console.log(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
       } catch (error) {
-        console.log(`Waiting for blockchain to be ready... Attempt ${attempt}/${maxAttempts}`);
+        console.log(`Waiting for blockchain to be ready... Attempt ${attempt}/${maxAttempts} - ${error.message}`);
         await new Promise((resolve) => setTimeout(resolve, interval));
       }
     }
