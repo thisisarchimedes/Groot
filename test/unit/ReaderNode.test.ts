@@ -27,18 +27,10 @@ describe('Check that we work with local Hardhat node correctly', function () {
         this.timeout(120000);
 
         try {
-            // Attempt to reset the node, expecting an error
             await localNode.resetNode('invalidRPCUrl');
-            
-            // If the above line does not throw, force the test to fail
             expect.fail('Expected resetNode to throw an error');
         } catch (error) {
-            console.log(error.message);
-            // Assert that the error message is as expected
             expect(error.message).to.include('RPC Error');
         }
-        //await expect (localNode.resetNode('http://localhost:1234')).to.be.rejected;
-        //await localNode.waitForNodeToBeReady();
-        //await expect(localNode.getBlockNumber()).to.be.rejected;
     });
 });
