@@ -31,6 +31,23 @@ export class LocalHardhatNode {
     return this.web3.eth.getBlockNumber();
   }
 
+  public async callViewFunction(
+    contractAddress: string, 
+    abi: any[], 
+    functionName: string,
+    params: any[] = []
+    ): Promise<any> {
+    const contract = new this.web3.eth.Contract(abi, contractAddress);
+
+    try {
+      const data = await contract.methods[functionName](...params).call();
+      return data;
+    } catch (error) {
+      console.error(`Error calling view function ${functionName}:`, error);
+      throw error;
+    }
+  }
+
   public async resetNode(externalProviderRpcUrl: string): Promise<void> {
     try {
       const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
