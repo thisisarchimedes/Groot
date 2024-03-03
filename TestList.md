@@ -28,3 +28,7 @@
 ## Rules Engine
 
 **Refactor**
+
+# Architecture
+
+- Run strategy and return tx - don't immediately broadcast. Have all tx and order them by priority, then broadcast
