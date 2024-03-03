@@ -1,6 +1,16 @@
 import Web3 from 'web3';
 import Docker from 'dockerode';
 
+export class LocalHardhatNodeResetError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'LocalHardhatNodeResetError';
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, LocalHardhatNodeResetError);
+    }
+  }
+}
+
 export class LocalHardhatNode {
   private readonly web3: Web3;
   private readonly docker: Docker = new Docker({socketPath: '/var/run/docker.sock'});
@@ -54,39 +64,37 @@ export class LocalHardhatNode {
   public async resetNode(externalProviderRpcUrl: string) {
     let response: Response;
     try {
-         response = await fetch(this.localRpcUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+      response = await fetch(this.localRpcUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'hardhat_reset',
+          params: [{
+            forking: {
+              jsonRpcUrl: externalProviderRpcUrl,
             },
-            body: JSON.stringify({
-                jsonrpc: '2.0',
-                method: 'hardhat_reset',
-                params: [{
-                    forking: {
-                        jsonRpcUrl: externalProviderRpcUrl,
-                    },
-                }],
-                id: 1,
-            }),
-        });
-
+          }],
+          id: 1,
+        }),
+      });
     } catch (error) {
-        console.error(`Failed to reset node: ${error.message}`);
-        throw error; // Rethrow the error after logging
+      console.error(`Failed to reset node: ${error.message}`);
+      throw error;
     }
-        const data = await response.json();
-        
-        // Check if the response contains an error
-        if (data.error) {
-            const msg = `RPC Error: ${data.error.message}`
-            console.error(msg);
-            throw new Error(msg);
-        } else {
-            console.log('Node reset successfully.');
-        }
-    
-}
+    const data = await response.json();
+
+    // Check if the response contains an error
+    if (data.error) {
+      const msg = `RPC Error: ${data.error.message}`;
+      console.error(msg);
+      throw new LocalHardhatNodeResetError(msg);
+    } else {
+      console.log('Node reset successfully.');
+    }
+  }
 
   private async checkContainerExists(): Promise<boolean> {
     try {
