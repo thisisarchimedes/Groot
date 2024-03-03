@@ -1,96 +1,83 @@
-import { Web3 } from 'web3';
+import Web3 from 'web3';
 import Docker from 'dockerode';
 
 export class LocalHardhatNode {
-    private web3: Web3;
-    private rpcUrl: string;
+    private readonly web3: Web3;
+    private readonly docker: Docker = new Docker({ socketPath: '/var/run/docker.sock' });
+    private readonly rpcUrl: string;
+    private readonly containerPort: number;
+    private readonly imageName: string;
+    private readonly containerName: string;
 
-    constructor(rpc_url: string) {
-        this.rpcUrl = rpc_url;
-        this.web3 = new Web3(rpc_url);
+    constructor(port: number, imageName: string, containerName: string) {
+        this.rpcUrl = `http://127.0.0.1:${port}`;
+        this.web3 = new Web3(this.rpcUrl);
+        this.containerPort = port;
+        this.imageName = imageName;
+        this.containerName = containerName;
     }
 
     public async getBlockNumber(): Promise<bigint> {
-        let blockNumber: Promise<bigint>;
-        
-        blockNumber = this.web3.eth.getBlockNumber();
-        
-        return blockNumber;
+        return this.web3.eth.getBlockNumber();
     }
 
-    public async launchNodeContainer(hostPort = 8545, containerPort = 8545) {
-        const imageName = 'archimedes-node:latest';
-        const containerName = 'archimedes-node-alchemy';
-        const docker = new Docker({socketPath: '/var/run/docker.sock'});
-
-        let container: Docker.Container;
-        try {
-            // Attempt to get the container if it already exists
-            container = docker.getContainer(containerName);
-            const containerInfo = await container.inspect();
-            
-            // If the container exists but is not running, start it
-            if (!containerInfo.State.Running) {
-                console.log(`Starting existing container ${containerName}...`);
-                await container.start();
-                console.log(`Container ${containerName} started successfully.`);
-            } else {
-                console.log(`Container ${containerName} is already running.`);
-            }
-        } catch (error) {
-            // If the container does not exist, create and start a new one
-            if (error.statusCode === 404) {
-                console.log(`Container ${containerName} does not exist. Creating a new one...`);
-                try {
-                    container = await docker.createContainer({
-                        Image: imageName,
-                        name: containerName,
-                        ExposedPorts: {
-                            [`${containerPort}/tcp`]: {}
-                        },
-                        HostConfig: {
-                            PortBindings: {
-                                [`${containerPort}/tcp`]: [{ HostPort: `${hostPort.toString()}` }]
-                            }
-                        },
-                    });
-    
-                    await container.start();
-                    console.log(`Container ${containerName} created and started successfully with port mapping ${hostPort}:${containerPort}`);
-                } catch (creationError) {
-                    console.error('Error creating and starting new container:', creationError);
-                }
-            } else {
-                // Handle other errors
-                console.error('Error checking for existing container:', error);
-            }
+    public async startNodeContainer() {
+        const containerExists = await this.checkContainerExists();
+        if (containerExists) {
+            await this.ensureContainerStarted();
+        } else {
+            await this.createAndStartContainer();
         }
     }
 
-    public async waitForContainerToBeReady(maxAttempts = 5, interval = 3000) {
-        let attempts = 0;
-    
-        const checkReady = async () => {
+    private async checkContainerExists(): Promise<boolean> {
+        try {
+            const container = this.docker.getContainer(this.containerName);
+            await container.inspect();
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    private async ensureContainerStarted() {
+        const container = this.docker.getContainer(this.containerName);
+        const info = await container.inspect();
+        if (!info.State.Running) {
+            console.log(`Starting existing container ${this.containerName}...`);
+            await container.start();
+            console.log(`Container ${this.containerName} started.`);
+        } else {
+            console.log(`Container ${this.containerName} is already running.`);
+        }
+    }
+
+    private async createAndStartContainer() {
+        console.log(`Creating container ${this.containerName}...`);
+        const container = await this.docker.createContainer({
+            Image: this.imageName,
+            name: this.containerName,
+            ExposedPorts: { [`${this.containerPort}/tcp`]: {} },
+            HostConfig: {
+                PortBindings: { [`${this.containerPort}/tcp`]: [{ HostPort: `${this.containerPort.toString()}` }] }
+            },
+        });
+
+        await container.start();
+        console.log(`Container ${this.containerName} created and started with port mapping ${this.containerPort}:${this.containerPort}.`);
+    }
+
+    public async waitForContainerToBeReady(maxAttempts = 8, interval = 3000) {
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
-                // Attempt to get the current block number
                 const blockNumber = await this.getBlockNumber();
                 console.log(`Blockchain is ready. Current block number is ${blockNumber}.`);
-                return true; // If successful, the container is ready
+                return;
             } catch (error) {
-                console.log(`Waiting for blockchain to be ready... Attempt ${attempts + 1}/${maxAttempts}`);
-                attempts++;
-                if (attempts < maxAttempts) {
-                    // If we have not exceeded max attempts, wait and try again
-                    await new Promise(resolve => setTimeout(resolve, interval));
-                    return checkReady();
-                } else {
-                    // Max attempts reached, throw an error
-                    throw new Error('Blockchain node is not ready after maximum attempts.');
-                }
+                console.log(`Waiting for blockchain to be ready... Attempt ${attempt}/${maxAttempts}`);
+                await new Promise(resolve => setTimeout(resolve, interval));
             }
-        };
-    
-        await checkReady();
+        }
+        throw new Error('Blockchain node is not ready after maximum attempts.');
     }
-    
 }

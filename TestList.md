@@ -9,3 +9,8 @@
 [] Can facilitate read call, decide which node to use
 [] Can handle node failuire, and switch to another node, kill the old one and spin a new backup node
 [] Can handle all nodes failing, and report error and spin new nodes
+
+
+# Refactor
+
+[] Change console.log to log.debug
