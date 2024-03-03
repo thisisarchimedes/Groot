@@ -23,7 +23,7 @@ export class LocalHardhatNode {
         const containerName = 'archimedes-node-alchemy';
         const docker = new Docker({socketPath: '/var/run/docker.sock'});
 
-        let container;
+        let container: Docker.Container;
         try {
             // Attempt to get the container if it already exists
             container = docker.getContainer(containerName);
