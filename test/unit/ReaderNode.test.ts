@@ -32,4 +32,21 @@ describe('Check that we work with local Hardhat node correctly', function() {
       expect(error).to.be.instanceOf(LocalHardhatNodeResetError);
     }
   });
+
+  it('Should be able to reset node and point it to valid RPC', async function() {
+    
+    const alchemyRpcUrl: string = 'https://eth-mainnet.g.alchemy.com/v2/' + process.env.API_KEY_ALCHEMY;
+    await resetAndVerify(alchemyRpcUrl);
+
+    const infuraRpcUrl: string = 'https://mainnet.infura.io/v3/' + process.env.API_KEY_INFURA;
+    await resetAndVerify(infuraRpcUrl);
+  });
+
+  async function resetAndVerify(rpcUrl: string) {
+    await localNode.resetNode(rpcUrl);
+    await localNode.waitForNodeToBeReady();
+
+    const blockNumber = await localNode.getBlockNumber();
+    expect(blockNumber > 1934000n).to.be.true;
+  }
 });
