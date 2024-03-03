@@ -15,14 +15,21 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "test": "mocha --import=tsx test/**/*.test.ts"
+    "test": "mocha --import=tsx test/**/*.test.ts",
+    "lint": "eslint --ext .ts,.tsx -c .eslintrc.cjs ."
   },
   "dependencies": {
     "@types/chai-as-promised": "^7.1.8",
     "@types/dockerode": "^3.3.24",
     "@types/mocha": "^10.0.0",
     "@types/node": "^20.11.24",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
     "dockerode": "^4.0.2",
+    "eslint": "^8.57.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-mocha": "^10.3.0",
+    "eslint-plugin-promise": "^6.1.1",
     "ethers": "^6.11.1",
     "tsx": "^3.11.0",
     "web3": "^4.5.0"
