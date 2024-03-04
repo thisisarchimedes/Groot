@@ -11,6 +11,7 @@ export class LocalNodeError extends Error {
   }
 }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export class LocalNodeHardhat {
   private readonly web3: Web3;
   private readonly dockerOperator: DockerOperator;
@@ -119,3 +120,4 @@ export class LocalNodeHardhat {
     console.log('Node reset successfully.');
   }
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
