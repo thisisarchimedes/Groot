@@ -1,4 +1,4 @@
-import Web3 from 'web3';
+import Web3, {AbiItem} from 'web3';
 import {DockerOperator} from './DockerOperator';
 
 export class LocalNodeError extends Error {
@@ -56,14 +56,13 @@ export class LocalNodeHardhat {
     await this.waitForNodeToBeReady();
   }
 
-
   public getBlockNumber(): Promise<bigint> {
     return this.web3.eth.getBlockNumber();
   }
 
   public async callViewFunction(
       contractAddress: string,
-      abi: any[],
+      abi: AbiItem[],
       functionName: string,
       params: any[] = [],
   ): Promise<any> {
