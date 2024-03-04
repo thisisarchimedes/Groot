@@ -24,33 +24,18 @@ export class DockerOperator {
   public async startContainer() {
     const containerExists = await this.checkContainerExists();
     if (containerExists) {
-        const needsPortUpdate = await this.checkPortBindings();
-        if (needsPortUpdate) {
-            console.log(`Port bindings have changed. Updating container ${this.instanceName}...`);
-            await this.removeContainer();
-            await this.createAndStartContainer();
-        } else {
-            await this.ensureContainerStarted();
-        }
-    } else {
+      const needsPortUpdate = await this.checkPortBindings();
+      if (needsPortUpdate) {
+        console.log(`Port bindings have changed. Updating container ${this.instanceName}...`);
+        await this.removeContainer();
         await this.createAndStartContainer();
+      } else {
+        await this.ensureContainerStarted();
+      }
+    } else {
+      await this.createAndStartContainer();
     }
-}
-
-private async checkPortBindings(): Promise<boolean> {
-    const container = this.docker.getContainer(this.instanceName);
-    const info = await container.inspect();
-    const internalPortTcp = `${this.portInternal}/tcp`;
-    const externalPortBinding = info.HostConfig.PortBindings?.[internalPortTcp]?.[0]?.HostPort;
-    return externalPortBinding !== this.portExternal.toString();
-}
-
-private async removeContainer() {
-    const container = this.docker.getContainer(this.instanceName);
-    await container.stop();
-    await container.remove();
-}
-
+  }
 
   public async stopContainer() {
     try {
@@ -59,7 +44,7 @@ private async removeContainer() {
 
       if (containerInfo.State.Running) {
         console.log(`Stopping container ${this.instanceName}...`);
-        await container.stop();
+        await this.removeContainer();
         console.log(`Container ${this.instanceName} has been stopped.`);
       } else {
         console.log(`Container ${this.instanceName} is not running.`);
@@ -72,7 +57,7 @@ private async removeContainer() {
       }
     }
   }
-  
+
   private async checkContainerExists(): Promise<boolean> {
     try {
       const container = this.docker.getContainer(this.instanceName);
@@ -83,12 +68,24 @@ private async removeContainer() {
     }
   }
 
-  private async ensureContainerStarted() {
-    console.log('0 - ensureContainerStarted');
+  private async checkPortBindings(): Promise<boolean> {
     const container = this.docker.getContainer(this.instanceName);
-    console.log('1 - ensureContainerStarted');
     const info = await container.inspect();
-    console.log('2 - ensureContainerStarted');
+    const internalPortTcp = `${this.portInternal}/tcp`;
+    const externalPortBinding = info.HostConfig.PortBindings?.[internalPortTcp]?.[0]?.HostPort;
+    return externalPortBinding !== this.portExternal.toString();
+  }
+
+  private async removeContainer() {
+    const container = this.docker.getContainer(this.instanceName);
+    await container.stop();
+    await container.remove();
+  }
+
+  private async ensureContainerStarted() {
+    const container = this.docker.getContainer(this.instanceName);
+    const info = await container.inspect();
+
     if (!info.State.Running) {
       console.log(`Starting existing container ${this.instanceName}...`);
       await container.start();
@@ -105,14 +102,13 @@ private async removeContainer() {
     const container = await this.docker.createContainer({
       Image: this.imageName,
       name: this.instanceName,
-      ExposedPorts: { [`${this.portInternal}/tcp`]: {} }, // Expose the internal port of the container
+      ExposedPorts: {[`${this.portInternal}/tcp`]: {}}, // Expose the internal port of the container
       HostConfig: {
-        PortBindings: { [`${this.portInternal}/tcp`]: [{ HostPort: `${this.portExternal.toString()}` }] }, // Map the internal port to an external port on the host
+        PortBindings: {[`${this.portInternal}/tcp`]: [{HostPort: `${this.portExternal.toString()}`}]}, // Map the internal port to an external port on the host
       },
     });
-  
+
     await container.start();
     console.log(`Container ${this.instanceName} created with ports ${this.portExternal}:${this.portInternal}.`);
   }
-  
 }
