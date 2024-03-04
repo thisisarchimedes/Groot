@@ -1,17 +1,17 @@
-import { LocalNodeHardhat } from '../../src/blockchain_reader/LocalNodeHardhat';
+import {LocalNodeHardhat} from '../../src/blockchain_reader/LocalNodeHardhat';
 
 import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 chai.use(chaiAsPromised);
 
-const { expect } = chai;
+const {expect} = chai;
 
-describe('Check that we able to launch and stop docker containers', function () {
+describe('Check that we able to launch and stop docker containers', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
-  it('should spin a new docker and read current block number directly from node', async function () {
+  it('should spin a new docker and read current block number directly from node', async function() {
     const localNode = new LocalNodeHardhat(8545, 'archimedes-node');
 
     await localNode.startNode();
