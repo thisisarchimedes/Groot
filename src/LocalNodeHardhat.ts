@@ -1,5 +1,4 @@
 import Web3 from 'web3';
-import Docker from 'dockerode';
 import {DockerOperator} from './DockerOperator';
 
 export class LocalNodeError extends Error {

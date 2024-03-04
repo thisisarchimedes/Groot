@@ -10,6 +10,7 @@ chai.use(chaiAsPromised);
 const {expect} = chai;
 
 describe('Check that we work with local Hardhat node correctly', function() {
+  // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
   let localNode: LocalNodeHardhat;

@@ -8,6 +8,7 @@ chai.use(chaiAsPromised);
 const {expect} = chai;
 
 describe('Check that we able to launch and stop docker containers', function() {
+  // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
   it('should fail connecting to RPC', async function() {

@@ -102,9 +102,9 @@ export class DockerOperator {
     const container = await this.docker.createContainer({
       Image: this.imageName,
       name: this.instanceName,
-      ExposedPorts: {[`${this.portInternal}/tcp`]: {}}, // Expose the internal port of the container
+      ExposedPorts: {[`${this.portInternal}/tcp`]: {}},
       HostConfig: {
-        PortBindings: {[`${this.portInternal}/tcp`]: [{HostPort: `${this.portExternal.toString()}`}]}, // Map the internal port to an external port on the host
+        PortBindings: {[`${this.portInternal}/tcp`]: [{HostPort: `${this.portExternal.toString()}`}]},
       },
     });
 
