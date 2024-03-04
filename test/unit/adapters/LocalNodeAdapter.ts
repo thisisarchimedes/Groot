@@ -1,7 +1,7 @@
 import {AbiItem} from 'web3';
 import {LocalNode} from '../../../src/blockchain_reader/LocalNode';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 export class LocalNodeAdapter implements LocalNode {
   private currentBlockNumber: bigint = BigInt(0);
 
@@ -18,10 +18,12 @@ export class LocalNodeAdapter implements LocalNode {
 
   }
 
+  // eslint-disable-next-line require-await
   public async getBlockNumber(): Promise<bigint> {
     return BigInt(this.currentBlockNumber);
   }
 
+  // eslint-disable-next-line require-await
   public async callViewFunction(
       contractAddress: string,
       abi: AbiItem[],
@@ -35,4 +37,4 @@ export class LocalNodeAdapter implements LocalNode {
     this.currentBlockNumber = BigInt(blockNumber);
   }
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
+/* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */

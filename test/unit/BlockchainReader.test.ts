@@ -2,8 +2,8 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
-import { LocalNodeAdapter } from './adapters/LocalNodeAdapter';
-import { BlockchainReader } from '../../src/blockchain_reader/BlockchainReader';
+import {LocalNodeAdapter} from './adapters/LocalNodeAdapter';
+import {BlockchainReader} from '../../src/blockchain_reader/BlockchainReader';
 
 dotenv.config();
 chai.use(chaiAsPromised);

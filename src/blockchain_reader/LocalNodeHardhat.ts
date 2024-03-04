@@ -77,7 +77,7 @@ export class LocalNodeHardhat implements LocalNode {
         console.log(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
       } catch (error) {
-        console.log(`Waiting for blockchain to be ready... Attempt ${attempt}/${maxAttempts} - ${(error as Error).message}`);
+        console.log(`Waiting for blockchain... Attempt ${attempt}/${maxAttempts} - ${(error as Error).message}`);
         await new Promise((resolve) => setTimeout(resolve, interval));
       }
     }
