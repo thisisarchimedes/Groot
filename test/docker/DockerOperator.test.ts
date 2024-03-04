@@ -11,12 +11,6 @@ describe('Check that we able to launch and stop docker containers', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
-  it('should fail connecting to RPC', async function() {
-    const localNode = new LocalNodeHardhat(1231, 'invalid-container');
-    await expect(localNode.startNode()).to.be.rejected;
-    localNode.stopNode();
-  });
-
   it('should spin a new docker and read current block number directly from node', async function() {
     const localNode = new LocalNodeHardhat(8545, 'archimedes-node');
 

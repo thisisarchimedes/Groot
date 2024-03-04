@@ -21,6 +21,7 @@ export class LocalNodeHardhat {
   private readonly nodeName: string;
 
   private readonly DEFAULT_HARDHAT_NODE_PORT = 8545;
+  private readonly DEFAULT_HARDHAT_DOCKER_IMAGE_NAME = 'arch-production-node:latest';
 
   constructor(externalPort: number, nodeName: string) {
     this.localRpcUrl = `http://127.0.0.1:${externalPort}`;
@@ -31,7 +32,7 @@ export class LocalNodeHardhat {
     this.dockerOperator = new DockerOperator({
       portExternal: externalPort,
       portInternal: this.DEFAULT_HARDHAT_NODE_PORT,
-      imageName: 'archimedes-node',
+      imageName: this.DEFAULT_HARDHAT_DOCKER_IMAGE_NAME,
       instanceName: nodeName,
     });
   }
