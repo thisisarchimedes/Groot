@@ -1,4 +1,5 @@
 import Docker from 'dockerode';
+import { Logger } from '../service/Logger';
 
 export interface DockerConfig {
   portExternal: number;
@@ -26,7 +27,7 @@ export class DockerOperator {
     if (containerExists) {
       const needsPortUpdate = await this.checkPortBindings();
       if (needsPortUpdate) {
-        console.log(`Port bindings have changed. Updating container ${this.instanceName}...`);
+        Logger.debug(`Port bindings have changed. Updating container ${this.instanceName}...`);
         await this.removeContainer();
         await this.createAndStartContainer();
       } else {
@@ -43,17 +44,17 @@ export class DockerOperator {
       const containerInfo = await container.inspect();
 
       if (containerInfo.State.Running) {
-        console.log(`Stopping container ${this.instanceName}...`);
+        Logger.debug(`Stopping container ${this.instanceName}...`);
         await this.removeContainer();
-        console.log(`Container ${this.instanceName} has been stopped.`);
+        Logger.debug(`Container ${this.instanceName} has been stopped.`);
       } else {
-        console.log(`Container ${this.instanceName} is not running.`);
+        Logger.debug(`Container ${this.instanceName} is not running.`);
       }
     } catch (error) {
-      if (error.statusCode === 404) {
-        console.log(`Container ${this.instanceName} does not exist.`);
+      if ((error as any).statusCode === 404) {
+        Logger.debug(`Container ${this.instanceName} does not exist.`);
       } else {
-        console.error(`Error stopping container ${this.instanceName}:`, error);
+        Logger.error(`Error stopping container ${this.instanceName}:`, error);
       }
     }
   }
@@ -87,18 +88,18 @@ export class DockerOperator {
     const info = await container.inspect();
 
     if (!info.State.Running) {
-      console.log(`Starting existing container ${this.instanceName}...`);
+      Logger.debug(`Starting existing container ${this.instanceName}...`);
       await container.start();
-      console.log(`Container ${this.instanceName} started.`);
+      Logger.debug(`Container ${this.instanceName} started.`);
     } else {
-      console.log(`Container ${this.instanceName} is already running.`);
+      Logger.debug(`Container ${this.instanceName} is already running.`);
     }
   }
 
   private async createAndStartContainer() {
-    console.log(`External Port: ${this.portExternal}, Internal Port: ${this.portInternal}`);
+    Logger.debug(`External Port: ${this.portExternal}, Internal Port: ${this.portInternal}`);
 
-    console.log(`Creating container ${this.instanceName}...`);
+    Logger.debug(`Creating container ${this.instanceName}...`);
     const container = await this.docker.createContainer({
       Image: this.imageName,
       name: this.instanceName,
@@ -109,6 +110,6 @@ export class DockerOperator {
     });
 
     await container.start();
-    console.log(`Container ${this.instanceName} created with ports ${this.portExternal}:${this.portInternal}.`);
+    Logger.debug(`Container ${this.instanceName} created with ports ${this.portExternal}:${this.portInternal}.`);
   }
 }

@@ -1,6 +1,7 @@
 import Web3, {AbiItem} from 'web3';
 import {DockerOperator} from './DockerOperator';
 import {LocalNode, LocalNodeError} from './LocalNode';
+import { Logger } from '../service/Logger';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export class LocalNodeHardhat implements LocalNode {
@@ -42,7 +43,7 @@ export class LocalNodeHardhat implements LocalNode {
       const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
       this.handleResetResponse(responseData);
     } catch (error) {
-      console.error(`Failed to reset node: ${(error as Error).message}`);
+      Logger.error(`Failed to reset node: ${(error as Error).message}`);
       throw error instanceof LocalNodeError ? error : new LocalNodeError((error as Error).message);
     }
 
@@ -65,7 +66,7 @@ export class LocalNodeHardhat implements LocalNode {
       const data = await contract.methods[functionName](...params).call();
       return data;
     } catch (error) {
-      console.error(`Error calling view function ${functionName}:`, error);
+      Logger.error(`Error calling view function ${functionName}: ${error}`);
       throw error;
     }
   }
@@ -74,10 +75,10 @@ export class LocalNodeHardhat implements LocalNode {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const blockNumber = await this.getBlockNumber();
-        console.log(`Blockchain is ready. Current block number is ${blockNumber}.`);
+        Logger.debug(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
       } catch (error) {
-        console.log(`Waiting for blockchain... Attempt ${attempt}/${maxAttempts} - ${(error as Error).message}`);
+        Logger.debug(`Waiting for blockchain... Attempt ${attempt}/${maxAttempts} - ${(error as Error).message}`);
         await new Promise((resolve) => setTimeout(resolve, interval));
       }
     }
@@ -109,7 +110,7 @@ export class LocalNodeHardhat implements LocalNode {
       throw new LocalNodeError(msg);
     }
 
-    console.log('Node reset successfully.');
+    Logger.debug('Node reset successfully.');
   }
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
