@@ -12,6 +12,7 @@ export class BlockchainReader {
     return Number(blockNumbers.reduce((max, current) => (current > max ? current : max), BigInt(0)));
   }
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   public async callViewFunction(
       contractAddress: string,
       abi: any[],
@@ -29,4 +30,5 @@ export class BlockchainReader {
 
     return responses[highestBlockNumberIndex];
   }
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 }

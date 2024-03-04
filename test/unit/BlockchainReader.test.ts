@@ -1,13 +1,10 @@
 import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import * as dotenv from 'dotenv';
 
 import {LocalNodeAdapter} from './adapters/LocalNodeAdapter';
 import {BlockchainReader} from '../../src/blockchain_reader/BlockchainReader';
 
-dotenv.config();
 chai.use(chaiAsPromised);
-
 const {expect} = chai;
 
 describe('Check that blockchain reader works with multiple underlying nodes', function() {
@@ -48,10 +45,24 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
 
     const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
 
-    const abi = [{'inputs': [], 'name': 'decimals', 'outputs': [{'internalType': 'uint8', 'name': '', 'type': 'uint8'}], 'stateMutability': 'view', 'type': 'function'}];
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
-    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals'));
+    const abi = [
+      {
+        'inputs': [],
+        'name': 'decimals',
+        'outputs': [
+          {
+            'internalType': 'uint8',
+            'name': '',
+            'type': 'uint8',
+          },
+        ],
+        'stateMutability': 'view',
+        'type': 'function',
+      },
+    ];
 
+    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals'));
     expect(res).to.be.eq(2);
   });
 });
