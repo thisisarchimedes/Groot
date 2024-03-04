@@ -2,7 +2,8 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
-import {LocalNodeHardhat, LocalNodeError} from '../../src/blockchain_reader/LocalNodeHardhat';
+import {LocalNodeHardhat} from '../../src/blockchain_reader/LocalNodeHardhat';
+import { LocalNodeError } from '../../src/blockchain_reader/LocalNode';
 
 dotenv.config();
 chai.use(chaiAsPromised);

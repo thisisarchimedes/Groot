@@ -1,18 +1,9 @@
 import Web3, {AbiItem} from 'web3';
 import {DockerOperator} from './DockerOperator';
-
-export class LocalNodeError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'LocalNodeError';
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, LocalNodeError);
-    }
-  }
-}
+import {LocalNode, LocalNodeError} from './LocalNode';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export class LocalNodeHardhat {
+export class LocalNodeHardhat implements LocalNode {
   private readonly web3: Web3;
   private readonly dockerOperator: DockerOperator;
 
@@ -37,12 +28,12 @@ export class LocalNodeHardhat {
     });
   }
 
-  public async startNode() {
+  public async startNode(): Promise<void> {
     await this.dockerOperator.startContainer();
     await this.waitForNodeToBeReady();
   }
 
-  public async stopNode() {
+  public async stopNode(): Promise<void> {
     await this.dockerOperator.stopContainer();
   }
 
@@ -51,8 +42,8 @@ export class LocalNodeHardhat {
       const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
       this.handleResetResponse(responseData);
     } catch (error) {
-      console.error(`Failed to reset node: ${error.message}`);
-      throw error instanceof LocalNodeError ? error : new LocalNodeError(error.message);
+      console.error(`Failed to reset node: ${(error as Error).message}`);
+      throw error instanceof LocalNodeError ? error : new LocalNodeError((error as Error).message);
     }
 
     await this.waitForNodeToBeReady();
@@ -79,14 +70,14 @@ export class LocalNodeHardhat {
     }
   }
 
-  private async waitForNodeToBeReady(maxAttempts = 8, interval = 3000) {
+  private async waitForNodeToBeReady(maxAttempts: number = 8, interval: number = 3000): Promise<void> {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const blockNumber = await this.getBlockNumber();
         console.log(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
       } catch (error) {
-        console.log(`Waiting for blockchain to be ready... Attempt ${attempt}/${maxAttempts} - ${error.message}`);
+        console.log(`Waiting for blockchain to be ready... Attempt ${attempt}/${maxAttempts} - ${(error as Error).message}`);
         await new Promise((resolve) => setTimeout(resolve, interval));
       }
     }
