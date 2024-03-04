@@ -19,6 +19,7 @@
     "lint": "eslint --ext .ts,.tsx -c .eslintrc.cjs ."
   },
   "dependencies": {
+    "@dotenvx/dotenvx": "^0.24.0",
     "@types/chai-as-promised": "^7.1.8",
     "@types/dockerode": "^3.3.24",
     "@types/mocha": "^10.0.0",
@@ -32,6 +33,7 @@
     "eslint-plugin-mocha": "^10.3.0",
     "eslint-plugin-promise": "^6.1.1",
     "ethers": "^6.11.1",
+    "nyc": "^15.1.0",
     "tsx": "^3.11.0",
     "web3": "^4.5.0"
   }

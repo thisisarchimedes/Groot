@@ -1,3 +1,72 @@
+name: Commit Stage
 
-#lint
-#build
+on:
+  push:
+    branches-ignore:
+      - 'main' 
+
+env:
+  ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
+  DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
+
+
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+  API_DEVOPS_EVENT_CATCHER: ${{ vars.API_DEVOPS_EVENT_CATCHER }}
+  DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set env variables
+        run: |
+            echo "TEST_PASS=true" >> $GITHUB_ENV
+            echo "REPORT_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"  >> $GITHUB_ENV
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dotenvx
+        run: | 
+          curl -fsS https://dotenvx.sh/ | sh
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Lint Code
+        run: yarn eslint src/**/*.ts --ext .js,.jsx,.ts,.tsx --ignore-pattern /devops/
+
+      - name: Build
+        run: yarn tsc
+
+      - name: Run Tests
+        run: |
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run --  yarn test
+          
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+
+      - name: Update TEST_PASS on failure
+        if: failure()
+        run: echo "TEST_PASS=false" >> $GITHUB_ENV
+
+      - name: 'Report DevOps Metrics'
+        if: always()
+        run: |
+          yarn add axios dotenv
+          node devops/metrics/src/cicd_script/report_devops_event.js ${{ github.repository }} push '{"pass": "${{ env.TEST_PASS }}", "commit_id": "${{ github.sha }}" ,"report_url": "${{ env.REPORT_URL }}"}'
