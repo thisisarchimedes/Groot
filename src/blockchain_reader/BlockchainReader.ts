@@ -11,4 +11,22 @@ export class BlockchainReader {
     const blockNumbers = await Promise.all(this.nodes.map((node) => node.getBlockNumber()));
     return Number(blockNumbers.reduce((max, current) => (current > max ? current : max), BigInt(0)));
   }
+
+  public async callViewFunction(
+      contractAddress: string,
+      abi: any[],
+      functionName: string,
+      params: any[] = [],
+  ): Promise<any> {
+    const functionCalls = this.nodes.map((node) => node.callViewFunction(contractAddress, abi, functionName, params));
+    const blockNumbers = this.nodes.map((node) => node.getBlockNumber());
+
+    const responses = await Promise.all(functionCalls);
+    const blocks = await Promise.all(blockNumbers);
+
+    const highestBlockNumberIndex = blocks.reduce((highestIndex, currentBlock, currentIndex, array) =>
+        currentBlock > array[highestIndex] ? currentIndex : highestIndex, 0);
+
+    return responses[highestBlockNumberIndex];
+  }
 }

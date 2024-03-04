@@ -6,8 +6,8 @@
 [X] Can kill a running container
 [X] Can reset node and get a newer block number
 [X] Can manage 2 nodes, get block number from both and return the latest
-[] Can facilitate read call, decide which node to use in case both response
-[] Can handle node failuire, and switch to another node, kill the old one and spin a new backup node
+[X] Can facilitate read call, decide which node to use in case both response
+[] Can handle 1/2 node failed, use another node, and recover failed one
 [] Can handle all nodes failing, and report error and spin new nodes
 
 **Refactor**

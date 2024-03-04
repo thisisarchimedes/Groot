@@ -4,6 +4,7 @@ import {LocalNode} from '../../../src/blockchain_reader/LocalNode';
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 export class LocalNodeAdapter implements LocalNode {
   private currentBlockNumber: bigint = BigInt(0);
+  private currentReadResponse: any = {};
 
 
   public async startNode(): Promise<void> {
@@ -30,11 +31,15 @@ export class LocalNodeAdapter implements LocalNode {
       functionName: string,
       params: any[],
   ): Promise<any> {
-    return Promise.resolve({});
+    return this.currentReadResponse;
   }
 
   public setBlockNumber(blockNumber: number): void {
     this.currentBlockNumber = BigInt(blockNumber);
+  }
+
+  public setReadResponse(response: any): void {
+    this.currentReadResponse = response;
   }
 }
 /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
