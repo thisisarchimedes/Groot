@@ -1,5 +1,5 @@
 import Docker from 'dockerode';
-import { Logger } from '../service/Logger';
+import {Logger} from '../service/Logger';
 
 export interface DockerConfig {
   portExternal: number;
@@ -54,7 +54,7 @@ export class DockerOperator {
       if ((error as any).statusCode === 404) {
         Logger.debug(`Container ${this.instanceName} does not exist.`);
       } else {
-        Logger.error(`Error stopping container ${this.instanceName}:`, error);
+        Logger.error(`Error stopping container ${this.instanceName} - Error: ${error}`);
       }
     }
   }

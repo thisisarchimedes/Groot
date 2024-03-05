@@ -1,8 +1,8 @@
 import {AbiItem} from 'web3';
-import {LocalNode} from '../../../src/blockchain_reader/LocalNode';
+import {BlockchainNode} from '../../../src/blockchain_nodes/BlockchainNode';
 
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
-export class LocalNodeAdapter implements LocalNode {
+export class BlockchainNodeAdapter implements BlockchainNode {
   private currentBlockNumber: bigint = BigInt(0);
   private currentReadResponse: any = {};
 

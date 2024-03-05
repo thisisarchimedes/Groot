@@ -2,8 +2,8 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
-import {LocalNodeHardhat} from '../../src/blockchain_reader/LocalNodeHardhat';
-import {LocalNodeError} from '../../src/blockchain_reader/LocalNode';
+import {BlockchainNodeLocalHardhat} from '../../src/blockchain_nodes/BlockchainNodeLocalHardhat';
+import {BlockchainNodeError} from '../../src/blockchain_nodes/BlockchainNode';
 
 dotenv.config();
 chai.use(chaiAsPromised);
@@ -14,10 +14,10 @@ describe('Check that we work with local Hardhat node correctly', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
-  let localNode: LocalNodeHardhat;
+  let localNode: BlockchainNodeLocalHardhat;
 
   beforeEach(async function() {
-    localNode = new LocalNodeHardhat(8545, 'archimedes-node-alchemy');
+    localNode = new BlockchainNodeLocalHardhat(8545, 'archimedes-node-alchemy');
     await localNode.startNode();
   });
 
@@ -30,8 +30,16 @@ describe('Check that we work with local Hardhat node correctly', function() {
       await localNode.resetNode('invalidRPCUrl');
       expect.fail('Expected resetNode to throw an error');
     } catch (error) {
-      expect(error).to.be.instanceOf(LocalNodeError);
+      expect(error).to.be.instanceOf(BlockchainNodeError);
     }
+  });
+
+  it('Should be able to point to demo RPC', async function() {
+    // const alchemyRpcUrl: string = 'http://ec2-52-4-114-208.compute-1.amazonaws.com';
+    // await resetAndVerify(alchemyRpcUrl);
+
+    // const blockNumber = await localNode.getBlockNumber();
+    // expect(blockNumber > 1934000n).to.be.true;
   });
 
   it('Should be able to reset node and point it to valid RPC', async function() {

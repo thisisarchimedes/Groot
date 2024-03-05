@@ -1,10 +1,10 @@
 import Web3, {AbiItem} from 'web3';
-import {DockerOperator} from './DockerOperator';
-import {LocalNode, LocalNodeError} from './LocalNode';
-import { Logger } from '../service/Logger';
+import {DockerOperator} from '../blockchain_reader/DockerOperator';
+import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
+import {Logger} from '../service/Logger';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export class LocalNodeHardhat implements LocalNode {
+export class BlockchainNodeLocalHardhat implements BlockchainNode {
   private readonly web3: Web3;
   private readonly dockerOperator: DockerOperator;
 
@@ -44,7 +44,7 @@ export class LocalNodeHardhat implements LocalNode {
       this.handleResetResponse(responseData);
     } catch (error) {
       Logger.error(`Failed to reset node: ${(error as Error).message}`);
-      throw error instanceof LocalNodeError ? error : new LocalNodeError((error as Error).message);
+      throw error instanceof BlockchainNodeError ? error : new BlockchainNodeError((error as Error).message);
     }
 
     await this.waitForNodeToBeReady();
@@ -82,7 +82,7 @@ export class LocalNodeHardhat implements LocalNode {
         await new Promise((resolve) => setTimeout(resolve, interval));
       }
     }
-    throw new LocalNodeError('Blockchain node is not ready after maximum attempts.');
+    throw new BlockchainNodeError('Blockchain node is not ready after maximum attempts.');
   }
 
   private async performResetRpcCall(externalProviderRpcUrl: string): Promise<any> {
@@ -107,7 +107,7 @@ export class LocalNodeHardhat implements LocalNode {
   private handleResetResponse(data: any): void {
     if (data.error) {
       const msg = `RPC Error: ${data.error.message}`;
-      throw new LocalNodeError(msg);
+      throw new BlockchainNodeError(msg);
     }
 
     Logger.debug('Node reset successfully.');

@@ -1,9 +1,9 @@
-import {LocalNode} from './LocalNode';
+import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
 
 export class BlockchainReader {
-  private readonly nodes: LocalNode[];
+  private readonly nodes: BlockchainNode[];
 
-  constructor(nodes: LocalNode[]) {
+  constructor(nodes: BlockchainNode[]) {
     this.nodes = nodes;
   }
 
@@ -26,7 +26,7 @@ export class BlockchainReader {
     const blocks = await Promise.all(blockNumbers);
 
     const highestBlockNumberIndex = blocks.reduce((highestIndex, currentBlock, currentIndex, array) =>
-        currentBlock > array[highestIndex] ? currentIndex : highestIndex, 0);
+            currentBlock > array[highestIndex] ? currentIndex : highestIndex, 0);
 
     return responses[highestBlockNumberIndex];
   }

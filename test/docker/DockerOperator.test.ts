@@ -1,4 +1,4 @@
-import {LocalNodeHardhat} from '../../src/blockchain_reader/LocalNodeHardhat';
+import {BlockchainNodeLocalHardhat} from '../../src/blockchain_nodes/BlockchainNodeLocalHardhat';
 
 import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
@@ -12,7 +12,7 @@ describe('Check that we able to launch and stop docker containers', function() {
   this.timeout(120000);
 
   it('should spin a new docker and read current block number directly from node', async function() {
-    const localNode = new LocalNodeHardhat(8545, 'archimedes-node');
+    const localNode = new BlockchainNodeLocalHardhat(8545, 'archimedes-node');
 
     await localNode.startNode();
     const blockNumber = await localNode.getBlockNumber();

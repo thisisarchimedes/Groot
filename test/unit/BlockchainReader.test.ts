@@ -1,20 +1,20 @@
 import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
-import {LocalNodeAdapter} from './adapters/LocalNodeAdapter';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {BlockchainReader} from '../../src/blockchain_reader/BlockchainReader';
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
 
 describe('Check that blockchain reader works with multiple underlying nodes', function() {
-  let localNodeAlchemy: LocalNodeAdapter;
-  let localNodeInfura: LocalNodeAdapter;
+  let localNodeAlchemy: BlockchainNodeAdapter;
+  let localNodeInfura: BlockchainNodeAdapter;
 
   beforeEach(async function() {
-    localNodeAlchemy = new LocalNodeAdapter();
+    localNodeAlchemy = new BlockchainNodeAdapter();
     await localNodeAlchemy.startNode();
-    localNodeInfura = new LocalNodeAdapter();
+    localNodeInfura = new BlockchainNodeAdapter();
     await localNodeInfura.startNode();
   });
 
@@ -64,5 +64,15 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
 
     const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals'));
     expect(res).to.be.eq(2);
+  });
+
+  it('Should handle 1/2 node failed, use another node, and recover failed one', async function() {
+    const blockNumberAlchemy: number = 19364429;
+    localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
+    localNodeAlchemy.setReadResponse('1');
+
+    const blockNumberInfura: number = 19364430;
+    localNodeInfura.setBlockNumber(blockNumberInfura);
+    localNodeInfura.setReadResponse('2');
   });
 });
