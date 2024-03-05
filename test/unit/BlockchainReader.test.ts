@@ -160,6 +160,32 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     }
   });
 
+  it('Should throw an error when all nodes fail to call view function - different path - callViewFunction fails', async function() {
+    const blockNumberAlchemy: number = 19364429;
+    localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
+    localNodeAlchemy.setThrowErrorOnGetBlockNumber(false);
+    localNodeAlchemy.setReadResponse('1');
+    localNodeAlchemy.setThrowErrorOnCallViewFunction(true);
+
+    const blockNumberInfura: number = 19364430;
+    localNodeInfura.setBlockNumber(blockNumberInfura);
+    localNodeInfura.setThrowErrorOnGetBlockNumber(false);
+    localNodeInfura.setReadResponse('2');
+    localNodeInfura.setThrowErrorOnCallViewFunction(true);
+
+    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+
+    try {
+      const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
+      const abi = getStubAbi();
+
+      await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals');
+      expect.fail('Expected callViewFunction to throw an error');
+    } catch (error) {
+      expect(error).to.be.instanceOf(BlockChainReaderError);
+    }
+  });
+
   function getStubAbi() {
     return [
       {

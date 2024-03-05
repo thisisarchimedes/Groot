@@ -12,6 +12,8 @@ export class BlockChainReaderError extends Error {
   }
 }
 
+const PROMISE_FULFILLED = 'fulfilled';
+
 export class BlockchainReader {
   private readonly nodes: BlockchainNode[];
 
@@ -83,8 +85,8 @@ export class BlockchainReader {
     ]);
 
     return settledFunctionCalls.map((result, index) => ({
-      response: result.status === 'fulfilled' ? result.value : null,
-      blockNumber: settledBlockNumbers[index].status === 'fulfilled' ? settledBlockNumbers[index].value : null,
+      response: result.status === PROMISE_FULFILLED ? result.value : null,
+      blockNumber: settledBlockNumbers[index].status === PROMISE_FULFILLED ? settledBlockNumbers[index].value : null,
     }));
   }
 
