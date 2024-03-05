@@ -3,18 +3,19 @@ import {DockerOperator} from '../blockchain_reader/DockerOperator';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
 import {Logger} from '../service/Logger';
 
-export class BlockchainNodeLocalHardhat implements BlockchainNode {
+export class BlockchainNodeLocalHardhat extends BlockchainNode {
   private readonly web3: Web3;
   private readonly dockerOperator: DockerOperator;
 
   private readonly localRpcUrl: string;
   private readonly nodePort: number;
-  private readonly nodeName: string;
 
   private readonly DEFAULT_HARDHAT_NODE_PORT = 8545;
   private readonly DEFAULT_HARDHAT_DOCKER_IMAGE_NAME = 'arch-production-node:latest';
 
   constructor(externalPort: number, nodeName: string) {
+    super();
+
     this.localRpcUrl = `http://127.0.0.1:${externalPort}`;
     this.web3 = new Web3(this.localRpcUrl);
     this.nodePort = externalPort;
@@ -42,6 +43,7 @@ export class BlockchainNodeLocalHardhat implements BlockchainNode {
     await this.stopNode();
     await this.startNode();
     Logger.info('Node recovered successfully.');
+    this.isNodeHealthy = true;
   }
 
   public async resetNode(externalProviderRpcUrl: string): Promise<void> {
@@ -57,8 +59,15 @@ export class BlockchainNodeLocalHardhat implements BlockchainNode {
   }
 
   public async getBlockNumber(): Promise<number> {
-    const blockNumber = await this.web3.eth.getBlockNumber();
-    return Number(blockNumber);
+    try {
+      const blockNumber = await this.web3.eth.getBlockNumber();
+      this.isNodeHealthy = true;
+      return Number(blockNumber);
+    } catch (error) {
+      Logger.info(`${this.nodeName} cannot get block number: ${(error as Error).message}`);
+      this.isNodeHealthy = false;
+      throw error;
+    }
   }
 
   public async callViewFunction(
@@ -71,9 +80,11 @@ export class BlockchainNodeLocalHardhat implements BlockchainNode {
 
     try {
       const data = await contract.methods[functionName](...params).call();
+      this.isNodeHealthy = true;
       return data;
     } catch (error) {
-      Logger.error(`Error calling view function ${functionName}: ${error}`);
+      Logger.info(`${this.nodeName} cannot call view function ${functionName}: ${error}`);
+      this.isNodeHealthy = false;
       throw error;
     }
   }

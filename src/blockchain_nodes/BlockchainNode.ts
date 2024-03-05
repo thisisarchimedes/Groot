@@ -10,19 +10,25 @@ export class BlockchainNodeError extends Error {
   }
 }
 
-export interface BlockchainNode {
+export abstract class BlockchainNode {
+  protected isNodeHealthy: boolean = true;
+  protected nodeName: string = '';
 
-  startNode(): Promise<void>;
-  stopNode(): Promise<void>;
-  resetNode(externalProviderRpcUrl: string): Promise<void>;
-  recoverNode(): Promise<void>;
+  abstract startNode(): Promise<void>;
+  abstract stopNode(): Promise<void>;
+  abstract resetNode(externalProviderRpcUrl: string): Promise<void>;
+  abstract recoverNode(): Promise<void>;
 
-  getBlockNumber(): Promise<number>;
+  abstract getBlockNumber(): Promise<number>;
 
-  callViewFunction(
+  abstract callViewFunction(
     contractAddress: string,
     abi: AbiItem[],
     functionName: string,
     params: unknown[],
   ): Promise<unknown>;
+
+  public isHealthy(): boolean {
+    return this.isNodeHealthy;
+  }
 }

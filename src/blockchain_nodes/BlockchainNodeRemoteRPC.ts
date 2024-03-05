@@ -3,15 +3,14 @@ import Web3, {AbiItem} from 'web3';
 import {BlockchainNode} from './BlockchainNode';
 import {Logger} from '../service/Logger';
 
-export class BlockchainNodeRemoteRPC implements BlockchainNode {
+export class BlockchainNodeRemoteRPC extends BlockchainNode {
   private readonly web3: Web3;
-
   private readonly remoteRpcUrl: string;
-  private readonly nodeName: string;
-
   private readonly SLEEP_DURATION_WHEN_RECOVERING_NODE = 10000;
 
   constructor(remoteRpcUrl: string, nodeName: string) {
+    super();
+
     this.remoteRpcUrl = remoteRpcUrl;
     this.web3 = new Web3(remoteRpcUrl);
     this.nodeName = nodeName;
@@ -32,14 +31,22 @@ export class BlockchainNodeRemoteRPC implements BlockchainNode {
 
   public async recoverNode(): Promise<void> {
     Logger.info('Trying to recover node...');
-    await this.busySleep(this.SLEEP_DURATION_WHEN_RECOVERING_NODE);    
+    await this.busySleep(this.SLEEP_DURATION_WHEN_RECOVERING_NODE);
     await this.getBlockNumber();
     Logger.info('Node recovered successfully.');
+    this.isNodeHealthy = true;
   }
 
   public async getBlockNumber(): Promise<number> {
-    const blockNumber = await this.web3.eth.getBlockNumber();
-    return Number(blockNumber);
+    try {
+      const blockNumber = await this.web3.eth.getBlockNumber();
+      this.isNodeHealthy = true;
+      return Number(blockNumber);
+    } catch (error) {
+      Logger.info(`${this.nodeName} cannot get block number: ${(error as Error).message}`);
+      this.isNodeHealthy = false;
+      throw error;
+    }
   }
 
   public async callViewFunction(
@@ -52,14 +59,16 @@ export class BlockchainNodeRemoteRPC implements BlockchainNode {
 
     try {
       const data = await contract.methods[functionName](...params).call();
+      this.isNodeHealthy = true;
       return data;
     } catch (error) {
-      Logger.error(`Error calling view function ${functionName}: ${error}`);
+      Logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error}`);
+      this.isNodeHealthy = false;
       throw error;
     }
   }
 
-  private async busySleep(duration: number): Promise<void> {
+  private busySleep(duration: number): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(resolve, duration);
     });

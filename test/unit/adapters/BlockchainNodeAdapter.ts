@@ -2,7 +2,7 @@ import {AbiItem} from 'web3';
 import {BlockchainNode} from '../../../src/blockchain_nodes/BlockchainNode';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export class BlockchainNodeAdapter implements BlockchainNode {
+export class BlockchainNodeAdapter extends BlockchainNode {
   private currentBlockNumber: number = 100;
   private currentReadResponse: unknown = {};
   private throwErrorOnGetBlockNumber: boolean = false;
@@ -21,8 +21,9 @@ export class BlockchainNodeAdapter implements BlockchainNode {
 
   }
 
+  // eslint-disable-next-line require-await
   public async recoverNode(): Promise<void> {
-
+    this.isNodeHealthy = true;
   }
 
   // eslint-disable-next-line require-await
@@ -30,7 +31,7 @@ export class BlockchainNodeAdapter implements BlockchainNode {
     if (this.throwErrorOnGetBlockNumber) {
       throw new Error('getBlockNumber: Error');
     }
-
+    this.isNodeHealthy = true;
     return this.currentBlockNumber;
   }
 
@@ -44,7 +45,7 @@ export class BlockchainNodeAdapter implements BlockchainNode {
     if (this.throwErrorOnCallViewFunction) {
       throw new Error('callViewFunction: Error');
     }
-
+    this.isNodeHealthy = true;
     return this.currentReadResponse;
   }
 
@@ -62,6 +63,10 @@ export class BlockchainNodeAdapter implements BlockchainNode {
 
   public setReadResponse(response: unknown): void {
     this.currentReadResponse = response;
+  }
+
+  public setNodeHealthy(healthy: boolean): void {
+    this.isNodeHealthy = healthy;
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */

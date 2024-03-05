@@ -8,8 +8,6 @@
 [X] Can manage 2 nodes, get block number from both and return the latest
 [X] Can facilitate read call, decide which node to use in case both response
 [X] Can handle 1/2 node failed, use another node
-[] When 1/2 nodes fail, can spin new nodes and use them
-[] Can handle all nodes failing, and report error and spin new nodes
 
 **Refactor**
 
@@ -17,8 +15,15 @@
 [] Add new relic support to logger.ts
 [] add more logging
 
-## Tx Broadcaster
+## Node Manager
+- probably want to check each node health flag and call recover. Do it once at the end of the test suite or if all nodes are down
+[] Get RPCs from AWS AppConfig
+[] Create an array of nodes
+[] When 1/2 nodes fail, can spin new nodes and use them
+[] Can handle all nodes failing, and report error and spin new nodes
 
+
+## Tx Broadcaster
 [] Can sign a tx with the correct key without exposing the key (KMS)
 [] Simulate transaction and report invalid without broadcasting it
 [] Can broadcast an invalid transaction (test pass simulation) and report when it failed
