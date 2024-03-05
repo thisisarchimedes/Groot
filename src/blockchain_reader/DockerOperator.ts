@@ -51,8 +51,7 @@ export class DockerOperator {
         Logger.debug(`Container ${this.instanceName} is not running.`);
       }
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if ((error as any).statusCode === 404) {
+      if (this.isDockerError(error) && error.statusCode === 404) {
         Logger.debug(`Container ${this.instanceName} does not exist.`);
       } else {
         Logger.error(`Error stopping container ${this.instanceName} - Error: ${error}`);
@@ -112,5 +111,9 @@ export class DockerOperator {
 
     await container.start();
     Logger.debug(`Container ${this.instanceName} created with ports ${this.portExternal}:${this.portInternal}.`);
+  }
+
+  private isDockerError(error: unknown): error is { statusCode: number } {
+    return typeof error === 'object' && error !== null && 'statusCode' in error;
   }
 }
