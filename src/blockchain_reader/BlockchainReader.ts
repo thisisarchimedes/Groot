@@ -85,9 +85,13 @@ export class BlockchainReader {
     ]);
 
     return settledFunctionCalls.map((result, index) => ({
-      response: result.status === PROMISE_FULFILLED ? result.value : null,
-      blockNumber: settledBlockNumbers[index].status === PROMISE_FULFILLED ? settledBlockNumbers[index].value : null,
+      response: this.isFulfilled(result) ? result.value : null,
+      blockNumber: this.isFulfilled(settledBlockNumbers[index]) ? (settledBlockNumbers[index] as PromiseFulfilledResult<number | null>).value : null,
     }));
+  }
+
+  private isFulfilled<T>(result: PromiseSettledResult<T>): result is PromiseFulfilledResult<T> {
+    return result.status === PROMISE_FULFILLED;
   }
 
   private filterValidNodeResponses(nodeResponses: NodeResponse[]): ValidNodeResponse[] {
