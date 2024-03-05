@@ -49,8 +49,9 @@ export class BlockchainNodeLocalHardhat implements BlockchainNode {
     await this.waitForNodeToBeReady();
   }
 
-  public getBlockNumber(): Promise<number> {
-    return this.web3.eth.getBlockNumber();
+  public async getBlockNumber(): Promise<number> {
+    const blockNumber = await this.web3.eth.getBlockNumber();
+    return Number(blockNumber);
   }
 
   public async callViewFunction(
