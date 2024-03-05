@@ -12,25 +12,24 @@ export class BlockChainReaderError extends Error {
   }
 }
 
-const PROMISE_FULFILLED = 'fulfilled';
+interface NodeResponse {
+  response: unknown | null;
+  blockNumber: number | null;
+}
+
+interface ValidNodeResponse {
+  response: unknown;
+  blockNumber: number;
+}
 
 export class BlockchainReader {
-  private readonly nodes: BlockchainNode[];
-
-  constructor(nodes: BlockchainNode[]) {
-    this.nodes = nodes;
-  }
+  constructor(private readonly nodes: BlockchainNode[]) {}
 
   public async getBlockNumber(): Promise<number> {
-    const blockNumbers = await this.getAllBlockNumbers();
-    const validBlockNumbers = this.filterValidBlockNumbers(blockNumbers);
-
-    if (validBlockNumbers.length === 0) {
-      Logger.error('All nodes failed to retrieve block number');
-      throw new BlockChainReaderError('All nodes failed to retrieve block number');
-    }
-
-    return this.getHighestBlockNumber(validBlockNumbers);
+    const blockNumbers = await this.fetchBlockNumbersFromNodes();
+    const validBlockNumbers = this.extractValidBlockNumbers(blockNumbers);
+    this.ensureValidBlockNumbers(validBlockNumbers);
+    return this.findHighestBlockNumber(validBlockNumbers);
   }
 
   public async callViewFunction(
@@ -39,34 +38,35 @@ export class BlockchainReader {
       functionName: string,
       params: unknown[] = [],
   ): Promise<unknown> {
-    const nodeResponses = await this.getAllNodeResponses(contractAddress, abi, functionName, params);
-    const validNodeResponses = this.filterValidNodeResponses(nodeResponses);
-
-    if (validNodeResponses.length === 0) {
-      Logger.error('All nodes failed to retrieve block number');
-      throw new BlockChainReaderError('All nodes failed to execute callViewFunction or getBlockNumber');
-    }
-
-    return this.getValidResponseFromNodeWithHighestBlockNumber(validNodeResponses);
+    const nodeResponses = await this.fetchNodeResponses(contractAddress, abi, functionName, params);
+    const validNodeResponses = this.extractValidNodeResponses(nodeResponses);
+    this.ensureValidNodeResponses(validNodeResponses);
+    return this.findResponseFromNodeWithHighestBlockNumber(validNodeResponses);
   }
 
-  private getAllBlockNumbers(): Promise<(number | null)[]> {
+  private fetchBlockNumbersFromNodes(): Promise<(number | null)[]> {
     const blockNumberPromises = this.nodes.map((node) =>
       node.getBlockNumber().catch(() => null),
     );
-
     return Promise.all(blockNumberPromises);
   }
 
-  private filterValidBlockNumbers(blockNumbers: (number | null)[]): number[] {
+  private extractValidBlockNumbers(blockNumbers: (number | null)[]): number[] {
     return blockNumbers.filter((blockNumber): blockNumber is number => blockNumber !== null);
   }
 
-  private getHighestBlockNumber(blockNumbers: number[]): number {
+  private ensureValidBlockNumbers(validBlockNumbers: number[]): void {
+    if (validBlockNumbers.length === 0) {
+      Logger.error('All nodes failed to retrieve block number');
+      throw new BlockChainReaderError('All nodes failed to retrieve block number');
+    }
+  }
+
+  private findHighestBlockNumber(blockNumbers: number[]): number {
     return Math.max(...blockNumbers);
   }
 
-  private async getAllNodeResponses(
+  private async fetchNodeResponses(
       contractAddress: string,
       abi: AbiItem[],
       functionName: string,
@@ -85,39 +85,35 @@ export class BlockchainReader {
     ]);
 
     return settledFunctionCalls.map((result, index) => ({
-      response: this.isFulfilled(result) ? result.value : null,
-      blockNumber: this.isFulfilled(settledBlockNumbers[index]) ? (settledBlockNumbers[index] as PromiseFulfilledResult<number | null>).value : null,
+      response: this.extractFulfilledValue(result),
+      blockNumber: this.extractFulfilledValue(settledBlockNumbers[index]),
     }));
   }
 
-  private isFulfilled<T>(result: PromiseSettledResult<T>): result is PromiseFulfilledResult<T> {
-    return result.status === PROMISE_FULFILLED;
+  private extractFulfilledValue<T>(result: PromiseSettledResult<T>): T | null {
+    return result.status === 'fulfilled' ? result.value : null;
   }
 
-  private filterValidNodeResponses(nodeResponses: NodeResponse[]): ValidNodeResponse[] {
+  private extractValidNodeResponses(nodeResponses: NodeResponse[]): ValidNodeResponse[] {
     return nodeResponses.filter(
         (nodeResponse): nodeResponse is ValidNodeResponse =>
           nodeResponse.response !== null && nodeResponse.blockNumber !== null,
     );
   }
 
-  private getValidResponseFromNodeWithHighestBlockNumber(validNodeResponses: ValidNodeResponse[]): unknown {
+  private ensureValidNodeResponses(validNodeResponses: ValidNodeResponse[]): void {
+    if (validNodeResponses.length === 0) {
+      Logger.error('All nodes failed to retrieve block number');
+      throw new BlockChainReaderError('All nodes failed to execute callViewFunction or getBlockNumber');
+    }
+  }
+
+  private findResponseFromNodeWithHighestBlockNumber(validNodeResponses: ValidNodeResponse[]): unknown {
     const highestBlockNumberIndex = validNodeResponses.reduce(
         (highestIndex, currentNode, currentIndex) =>
-        currentNode.blockNumber! > validNodeResponses[highestIndex].blockNumber! ? currentIndex : highestIndex,
+        currentNode.blockNumber > validNodeResponses[highestIndex].blockNumber ? currentIndex : highestIndex,
         0,
     );
-
     return validNodeResponses[highestBlockNumberIndex].response;
   }
-}
-
-interface NodeResponse {
-  response: unknown | null;
-  blockNumber: number | null;
-}
-
-interface ValidNodeResponse {
-  response: unknown;
-  blockNumber: number;
 }

@@ -134,7 +134,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     }
   });
 
-  it('Should throw an error when all nodes fail to call view function - different path - getBlockNumber fails', async function() {
+  it('Should throw an error when all nodes fail - getBlockNumber fails', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(true);
@@ -160,7 +160,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     }
   });
 
-  it('Should throw an error when all nodes fail to call view function - different path - callViewFunction fails', async function() {
+  it('Should throw an error when all nodes fail - callViewFunction fails', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(false);
