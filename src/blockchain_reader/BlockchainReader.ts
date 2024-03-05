@@ -1,5 +1,6 @@
 import {AbiItem} from 'web3-types';
 import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
+import {Logger} from '../service/Logger';
 
 export class BlockchainReader {
   private readonly nodes: BlockchainNode[];
@@ -9,8 +10,15 @@ export class BlockchainReader {
   }
 
   public async getBlockNumber(): Promise<number> {
-    const blockNumbers = await Promise.all(this.nodes.map((node) => node.getBlockNumber()));
-    return Number(blockNumbers.reduce((max, current) => (current > max ? current : max), 0));
+    const blockNumbers = await this.getAllBlockNumbers();
+    const validBlockNumbers = this.filterValidBlockNumbers(blockNumbers);
+
+    if (validBlockNumbers.length === 0) {
+      Logger.error('All nodes failed to retrieve block number');
+      throw new Error('All nodes failed to retrieve block number');
+    }
+
+    return this.getHighestBlockNumber(validBlockNumbers);
   }
 
   public async callViewFunction(
@@ -23,10 +31,27 @@ export class BlockchainReader {
     const validNodeResponses = this.filterValidNodeResponses(nodeResponses);
 
     if (validNodeResponses.length === 0) {
+      Logger.error('All nodes failed to retrieve block number');
       throw new Error('All nodes failed to execute callViewFunction or getBlockNumber');
     }
 
-    return this.getVaildResponseFromNodeWithHighestBlockNumber(validNodeResponses);
+    return this.getValidResponseFromNodeWithHighestBlockNumber(validNodeResponses);
+  }
+
+  private getAllBlockNumbers(): Promise<(number | null)[]> {
+    const blockNumberPromises = this.nodes.map((node) =>
+      node.getBlockNumber().catch(() => null),
+    );
+
+    return Promise.all(blockNumberPromises);
+  }
+
+  private filterValidBlockNumbers(blockNumbers: (number | null)[]): number[] {
+    return blockNumbers.filter((blockNumber): blockNumber is number => blockNumber !== null);
+  }
+
+  private getHighestBlockNumber(blockNumbers: number[]): number {
+    return Math.max(...blockNumbers);
   }
 
   private async getAllNodeResponses(
@@ -60,7 +85,7 @@ export class BlockchainReader {
     );
   }
 
-  private getVaildResponseFromNodeWithHighestBlockNumber(validNodeResponses: ValidNodeResponse[]): unknown {
+  private getValidResponseFromNodeWithHighestBlockNumber(validNodeResponses: ValidNodeResponse[]): unknown {
     const highestBlockNumberIndex = validNodeResponses.reduce(
         (highestIndex, currentNode, currentIndex) =>
         currentNode.blockNumber! > validNodeResponses[highestIndex].blockNumber! ? currentIndex : highestIndex,

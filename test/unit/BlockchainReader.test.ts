@@ -53,9 +53,10 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     expect(res).to.be.eq(2);
   });
 
-  it('Should call getBlockNumner and handle 1/2 node failed, use another node, and recover failed one', async function() {
+  it('Should call getBlockNumber and handle 1/2 node failed, use another node', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
+    localNodeAlchemy.setThrowErrorOnGetBlockNumber(false);
 
     const blockNumberInfura: number = 19364430;
     localNodeInfura.setBlockNumber(blockNumberInfura);
@@ -68,7 +69,23 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     expect(res).to.be.eq(19364429);
   });
 
-  it('Should call callViewFunction and handle 1/2 node failed, use another node, and recover failed one', async function() {
+  it('Should throw an error when all nodes fail to retrieve block number', async function() {
+    const blockNumberAlchemy: number = 19364429;
+    localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
+    localNodeAlchemy.setThrowErrorOnGetBlockNumber(true);
+
+    const blockNumberInfura: number = 19364430;
+    localNodeInfura.setBlockNumber(blockNumberInfura);
+    localNodeInfura.setThrowErrorOnGetBlockNumber(true);
+
+    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+
+    await expect(blockchainReader.getBlockNumber()).to.be.rejectedWith(
+        'All nodes failed to retrieve block number',
+    );
+  });
+
+  it('Should call callViewFunction and handle 1/2 node failed, use another node', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setReadResponse('1');

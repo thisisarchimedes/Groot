@@ -3,7 +3,7 @@ import {BlockchainNode} from '../../../src/blockchain_nodes/BlockchainNode';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export class BlockchainNodeAdapter implements BlockchainNode {
-  private currentBlockNumber: number = 0;
+  private currentBlockNumber: number = 100;
   private currentReadResponse: unknown = {};
   private throwErrorOnGetBlockNumber: boolean = false;
   private throwErrorOnCallViewFunction: boolean = false;
