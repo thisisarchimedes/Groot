@@ -58,4 +58,17 @@ describe('Check that we work with local Hardhat node correctly', function() {
 
     expect(res).to.be.equal(6);
   });
+
+  it('Should be able to recover node after getting invalid RPC', async function() {
+    try {
+      await localNode.resetNode('invalidRPCUrl');
+      expect.fail('Expected resetNode to throw an error');
+    } catch (error) {
+      expect(error).to.be.instanceOf(BlockchainNodeError);
+    }
+
+    await localNode.recoverNode();
+    const blockNumber = await localNode.getBlockNumber();
+    expect(blockNumber > 1934000n).to.be.true;
+  });
 });

@@ -9,6 +9,8 @@ export class BlockchainNodeRemoteRPC implements BlockchainNode {
   private readonly remoteRpcUrl: string;
   private readonly nodeName: string;
 
+  private readonly SLEEP_DURATION_WHEN_RECOVERING_NODE = 10000;
+
   constructor(remoteRpcUrl: string, nodeName: string) {
     this.remoteRpcUrl = remoteRpcUrl;
     this.web3 = new Web3(remoteRpcUrl);
@@ -26,6 +28,13 @@ export class BlockchainNodeRemoteRPC implements BlockchainNode {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async resetNode(externalProviderRpcUrl: string): Promise<void> {
     // Do nothing, as this is a remote node
+  }
+
+  public async recoverNode(): Promise<void> {
+    Logger.info('Trying to recover node...');
+    await this.busySleep(this.SLEEP_DURATION_WHEN_RECOVERING_NODE);    
+    await this.getBlockNumber();
+    Logger.info('Node recovered successfully.');
   }
 
   public async getBlockNumber(): Promise<number> {
@@ -48,5 +57,11 @@ export class BlockchainNodeRemoteRPC implements BlockchainNode {
       Logger.error(`Error calling view function ${functionName}: ${error}`);
       throw error;
     }
+  }
+
+  private async busySleep(duration: number): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(resolve, duration);
+    });
   }
 }

@@ -21,6 +21,10 @@ export class BlockchainNodeAdapter implements BlockchainNode {
 
   }
 
+  public async recoverNode(): Promise<void> {
+
+  }
+
   // eslint-disable-next-line require-await
   public async getBlockNumber(): Promise<number> {
     if (this.throwErrorOnGetBlockNumber) {

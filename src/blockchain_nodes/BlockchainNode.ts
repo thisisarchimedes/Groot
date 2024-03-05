@@ -15,6 +15,7 @@ export interface BlockchainNode {
   startNode(): Promise<void>;
   stopNode(): Promise<void>;
   resetNode(externalProviderRpcUrl: string): Promise<void>;
+  recoverNode(): Promise<void>;
 
   getBlockNumber(): Promise<number>;
 

@@ -37,6 +37,13 @@ export class BlockchainNodeLocalHardhat implements BlockchainNode {
     await this.dockerOperator.stopContainer();
   }
 
+  public async recoverNode(): Promise<void> {
+    Logger.info('Trying to recover node...');
+    await this.stopNode();
+    await this.startNode();
+    Logger.info('Node recovered successfully.');
+  }
+
   public async resetNode(externalProviderRpcUrl: string): Promise<void> {
     try {
       const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
