@@ -35,7 +35,7 @@ export class BlockchainNodeAdapter implements BlockchainNode {
   }
 
   public setBlockNumber(blockNumber: number): void {
-    this.currentBlockNumber = BigInt(blockNumber);
+    this.currentBlockNumber = blockNumber;
   }
 
   public setReadResponse(response: unknown): void {

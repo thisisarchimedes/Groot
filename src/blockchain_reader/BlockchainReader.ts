@@ -1,3 +1,4 @@
+import {AbiItem} from 'web3-types';
 import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
 
 export class BlockchainReader {
@@ -14,7 +15,7 @@ export class BlockchainReader {
 
   public async callViewFunction(
       contractAddress: string,
-      abi: unknown[],
+      abi: AbiItem[],
       functionName: string,
       params: unknown[] = [],
   ): Promise<unknown> {

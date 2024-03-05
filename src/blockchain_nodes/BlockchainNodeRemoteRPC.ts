@@ -28,8 +28,9 @@ export class BlockchainNodeRemoteRPC implements BlockchainNode {
     // Do nothing, as this is a remote node
   }
 
-  public getBlockNumber(): Promise<number> {
-    return this.web3.eth.getBlockNumber();
+  public async getBlockNumber(): Promise<number> {
+    const blockNumber = await this.web3.eth.getBlockNumber();
+    return Number(blockNumber);
   }
 
   public async callViewFunction(
