@@ -3,7 +3,7 @@ import {AbiItem} from 'web3';
 export class BlockchainNodeError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'LocalNodeError';
+    this.name = 'BlockchainNodeError';
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, BlockchainNodeError);
     }

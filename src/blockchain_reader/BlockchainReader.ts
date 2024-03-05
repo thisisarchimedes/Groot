@@ -2,6 +2,16 @@ import {AbiItem} from 'web3-types';
 import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
 import {Logger} from '../service/Logger';
 
+export class BlockChainReaderError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'BlockChainReaderError';
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, BlockChainReaderError);
+    }
+  }
+}
+
 export class BlockchainReader {
   private readonly nodes: BlockchainNode[];
 
@@ -15,7 +25,7 @@ export class BlockchainReader {
 
     if (validBlockNumbers.length === 0) {
       Logger.error('All nodes failed to retrieve block number');
-      throw new Error('All nodes failed to retrieve block number');
+      throw new BlockChainReaderError('All nodes failed to retrieve block number');
     }
 
     return this.getHighestBlockNumber(validBlockNumbers);
@@ -32,7 +42,7 @@ export class BlockchainReader {
 
     if (validNodeResponses.length === 0) {
       Logger.error('All nodes failed to retrieve block number');
-      throw new Error('All nodes failed to execute callViewFunction or getBlockNumber');
+      throw new BlockChainReaderError('All nodes failed to execute callViewFunction or getBlockNumber');
     }
 
     return this.getValidResponseFromNodeWithHighestBlockNumber(validNodeResponses);
