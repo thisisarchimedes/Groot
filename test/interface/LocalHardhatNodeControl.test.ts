@@ -34,14 +34,6 @@ describe('Check that we work with local Hardhat node correctly', function() {
     }
   });
 
-  it('Should be able to point to demo RPC', async function() {
-    // const alchemyRpcUrl: string = 'http://ec2-52-4-114-208.compute-1.amazonaws.com';
-    // await resetAndVerify(alchemyRpcUrl);
-
-    // const blockNumber = await localNode.getBlockNumber();
-    // expect(blockNumber > 1934000n).to.be.true;
-  });
-
   it('Should be able to reset node and point it to valid RPC', async function() {
     const alchemyRpcUrl: string = 'https://eth-mainnet.g.alchemy.com/v2/' + process.env.API_KEY_ALCHEMY;
     await resetAndVerify(alchemyRpcUrl);
