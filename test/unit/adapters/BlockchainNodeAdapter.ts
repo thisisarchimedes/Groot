@@ -5,6 +5,8 @@ import {BlockchainNode} from '../../../src/blockchain_nodes/BlockchainNode';
 export class BlockchainNodeAdapter implements BlockchainNode {
   private currentBlockNumber: number = 0;
   private currentReadResponse: unknown = {};
+  private throwErrorOnGetBlockNumber: boolean = false;
+  private throwErrorOnCallViewFunction: boolean = false;
 
 
   public async startNode(): Promise<void> {
@@ -21,6 +23,10 @@ export class BlockchainNodeAdapter implements BlockchainNode {
 
   // eslint-disable-next-line require-await
   public async getBlockNumber(): Promise<number> {
+    if (this.throwErrorOnGetBlockNumber) {
+      throw new Error('getBlockNumber: Error');
+    }
+
     return this.currentBlockNumber;
   }
 
@@ -31,7 +37,19 @@ export class BlockchainNodeAdapter implements BlockchainNode {
       functionName: string,
       params: unknown[],
   ): Promise<unknown> {
+    if (this.throwErrorOnCallViewFunction) {
+      throw new Error('callViewFunction: Error');
+    }
+
     return this.currentReadResponse;
+  }
+
+  public setThrowErrorOnCallViewFunction(throwError: boolean): void {
+    this.throwErrorOnCallViewFunction = throwError;
+  }
+
+  public setThrowErrorOnGetBlockNumber(throwError: boolean): void {
+    this.throwErrorOnGetBlockNumber = throwError;
   }
 
   public setBlockNumber(blockNumber: number): void {

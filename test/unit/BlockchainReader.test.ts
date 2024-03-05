@@ -37,16 +37,58 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
 
   it('Should be able to facilitate read call, decide which node to use, when both response', async function() {
     const blockNumberAlchemy: number = 19364429;
-    const blockNumberInfura: number = 19364430;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
-    localNodeInfura.setBlockNumber(blockNumberInfura);
     localNodeAlchemy.setReadResponse('1');
+
+    const blockNumberInfura: number = 19364430;
+    localNodeInfura.setBlockNumber(blockNumberInfura);
     localNodeInfura.setReadResponse('2');
 
     const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
 
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
-    const abi = [
+    const abi = getStubAbi();
+    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals'));
+
+    expect(res).to.be.eq(2);
+  });
+
+  it('Should call getBlockNumner and handle 1/2 node failed, use another node, and recover failed one', async function() {
+    const blockNumberAlchemy: number = 19364429;
+    localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
+
+    const blockNumberInfura: number = 19364430;
+    localNodeInfura.setBlockNumber(blockNumberInfura);
+    localNodeInfura.setThrowErrorOnGetBlockNumber(true);
+
+    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+
+    const res = await blockchainReader.getBlockNumber();
+
+    expect(res).to.be.eq(19364429);
+  });
+
+  it('Should call callViewFunction and handle 1/2 node failed, use another node, and recover failed one', async function() {
+    const blockNumberAlchemy: number = 19364429;
+    localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
+    localNodeAlchemy.setReadResponse('1');
+
+    const blockNumberInfura: number = 19364430;
+    localNodeInfura.setBlockNumber(blockNumberInfura);
+    localNodeInfura.setReadResponse('2');
+    localNodeInfura.setThrowErrorOnCallViewFunction(true);
+
+    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+
+    const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
+    const abi = getStubAbi();
+    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals'));
+
+    expect(res).to.be.eq(1);
+  });
+
+  function getStubAbi() {
+    return [
       {
         'inputs': [],
         'name': 'decimals',
@@ -61,18 +103,5 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
         'type': 'function',
       },
     ];
-
-    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals'));
-    expect(res).to.be.eq(2);
-  });
-
-  it('Should handle 1/2 node failed, use another node, and recover failed one', function() {
-    const blockNumberAlchemy: number = 19364429;
-    localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
-    localNodeAlchemy.setReadResponse('1');
-
-    const blockNumberInfura: number = 19364430;
-    localNodeInfura.setBlockNumber(blockNumberInfura);
-    localNodeInfura.setReadResponse('2');
-  });
+  }
 });
