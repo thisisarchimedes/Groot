@@ -7,7 +7,8 @@
 [X] Can reset node and get a newer block number
 [X] Can manage 2 nodes, get block number from both and return the latest
 [X] Can facilitate read call, decide which node to use in case both response
-[] Can handle 1/2 node failed, use another node, and recover failed one
+[X] Can handle 1/2 node failed, use another node
+[] When 1/2 nodes fail, can spin new nodes and use them
 [] Can handle all nodes failing, and report error and spin new nodes
 
 **Refactor**
