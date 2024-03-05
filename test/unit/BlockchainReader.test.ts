@@ -66,7 +66,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     expect(res).to.be.eq(2);
   });
 
-  it('Should handle 1/2 node failed, use another node, and recover failed one', async function() {
+  it('Should handle 1/2 node failed, use another node, and recover failed one', function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setReadResponse('1');

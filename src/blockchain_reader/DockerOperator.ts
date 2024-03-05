@@ -51,6 +51,7 @@ export class DockerOperator {
         Logger.debug(`Container ${this.instanceName} is not running.`);
       }
     } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       if ((error as any).statusCode === 404) {
         Logger.debug(`Container ${this.instanceName} does not exist.`);
       } else {

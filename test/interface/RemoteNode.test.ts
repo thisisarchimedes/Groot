@@ -2,7 +2,7 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
-import { BlockchainNodeRemoteRPC } from '../../src/blockchain_nodes/BlockchainNodeRemoteRPC';
+import {BlockchainNodeRemoteRPC} from '../../src/blockchain_nodes/BlockchainNodeRemoteRPC';
 
 dotenv.config();
 chai.use(chaiAsPromised);
