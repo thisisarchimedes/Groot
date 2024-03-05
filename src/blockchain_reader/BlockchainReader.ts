@@ -9,16 +9,15 @@ export class BlockchainReader {
 
   public async getBlockNumber(): Promise<number> {
     const blockNumbers = await Promise.all(this.nodes.map((node) => node.getBlockNumber()));
-    return Number(blockNumbers.reduce((max, current) => (current > max ? current : max), BigInt(0)));
+    return Number(blockNumbers.reduce((max, current) => (current > max ? current : max), 0));
   }
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
   public async callViewFunction(
       contractAddress: string,
-      abi: any[],
+      abi: unknown[],
       functionName: string,
-      params: any[] = [],
-  ): Promise<any> {
+      params: unknown[] = [],
+  ): Promise<unknown> {
     const functionCalls = this.nodes.map((node) => node.callViewFunction(contractAddress, abi, functionName, params));
     const blockNumbers = this.nodes.map((node) => node.getBlockNumber());
 
@@ -30,5 +29,4 @@ export class BlockchainReader {
 
     return responses[highestBlockNumberIndex];
   }
-  /* eslint-enable @typescript-eslint/no-explicit-any */
 }

@@ -3,7 +3,6 @@ import {DockerOperator} from '../blockchain_reader/DockerOperator';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
 import {Logger} from '../service/Logger';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export class BlockchainNodeLocalHardhat implements BlockchainNode {
   private readonly web3: Web3;
   private readonly dockerOperator: DockerOperator;
@@ -50,7 +49,7 @@ export class BlockchainNodeLocalHardhat implements BlockchainNode {
     await this.waitForNodeToBeReady();
   }
 
-  public getBlockNumber(): Promise<bigint> {
+  public getBlockNumber(): Promise<number> {
     return this.web3.eth.getBlockNumber();
   }
 
@@ -58,8 +57,8 @@ export class BlockchainNodeLocalHardhat implements BlockchainNode {
       contractAddress: string,
       abi: AbiItem[],
       functionName: string,
-      params: any[] = [],
-  ): Promise<any> {
+      params: unknown[] = [],
+  ): Promise<unknown> {
     const contract = new this.web3.eth.Contract(abi, contractAddress);
 
     try {
@@ -85,7 +84,7 @@ export class BlockchainNodeLocalHardhat implements BlockchainNode {
     throw new BlockchainNodeError('Blockchain node is not ready after maximum attempts.');
   }
 
-  private async performResetRpcCall(externalProviderRpcUrl: string): Promise<any> {
+  private async performResetRpcCall(externalProviderRpcUrl: string): Promise<unknown> {
     const response = await fetch(this.localRpcUrl, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -104,13 +103,12 @@ export class BlockchainNodeLocalHardhat implements BlockchainNode {
     return response.json();
   }
 
-  private handleResetResponse(data: any): void {
-    if (data.error) {
-      const msg = `RPC Error: ${data.error.message}`;
+  private handleResetResponse(data: unknown): void {
+    if (typeof data === 'object' && data !== null && 'error' in data) {
+      const error = data.error as { message: string };
+      const msg = `RPC Error: ${error.message}`;
       throw new BlockchainNodeError(msg);
     }
-
     Logger.debug('Node reset successfully.');
   }
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

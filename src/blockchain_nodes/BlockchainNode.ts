@@ -10,20 +10,18 @@ export class BlockchainNodeError extends Error {
   }
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface BlockchainNode {
 
   startNode(): Promise<void>;
   stopNode(): Promise<void>;
   resetNode(externalProviderRpcUrl: string): Promise<void>;
 
-  getBlockNumber(): Promise<bigint>;
+  getBlockNumber(): Promise<number>;
 
   callViewFunction(
     contractAddress: string,
     abi: AbiItem[],
     functionName: string,
-    params: any[],
-  ): Promise<any>;
+    params: unknown[],
+  ): Promise<unknown>;
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */

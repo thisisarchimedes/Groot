@@ -3,7 +3,6 @@ import Web3, {AbiItem} from 'web3';
 import {BlockchainNode} from './BlockchainNode';
 import {Logger} from '../service/Logger';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export class BlockchainNodeRemoteRPC implements BlockchainNode {
   private readonly web3: Web3;
 
@@ -29,7 +28,7 @@ export class BlockchainNodeRemoteRPC implements BlockchainNode {
     // Do nothing, as this is a remote node
   }
 
-  public getBlockNumber(): Promise<bigint> {
+  public getBlockNumber(): Promise<number> {
     return this.web3.eth.getBlockNumber();
   }
 
@@ -37,8 +36,8 @@ export class BlockchainNodeRemoteRPC implements BlockchainNode {
       contractAddress: string,
       abi: AbiItem[],
       functionName: string,
-      params: any[] = [],
-  ): Promise<any> {
+      params: unknown[] = [],
+  ): Promise<unknown> {
     const contract = new this.web3.eth.Contract(abi, contractAddress);
 
     try {
@@ -50,4 +49,3 @@ export class BlockchainNodeRemoteRPC implements BlockchainNode {
     }
   }
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
