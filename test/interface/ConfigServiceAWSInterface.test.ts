@@ -2,12 +2,12 @@ import {expect} from 'chai';
 import dotenv from 'dotenv';
 
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {Rule} from '../../src/types/Rule';
 
 dotenv.config();
 
 describe('Config Service Test', function() {
   let configService: ConfigServiceAWS;
-  const ADDRESS_LENGTH = 42;
 
   beforeEach(async function() {
     await initalizeObjectUnderTest();
@@ -26,6 +26,11 @@ describe('Config Service Test', function() {
     expect(altRpcURL.startsWith('http')).to.be.true;
   });
 
+  it('should get GrootRules JSON from AWS', function() {
+    const rules: Rule[] = configService.getRules();
+    expect(rules).to.not.be.undefined;
+    expect(rules.length).to.be.greaterThan(0);
+  });
 });
 
 

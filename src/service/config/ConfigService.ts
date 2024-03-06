@@ -1,8 +1,10 @@
+import {Rule} from '../../types/Rule';
 
 export abstract class ConfigService {
   protected environment: string = '';
-  protected MainRPCURL: string = '';
-  protected AltRPCURL: string = '';
+  protected mainRPCURL: string = '';
+  protected altRPCURL: string = '';
+  protected rules: Rule[] = [];
 
   abstract refreshConfig(): Promise<void>;
 
@@ -10,12 +12,15 @@ export abstract class ConfigService {
     return this.environment;
   }
 
-  
   public getMainRPCURL(): string {
-    return this.MainRPCURL;
+    return this.mainRPCURL;
   }
 
   public getAlternativeRPCURL(): string {
-    return this.AltRPCURL;
+    return this.altRPCURL;
+  }
+
+  public getRules(): Rule[] {
+    return this.rules;
   }
 }

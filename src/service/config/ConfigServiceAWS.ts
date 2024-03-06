@@ -1,5 +1,5 @@
 import {AppConfigClient} from './AppConfigClient';
-import { ConfigService } from './ConfigService';
+import {ConfigService} from './ConfigService';
 
 export class ConfigServiceAWS extends ConfigService {
   private readonly appConfigClient: AppConfigClient;
@@ -13,6 +13,7 @@ export class ConfigServiceAWS extends ConfigService {
   public async refreshConfig(): Promise<void> {
     await Promise.all([
       this.refreshRPCURL(),
+      this.refreshRules(),
     ]);
   }
 
@@ -22,7 +23,12 @@ export class ConfigServiceAWS extends ConfigService {
       this.appConfigClient.fetchConfigRawString('AltRpcUrl'),
     ]);
 
-    this.MainRPCURL = mainRPCURL;
-    this.AltRPCURL = altRPCURL;
+    this.mainRPCURL = mainRPCURL;
+    this.altRPCURL = altRPCURL;
+  }
+
+  private async refreshRules(): Promise<void> {
+    const rules = await this.appConfigClient.fetchConfigRawString('GrootRules');
+    this.rules = JSON.parse(rules);
   }
 }
