@@ -19,6 +19,7 @@
     "lint": "eslint --ext .ts,.tsx -c .eslintrc.cjs ."
   },
   "dependencies": {
+    "@aws-sdk/client-appconfig": "^3.525.0",
     "@dotenvx/dotenvx": "^0.24.0",
     "@types/chai-as-promised": "^7.1.8",
     "@types/dockerode": "^3.3.24",
@@ -26,6 +27,8 @@
     "@types/node": "^20.11.24",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
+    "aws-sdk": "^2.1571.0",
+    "awssdk": "^1.0.1",
     "dockerode": "^4.0.2",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",

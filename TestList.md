@@ -15,13 +15,9 @@
 [] Add new relic support to logger.ts
 [] add more logging
 
-## Node Manager
-- probably want to check each node health flag and call recover. Do it once at the end of the test suite or if all nodes are down
-[] Get RPCs from AWS AppConfig
-[] Create an array of nodes
-[] When 1/2 nodes fail, can spin new nodes and use them
-[] Can handle all nodes failing, and report error and spin new nodes
 
+## ConfigService
+[X] Get RPCs from AWS AppConfig
 
 ## Tx Broadcaster
 [] Can sign a tx with the correct key without exposing the key (KMS)
@@ -35,7 +31,16 @@
 
 ## Rules Engine
 
+[] Load rules from AWS AppConfig
+[] Go through all rules 
+[] Rule that needs to transmit tx - add to queue with priority
+
 **Refactor**
+
+## Health Monitor
+- probably want to check each node health flag and call recover. Do it once at the end of the test suite or if all nodes are down
+[] When a nodes fails, can spin new nodes and use them
+[] Can handle all nodes failing, and report error and spin new nodes
 
 # Architecture
 
