@@ -3,7 +3,8 @@ import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
 import {BlockchainNodeRemoteRPC} from '../../src/blockchain/blockchain_nodes/BlockchainNodeRemoteRPC';
-import { LoggerAdapter } from '../unit/adapters/LoggerAdapter';
+import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
+import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 
 dotenv.config();
 chai.use(chaiAsPromised);
@@ -15,10 +16,18 @@ describe('Check that we work with remote node correctly', function() {
   this.timeout(120000);
 
   let remoteNode: BlockchainNodeRemoteRPC;
+  let configService: ConfigServiceAWS;
   const logger: LoggerAdapter = new LoggerAdapter();
 
   beforeEach(async function() {
-    remoteNode = new BlockchainNodeRemoteRPC(logger, 'http://ec2-52-4-114-208.compute-1.amazonaws.com:8545', 'demo-node');
+    const environment = process.env.ENVIRONMENT as string;
+    const region = process.env.AWS_REGION as string;
+    configService = new ConfigServiceAWS(environment, region);
+    await configService.refreshConfig();
+
+    const res = configService.getMainRPCURL();
+    console.log('>>>> res: ', res);
+    remoteNode = new BlockchainNodeRemoteRPC(logger, configService.getMainRPCURL(), 'demo-node');
     await remoteNode.startNode();
   });
 

@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {BlockChainReaderError, BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
 
 chai.use(chaiAsPromised);
 const {expect} = chai;

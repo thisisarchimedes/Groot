@@ -1,6 +1,6 @@
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Logger} from '../service/logger/Logger';
-import { UrgencyLevel } from './RuleTypes';
+import {UrgencyLevel} from './RuleTypes';
 
 export interface RuleParams {
     urgencyLevel: UrgencyLevel;

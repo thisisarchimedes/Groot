@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 
 import {BlockchainNodeLocalHardhat} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocalHardhat';
 import {BlockchainNodeError} from '../../src/blockchain/blockchain_nodes/BlockchainNode';
-import { LoggerAdapter } from '../unit/adapters/LoggerAdapter';
+import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 
 dotenv.config();
 chai.use(chaiAsPromised);
