@@ -1,0 +1,16 @@
+[
+    {
+        "name": "dummy",
+        "params": {
+            "param1": "value1",
+            "param2": "value2"
+        }
+    },
+    {
+        "name": "dummy2",
+        "params": {
+            "param1": "value3",
+            "param2": "value5"
+        }
+    }
+]

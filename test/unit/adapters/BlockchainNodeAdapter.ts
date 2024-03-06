@@ -1,5 +1,5 @@
 import {AbiItem} from 'web3';
-import {BlockchainNode} from '../../../src/blockchain_nodes/BlockchainNode';
+import {BlockchainNode} from '../../../src/blockchain/blockchain_nodes/BlockchainNode';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export class BlockchainNodeAdapter extends BlockchainNode {

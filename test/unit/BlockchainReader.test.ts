@@ -2,7 +2,8 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
-import {BlockChainReaderError, BlockchainReader} from '../../src/blockchain_reader/BlockchainReader';
+import {BlockChainReaderError, BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import { LoggerAdapter } from './adapters/LoggerAdapter';
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
@@ -10,6 +11,7 @@ const {expect} = chai;
 describe('Check that blockchain reader works with multiple underlying nodes', function() {
   let localNodeAlchemy: BlockchainNodeAdapter;
   let localNodeInfura: BlockchainNodeAdapter;
+  const logger: LoggerAdapter = new LoggerAdapter();
 
   beforeEach(async function() {
     localNodeAlchemy = new BlockchainNodeAdapter();
@@ -29,7 +31,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeInfura.setBlockNumber(blockNumberInfura);
 
-    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
     const blockNumber = await blockchainReader.getBlockNumber();
     expect(blockNumber).to.be.a('number');
     expect(blockNumber).to.be.eq(Math.max(blockNumberAlchemy, blockNumberInfura));
@@ -44,7 +46,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setBlockNumber(blockNumberInfura);
     localNodeInfura.setReadResponse('2');
 
-    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
 
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
@@ -62,7 +64,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setBlockNumber(blockNumberInfura);
     localNodeInfura.setThrowErrorOnGetBlockNumber(true);
 
-    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
 
     const res = await blockchainReader.getBlockNumber();
 
@@ -78,7 +80,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setBlockNumber(blockNumberInfura);
     localNodeInfura.setThrowErrorOnGetBlockNumber(true);
 
-    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
 
     try {
       await blockchainReader.getBlockNumber();
@@ -99,7 +101,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setReadResponse('2');
     localNodeInfura.setThrowErrorOnCallViewFunction(true);
 
-    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
 
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
@@ -121,7 +123,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setReadResponse('2');
     localNodeInfura.setThrowErrorOnCallViewFunction(true);
 
-    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
 
     try {
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
@@ -147,7 +149,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setReadResponse('2');
     localNodeInfura.setThrowErrorOnCallViewFunction(false);
 
-    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
 
     try {
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
@@ -173,7 +175,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setReadResponse('2');
     localNodeInfura.setThrowErrorOnCallViewFunction(true);
 
-    const blockchainReader = new BlockchainReader([localNodeAlchemy, localNodeInfura]);
+    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
 
     try {
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';

@@ -1,7 +1,7 @@
 import Web3, {AbiItem} from 'web3';
 import {DockerOperator} from '../blockchain_reader/DockerOperator';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
-import {Logger} from '../service/Logger';
+import {Logger} from '../service/logger/Logger';
 
 export class BlockchainNodeLocalHardhat extends BlockchainNode {
   private readonly web3: Web3;
@@ -13,20 +13,24 @@ export class BlockchainNodeLocalHardhat extends BlockchainNode {
   private readonly DEFAULT_HARDHAT_NODE_PORT = 8545;
   private readonly DEFAULT_HARDHAT_DOCKER_IMAGE_NAME = 'arch-production-node:latest';
 
-  constructor(externalPort: number, nodeName: string) {
+  constructor(logger: Logger, externalPort: number, nodeName: string) {
     super();
+
+    this.logger = logger;
 
     this.localRpcUrl = `http://127.0.0.1:${externalPort}`;
     this.web3 = new Web3(this.localRpcUrl);
+
     this.nodePort = externalPort;
     this.nodeName = nodeName;
 
-    this.dockerOperator = new DockerOperator({
-      portExternal: externalPort,
-      portInternal: this.DEFAULT_HARDHAT_NODE_PORT,
-      imageName: this.DEFAULT_HARDHAT_DOCKER_IMAGE_NAME,
-      instanceName: nodeName,
-    });
+    this.dockerOperator = new DockerOperator(logger,
+        {
+          portExternal: externalPort,
+          portInternal: this.DEFAULT_HARDHAT_NODE_PORT,
+          imageName: this.DEFAULT_HARDHAT_DOCKER_IMAGE_NAME,
+          instanceName: nodeName,
+        });
   }
 
   public async startNode(): Promise<void> {
@@ -39,10 +43,10 @@ export class BlockchainNodeLocalHardhat extends BlockchainNode {
   }
 
   public async recoverNode(): Promise<void> {
-    Logger.info('Trying to recover node...');
+    this.logger.info('Trying to recover node...');
     await this.stopNode();
     await this.startNode();
-    Logger.info('Node recovered successfully.');
+    this.logger.info('Node recovered successfully.');
     this.isNodeHealthy = true;
   }
 
@@ -51,7 +55,7 @@ export class BlockchainNodeLocalHardhat extends BlockchainNode {
       const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
       this.handleResetResponse(responseData);
     } catch (error) {
-      Logger.error(`Failed to reset node: ${(error as Error).message}`);
+      this.logger.error(`Failed to reset node: ${(error as Error).message}`);
       throw error instanceof BlockchainNodeError ? error : new BlockchainNodeError((error as Error).message);
     }
 
@@ -64,7 +68,7 @@ export class BlockchainNodeLocalHardhat extends BlockchainNode {
       this.isNodeHealthy = true;
       return Number(blockNumber);
     } catch (error) {
-      Logger.info(`${this.nodeName} cannot get block number: ${(error as Error).message}`);
+      this.logger.info(`${this.nodeName} cannot get block number: ${(error as Error).message}`);
       this.isNodeHealthy = false;
       throw error;
     }
@@ -83,7 +87,7 @@ export class BlockchainNodeLocalHardhat extends BlockchainNode {
       this.isNodeHealthy = true;
       return data;
     } catch (error) {
-      Logger.info(`${this.nodeName} cannot call view function ${functionName}: ${error}`);
+      this.logger.info(`${this.nodeName} cannot call view function ${functionName}: ${error}`);
       this.isNodeHealthy = false;
       throw error;
     }
@@ -93,10 +97,10 @@ export class BlockchainNodeLocalHardhat extends BlockchainNode {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const blockNumber = await this.getBlockNumber();
-        Logger.debug(`Blockchain is ready. Current block number is ${blockNumber}.`);
+        this.logger.debug(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
       } catch (error) {
-        Logger.debug(`Waiting for blockchain... Attempt ${attempt}/${maxAttempts} - ${(error as Error).message}`);
+        this.logger.debug(`Waiting for blockchain... Attempt ${attempt}/${maxAttempts} - ${(error as Error).message}`);
         await new Promise((resolve) => setTimeout(resolve, interval));
       }
     }
@@ -128,6 +132,6 @@ export class BlockchainNodeLocalHardhat extends BlockchainNode {
       const msg = `RPC Error: ${error.message}`;
       throw new BlockchainNodeError(msg);
     }
-    Logger.debug('Node reset successfully.');
+    this.logger.debug('Node reset successfully.');
   }
 }

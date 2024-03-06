@@ -1,7 +1,8 @@
-import {BlockchainNodeLocalHardhat} from '../../src/blockchain_nodes/BlockchainNodeLocalHardhat';
+import {BlockchainNodeLocalHardhat} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocalHardhat';
 
 import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 
 chai.use(chaiAsPromised);
 
@@ -11,8 +12,10 @@ describe('Check that we able to launch and stop docker containers', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
+  const logger: LoggerAdapter = new LoggerAdapter();
+
   it('should spin a new docker and read current block number directly from node', async function() {
-    const localNode = new BlockchainNodeLocalHardhat(8545, 'archimedes-node');
+    const localNode = new BlockchainNodeLocalHardhat(logger, 8545, 'archimedes-node');
 
     await localNode.startNode();
     const blockNumber = await localNode.getBlockNumber();

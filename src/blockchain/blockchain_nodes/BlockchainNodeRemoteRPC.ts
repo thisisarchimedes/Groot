@@ -1,16 +1,17 @@
 import Web3, {AbiItem} from 'web3';
 
 import {BlockchainNode} from './BlockchainNode';
-import {Logger} from '../service/Logger';
+import {Logger} from '../service/logger/Logger';
 
 export class BlockchainNodeRemoteRPC extends BlockchainNode {
   private readonly web3: Web3;
   private readonly remoteRpcUrl: string;
   private readonly SLEEP_DURATION_WHEN_RECOVERING_NODE = 10000;
 
-  constructor(remoteRpcUrl: string, nodeName: string) {
+  constructor(logger: Logger, remoteRpcUrl: string, nodeName: string) {
     super();
 
+    this.logger = logger;
     this.remoteRpcUrl = remoteRpcUrl;
     this.web3 = new Web3(remoteRpcUrl);
     this.nodeName = nodeName;
@@ -30,10 +31,10 @@ export class BlockchainNodeRemoteRPC extends BlockchainNode {
   }
 
   public async recoverNode(): Promise<void> {
-    Logger.info('Trying to recover node...');
+    this.logger.info('Trying to recover node...');
     await this.busySleep(this.SLEEP_DURATION_WHEN_RECOVERING_NODE);
     await this.getBlockNumber();
-    Logger.info('Node recovered successfully.');
+    this.logger.info('Node recovered successfully.');
     this.isNodeHealthy = true;
   }
 
@@ -43,7 +44,7 @@ export class BlockchainNodeRemoteRPC extends BlockchainNode {
       this.isNodeHealthy = true;
       return Number(blockNumber);
     } catch (error) {
-      Logger.info(`${this.nodeName} cannot get block number: ${(error as Error).message}`);
+      this.logger.info(`${this.nodeName} cannot get block number: ${(error as Error).message}`);
       this.isNodeHealthy = false;
       throw error;
     }
@@ -62,7 +63,7 @@ export class BlockchainNodeRemoteRPC extends BlockchainNode {
       this.isNodeHealthy = true;
       return data;
     } catch (error) {
-      Logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error}`);
+      this.logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error}`);
       this.isNodeHealthy = false;
       throw error;
     }

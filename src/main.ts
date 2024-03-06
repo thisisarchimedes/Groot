@@ -1,1 +1,5 @@
-console.log('I AM GROOT');
+
+export async function startGroot(runOnce: boolean = false): Promise<void> {
+
+    
+}

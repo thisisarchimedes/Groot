@@ -1,4 +1,5 @@
 import {AbiItem} from 'web3';
+import {Logger} from '../../service/logger/Logger';
 
 export class BlockchainNodeError extends Error {
   constructor(message: string) {
@@ -11,6 +12,7 @@ export class BlockchainNodeError extends Error {
 }
 
 export abstract class BlockchainNode {
+  protected logger: Logger;
   protected isNodeHealthy: boolean = true;
   protected nodeName: string = '';
 

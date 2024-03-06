@@ -29,11 +29,12 @@
 
 **Refactor**
 
-## Rules Engine
+## Rules Engine / Factory
+[] Create rule from dummy rule object
+[] Load rules from rule JSON and iterate on them, invoke each one
+[] Collect all tx from executed rule and put them in a queue
 
-[] Load rules from AWS AppConfig
-[] Go through all rules 
-[] Rule that needs to transmit tx - add to queue with priority
+- Do dummy rule (that create NewRelic log line) and then do end-to-end deploy with Kubernetes
 
 **Refactor**
 
@@ -46,3 +47,10 @@
 
 [] Run strategy and return tx - don't immediately broadcast. Have all tx and order them by priority, then broadcast
 [X] Create production docker image that doesn't mine blocks
+
+
+- Rule has a JSON param.
+- There is some kind of ABI repo
+
+# Plan 
+

@@ -2,8 +2,9 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
-import {BlockchainNodeLocalHardhat} from '../../src/blockchain_nodes/BlockchainNodeLocalHardhat';
-import {BlockchainNodeError} from '../../src/blockchain_nodes/BlockchainNode';
+import {BlockchainNodeLocalHardhat} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocalHardhat';
+import {BlockchainNodeError} from '../../src/blockchain/blockchain_nodes/BlockchainNode';
+import { LoggerAdapter } from '../unit/adapters/LoggerAdapter';
 
 dotenv.config();
 chai.use(chaiAsPromised);
@@ -15,9 +16,10 @@ describe('Check that we work with local Hardhat node correctly', function() {
   this.timeout(120000);
 
   let localNode: BlockchainNodeLocalHardhat;
+  const logger: LoggerAdapter = new LoggerAdapter();
 
   beforeEach(async function() {
-    localNode = new BlockchainNodeLocalHardhat(8545, 'archimedes-node-alchemy');
+    localNode = new BlockchainNodeLocalHardhat(logger, 8545, 'archimedes-node-alchemy');
     await localNode.startNode();
   });
 

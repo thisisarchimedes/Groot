@@ -1,6 +1,6 @@
 import {AbiItem} from 'web3-types';
 import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
-import {Logger} from '../service/Logger';
+import {Logger} from '../../service/logger/Logger';
 
 export class BlockChainReaderError extends Error {
   constructor(message: string) {
@@ -23,7 +23,13 @@ interface ValidNodeResponse {
 }
 
 export class BlockchainReader {
-  constructor(private readonly nodes: BlockchainNode[]) {}
+  private readonly nodes: BlockchainNode[];
+  private readonly logger: Logger;
+
+  constructor(logger: Logger, nodes: BlockchainNode[]) {
+    this.nodes = nodes;
+    this.logger = logger;
+  }
 
   public async getBlockNumber(): Promise<number> {
     const blockNumbers = await this.fetchBlockNumbersFromNodes();
@@ -57,7 +63,7 @@ export class BlockchainReader {
 
   private ensureValidBlockNumbers(validBlockNumbers: number[]): void {
     if (validBlockNumbers.length === 0) {
-      Logger.error('All nodes failed to retrieve block number');
+      this.logger.error('All nodes failed to retrieve block number');
       throw new BlockChainReaderError('All nodes failed to retrieve block number');
     }
   }
@@ -103,7 +109,7 @@ export class BlockchainReader {
 
   private ensureValidNodeResponses(validNodeResponses: ValidNodeResponse[]): void {
     if (validNodeResponses.length === 0) {
-      Logger.error('All nodes failed to retrieve block number');
+      this.logger.error('All nodes failed to retrieve block number');
       throw new BlockChainReaderError('All nodes failed to execute callViewFunction or getBlockNumber');
     }
   }
