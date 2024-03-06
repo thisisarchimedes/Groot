@@ -30,7 +30,7 @@
 **Refactor**
 
 ## Rules Engine / Factory
-[] Create rule from dummy rule object
+[X] Create rule from dummy rule object
 [] Load rules from rule JSON and iterate on them, invoke each one
 [] Collect all tx from executed rule and put them in a queue
 

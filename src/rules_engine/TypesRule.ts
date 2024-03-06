@@ -1,4 +1,4 @@
-export enum RuleType {
+export enum TypeRule {
     Dummy = 'dummy',
 }
 
@@ -8,6 +8,6 @@ export enum UrgencyLevel {
 }
 
 export interface RuleJSONConfigItem {
-    ruleType: RuleType;
+    ruleType: TypeRule;
     params: unknown;
 }

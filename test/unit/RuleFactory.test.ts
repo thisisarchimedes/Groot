@@ -1,17 +1,17 @@
 import {expect} from 'chai';
-import {RuleFactory} from '../../src/rules_engine/RuleFactory';
+import {FactoryRule} from '../../src/rules_engine/FactoryRule';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
-import {RuleJSONConfigItem, RuleType} from '../../src/rules_engine/RuleTypes';
+import {RuleJSONConfigItem, TypeRule} from '../../src/rules_engine/TypesRule';
 import {RuleParams} from '../../src/rules_engine/Rule';
 
 describe('Rule Factory', function() {
   const logger: LoggerAdapter = new LoggerAdapter();
 
   it('should create Rule object from a dummy rule config', async function() {
-    const ruleFactory = new RuleFactory(logger);
+    const ruleFactory = new FactoryRule(logger);
 
     const dummyRule: RuleJSONConfigItem = {
-      ruleType: RuleType.Dummy,
+      ruleType: TypeRule.Dummy,
       params: {
         message: 'I AM GROOT',
       },
