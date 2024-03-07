@@ -1,5 +1,5 @@
 import Docker from 'dockerode';
-import {Logger} from '../service/logger/Logger';
+import {Logger} from '../../service/logger/Logger';
 
 export interface DockerConfig {
   portExternal: number;

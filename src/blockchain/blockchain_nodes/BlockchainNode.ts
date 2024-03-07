@@ -12,9 +12,13 @@ export class BlockchainNodeError extends Error {
 }
 
 export abstract class BlockchainNode {
-  protected logger: Logger;
+  protected readonly logger: Logger;
   protected isNodeHealthy: boolean = true;
   protected nodeName: string = '';
+
+  constructor(logger: Logger) {
+    this.logger = logger;
+  }
 
   abstract startNode(): Promise<void>;
   abstract stopNode(): Promise<void>;

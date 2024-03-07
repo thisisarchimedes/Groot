@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import dotenv from 'dotenv';
 
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {Rule} from '../../src/types/Rule';
+import {RuleJSONConfigItem} from '../../src/rules_engine/TypesRule';
 
 dotenv.config();
 
@@ -27,7 +27,7 @@ describe('Config Service Test', function() {
   });
 
   it('should get GrootRules JSON from AWS', function() {
-    const rules: Rule[] = configService.getRules();
+    const rules: RuleJSONConfigItem[] = configService.getRules();
     expect(rules).to.not.be.undefined;
     expect(rules.length).to.be.greaterThan(0);
   });

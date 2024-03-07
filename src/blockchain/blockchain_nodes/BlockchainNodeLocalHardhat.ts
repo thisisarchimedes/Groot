@@ -1,7 +1,7 @@
 import Web3, {AbiItem} from 'web3';
 import {DockerOperator} from '../blockchain_reader/DockerOperator';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
-import {Logger} from '../service/logger/Logger';
+import {Logger} from '../../service/logger/Logger';
 
 export class BlockchainNodeLocalHardhat extends BlockchainNode {
   private readonly web3: Web3;
@@ -14,9 +14,7 @@ export class BlockchainNodeLocalHardhat extends BlockchainNode {
   private readonly DEFAULT_HARDHAT_DOCKER_IMAGE_NAME = 'arch-production-node:latest';
 
   constructor(logger: Logger, externalPort: number, nodeName: string) {
-    super();
-
-    this.logger = logger;
+    super(logger);
 
     this.localRpcUrl = `http://127.0.0.1:${externalPort}`;
     this.web3 = new Web3(this.localRpcUrl);
