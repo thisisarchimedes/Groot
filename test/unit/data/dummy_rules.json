@@ -1,0 +1,14 @@
+[
+    {
+        "ruleType": "dummy",
+        "params": {
+            "message": "I AM GROOT 1"
+        }
+    },
+    {
+        "ruleType": "dummy",
+        "params": {
+            "message": "I AM GROOT 2"
+        }
+    }
+]

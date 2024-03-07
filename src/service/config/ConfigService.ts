@@ -1,10 +1,10 @@
-import {Rule} from '../../types/Rule';
+import {RuleJSONConfigItem} from '../../rules_engine/TypesRule';
 
 export abstract class ConfigService {
   protected environment: string = '';
   protected mainRPCURL: string = '';
   protected altRPCURL: string = '';
-  protected rules: Rule[] = [];
+  protected rules: RuleJSONConfigItem[] = [];
 
   abstract refreshConfig(): Promise<void>;
 
@@ -20,7 +20,7 @@ export abstract class ConfigService {
     return this.altRPCURL;
   }
 
-  public getRules(): Rule[] {
+  public getRules(): RuleJSONConfigItem[] {
     return this.rules;
   }
 }

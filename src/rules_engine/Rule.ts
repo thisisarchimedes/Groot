@@ -9,6 +9,7 @@ export interface RuleParams {
 export abstract class Rule {
   protected logger: Logger;
   protected params: RuleParams;
+  protected pendingTx: OutboundTransaction | null = null;
 
   constructor(logger: Logger, params: RuleParams) {
     this.logger = logger;
@@ -16,5 +17,8 @@ export abstract class Rule {
   }
 
   abstract evaluate(): Promise<boolean>;
-  abstract getTransaction(): OutboundTransaction | null;
+
+  public getTransaction(): OutboundTransaction | null {
+    return this.pendingTx;
+  }
 }
