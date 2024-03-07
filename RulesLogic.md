@@ -12,7 +12,8 @@
     - **If TRUE**: If we go above the slippage threshold we withdraw everything from the pool.
 
 2. **Ownership Guard**: We don't want to own too much of the pool "vaule" asset
-    - **Logic**: We only consider the "value" asset for this calculation (e.g.: ETH/OETH pool - we only count ETH). If we deposit more than a certain percentage of the pool's "value" asset, we withdraw the excess. Example: ETH/OETH pool. ETH=50 OETH=90, if our ownership threshold is 30%, we always deposit less than 15 ETH. In doesn't matter how much OETH in the pool for this calculation
+    - **Logic**: We only consider the "value" asset for this calculation (e.g.: ETH/OETH pool - we only count ETH). If we deposit more than a certain percentage of the pool's "value" asset, we withdraw the excess. 
+        - Example: ETH/OETH pool. ETH=50 OETH=90, if our ownership threshold is 30%, we always deposit less than 15 ETH. In doesn't matter how much OETH in the pool for this calculation
      - **Parameters** _Ownership Threshold_ (30% in the above example). _Rebalance Rate_ (when we withdraw what is ownership target - for example when we trigger withdraw because we own more than 30% we want to withdraw until we own 20% of the pool value asset).
     - **If TRUE**: If we go above the _Ownership Threshold_ we withdraw until we are at the _Rebalance Rate_
 
