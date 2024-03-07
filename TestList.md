@@ -28,8 +28,7 @@
 ## TxQueuer
 
 [X] Get transactions from rules engine and filter all tx that don't have a hash + report on bad transaction (report context)
-[] Sort transactions by urgency level
-[] Add transactions to queue and report with context on each tx sent
+[X] Add transactions to queue and report with context on each tx sent
 
 
 - Do dummy rule (that create NewRelic log line) and then do end-to-end deploy with Kubernetes
@@ -51,7 +50,7 @@
 
 # Architecture
 
-[] Run strategy and return tx - don't immediately broadcast. Have all tx and order them by priority, then broadcast
+[X] Run strategy and return tx - don't immediately broadcast. Have all tx and order them by priority, then broadcast
 [X] Create production docker image that doesn't mine blocks
 
 

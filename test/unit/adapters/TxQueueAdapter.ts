@@ -4,7 +4,7 @@ import {ITxQueue} from '../../../src/tx_queue/ITxQueue';
 export class TxQueueAdapter implements ITxQueue {
   private transactions: OutboundTransaction[] = [];
 
-  public add(tx: OutboundTransaction): void {
+  public addTransactionToQueue(tx: OutboundTransaction): void {
     this.transactions.push(tx);
   }
 

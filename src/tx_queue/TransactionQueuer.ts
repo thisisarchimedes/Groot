@@ -18,7 +18,7 @@ export class TransactionQueuer {
         continue;
       }
       this.logger.info(`Queuing transaction: ${tx.context}`);
-      await this.queue.add(tx);
+      await this.queue.addTransactionToQueue(tx);
     }
   }
 
