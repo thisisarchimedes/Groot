@@ -1,4 +1,4 @@
-import { LogLevel, Logger } from '../../../src/service/logger/Logger';
+import {LogLevel, Logger} from '../../../src/service/logger/Logger';
 
 export class LoggerAdapter extends Logger {
   private latestInfoLogLine: string = '';
