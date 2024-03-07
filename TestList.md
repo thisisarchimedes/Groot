@@ -31,7 +31,7 @@
 
 ## Rules Engine / Factory
 [X] Create rule from dummy rule object
-[] Load rules from rule JSON and iterate on them, invoke each one
+[X] Load rules from rule JSON and iterate on them, invoke each one
 [] Collect all tx from executed rule and put them in a queue
 
 - Do dummy rule (that create NewRelic log line) and then do end-to-end deploy with Kubernetes
