@@ -12,7 +12,7 @@ export class RuleDummy extends Rule {
 
     this.pendingTx = {
       urgencyLevel: UrgencyLevel.NORMAL,
-      hash: 'dummyHash',
+      hash: '',
       lowLevelUnsignedTransaction: {},
     };
 

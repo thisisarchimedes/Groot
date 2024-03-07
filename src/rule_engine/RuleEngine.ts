@@ -4,6 +4,7 @@ import {Logger} from '../service/logger/Logger';
 import {FactoryRule} from './FactoryRule';
 import {Rule, RuleParams} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
+import Web3 from 'web3';
 
 export class RuleEngine {
   private rules: Rule[] = [];
@@ -27,7 +28,19 @@ export class RuleEngine {
 
   public async evaluateRules(): Promise<OutboundTransaction[]> {
     const evaluateResults = await this.evaluateRulesInParallel();
-    return this.getTransactionsFromEvaluateResults(evaluateResults);
+
+    let outboundTransactions = this.getTransactionsFromEvaluateResults(evaluateResults);
+
+    // Generate the hash for each outbound transaction
+    outboundTransactions = outboundTransactions.map((transaction) => {
+      const lowLevelUnsignedTransactionHash = Web3.utils.sha3(JSON.stringify(transaction.lowLevelUnsignedTransaction));
+      return {
+        ...transaction,
+        hash: lowLevelUnsignedTransactionHash,
+      };
+    });
+
+    return outboundTransactions;
   }
 
   private evaluateRulesInParallel(): Promise<{ rule: Rule; shouldExecute: boolean }[]> {
