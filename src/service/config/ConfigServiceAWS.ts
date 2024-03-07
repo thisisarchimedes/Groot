@@ -14,6 +14,7 @@ export class ConfigServiceAWS extends ConfigService {
     await Promise.all([
       this.refreshRPCURL(),
       this.refreshRules(),
+      this.refreshNewRelicConfig(),
     ]);
   }
 
@@ -30,5 +31,13 @@ export class ConfigServiceAWS extends ConfigService {
   private async refreshRules(): Promise<void> {
     const rules = await this.appConfigClient.fetchConfigRawString('GrootRules');
     this.rules = JSON.parse(rules);
+  }
+
+  private async refreshNewRelicConfig(): Promise<void> {
+    const newRelicURL = await this.appConfigClient.fetchConfigRawString('NewRelicURL');
+    const newRelicAPIKey = await this.appConfigClient.fetchConfigRawString('NewRelicApiKey');
+
+    this.newRelicURL = newRelicURL;
+    this.newRelicAPIKey = newRelicAPIKey;
   }
 }

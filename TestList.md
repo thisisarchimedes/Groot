@@ -54,7 +54,14 @@
 [X] Create production docker image that doesn't mine blocks
 
 Main process
-- Initalize objects and rules
+- start loop
+    - Init objects
+    - refresh config
+    - Health monitor - start
+    - Load rules 
+    - Run roles
+    - Do health monitoring on local nodes
+    - Health monitor - done
 
 
 - Rule has a JSON param.

@@ -25,8 +25,6 @@ describe('Check that we work with remote node correctly', function() {
     configService = new ConfigServiceAWS(environment, region);
     await configService.refreshConfig();
 
-    const res = configService.getMainRPCURL();
-    console.log('>>>> res: ', res);
     remoteNode = new BlockchainNodeRemoteRPC(logger, configService.getMainRPCURL(), 'demo-node');
     await remoteNode.startNode();
   });

@@ -4,7 +4,10 @@ export abstract class ConfigService {
   protected environment: string = '';
   protected mainRPCURL: string = '';
   protected altRPCURL: string = '';
+
   protected rules: RuleJSONConfigItem[] = [];
+  protected newRelicURL: string = '';
+  protected newRelicAPIKey: string = '';
 
   abstract refreshConfig(): Promise<void>;
 
@@ -22,5 +25,13 @@ export abstract class ConfigService {
 
   public getRules(): RuleJSONConfigItem[] {
     return this.rules;
+  }
+
+  public getNewRelicUrl(): string {
+    return this.newRelicURL;
+  }
+
+  public getNewRelicAPIKey(): string {
+    return this.newRelicAPIKey;
   }
 }
