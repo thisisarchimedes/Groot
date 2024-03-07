@@ -24,7 +24,7 @@
 [] Simulate transaction and report invalid without broadcasting it
 [] Can broadcast an invalid transaction (test pass simulation) and report when it failed
 [] Can boradcast a vaild transaction and report when it is successful
-[] Can set priority level for a transaction low/medium/high based on current network conditions
+[] Can set priority level "fees" for a transaction normal/urgent based on current network conditions
 [] Can re-broadcast if tx failed because PRC provider is down
 
 **Refactor**
