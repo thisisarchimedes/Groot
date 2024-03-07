@@ -12,6 +12,7 @@ export class RuleDummy extends Rule {
 
     this.pendingTx = {
       urgencyLevel: UrgencyLevel.NORMAL,
+      context: 'this is a dummy context',
       hash: '',
       lowLevelUnsignedTransaction: {},
     };
