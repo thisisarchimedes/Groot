@@ -24,6 +24,15 @@
      - **Parameters** Min amount of time since last recompound, Expected protocol profit are are least X times more than expected gas fees.
     - **If TRUE**: Call "DoHardWork" on the strategy
 
+5. **Adjust Uniswap Ticks**: When Uniswap is at the edge of the tick range we need to readjust the range
+    - **Logic**: Our liquidity is X% above the lower tick or Y% below the upper tick
+    - **Parameters**: 
+        - % threshold above lower tick
+        - % threshold below upper tick
+        - _lower tick range_: when readjusting liquidity, we want to be at least this much above the lower tick. A percentage of current price. For example: if price is 100 and _lower tick range_ is 10%, we set lower tick to 90.
+        - _upper tick range_: similar to above
+    - **If TRUE**: Readjust ticks base on _lower tick range_, _upper tick range_ and current price point
+
 
 
 # Leverage
