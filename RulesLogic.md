@@ -5,8 +5,6 @@
 - Rule logic is implemented in code. Rule Params are a JSON object.
 
 # Table of Contents
-- [Context](#context)
-- [Table of Contents](#table-of-contents)
 - [PSP](#psp)
   - [Slippage Guard (URGENT)](#slippage-guard-urgent)
   - [Ownership Guard (URGENT)](#ownership-guard-urgent)
