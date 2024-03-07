@@ -53,6 +53,9 @@
 [X] Run strategy and return tx - don't immediately broadcast. Have all tx and order them by priority, then broadcast
 [X] Create production docker image that doesn't mine blocks
 
+Main process
+- Initalize objects and rules
+
 
 - Rule has a JSON param.
 - There is some kind of ABI repo

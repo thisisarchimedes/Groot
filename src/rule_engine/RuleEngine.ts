@@ -1,8 +1,6 @@
 import Web3 from 'web3';
 import {Transaction} from 'web3-types';
-
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {ConfigService} from '../service/config/ConfigService';
 import {Logger} from '../service/logger/Logger';
 import {FactoryRule} from './FactoryRule';
 import {Rule, RuleParams} from './rule/Rule';
@@ -14,12 +12,10 @@ export class RuleEngine {
 
   constructor(
     private readonly logger: Logger,
-    private readonly configService: ConfigService,
     private readonly ruleFactory: FactoryRule,
-  ) {}
+  ) { }
 
-  public loadRules(): void {
-    const ruleConfig: RuleJSONConfigItem[] = this.configService.getRules();
+  public loadRulesFromJSONConfig(ruleConfig: RuleJSONConfigItem[]): void {
     this.rules = this.createRulesFromConfig(ruleConfig);
   }
 

@@ -17,9 +17,9 @@ describe('Rule Engine', function() {
     await configService.refreshConfig();
 
     const ruleFactory = new FactoryRule(logger);
-    const ruleEngine = new RuleEngine(logger, configService, ruleFactory);
+    const ruleEngine = new RuleEngine(logger, ruleFactory);
 
-    ruleEngine.loadRules();
+    ruleEngine.loadRulesFromJSONConfig(configService.getRules());
     const tx = await ruleEngine.evaluateRules();
 
     expect(tx).not.to.be.undefined;
@@ -32,9 +32,9 @@ describe('Rule Engine', function() {
     await configService.refreshConfig();
 
     const ruleFactory = new FactoryRule(logger);
-    const ruleEngine = new RuleEngine(logger, configService, ruleFactory);
+    const ruleEngine = new RuleEngine(logger, ruleFactory);
 
-    ruleEngine.loadRules();
+    ruleEngine.loadRulesFromJSONConfig(configService.getRules());
     const tx = await ruleEngine.evaluateRules();
 
     expect(tx).not.to.be.undefined;
