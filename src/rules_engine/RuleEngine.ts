@@ -6,43 +6,43 @@ import {Rule, RuleParams} from './Rule';
 import {RuleJSONConfigItem} from './TypesRule';
 
 export class RuleEngine {
-  private logger: Logger;
-  private configService: ConfigService;
-  private ruleFactory: FactoryRule;
-
   private rules: Rule[] = [];
 
-  constructor(logger: Logger, configService: ConfigService, ruleFactory: FactoryRule) {
-    this.logger = logger;
-    this.configService = configService;
-    this.ruleFactory = ruleFactory;
-  }
+  constructor(
+    private readonly logger: Logger,
+    private readonly configService: ConfigService,
+    private readonly ruleFactory: FactoryRule,
+  ) {}
 
   public loadRules(): void {
     const ruleConfig: RuleJSONConfigItem[] = this.configService.getRules();
-    this.rules = [];
+    this.rules = this.createRulesFromConfig(ruleConfig);
+  }
 
-    for (const config of ruleConfig) {
-      const rule = this.ruleFactory.createRule(config.ruleType, config.params as RuleParams);
-      this.rules.push(rule);
-    }
+  private createRulesFromConfig(ruleConfig: RuleJSONConfigItem[]): Rule[] {
+    return ruleConfig.map((config) =>
+      this.ruleFactory.createRule(config.ruleType, config.params as RuleParams),
+    );
   }
 
   public async evaluateRules(): Promise<OutboundTransaction[]> {
-    const evaluatePromises = this.rules.map(async (rule) => {
-      const shouldExecute = await rule.evaluate();
-      return {rule, shouldExecute};
-    });
+    const evaluateResults = await this.evaluateRulesInParallel();
+    return this.getTransactionsFromEvaluateResults(evaluateResults);
+  }
 
-    const evaluateResults = await Promise.all(evaluatePromises);
+  private async evaluateRulesInParallel(): Promise<{ rule: Rule; shouldExecute: boolean }[]> {
+    const evaluatePromises = this.rules.map(async (rule) => ({
+      rule,
+      shouldExecute: await rule.evaluate(),
+    }));
+    return Promise.all(evaluatePromises);
+  }
 
-    const txs: OutboundTransaction[] = [];
-    for (const {rule, shouldExecute} of evaluateResults) {
-      if (shouldExecute) {
-        txs.push(rule.getTransaction() as OutboundTransaction);
-      }
-    }
-
-    return txs;
+  private getTransactionsFromEvaluateResults(
+      evaluateResults: { rule: Rule; shouldExecute: boolean }[],
+  ): OutboundTransaction[] {
+    return evaluateResults
+        .filter(({shouldExecute}) => shouldExecute)
+        .map(({rule}) => rule.getTransaction() as OutboundTransaction);
   }
 }

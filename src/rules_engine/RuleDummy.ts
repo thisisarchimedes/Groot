@@ -1,4 +1,3 @@
-import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Rule, RuleParams} from './Rule';
 import {UrgencyLevel} from './TypesRule';
 
