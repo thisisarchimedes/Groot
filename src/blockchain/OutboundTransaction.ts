@@ -1,5 +1,5 @@
 import {Transaction} from 'web3-types';
-import {UrgencyLevel} from '../rules_engine/TypesRule';
+import {UrgencyLevel} from '../rule_engine/TypesRule';
 
 export interface OutboundTransaction {
   urgencyLevel: UrgencyLevel;

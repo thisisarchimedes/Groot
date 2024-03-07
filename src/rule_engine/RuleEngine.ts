@@ -2,7 +2,7 @@ import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {ConfigService} from '../service/config/ConfigService';
 import {Logger} from '../service/logger/Logger';
 import {FactoryRule} from './FactoryRule';
-import {Rule, RuleParams} from './Rule';
+import {Rule, RuleParams} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
 
 export class RuleEngine {
@@ -12,7 +12,7 @@ export class RuleEngine {
     private readonly logger: Logger,
     private readonly configService: ConfigService,
     private readonly ruleFactory: FactoryRule,
-  ) {}
+  ) { }
 
   public loadRules(): void {
     const ruleConfig: RuleJSONConfigItem[] = this.configService.getRules();

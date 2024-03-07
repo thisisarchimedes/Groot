@@ -2,7 +2,7 @@ import {expect} from 'chai';
 import dotenv from 'dotenv';
 
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {RuleJSONConfigItem} from '../../src/rules_engine/TypesRule';
+import {RuleJSONConfigItem} from '../../src/rule_engine/TypesRule';
 
 dotenv.config();
 

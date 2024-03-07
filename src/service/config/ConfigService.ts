@@ -1,4 +1,4 @@
-import {RuleJSONConfigItem} from '../../rules_engine/TypesRule';
+import {RuleJSONConfigItem} from '../../rule_engine/TypesRule';
 
 export abstract class ConfigService {
   protected environment: string = '';

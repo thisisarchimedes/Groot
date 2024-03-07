@@ -1,8 +1,8 @@
 import {expect} from 'chai';
-import {FactoryRule} from '../../src/rules_engine/FactoryRule';
+import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
-import {RuleJSONConfigItem, TypeRule} from '../../src/rules_engine/TypesRule';
-import {RuleParams} from '../../src/rules_engine/Rule';
+import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
+import {RuleParams} from '../../src/rule_engine/rule/Rule';
 
 describe('Rule Factory', function() {
   const logger: LoggerAdapter = new LoggerAdapter();

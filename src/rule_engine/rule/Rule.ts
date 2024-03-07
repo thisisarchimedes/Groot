@@ -1,9 +1,9 @@
-import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {Logger} from '../service/logger/Logger';
-import {UrgencyLevel} from './TypesRule';
+import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
+import {Logger} from '../../service/logger/Logger';
+import {UrgencyLevel} from '../TypesRule';
 
 export interface RuleParams {
-    urgencyLevel: UrgencyLevel;
+  urgencyLevel: UrgencyLevel;
 }
 
 export abstract class Rule {

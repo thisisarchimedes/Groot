@@ -1,5 +1,5 @@
 import {Rule, RuleParams} from './Rule';
-import {UrgencyLevel} from './TypesRule';
+import {UrgencyLevel} from '../TypesRule';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;

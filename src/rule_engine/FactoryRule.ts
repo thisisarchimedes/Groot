@@ -1,6 +1,6 @@
 import {Logger} from '../service/logger/Logger';
-import {Rule, RuleParams} from './Rule';
-import {RuleDummy} from './RuleDummy';
+import {Rule, RuleParams} from './rule/Rule';
+import {RuleDummy} from './rule/RuleDummy';
 import {TypeRule} from './TypesRule';
 
 export class ErrorRuleFactory extends Error {
