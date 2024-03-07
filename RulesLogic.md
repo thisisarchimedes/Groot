@@ -29,3 +29,22 @@
 # Leverage
 
 # URGENT
+1. **Liquidation**: When position is too close the the collateral value, we close it
+    - **Logic**: Simulate closing the postion. If the amount of WBTC we get back is below: _collateral amount_ * _liquidation buffer_
+    - **Parameters** : liquidation buffer (e.g. x1.1)
+    - **If TRUE**: Liquidate position on chain
+
+# NORMAL
+2. **Rebalance pool/expiration**: When WBTC/lvBTC pool has less than a certain % of WBTC, we rebalance it
+    - **Logic**: If the amount of WBTC in the pool is less than _pool rebalance threshold_ 
+    - **Parameters**: 
+        - _pool rebalance threshold_: the % of WBTC in the pool (e.g. 10%). 
+        - _pool rebalance target_: the % of WBTC in the pool we aim from when rebalancing and expiring(e.g. 20%)
+    - **If TRUE**: we deposit more WBTC to the pool from the WBTC vault. If there isn't enough WBTC in the vault, expire as much positions as needed (start from the oldest position)
+
+3. **Add WBTC from pool to vault**: When WBTC/lvBTC pool has more than a certain % of WBTC, we mint lvBTC and swap it for WBTC, and add it to the vault
+    - **Logic**: If the amount of WBTC in the pool is more than _vault rebalance target_ 
+    - **Parameters**: 
+        - _vault rebalance threshold_: the % of WBTC in the pool (e.g. 70%). 
+        - _vault rebalance target_: the % of WBTC in the pool we aim from when rebalancing and expiring(e.g. 40%)
+    - **If TRUE**: we mint lvBTC and use it to withdraw WBTC from the pool to the WBTC vault
