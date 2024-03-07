@@ -2,8 +2,9 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
-import {LoggerNewRelic} from '../../src/service/logger/LoggerNewRelic';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {LoggerNewRelic} from '../../src/service/logger/LoggerNewRelic';
+import {LoggerAll} from '../../src/service/logger/LoggerAll';
 
 chai.use(chaiAsPromised);
 dotenv.config();
@@ -24,6 +25,12 @@ describe('Check that we work with NewRelic correctly', function() {
   it('Should send a log line to New Relic', async function() {
     const logger = new LoggerNewRelic(configService, 'AcceptanceTest');
     logger.info('I AM GROOT');
+    await logger.flush();
+  });
+
+  it('Should send a log line to New Relic and console', async function() {
+    const logger = new LoggerAll(configService, 'AcceptanceTest');
+    logger.info('I AM GROOT - ALL');
     await logger.flush();
   });
 });

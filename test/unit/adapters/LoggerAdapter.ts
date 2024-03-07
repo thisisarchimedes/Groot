@@ -4,6 +4,10 @@ export class LoggerAdapter extends Logger {
   private latestInfoLogLine: string = '';
   private latestErrorLogLine: string = '';
 
+  public async flush(): Promise<void> {
+    // No-op
+  }
+
   public debug(message: string): void {
     if (this.currentLevel >= LogLevel.Debug) {
       console.debug('\x1b[2;37m%s\x1b[0m', '[DEBUG] ' + message);
