@@ -12,7 +12,7 @@
 **Refactor**
 
 [X] Change console.log to log.debug
-[] Add new relic support to logger.ts
+[X] Add new relic support to logger.ts
 [] add more logging
 
 ## ConfigService
