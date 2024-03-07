@@ -1,10 +1,13 @@
+import Web3 from 'web3';
+import {Transaction} from 'web3-types';
+
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {ConfigService} from '../service/config/ConfigService';
 import {Logger} from '../service/logger/Logger';
 import {FactoryRule} from './FactoryRule';
 import {Rule, RuleParams} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
-import Web3 from 'web3';
+
 
 export class RuleEngine {
   private rules: Rule[] = [];
@@ -13,11 +16,17 @@ export class RuleEngine {
     private readonly logger: Logger,
     private readonly configService: ConfigService,
     private readonly ruleFactory: FactoryRule,
-  ) { }
+  ) {}
 
   public loadRules(): void {
     const ruleConfig: RuleJSONConfigItem[] = this.configService.getRules();
     this.rules = this.createRulesFromConfig(ruleConfig);
+  }
+
+  public async evaluateRules(): Promise<OutboundTransaction[]> {
+    const evaluateResults = await this.evaluateRulesInParallel();
+    const outboundTransactions = this.getTransactionsFromEvaluateResults(evaluateResults);
+    return this.addHashToTransactions(outboundTransactions);
   }
 
   private createRulesFromConfig(ruleConfig: RuleJSONConfigItem[]): Rule[] {
@@ -26,24 +35,7 @@ export class RuleEngine {
     );
   }
 
-  public async evaluateRules(): Promise<OutboundTransaction[]> {
-    const evaluateResults = await this.evaluateRulesInParallel();
-
-    let outboundTransactions = this.getTransactionsFromEvaluateResults(evaluateResults);
-
-    // Generate the hash for each outbound transaction
-    outboundTransactions = outboundTransactions.map((transaction) => {
-      const lowLevelUnsignedTransactionHash = Web3.utils.sha3(JSON.stringify(transaction.lowLevelUnsignedTransaction));
-      return {
-        ...transaction,
-        hash: lowLevelUnsignedTransactionHash,
-      };
-    });
-
-    return outboundTransactions;
-  }
-
-  private evaluateRulesInParallel(): Promise<{ rule: Rule; shouldExecute: boolean }[]> {
+  private evaluateRulesInParallel(): Promise<EvaluateResult[]> {
     const evaluatePromises = this.rules.map(async (rule) => ({
       rule,
       shouldExecute: await rule.evaluate(),
@@ -51,11 +43,31 @@ export class RuleEngine {
     return Promise.all(evaluatePromises);
   }
 
-  private getTransactionsFromEvaluateResults(
-      evaluateResults: { rule: Rule; shouldExecute: boolean }[],
-  ): OutboundTransaction[] {
+  private getTransactionsFromEvaluateResults(evaluateResults: EvaluateResult[]): OutboundTransaction[] {
     return evaluateResults
         .filter(({shouldExecute}) => shouldExecute)
         .map(({rule}) => rule.getTransaction() as OutboundTransaction);
   }
+
+  private addHashToTransactions(transactions: OutboundTransaction[]): OutboundTransaction[] {
+    return transactions.map((transaction) => ({
+      ...transaction,
+      hash: this.generateTransactionHash(transaction.lowLevelUnsignedTransaction),
+    }));
+  }
+
+  private generateTransactionHash(transaction: Transaction): string {
+    const hash = Web3.utils.sha3(JSON.stringify(transaction));
+    if (hash === undefined) {
+      this.logger.error(`Failed to generate hash for transaction: ${transaction}`);
+      return '';
+    }
+
+    return hash;
+  }
+}
+
+interface EvaluateResult {
+  rule: Rule;
+  shouldExecute: boolean;
 }
