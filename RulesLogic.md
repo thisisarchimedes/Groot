@@ -7,18 +7,18 @@
 # Table of Contents
 - [PSP](#psp)
   - [URGENT](#urgent)
-    1. [Slippage Guard](#1-slippage-guard)
-    2. [Ownership Guard](#2-ownership-guard)
+    - [Slippage Guard](#1-slippage-guard)
+    - [Ownership Guard](#2-ownership-guard)
   - [NORMAL](#normal)
-    3. [Deposit](#3-deposit)
-    4. [Recompound](#4-recompound)
-    5. [Adjust Uniswap Ticks](#5-adjust-uniswap-ticks)
+    - [Deposit](#3-deposit)
+    - [Recompound](#4-recompound)
+    - [Adjust Uniswap Ticks](#5-adjust-uniswap-ticks)
 - [Leverage](#leverage)
   - [URGENT](#urgent-1)
-    6. [Liquidation](#6-liquidation)
+    - [Liquidation](#6-liquidation)
   - [NORMAL](#normal-1)
-    7. [Rebalance pool/expiration](#7-rebalance-poolexpiration)
-    8. [Add WBTC from pool to vault](#8-add-wbtc-from-pool-to-vault)
+    - [Rebalance pool/expiration](#7-rebalance-poolexpiration)
+    - [Add WBTC from pool to vault](#8-add-wbtc-from-pool-to-vault)
 
 
 # PSP
