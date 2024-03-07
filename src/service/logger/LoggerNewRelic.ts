@@ -3,120 +3,124 @@ import axios from 'axios';
 import {LogLevel, Logger} from './Logger';
 import {ConfigService} from '../config/ConfigService';
 
-interface LogRecord {
-  message: string;
-  level: string;
-  timestamp: number;
-  service: string;
-}
-
-class CustomJsonFormatter {
-  format(record: LogRecord): string {
-    return JSON.stringify({
-      ...record,
-      timestamp: new Date().getTime(), // timestamp in milliseconds
-    });
-  }
-}
-
 export class LoggerNewRelic extends Logger {
-  private readonly NewRelicEndpointUrl: string;
-  private readonly maxRetries: number;
-  private readonly backoffFactor: number;
-  private readonly apiKey: string;
-  private readonly environment: string;
-  private readonly serviceName: string;
+  private readonly config: NewRelicConfig;
+  private readonly formatter: LogFormatter;
   private pendingPromises: Promise<void>[] = [];
 
   constructor(
       configService: ConfigService,
       serviceName: string,
+      formatter: LogFormatter = new CustomJsonFormatter(),
       maxRetries = 3,
       backoffFactor = 2,
   ) {
     super();
-    this.apiKey = configService.getNewRelicAPIKey();
-    this.environment = configService.getEnvironment();
-    this.NewRelicEndpointUrl = configService.getNewRelicUrl();
-
-    this.serviceName = serviceName;
-    this.maxRetries = maxRetries;
-    this.backoffFactor = backoffFactor;
+    this.config = {
+      apiKey: configService.getNewRelicAPIKey(),
+      environment: configService.getEnvironment(),
+      endpointUrl: configService.getNewRelicUrl(),
+      serviceName,
+      maxRetries,
+      backoffFactor,
+    };
+    this.formatter = formatter;
   }
 
-  private log(level: string, message: string): void {
-    const formatter = new CustomJsonFormatter();
-    const record: LogRecord = {
-      message,
-      level,
-      timestamp: Date.now(),
-      service: this.serviceName,
-    };
-    const formattedRecord = formatter.format(record);
-    this.emit(JSON.parse(formattedRecord));
-  }
-
-  private emit(record: LogRecord): void {
-    const headers = {
-      'Api-Key': this.apiKey,
-      'Content-Type': 'application/json',
-    };
-
-    const payload = {
-      environment: this.environment,
-      ...record,
-    };
-
-    const promise = (async () => {
-      for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
-        try {
-          await axios.post(this.NewRelicEndpointUrl, payload, {headers});
-          break; // Successful request, break the loop
-        } catch (error) {
-          if (attempt === this.maxRetries) {
-            console.error(
-                `Failed to send log to New Relic after ${this.maxRetries} retries:`,
-                error,
-            );
-          } else {
-            await new Promise((resolve) =>
-              setTimeout(resolve, attempt * this.backoffFactor * 1000),
-            );
-          }
-        }
-      }
-    })();
-
-    this.pendingPromises.push(promise);
-  }
-
-  async flush(): Promise<void> {
+  public async flush(): Promise<void> {
     const promisesToFlush = [...this.pendingPromises];
     this.pendingPromises = [];
     await Promise.allSettled(promisesToFlush);
   }
 
-  debug(message: string): void {
-    if (this.currentLevel >= LogLevel.Debug) {
-      this.log('DEBUG', message);
-    }
+  public debug(message: string): void {
+    this.log(LogLevel.Debug, message);
   }
 
-  info(message: string): void {
-    if (this.currentLevel >= LogLevel.Info) {
-      this.log('INFO', message);
-    }
+  public info(message: string): void {
+    this.log(LogLevel.Info, message);
   }
 
-  warn(message: string): void {
-    if (this.currentLevel >= LogLevel.Warn) {
-      this.log('WARNING', message);
-    }
+  public warn(message: string): void {
+    this.log(LogLevel.Warn, message);
   }
 
-  error(message: string): void {
-    if (this.currentLevel >= LogLevel.Error) {
-      this.log('ERROR', message);
+  public error(message: string): void {
+    this.log(LogLevel.Error, message);
+  }
+
+  private log(level: LogLevel, message: string): void {
+    const record: LogRecord = {
+      message,
+      level: LogLevel[level],
+      timestamp: Date.now(),
+      service: this.config.serviceName,
+    };
+    const formattedRecord = this.formatter.format(record);
+    this.emit(JSON.parse(formattedRecord));
+  }
+
+  private emit(record: LogRecord): void {
+    const headers = {
+      'Api-Key': this.config.apiKey,
+      'Content-Type': 'application/json',
+    };
+
+    const payload = {
+      environment: this.config.environment,
+      ...record,
+    };
+
+    const promise = this.sendLogToNewRelic(payload, headers);
+    this.pendingPromises.push(promise);
+  }
+
+  private async sendLogToNewRelic(payload: Record<string, unknown>, headers: Record<string, string>): Promise<void> {
+    for (let attempt = 1; attempt <= this.config.maxRetries; attempt++) {
+      try {
+        await axios.post(this.config.endpointUrl, payload, {headers});
+        return;
+      } catch (error) {
+        if (attempt === this.config.maxRetries) {
+          console.error(
+              `Failed to send log to New Relic after ${this.config.maxRetries} retries:`,
+              error,
+          );
+        } else {
+          await new Promise((resolve) =>
+            setTimeout(resolve, attempt * this.config.backoffFactor * 1000),
+          );
+        }
+      }
     }
   }
 }
+
+interface LogRecord {
+    message: string;
+    level: string;
+    timestamp: number;
+    service: string;
+  }
+
+interface LogFormatter {
+    format(record: LogRecord): string;
+  }
+
+class CustomJsonFormatter implements LogFormatter {
+  format(record: LogRecord): string {
+    return JSON.stringify({
+      ...record,
+      timestamp: new Date().getTime(),
+    });
+  }
+}
+
+interface NewRelicConfig {
+    apiKey: string;
+    environment: string;
+    endpointUrl: string;
+    serviceName: string;
+    maxRetries: number;
+    backoffFactor: number;
+  }
