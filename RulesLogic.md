@@ -4,6 +4,23 @@
 - Rule objects get PSP strategy address, AMM pool address as param (so we can use the same Rule implementation on similar pools) 
 - Rule logic is implemented in code. Rule Params are a JSON object.
 
+# Table of Contents
+- [PSP](#psp)
+  - [URGENT](#urgent)
+    1. [Slippage Guard](#1-slippage-guard)
+    2. [Ownership Guard](#2-ownership-guard)
+  - [NORMAL](#normal)
+    3. [Deposit](#3-deposit)
+    4. [Recompound](#4-recompound)
+    5. [Adjust Uniswap Ticks](#5-adjust-uniswap-ticks)
+- [Leverage](#leverage)
+  - [URGENT](#urgent-1)
+    6. [Liquidation](#6-liquidation)
+  - [NORMAL](#normal-1)
+    7. [Rebalance pool/expiration](#7-rebalance-poolexpiration)
+    8. [Add WBTC from pool to vault](#8-add-wbtc-from-pool-to-vault)
+
+
 # PSP
 
 ## URGENT
