@@ -32,7 +32,9 @@
 ## Rules Engine / Factory
 [X] Create rule from dummy rule object
 [X] Load rules from rule JSON and iterate on them, invoke each one
+[] Add "group" to each rule and assign instance with a group number, make sure it only run rules under it's group 
 [] Collect all tx from executed rule and put them in a queue
+[] Push transactions to queue to deliver to broadcaster (urgent first)
 
 - Do dummy rule (that create NewRelic log line) and then do end-to-end deploy with Kubernetes
 
