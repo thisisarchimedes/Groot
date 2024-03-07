@@ -41,13 +41,17 @@ When a user deposit to our PSP strategy, tokens are not going straight to the po
     - We have more than a certain amount of tokens idle in the strategy
     - The amount of time passed from previous deposit (a.k.a. adjustin) and withdraw (a.k.a. adjust out), is more than our threshold
         - Example: If we deposit no more than once a day. But Slippage Guard or Ownership Guard triggered a few hours ago, we don't deposit.
-- **Parameters**: Min amount to deposit, min period of time
+- **Parameters**: 
+    - _Min amount available to deposit_
+    - _Min period of time_ since last deposit or withdraw (the latest one that happened)
 - **If TRUE**: Deposit all the idle liquidity to the AMM pool
 
 ## Recompound (NORMAL)
 We collect APY, send protocol fees to the treasury, and compound the rest.
 - **Logic**: When a minimum amount of time passed, and the amount of fees the protocol gets is X times more than the estimated gas we pay for the entire process.
-- **Parameters** Min amount of time since last recompound, Expected protocol profit are are least X times more than expected gas fees.
+- **Parameters** 
+    - _Min amount of time_ since last recompound, 
+    - _Expected protocol profit multiplier_. Profits are are least X times more than expected gas fees.
 - **If TRUE**: Call "DoHardWork" on the strategy
 
 ## Adjust Uniswap Ticks (NORMAL)
