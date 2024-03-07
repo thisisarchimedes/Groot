@@ -27,7 +27,7 @@ describe('Rule Engine', function() {
     expect(logger.getLatestLogLine()).to.contain('I AM GROOT');
   });
 
-  it('Should attach tx hash to all transaction', async function() {
+  it('Should attach tx hash to all transactions', async function() {
     configService.setRulesFromFile('./test/unit/data/dummy_rules.json');
     await configService.refreshConfig();
 
