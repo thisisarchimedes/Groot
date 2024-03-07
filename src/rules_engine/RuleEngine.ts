@@ -30,7 +30,7 @@ export class RuleEngine {
     return this.getTransactionsFromEvaluateResults(evaluateResults);
   }
 
-  private async evaluateRulesInParallel(): Promise<{ rule: Rule; shouldExecute: boolean }[]> {
+  private evaluateRulesInParallel(): Promise<{ rule: Rule; shouldExecute: boolean }[]> {
     const evaluatePromises = this.rules.map(async (rule) => ({
       rule,
       shouldExecute: await rule.evaluate(),
