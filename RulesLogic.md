@@ -1,8 +1,13 @@
+# Context
+
+- We are going to have two seperate Monitor addresses one for Urgent txs and one for the Normal txs
+
 # PSP
 
 ## URGENT
 1. **Slippage Guard**: We should always be able to leave the pool with minimal slippage.
     - **Logic**: Calculate slippage on an AMM pool (Convex/Aura or directly Curve/Balancer). How much slippage we suffer if we withdraw everything we currently have in the pool. 
+        - Slippage is calculated by simulating withdraw. We run "adjust out" on the strategy off-chain.
     - **Parameters** Rule object get PSP strategy object, AMM pool address and slippage threshold as param. 
     - **If TRUE**: If we go above the slippage threshold we withdraw everything from the pool.
 
@@ -16,6 +21,7 @@
      - **Logic**: If Slippage Guard and Ownership Guard aren't triggered, and:
         - We have more than a certain amount of tokens idle in the strategy
         - The amount of time passed from previous deposit (a.k.a. adjustin) and withdraw (a.k.a. adjust out), is more than our threshold
+            - Example: If we deposit no more than once a day. But Slippage Guard or Ownership Guard triggered a few hours ago, we don't deposit.
      - **Parameters**: Min amount to deposit, min period of time
     - **If TRUE**: Deposit all the idle liquidity to the AMM pool
 
@@ -40,7 +46,8 @@
 # URGENT
 1. **Liquidation**: When position is too close the the collateral value, we close it
     - **Logic**: Simulate closing the postion. If the amount of WBTC we get back is below: _collateral amount_ * _liquidation buffer_
-    - **Parameters** : liquidation buffer (e.g. x1.1)
+    - **Parameters** : 
+        - _liquidation buffer_ (e.g. x1.1 above collateral)
     - **If TRUE**: Liquidate position on chain
 
 # NORMAL
