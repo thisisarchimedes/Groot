@@ -36,8 +36,9 @@
 
 ## Health Monitor
 - probably want to check each node health flag and call recover. Do it once at the end of the test suite or if all nodes are down
-[] When a nodes fails, can spin new nodes and use them
+[] When a nodes fails, can spin new nodes and use them 
 [] Can handle all nodes failing, and report error and spin new nodes
+[] Send pulse check to external watchdog service
 
 
 ## Tx Broadcaster (Seperate process)
