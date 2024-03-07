@@ -5,25 +5,22 @@
 - Rule logic is implemented in code. Rule Params are a JSON object.
 
 # Table of Contents
+- [Context](#context)
+- [Table of Contents](#table-of-contents)
 - [PSP](#psp)
-  - [URGENT](#urgent)
-    - [Slippage Guard](#slippage-guard)
-    - [Ownership Guard](#ownership-guard)
-  - [NORMAL](#normal)
-    - [Deposit](#deposit)
-    - [Recompound](#recompound)
-    - [Adjust Uniswap Ticks](#adjust-uniswap-ticks)
+  - [Slippage Guard (URGENT)](#slippage-guard-urgent)
+  - [Ownership Guard (URGENT)](#ownership-guard-urgent)
+  - [Deposit (NORMAL)](#deposit-normal)
+  - [Recompound (NORMAL)](#recompound-normal)
+  - [Adjust Uniswap Ticks (NORMAL)](#adjust-uniswap-ticks-normal)
 - [Leverage](#leverage)
-  - [URGENT](#urgent-1)
-    - [Liquidation](#liquidation)
-  - [NORMAL](#normal-1)
-    - [Rebalance pool/expiration](#rebalance-poolexpiration)
-    - [Add WBTC from pool to vault](#add-wbtc-from-pool-to-vault)
+  - [Liquidation (URGENT)](#liquidation-urgent)
+  - [Rebalance pool/expiration (NORMAL)](#rebalance-poolexpiration-normal)
+  - [Add WBTC from pool to vault (NORMAL)](#add-wbtc-from-pool-to-vault-normal)
+
 
 # PSP
-
-## URGENT
-### Slippage Guard
+## Slippage Guard (URGENT)
 We should always be able to leave the pool with minimal slippage.
 - **Logic**: Calculate slippage on an AMM pool (Convex/Aura or directly Curve/Balancer). How much slippage we suffer if we withdraw everything we currently have in the pool. 
     - Slippage is calculated by simulating withdraw. We run "adjust out" on the strategy off-chain.
@@ -31,7 +28,7 @@ We should always be able to leave the pool with minimal slippage.
     - _Max slipage_
 - **If TRUE**: If we go above the slippage threshold we withdraw everything from the pool.
 
-### Ownership Guard
+## Ownership Guard (URGENT)
 We don't want to own too much of the pool "vaule" asset
 - **Logic**: We only consider the "value" asset for this calculation (e.g.: ETH/OETH pool - we only count ETH). If we deposit more than a certain percentage of the pool's "value" asset, we withdraw the excess. 
     - Example: ETH/OETH pool. ETH=50 OETH=90, if our ownership threshold is 30%, we always deposit less than 15 ETH. In doesn't matter how much OETH in the pool for this calculation
@@ -40,8 +37,7 @@ We don't want to own too much of the pool "vaule" asset
     - _Rebalance Rate_ (when we withdraw what is ownership target - for example when we trigger withdraw because we own more than 30% we want to withdraw until we own 20% of the pool value asset).
 - **If TRUE**: If we go above the _Ownership Threshold_ we withdraw until we are at the _Rebalance Rate_
 
-## NORMAL
-### Deposit
+## Deposit (NORMAL)
 When a user deposit to our PSP strategy, tokens are not going straight to the pool. We deposit everything every period of time (say once a day)
 - **Logic**: If Slippage Guard and Ownership Guard aren't triggered, and:
     - We have more than a certain amount of tokens idle in the strategy
@@ -50,13 +46,13 @@ When a user deposit to our PSP strategy, tokens are not going straight to the po
 - **Parameters**: Min amount to deposit, min period of time
 - **If TRUE**: Deposit all the idle liquidity to the AMM pool
 
-### Recompound
+## Recompound (NORMAL)
 We collect APY, send protocol fees to the treasury, and compound the rest.
 - **Logic**: When a minimum amount of time passed, and the amount of fees the protocol gets is X times more than the estimated gas we pay for the entire process.
 - **Parameters** Min amount of time since last recompound, Expected protocol profit are are least X times more than expected gas fees.
 - **If TRUE**: Call "DoHardWork" on the strategy
 
-### Adjust Uniswap Ticks
+## Adjust Uniswap Ticks (NORMAL)
 When Uniswap is at the edge of the tick range we need to readjust the range
 - **Logic**: Our liquidity is X% above the lower tick or Y% below the upper tick
 - **Parameters**: 
@@ -69,16 +65,14 @@ When Uniswap is at the edge of the tick range we need to readjust the range
 
 # Leverage
 
-# URGENT
-### Liquidation
+## Liquidation (URGENT)
 When position is too close the the collateral value, we close it
 - **Logic**: Simulate closing the postion. If the amount of WBTC we get back is below: _collateral amount_ * _liquidation buffer_
 - **Parameters** : 
     - _liquidation buffer_ (e.g. x1.1 above collateral)
 - **If TRUE**: Liquidate position on chain
 
-# NORMAL
-### Rebalance pool/expiration
+## Rebalance pool/expiration (NORMAL)
 When WBTC/lvBTC pool has less than a certain % of WBTC, we rebalance it
 - **Logic**: If the amount of WBTC in the pool is less than _pool rebalance threshold_ 
 - **Parameters**: 
@@ -86,7 +80,7 @@ When WBTC/lvBTC pool has less than a certain % of WBTC, we rebalance it
     - _pool rebalance target_: the % of WBTC in the pool we aim from when rebalancing and expiring(e.g. 20%)
 - **If TRUE**: we deposit more WBTC to the pool from the WBTC vault. If there isn't enough WBTC in the vault, expire as much positions as needed (start from the oldest position)
 
-### Add WBTC from pool to vault
+## Add WBTC from pool to vault (NORMAL)
 When WBTC/lvBTC pool has more than a certain % of WBTC, we mint lvBTC and swap it for WBTC, and add it to the vault
 - **Logic**: If the amount of WBTC in the pool is more than _vault rebalance target_ 
 - **Parameters**: 
