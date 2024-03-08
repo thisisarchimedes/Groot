@@ -10,9 +10,11 @@ export class RuleDummy extends Rule {
     const params = this.params as RuleParamsDummy;
     await this.logger.info('RuleDummy.evaluate() called: ' + params.message);
 
+    const blockNumber = await this.blockchainReader.getBlockNumber();
+
     this.pendingTx = {
       urgencyLevel: UrgencyLevel.NORMAL,
-      context: 'this is a dummy context',
+      context: `this is a dummy context - block: ${blockNumber}`,
       hash: '',
       lowLevelUnsignedTransaction: {},
     };

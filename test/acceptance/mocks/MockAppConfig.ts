@@ -48,6 +48,7 @@ export class MockAppConfig extends Mock {
     const url = `/applications/${this.applicationId}/environments/${this.environmentId}/configurations/GrootRules`;
 
     nock(this.awsAppConfigBaseUrl, options)
+        .persist()
         .get(url)
         .query({
           client_id: 'Groot',

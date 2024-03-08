@@ -5,33 +5,38 @@ import {startGroot} from '../../src/main';
 import {MockAppConfig} from './mocks/MockAppConfig';
 
 describe('Local Environment Setup', function() {
-  let newRelicSpy: MockNewRelic;
-  let appConfigStub: MockAppConfig;
+  // eslint-disable-next-line no-invalid-this
+  this.timeout(120000);
+
+  let newRelicMock: MockNewRelic;
+  let appConfigMock: MockAppConfig;
   let configService: ConfigServiceAWS;
 
   before(async function() {
     configService = createConfigService();
     await initializeConfigService(configService);
 
-    newRelicSpy = createNewRelicSpy(configService);
-    appConfigStub = createAppConfigStub();
+    appConfigMock = createAppConfigMock();
+    newRelicMock = createNewRelicMock(configService);
   });
 
   after(function() {
-    cleanupTestDoubles(newRelicSpy, appConfigStub);
+    cleanupTestDoubles(newRelicMock, appConfigMock);
   });
 
   it('should load dummy rule and emit a log item', async function() {
     const expectedMessage = 'Queuing transaction: this is a dummy context';
-    newRelicSpy.setWaitedOnMessage(expectedMessage);
+    newRelicMock.setWaitedOnMessage(expectedMessage);
 
-    await startGroot(true);
+    await startGroot(false);
     await waitForMessageProcessing();
 
-    const isMessageObserved = newRelicSpy.isWaitedOnMessageObserved();
+    const isMessageObserved = newRelicMock.isWaitedOnMessageObserved();
     expect(isMessageObserved).to.be.true;
   });
 });
+
+// Should handle invalid rules gracfully
 
 function createConfigService(): ConfigServiceAWS {
   const environment = process.env.ENVIRONMENT as string;
@@ -43,15 +48,15 @@ async function initializeConfigService(configService: ConfigServiceAWS): Promise
   await configService.refreshConfig();
 }
 
-function createNewRelicSpy(configService: ConfigServiceAWS): MockNewRelic {
+function createNewRelicMock(configService: ConfigServiceAWS): MockNewRelic {
   const newRelicURL = new URL(configService.getNewRelicUrl());
   return new MockNewRelic(`${newRelicURL.protocol}//${newRelicURL.host}`);
 }
 
-function createAppConfigStub(): MockAppConfig {
-  const appConfigStub = new MockAppConfig();
-  appConfigStub.setupNock();
-  return appConfigStub;
+function createAppConfigMock(): MockAppConfig {
+  const appConfigMock = new MockAppConfig();
+  appConfigMock.setupNock();
+  return appConfigMock;
 }
 
 function cleanupTestDoubles(newRelicSpy: MockNewRelic, appConfigStub: MockAppConfig): void {
