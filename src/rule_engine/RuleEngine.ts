@@ -26,9 +26,9 @@ export class RuleEngine {
   }
 
   private createRulesFromConfig(ruleConfig: RuleJSONConfigItem[]): Rule[] {
-    return ruleConfig.map((config) =>
-      this.ruleFactory.createRule(config.ruleType, config.params as RuleParams),
-    );
+    return ruleConfig
+        .map((config) => this.ruleFactory.createRule(config.ruleType, config.params as RuleParams))
+        .filter((rule): rule is Rule => rule !== null);
   }
 
   private evaluateRulesInParallel(): Promise<EvaluateResult[]> {

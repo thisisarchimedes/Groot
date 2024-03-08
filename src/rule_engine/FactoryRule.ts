@@ -20,12 +20,13 @@ export class FactoryRule {
     this.blockchainReader = blockchainReader;
   }
 
-  public createRule(type: TypeRule, params: RuleParams): Rule {
+  public createRule(type: TypeRule, params: RuleParams): Rule | null {
     switch (type) {
       case TypeRule.Dummy:
         return new RuleDummy(this.logger, this.blockchainReader, params);
       default:
-        throw new ErrorRuleFactory(`Unsupported rule type: ${type}`);
+        this.logger.warn(`Unsupported rule type: ${type}`);
+        return null;
     }
   }
 }

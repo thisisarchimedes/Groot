@@ -36,7 +36,9 @@ describe('Rule Factory Testings', function() {
 
     const rule = ruleFactory.createRule(dummyRule.ruleType, dummyRule.params as RuleParams);
     expect(rule).not.to.be.undefined;
-    await rule.evaluate();
+    if (rule) {
+      await rule.evaluate();
+    }
     expect(logger.getLatestInfoLogLine()).to.contain('I AM GROOT');
   });
 });

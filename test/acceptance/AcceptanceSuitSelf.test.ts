@@ -50,9 +50,34 @@ describe('Local Environment Setup', function() {
     const isMessageObserved = newRelicMock.isWaitedOnMessageObserved();
     expect(isMessageObserved).to.be.true;
   });
-});
 
-// Should handle invalid rules gracfully
+  it('Should handle invalid rules gracfully', async function() {
+    const mockRules: RuleJSONConfigItem[] = [
+      {
+        ruleType: TypeRule.Invalid,
+        params: {
+          message: 'I AM GROOT 1',
+        },
+      },
+      {
+        ruleType: TypeRule.Dummy,
+        params: {
+          message: 'I AM GROOT 2',
+        },
+      },
+    ];
+    appConfigMock = createAppConfigMock(mockRules);
+
+    const expectedMessage = 'Unsupported rule type';
+    newRelicMock.setWaitedOnMessage(expectedMessage);
+
+    await startGroot(false);
+    await waitForMessageProcessing();
+
+    const isMessageObserved = newRelicMock.isWaitedOnMessageObserved();
+    expect(isMessageObserved).to.be.true;
+  });
+});
 
 function createConfigService(): ConfigServiceAWS {
   const environment = process.env.ENVIRONMENT as string;

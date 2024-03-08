@@ -1,4 +1,5 @@
 export enum TypeRule {
+    Invalid = 'invalid',
     Dummy = 'dummy',
 }
 
