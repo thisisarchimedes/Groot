@@ -68,7 +68,7 @@ describe('Startup and Config', function() {
     ];
     appConfigMock = createAppConfigMock(mockRules);
 
-    const expectedMessage = 'Unsupported rule type';
+    const expectedMessage = 'Rule Engine loaded 1 rules';
     newRelicMock.setWaitedOnMessage(expectedMessage);
 
     await startGroot(false);
