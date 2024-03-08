@@ -1,47 +1,54 @@
 import nock from 'nock';
 import {Mock} from './Mock';
+import {RuleJSONConfigItem, TypeRule} from '../../../src/rule_engine/TypesRule';
 
 export class MockAppConfig extends Mock {
-  private awsAppConfigBaseUrl: string;
-  private applicationId: string;
-  private environmentId: string;
-
-  constructor() {
-    super();
-    this.awsAppConfigBaseUrl = 'https://appconfig.us-east-1.amazonaws.com';
-    this.applicationId = 'DemoApp';
-    this.environmentId = 'env';
-  }
+  private readonly awsAppConfigBaseUrl = 'https://appconfig.us-east-1.amazonaws.com';
+  private readonly applicationId = 'DemoApp';
+  private readonly environmentId = 'env';
 
   setupNock() {
-    const grootRulesProfile = [
+    const grootRulesProfile = this.createGrootRulesProfile();
+    this.setupGrootRulesNock(grootRulesProfile);
+  }
+
+  private createGrootRulesProfile(): RuleJSONConfigItem[] {
+    return [
       {
-        ruleType: 'dummy',
+        ruleType: TypeRule.Dummy,
         params: {
           message: 'I AM GROOT 1',
         },
       },
       {
-        ruleType: 'dummy',
+        ruleType: TypeRule.Dummy,
         params: {
           message: 'I AM GROOT 2',
         },
       },
     ];
+  }
 
-    nock(this.awsAppConfigBaseUrl, {
-      reqheaders: {
-        'x-amz-user-agent': /.+/,
-        'user-agent': /.+/,
-        'amz-sdk-invocation-id': /.+/,
-        'amz-sdk-request': /.+/,
-        'x-amz-date': /.+/,
-        'x-amz-content-sha256': /.+/,
-        'authorization': /.+/,
-      },
+  private setupGrootRulesNock(grootRulesProfile: RuleJSONConfigItem[]) {
+    const headers = {
+      'x-amz-user-agent': /.+/,
+      'user-agent': /.+/,
+      'amz-sdk-invocation-id': /.+/,
+      'amz-sdk-request': /.+/,
+      'x-amz-date': /.+/,
+      'x-amz-content-sha256': /.+/,
+      'authorization': /.+/,
+    };
+
+    const options = {
+      reqheaders: headers,
       allowUnmocked: true,
-    })
-        .get(`/applications/${this.applicationId}/environments/${this.environmentId}/configurations/GrootRules`)
+    };
+
+    const url = `/applications/${this.applicationId}/environments/${this.environmentId}/configurations/GrootRules`;
+
+    nock(this.awsAppConfigBaseUrl, options)
+        .get(url)
         .query({
           client_id: 'Groot',
         })
