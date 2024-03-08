@@ -11,20 +11,6 @@ export class SpyNewRelic extends NockTestDouble {
     this.baseUrl = baseUrl;
   }
 
-  /* public spyLogEndpoint() {
-     nock(this.baseUrl)
-         .persist()
-         .post('/log/v1', () => true)
-         .reply(200, (_, requestBody) => {
-           console.log('requestBody:', JSON.stringify(requestBody));
-           console.log('this.waitedOnMessage:', this.waitedOnMessage);
-           if (JSON.stringify(requestBody).includes(this.waitedOnMessage)) {
-             this.waitedOnMessageObserved = true;
-           }
-           return {};
-         });
-   }*/
-
   public setWaitedOnMessage(message: string): void {
     this.waitedOnMessage = message;
     this.waitedOnMessageObserved = false;
