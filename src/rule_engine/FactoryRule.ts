@@ -1,4 +1,4 @@
-import { BlockchainReader } from '../blockchain/blockchain_reader/BlockchainReader';
+import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
 import {Logger} from '../service/logger/Logger';
 import {Rule, RuleParams} from './rule/Rule';
 import {RuleDummy} from './rule/RuleDummy';

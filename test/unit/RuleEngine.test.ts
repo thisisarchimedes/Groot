@@ -1,22 +1,35 @@
 import {expect} from 'chai';
+import Web3 from 'web3';
+
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
 import {ConfigServiceAdapter} from './adapters/ConfigServiceAdapter';
 import {RuleEngine} from '../../src/rule_engine/RuleEngine';
-import Web3 from 'web3';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
+import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 
-describe('Rule Engine', function() {
+describe('Rule Engine Testings', function() {
   const logger: LoggerAdapter = new LoggerAdapter();
   const configService: ConfigServiceAdapter = new ConfigServiceAdapter();
+  let localNodeAlchemy: BlockchainNodeAdapter;
+  let localNodeInfura: BlockchainNodeAdapter;
+  let blockchainReader: BlockchainReader;
 
   beforeEach(async function() {
+    localNodeAlchemy = new BlockchainNodeAdapter(logger);
+    await localNodeAlchemy.startNode();
+
+    localNodeInfura = new BlockchainNodeAdapter(logger);
+    await localNodeInfura.startNode();
+
+    blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
   });
 
   it('should load rules from rule JSON and iterate on them, invoke each one', async function() {
     configService.setRulesFromFile('./test/unit/data/dummy_rules.json');
     await configService.refreshConfig();
 
-    const ruleFactory = new FactoryRule(logger);
+    const ruleFactory = new FactoryRule(logger, blockchainReader);
     const ruleEngine = new RuleEngine(logger, ruleFactory);
 
     ruleEngine.loadRulesFromJSONConfig(configService.getRules());
@@ -31,7 +44,7 @@ describe('Rule Engine', function() {
     configService.setRulesFromFile('./test/unit/data/dummy_rules.json');
     await configService.refreshConfig();
 
-    const ruleFactory = new FactoryRule(logger);
+    const ruleFactory = new FactoryRule(logger, blockchainReader);
     const ruleEngine = new RuleEngine(logger, ruleFactory);
 
     ruleEngine.loadRulesFromJSONConfig(configService.getRules());
