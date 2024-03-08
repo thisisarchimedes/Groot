@@ -3,6 +3,7 @@ import {MockNewRelic} from './mocks/MockNewRelic';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {startGroot} from '../../src/main';
 import {MockAppConfig} from './mocks/MockAppConfig';
+import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 
 describe('Local Environment Setup', function() {
   // eslint-disable-next-line no-invalid-this
@@ -12,19 +13,34 @@ describe('Local Environment Setup', function() {
   let appConfigMock: MockAppConfig;
   let configService: ConfigServiceAWS;
 
-  before(async function() {
+  beforeEach(async function() {
     configService = createConfigService();
     await initializeConfigService(configService);
 
-    appConfigMock = createAppConfigMock();
     newRelicMock = createNewRelicMock(configService);
   });
 
-  after(function() {
+  afterEach(function() {
     cleanupTestDoubles(newRelicMock, appConfigMock);
   });
 
   it('should load dummy rule and emit a log item', async function() {
+    const mockRules: RuleJSONConfigItem[] = [
+      {
+        ruleType: TypeRule.Dummy,
+        params: {
+          message: 'I AM GROOT 1',
+        },
+      },
+      {
+        ruleType: TypeRule.Dummy,
+        params: {
+          message: 'I AM GROOT 2',
+        },
+      },
+    ];
+    appConfigMock = createAppConfigMock(mockRules);
+
     const expectedMessage = 'Queuing transaction: this is a dummy context';
     newRelicMock.setWaitedOnMessage(expectedMessage);
 
@@ -53,9 +69,9 @@ function createNewRelicMock(configService: ConfigServiceAWS): MockNewRelic {
   return new MockNewRelic(`${newRelicURL.protocol}//${newRelicURL.host}`);
 }
 
-function createAppConfigMock(): MockAppConfig {
+function createAppConfigMock(mockRules: RuleJSONConfigItem[]): MockAppConfig {
   const appConfigMock = new MockAppConfig();
-  appConfigMock.setupNock();
+  appConfigMock.setupGrootRulesNock(mockRules);
   return appConfigMock;
 }
 
