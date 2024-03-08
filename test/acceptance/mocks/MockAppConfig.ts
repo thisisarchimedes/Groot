@@ -1,7 +1,7 @@
 import nock from 'nock';
-import {NockTestDouble} from './NockTestDouble';
+import {Mock} from './Mock';
 
-export class StubAppConfig extends NockTestDouble {
+export class MockAppConfig extends Mock {
   private awsAppConfigBaseUrl: string;
   private applicationId: string;
   private environmentId: string;

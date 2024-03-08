@@ -1,7 +1,7 @@
 import nock from 'nock';
-import {NockTestDouble} from './NockTestDouble';
+import {Mock} from './Mock';
 
-export class SpyNewRelic extends NockTestDouble {
+export class MockNewRelic extends Mock {
   private baseUrl: string;
   private waitedOnMessage!: string;
   private waitedOnMessageObserved: boolean = false;

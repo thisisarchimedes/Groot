@@ -1,12 +1,12 @@
 import {expect} from 'chai';
-import {SpyNewRelic} from './test_doubles/SpyNewRelic';
+import {MockNewRelic} from './mocks/MockNewRelic';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {startGroot} from '../../src/main';
-import {StubAppConfig} from './test_doubles/StubAppConfig';
+import {MockAppConfig} from './mocks/MockAppConfig';
 
 describe('Local Environment Setup', function() {
-  let newRelicSpy: SpyNewRelic;
-  let appConfigStub: StubAppConfig;
+  let newRelicSpy: MockNewRelic;
+  let appConfigStub: MockAppConfig;
   let configService: ConfigServiceAWS;
 
   before(async function() {
@@ -43,18 +43,18 @@ async function initializeConfigService(configService: ConfigServiceAWS): Promise
   await configService.refreshConfig();
 }
 
-function createNewRelicSpy(configService: ConfigServiceAWS): SpyNewRelic {
+function createNewRelicSpy(configService: ConfigServiceAWS): MockNewRelic {
   const newRelicURL = new URL(configService.getNewRelicUrl());
-  return new SpyNewRelic(`${newRelicURL.protocol}//${newRelicURL.host}`);
+  return new MockNewRelic(`${newRelicURL.protocol}//${newRelicURL.host}`);
 }
 
-function createAppConfigStub(): StubAppConfig {
-  const appConfigStub = new StubAppConfig();
+function createAppConfigStub(): MockAppConfig {
+  const appConfigStub = new MockAppConfig();
   appConfigStub.setupNock();
   return appConfigStub;
 }
 
-function cleanupTestDoubles(newRelicSpy: SpyNewRelic, appConfigStub: StubAppConfig): void {
+function cleanupTestDoubles(newRelicSpy: MockNewRelic, appConfigStub: MockAppConfig): void {
   newRelicSpy.cleanup();
   appConfigStub.cleanup();
 }

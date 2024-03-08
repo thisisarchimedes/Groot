@@ -1,6 +1,6 @@
 import nock from 'nock';
 
-export class NockTestDouble {
+export class Mock {
   public cleanup() {
     nock.cleanAll();
   }
