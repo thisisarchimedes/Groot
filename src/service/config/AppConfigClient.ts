@@ -5,7 +5,7 @@ export class AppConfigClient {
 
   private readonly appConfigClient: AppConfig;
   private readonly environment: string;
-  private readonly clientId: string = 'EventFetcherService';
+  private readonly clientId: string = 'Groot';
 
   constructor(environment: string, region: string) {
     this.appConfigClient = new AppConfig({region: region});
