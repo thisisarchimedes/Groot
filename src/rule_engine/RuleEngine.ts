@@ -17,6 +17,7 @@ export class RuleEngine {
 
   public loadRulesFromJSONConfig(ruleConfig: RuleJSONConfigItem[]): void {
     this.rules = this.createRulesFromConfig(ruleConfig);
+    this.logger.debug(`Rule Engine loaded ${this.rules.length} rules.`);
   }
 
   public async evaluateRules(): Promise<OutboundTransaction[]> {

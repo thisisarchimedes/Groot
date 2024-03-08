@@ -5,7 +5,7 @@ import {startGroot} from '../../src/main';
 import {MockAppConfig} from './mocks/MockAppConfig';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 
-describe('Local Environment Setup', function() {
+describe('Startup and Config', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
