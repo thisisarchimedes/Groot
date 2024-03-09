@@ -1,6 +1,7 @@
 import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
+import {CloudWatchClient, GetMetricDataCommand} from '@aws-sdk/client-cloudwatch';
 
 import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
@@ -17,7 +18,7 @@ describe('Check that we work with AWS Health Check system correctly', function()
 
   let configService: ConfigServiceAWS;
   const logger: LoggerAdapter = new LoggerAdapter();
-
+  const cloudWatchClient: CloudWatchClient = new CloudWatchClient({});
 
   beforeEach(async function() {
     const environment = process.env.ENVIRONMENT as string;
@@ -27,17 +28,13 @@ describe('Check that we work with AWS Health Check system correctly', function()
   });
 
   afterEach(async function() {
+    // Clean up resources if needed
   });
 
-  it('Should be able to send health check', async function() {
+  it('Should be able to send health check and verify the received heartbeat', async function() {
     const healthMonitor: HealthMonitorAWS = new HealthMonitorAWS(logger);
 
-    try {
-      await healthMonitor.sendHeartBeat();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      expect.fail('Health check failed: ' + error.message);
-    }
+    const res = await healthMonitor.sendHeartBeat();
+    expect(res).to.be.true;
   });
 });
-

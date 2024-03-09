@@ -1,8 +1,8 @@
-import { IHealthMonitor } from './IHealthMonitor';
+import {IHealthMonitor} from './IHealthMonitor';
 import os from 'os';
-import { CloudWatchClient, PutMetricDataCommand } from '@aws-sdk/client-cloudwatch';
+import {CloudWatchClient, PutMetricDataCommand} from '@aws-sdk/client-cloudwatch';
 
-import { Logger } from '../logger/Logger';
+import {Logger} from '../logger/Logger';
 
 export class HealthMonitorAWS implements IHealthMonitor {
   private readonly hostingContainerName: string;
@@ -15,7 +15,7 @@ export class HealthMonitorAWS implements IHealthMonitor {
     this.cloudWatchClient = new CloudWatchClient({});
   }
 
-  public async sendHeartBeat(): Promise<void> {
+  public async sendHeartBeat(): Promise<boolean> {
     const metricData = {
       MetricName: 'Heartbeat',
       Namespace: 'Groot/Heartbeat',
@@ -38,9 +38,17 @@ export class HealthMonitorAWS implements IHealthMonitor {
     try {
       const command = new PutMetricDataCommand(params);
       const response = await this.cloudWatchClient.send(command);
-      this.logger.debug(`Heartbeat metric sent successfully. Response: ${JSON.stringify(response)}`);
+
+      if (response.$metadata.httpStatusCode !== 200) {
+        this.logger.error(`Failed to send heartbeat metric. HTTP status code: ${response}`);
+        return false;
+      } else {
+        this.logger.debug(`Heartbeat metric sent successfully. Response: ${JSON.stringify(response)}`);
+        return true;
+      }
     } catch (error) {
       this.logger.error(`Failed to send heartbeat metric. Error: ${error.message}`);
+      return false;
     }
   }
 }
