@@ -6,7 +6,7 @@ import {
   MetricDatum,
 } from '@aws-sdk/client-cloudwatch';
 
-import {IHeartBeat as IHeartBeat} from './IHeartBeat';
+import {IHeartBeat} from './IHeartBeat';
 import {Logger} from '../logger/Logger';
 import {ConfigService} from '../config/ConfigService';
 import {HostNameProvider} from './HostNameProvider';

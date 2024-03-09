@@ -37,9 +37,9 @@ describe('Check that we work with AWS Health Check system correctly', function()
   });
 
   it('Should be able to send health check and verify the received heartbeat', async function() {
-    const healthMonitor: HeartBeatAWS = new HeartBeatAWS(logger, configService, hostNameProvider);
+    const heartBeat: HeartBeatAWS = new HeartBeatAWS(logger, configService, hostNameProvider);
 
-    const res = await healthMonitor.sendHeartBeat();
+    const res = await heartBeat.sendHeartBeat();
     expect(res).to.be.true;
   });
 });
