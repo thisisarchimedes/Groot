@@ -12,6 +12,7 @@ import {BlockchainNodeLocalHardhat} from './blockchain/blockchain_nodes/Blockcha
 dotenv.config();
 
 export class Groot {
+  private readonly logServiceName: string = 'Groot';
   private readonly configService: ConfigServiceAWS;
 
   private logger!: LoggerAll;
@@ -30,10 +31,16 @@ export class Groot {
 
   public async initalizeGroot() {
     await this.configService.refreshConfig();
-    this.logger = new LoggerAll(this.configService, 'Groot');
+    this.logger = new LoggerAll(this.configService, this.logServiceName);
 
     this.logger.info('Initializing Groot...');
 
+    await this.initalizeReadOnlyLocalNodes();
+
+    this.logger.info('Groot initialized successfully.');
+  }
+
+  private async initalizeReadOnlyLocalNodes() {
     this.mainNode = new BlockchainNodeLocalHardhat(this.logger, this.nextAvailablePortNumber++, 'alchemy-node');
     this.altNode = new BlockchainNodeLocalHardhat(this.logger, this.nextAvailablePortNumber++, 'infura-node');
 
@@ -43,19 +50,21 @@ export class Groot {
     ]);
 
     this.blockchainReader = new BlockchainReader(this.logger, [this.mainNode, this.altNode]);
-
-    this.logger.info('Groot initialized successfully.');
   }
 
   public async shutdownGroot() {
     this.logger.warn('Shutting down Groot...');
 
+    await this.shutdownReadOnlyLocalNodes();
+
+    this.logger.warn('Groot shutdown successfully.');
+  }
+
+  private async shutdownReadOnlyLocalNodes() {
     await Promise.all([
       this.mainNode.stopNode(),
       this.altNode.stopNode(),
     ]);
-
-    this.logger.warn('Groot shutdown successfully.');
   }
 
   public async prepareForAnotherCycle() {
@@ -63,25 +72,34 @@ export class Groot {
 
     await this.configService.refreshConfig();
 
-    // get latest block number
-    await Promise.all([
-      this.mainNode.resetNode(this.configService.getMainRPCURL()),
-      this.altNode.resetNode(this.configService.getAlternativeRPCURL()),
-    ]);
+    await this.setLocalNodesToNewestBlock();
 
-    const ruleFactory = new FactoryRule(this.logger, this.blockchainReader);
-    this.ruleEngine = new RuleEngine(this.logger, ruleFactory);
+    this.resetRulesEngine();
 
-    // TODO: Replace with actual queue implementaion
-    const queue = new TxQueueAdapter();
-    this.txQueuer = new TransactionQueuer(this.logger, queue);
+    this.resetTransactionQueuer();
 
     this.logger.info('Groot is ready for another cycle.');
   }
 
-  public async runGroot(): Promise<void> {
-    await this.prepareForAnotherCycle();
+  private async setLocalNodesToNewestBlock() {
+    await Promise.all([
+      this.mainNode.resetNode(this.configService.getMainRPCURL()),
+      this.altNode.resetNode(this.configService.getAlternativeRPCURL()),
+    ]);
+  }
 
+  private resetRulesEngine() {
+    const ruleFactory = new FactoryRule(this.logger, this.blockchainReader);
+    this.ruleEngine = new RuleEngine(this.logger, ruleFactory);
+  }
+
+  private resetTransactionQueuer() {
+    // TODO: Replace with actual queue implementaion
+    const queue = new TxQueueAdapter();
+    this.txQueuer = new TransactionQueuer(this.logger, queue);
+  }
+
+  public async runGroot(): Promise<void> {
     this.logger.info('Running Groot...');
 
     this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
@@ -104,6 +122,7 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
   await groot.initalizeGroot();
 
   do {
+    await groot.prepareForAnotherCycle();
     await groot.runGroot();
   } while (runInfinite);
 
