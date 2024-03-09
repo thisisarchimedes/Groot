@@ -26,3 +26,4 @@
 
 # Plan 
 
+- CloudWatch Event: DemoApp/Groot/Heartbeat - when spining container add a heartbeat event to CloudWatch

@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 
 import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {HeartBeatAWS} from '../../src/service/health_monitor/HeartBeat';
+import {HeartbeatAWS} from '../../src/service/health_monitor/Heartbeat';
 import {HostNameProvider} from '../../src/service/health_monitor/HostNameProvider';
 
 dotenv.config();
@@ -37,9 +37,9 @@ describe('Check that we work with AWS Health Check system correctly', function()
   });
 
   it('Should be able to send heart beat and verify the received heartbeat', async function() {
-    const heartBeat: HeartBeatAWS = new HeartBeatAWS(logger, configService, hostNameProvider);
+    const heartBeat: HeartbeatAWS = new HeartbeatAWS(logger, configService, hostNameProvider);
 
-    const res = await heartBeat.sendHeartBeat();
+    const res = await heartBeat.sendHeartbeat();
     expect(res).to.be.true;
   });
 });
