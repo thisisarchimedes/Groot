@@ -18,7 +18,6 @@ describe('Check that we work with AWS Health Check system correctly', function()
 
   let configService: ConfigServiceAWS;
   const logger: LoggerAdapter = new LoggerAdapter();
-  const cloudWatchClient: CloudWatchClient = new CloudWatchClient({});
 
   beforeEach(async function() {
     const environment = process.env.ENVIRONMENT as string;
@@ -32,7 +31,7 @@ describe('Check that we work with AWS Health Check system correctly', function()
   });
 
   it('Should be able to send health check and verify the received heartbeat', async function() {
-    const healthMonitor: HealthMonitorAWS = new HealthMonitorAWS(logger);
+    const healthMonitor: HealthMonitorAWS = new HealthMonitorAWS(logger, configService);
 
     const res = await healthMonitor.sendHeartBeat();
     expect(res).to.be.true;

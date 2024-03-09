@@ -3,22 +3,30 @@ import os from 'os';
 import {CloudWatchClient, PutMetricDataCommand} from '@aws-sdk/client-cloudwatch';
 
 import {Logger} from '../logger/Logger';
+import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 
 export class HealthMonitorAWS implements IHealthMonitor {
-  private readonly hostingContainerName: string;
-  private readonly logger: Logger;
   private readonly cloudWatchClient: CloudWatchClient;
 
-  constructor(logger: Logger) {
-    this.hostingContainerName = os.hostname();
-    this.logger = logger;
+  private readonly logger: Logger;
+  private readonly configService: ConfigServiceAWS;
+  private readonly hostingContainerName: string;
+  private readonly environment: string;
+
+  constructor(logger: Logger, configService: ConfigServiceAWS) {
     this.cloudWatchClient = new CloudWatchClient({});
+
+    this.logger = logger;
+    this.configService = configService;
+    this.environment = this.configService.getEnvironment();
+
+    this.hostingContainerName = os.hostname();
   }
 
   public async sendHeartBeat(): Promise<boolean> {
     const metricData = {
       MetricName: 'Heartbeat',
-      Namespace: 'Groot/Heartbeat',
+      Namespace: `${this.environment}/Groot/Heartbeat`,
       Timestamp: new Date(),
       Value: 1,
       Unit: 'Count',
@@ -32,7 +40,7 @@ export class HealthMonitorAWS implements IHealthMonitor {
 
     const params = {
       MetricData: [metricData],
-      Namespace: 'Groot/Heartbeat',
+      Namespace: `${this.environment}/Groot/Heartbeat`,
     };
 
     try {
