@@ -33,7 +33,8 @@ describe('Rule Engine Testings', function() {
     const ruleEngine = new RuleEngine(logger, ruleFactory);
 
     ruleEngine.loadRulesFromJSONConfig(configService.getRules());
-    const tx = await ruleEngine.evaluateRules();
+    await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
+    const tx = ruleEngine.getOutboundTransactions();
 
     expect(tx).not.to.be.undefined;
     expect(tx.length).to.be.eq(2);
@@ -48,7 +49,8 @@ describe('Rule Engine Testings', function() {
     const ruleEngine = new RuleEngine(logger, ruleFactory);
 
     ruleEngine.loadRulesFromJSONConfig(configService.getRules());
-    const tx = await ruleEngine.evaluateRules();
+    await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
+    const tx = ruleEngine.getOutboundTransactions();
 
     expect(tx).not.to.be.undefined;
     expect(tx[0].hash).to.be.eq(Web3.utils.sha3(JSON.stringify(tx[0].lowLevelUnsignedTransaction)));

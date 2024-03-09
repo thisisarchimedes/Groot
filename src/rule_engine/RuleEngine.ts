@@ -9,6 +9,7 @@ import {RuleJSONConfigItem} from './TypesRule';
 
 export class RuleEngine {
   private rules: Rule[] = [];
+  private OutboundTransactions: OutboundTransaction[] = [];
 
   constructor(
     private readonly logger: Logger,
@@ -20,10 +21,14 @@ export class RuleEngine {
     this.logger.debug(`Rule Engine loaded ${this.rules.length} rules.`);
   }
 
-  public async evaluateRules(): Promise<OutboundTransaction[]> {
+  public async evaluateRulesAndCreateOutboundTransactions(): Promise<void> {
     const evaluateResults = await this.evaluateRulesInParallel();
     const outboundTransactions = this.getTransactionsFromEvaluateResults(evaluateResults);
-    return this.addHashToTransactions(outboundTransactions);
+    this.OutboundTransactions = this.addHashToTransactions(outboundTransactions);
+  }
+
+  public getOutboundTransactions(): OutboundTransaction[] {
+    return this.OutboundTransactions;
   }
 
   private createRulesFromConfig(ruleConfig: RuleJSONConfigItem[]): Rule[] {

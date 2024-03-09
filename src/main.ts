@@ -86,7 +86,8 @@ export class Groot {
 
     this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
 
-    const txs = await this.ruleEngine.evaluateRules();
+    await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
+    const txs = this.ruleEngine.getOutboundTransactions();
     await this.txQueuer.queueTransactions(txs);
 
     this.logger.info('Groot cycle ran successfully.');
