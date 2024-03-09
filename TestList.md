@@ -3,7 +3,8 @@
 ## Health Monitor
 [X] Send heart beat to external watchdog service
 [] Check node health and spin new container if needed
-[] Can handle all nodes failing, and report error and spin new nodes
+
+- Add Health monitor to main flow
 
 ## Tx Broadcaster (Seperate process)
 [] Can sign a tx with the correct key without exposing the key (KMS)
