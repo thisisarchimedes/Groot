@@ -1,3 +1,3 @@
-export interface IHealthMonitor {
+export interface IHeartBeat {
     sendHeartBeat(): Promise<boolean>;
 }

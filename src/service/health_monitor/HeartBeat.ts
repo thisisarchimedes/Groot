@@ -1,10 +1,17 @@
-import {IHealthMonitor} from './IHealthMonitor';
-import {CloudWatchClient, PutMetricDataCommand, PutMetricDataCommandInput} from '@aws-sdk/client-cloudwatch';
+import {
+  CloudWatchClient,
+  PutMetricDataCommand,
+  PutMetricDataCommandInput,
+  PutMetricDataCommandOutput,
+  MetricDatum,
+} from '@aws-sdk/client-cloudwatch';
+
+import {IHeartBeat as IHeartBeat} from './IHeartBeat';
 import {Logger} from '../logger/Logger';
 import {ConfigService} from '../config/ConfigService';
-import { HostNameProvider } from './HostNameProvider';
+import {HostNameProvider} from './HostNameProvider';
 
-export class HealthMonitorAWS implements IHealthMonitor {
+export class HeartBeatAWS implements IHeartBeat {
   private readonly cloudWatchClient: CloudWatchClient;
   private readonly logger: Logger;
   private readonly configService: ConfigService;
@@ -27,12 +34,12 @@ export class HealthMonitorAWS implements IHealthMonitor {
       const response = await this.putMetricData(putMetricDataParams);
       return this.handlePutMetricDataResponse(response);
     } catch (error) {
-      this.handlePutMetricDataError(error);
+      this.handlePutMetricDataError(error as Error);
       return false;
     }
   }
 
-  private createHeartbeatMetricData(): MetricData {
+  private createHeartbeatMetricData(): MetricDatum {
     return {
       MetricName: 'Heartbeat',
       Timestamp: new Date(),
@@ -47,19 +54,19 @@ export class HealthMonitorAWS implements IHealthMonitor {
     };
   }
 
-  private createPutMetricDataParams(metricData: MetricData): PutMetricDataCommandInput {
+  private createPutMetricDataParams(metricData: MetricDatum): PutMetricDataCommandInput {
     return {
       MetricData: [metricData],
       Namespace: this.metricNamespace,
     };
   }
 
-  private async putMetricData(params: PutMetricDataCommandInput): Promise<any> {
+  private putMetricData(params: PutMetricDataCommandInput): Promise<PutMetricDataCommandOutput> {
     const command = new PutMetricDataCommand(params);
     return this.cloudWatchClient.send(command);
   }
 
-  private handlePutMetricDataResponse(response: any): boolean {
+  private handlePutMetricDataResponse(response: PutMetricDataCommandOutput): boolean {
     if (response.$metadata.httpStatusCode !== 200) {
       this.logger.error(`Failed to send heartbeat metric. HTTP status code: ${response}`);
       return false;
@@ -69,7 +76,7 @@ export class HealthMonitorAWS implements IHealthMonitor {
     }
   }
 
-  private handlePutMetricDataError(error: any): void {
+  private handlePutMetricDataError(error: Error): void {
     this.logger.error(`Failed to send heartbeat metric. Error: ${error.message}`);
   }
 }
