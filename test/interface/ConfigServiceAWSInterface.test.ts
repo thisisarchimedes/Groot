@@ -7,6 +7,9 @@ import {RuleJSONConfigItem} from '../../src/rule_engine/TypesRule';
 dotenv.config();
 
 describe('Config Service Test', function() {
+  // eslint-disable-next-line no-invalid-this
+  this.timeout(120000);
+
   let configService: ConfigServiceAWS;
 
   beforeEach(async function() {

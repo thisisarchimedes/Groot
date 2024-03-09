@@ -2,7 +2,7 @@
 
 ## Health Monitor
 [X] Send heart beat to external watchdog service
-[] When a nodes fails, can spin new nodes and use them 
+[] Check node health and spin new container if needed
 [] Can handle all nodes failing, and report error and spin new nodes
 
 ## Tx Broadcaster (Seperate process)
