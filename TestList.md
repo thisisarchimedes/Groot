@@ -21,6 +21,8 @@
 
 - probably want to check each node health flag and call recover. Do it once at the end of the test suite or if all nodes are down
 - TODO: Implement the actual TxQueue class
+- Build pipeline
+    - Pack everything in a container and use AWS Fargate to manage it
 
 # Plan 
 
