@@ -1,7 +1,7 @@
 # Tests
 
 ## Health Monitor
-[] Send heart beat to external watchdog service
+[X] Send heart beat to external watchdog service
 [] When a nodes fails, can spin new nodes and use them 
 [] Can handle all nodes failing, and report error and spin new nodes
 
