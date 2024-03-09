@@ -36,7 +36,7 @@ describe('Check that we work with AWS Health Check system correctly', function()
     expect(hostName).to.be.not.empty;
   });
 
-  it('Should be able to send health check and verify the received heartbeat', async function() {
+  it('Should be able to send heart beat and verify the received heartbeat', async function() {
     const heartBeat: HeartBeatAWS = new HeartBeatAWS(logger, configService, hostNameProvider);
 
     const res = await heartBeat.sendHeartBeat();
