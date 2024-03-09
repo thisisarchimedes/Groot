@@ -112,7 +112,7 @@ export class Groot {
   }
 }
 
-export async function startGroot(runInfinite: boolean = true): Promise<void> {
+export async function grootStartHere(runInfinite: boolean = true): Promise<void> {
   const environment = process.env.ENVIRONMENT as string;
   const region = process.env.AWS_REGION as string;
 

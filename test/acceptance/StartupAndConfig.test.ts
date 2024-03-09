@@ -1,7 +1,7 @@
 import {expect} from 'chai';
 import {MockNewRelic} from './mocks/MockNewRelic';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {startGroot} from '../../src/main';
+import {grootStartHere} from '../../src/main';
 import {MockAppConfig} from './mocks/MockAppConfig';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 
@@ -44,7 +44,7 @@ describe('Startup and Config', function() {
     const expectedMessage = 'Queuing transaction: this is a dummy context';
     newRelicMock.setWaitedOnMessage(expectedMessage);
 
-    await startGroot(false);
+    await grootStartHere(false);
     await waitForMessageProcessing();
 
     const isMessageObserved = newRelicMock.isWaitedOnMessageObserved();
@@ -71,7 +71,7 @@ describe('Startup and Config', function() {
     const expectedMessage = 'Rule Engine loaded 1 rules';
     newRelicMock.setWaitedOnMessage(expectedMessage);
 
-    await startGroot(false);
+    await grootStartHere(false);
     await waitForMessageProcessing();
 
     const isMessageObserved = newRelicMock.isWaitedOnMessageObserved();
