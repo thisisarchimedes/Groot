@@ -7,6 +7,7 @@
 
 **Refactor**
 [] Add Health monitor to main flow
+[] Heartbean might need to be generalized to a "watchdog" service or something
 
 ## Tx Broadcaster (Seperate process)
 [] Can sign a tx with the correct key without exposing the key (KMS)
