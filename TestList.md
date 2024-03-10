@@ -3,7 +3,7 @@
 ## Health Monitor
 [X] Send heart beat to external watchdog service
 [X] Check node health and spin new container if needed
-[] Should be able to invoke an overall reset if cannot recover (send a "need reset" event)
+[X] Should be able to invoke an overall reset if cannot recover (send a "need reset" event)
 
 **Refactor**
 [] Add Health monitor to main flow
@@ -32,3 +32,9 @@
 # Plan 
 
 - CloudWatch Event: DemoApp/Groot/Heartbeat - when spining container add a heartbeat event to CloudWatch
+
+
+- HealthMonitor as the master class
+- Seperate the Node recovery to a different class
+- Heatbeat different class
+- critical failure different class

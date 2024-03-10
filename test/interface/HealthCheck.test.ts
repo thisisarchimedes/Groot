@@ -4,8 +4,9 @@ import * as dotenv from 'dotenv';
 
 import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {HeartbeatAWS} from '../../src/service/health_monitor/Heartbeat';
+import {SignalAWSHeartbeat} from '../../src/service/health_monitor/signal/SignalAWSHeartbeat';
 import {HostNameProvider} from '../../src/service/health_monitor/HostNameProvider';
+import {SignalAWSCriticalFailure} from '../../src/service/health_monitor/signal/SignalAWSCriticalFailure';
 
 dotenv.config();
 chai.use(chaiAsPromised);
@@ -37,9 +38,17 @@ describe('Check that we work with AWS Health Check system correctly', function()
   });
 
   it('Should be able to send heart beat and verify the received heartbeat', async function() {
-    const heartBeat: HeartbeatAWS = new HeartbeatAWS(logger, configService, hostNameProvider);
+    const heartBeat: SignalAWSHeartbeat = new SignalAWSHeartbeat(logger, configService, hostNameProvider);
 
     const res = await heartBeat.sendHeartbeat();
+    expect(res).to.be.true;
+  });
+
+  it('Should be able to send critical failure signal', async function() {
+    const criticalFailureSignal: SignalAWSCriticalFailure = new SignalAWSCriticalFailure(
+        logger, configService, hostNameProvider);
+
+    const res = await criticalFailureSignal.sendCriticalFailure();
     expect(res).to.be.true;
   });
 });
