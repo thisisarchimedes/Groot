@@ -26,7 +26,7 @@ export class BlockchainNodeAdapter extends BlockchainNode {
     if (this.expectRecoverToSucceed) {
       this.isNodeHealthy = true;
     } else {
-      throw new BlockchainNodeError('RecoverNode: Error');
+      throw new BlockchainNodeError(`RecoverNode: Cannot recover ${this.nodeName}`);
     }
   }
 

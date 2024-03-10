@@ -1,12 +1,11 @@
 import {BlockchainNode} from '../../blockchain/blockchain_nodes/BlockchainNode';
 import {Logger} from '../logger/Logger';
 
-export class BlockchainNodeHealth {
-  constructor(private readonly logger: Logger, private readonly nodes: BlockchainNode[]) {}
+export class BlockchainNodeHealthMonitor {
+  constructor(private readonly logger: Logger, private readonly nodes: BlockchainNode[]) { }
 
   public async checkBlockchainNodesHealth(): Promise<void> {
     const unhealthyNodes = this.getUnhealthyNodes();
-
     if (unhealthyNodes.length === 0) {
       return;
     }
@@ -16,7 +15,7 @@ export class BlockchainNodeHealth {
 
     if (this.allNodesFailedToRecover(failedRecoveries, unhealthyNodes)) {
       this.logAllNodesDownError();
-      throw new ErrorHealthMonitor('Health Monitor: All nodes are down and failed to recover');
+      throw new ErrorBlockchainNodeHealthMonitor('Blockchain Nodes Health Monitor:Nodes are down, none recovered');
     }
   }
 
@@ -72,7 +71,7 @@ export class BlockchainNodeHealth {
   }
 }
 
-export class ErrorHealthMonitor extends Error {
+export class ErrorBlockchainNodeHealthMonitor extends Error {
   constructor(message?: string) {
     super(message);
     this.name = 'ErrorHealthMonitor';

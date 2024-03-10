@@ -3,7 +3,10 @@ import chaiAsPromised from 'chai-as-promised';
 
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
-import {ErrorHealthMonitor, HealthMonitor} from '../../src/service/health_monitor/HealthMonitor';
+import {
+  BlockchainNodeHealthMonitor,
+  ErrorBlockchainNodeHealthMonitor,
+} from '../../src/service/health_monitor/BlockchainNodeHealthMonitor';
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
@@ -13,7 +16,7 @@ describe('Health Monitor tests', function() {
   let localNodeInfura: BlockchainNodeAdapter;
   const logger: LoggerAdapter = new LoggerAdapter();
 
-  let healthMonitor: HealthMonitor;
+  let blockchainNodeHealth: BlockchainNodeHealthMonitor;
 
   beforeEach(async function() {
     localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
@@ -21,7 +24,7 @@ describe('Health Monitor tests', function() {
     localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     await localNodeInfura.startNode();
 
-    healthMonitor = new HealthMonitor(logger, [localNodeAlchemy, localNodeInfura]);
+    blockchainNodeHealth = new BlockchainNodeHealthMonitor(logger, [localNodeAlchemy, localNodeInfura]);
   });
 
   afterEach(async function() {
@@ -34,7 +37,7 @@ describe('Health Monitor tests', function() {
     localNodeInfura.setNodeHealthy(false);
     localNodeInfura.setExpectRecoverToSucceed(true);
 
-    await healthMonitor.checkBlockchainNodesHealth();
+    await blockchainNodeHealth.checkBlockchainNodesHealth();
 
     expect(logger.getLatestInfoLogLine().includes(`Node ${localNodeInfura.getNodeName()} has been recovered`))
         .to.be.true;
@@ -47,10 +50,9 @@ describe('Health Monitor tests', function() {
     localNodeAlchemy.setExpectRecoverToSucceed(false);
 
     localNodeInfura.setNodeHealthy(false);
-    localNodeAlchemy.setExpectRecoverToSucceed(false);
+    localNodeInfura.setExpectRecoverToSucceed(false);
 
-    await healthMonitor.checkBlockchainNodesHealth();
-
-    await expect(healthMonitor.checkBlockchainNodesHealth()).to.be.rejectedWith(ErrorHealthMonitor);
+    await expect(blockchainNodeHealth.checkBlockchainNodesHealth())
+        .to.be.rejectedWith(ErrorBlockchainNodeHealthMonitor);
   });
 });
