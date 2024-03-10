@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
-import {HealthMonitor} from '../../src/service/health_monitor/HealthMonitor';
+import {ErrorHealthMonitor, HealthMonitor} from '../../src/service/health_monitor/HealthMonitor';
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
@@ -51,6 +51,6 @@ describe('Health Monitor tests', function() {
 
     await healthMonitor.checkBlockchainNodesHealth();
 
-    await expect(healthMonitor.checkBlockchainNodesHealth()).to.be.rejectedWith(Error);
+    await expect(healthMonitor.checkBlockchainNodesHealth()).to.be.rejectedWith(ErrorHealthMonitor);
   });
 });
