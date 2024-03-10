@@ -2,13 +2,15 @@
     {
         "ruleType": "dummy",
         "params": {
-            "message": "I AM GROOT 1"
+            "message": "I AM GROOT 1",
+            "NumberOfDummyTxs": 2
         }
     },
     {
         "ruleType": "dummy",
         "params": {
-            "message": "I AM GROOT 2"
+            "message": "I AM GROOT 2",
+            "NumberOfDummyTxs": 1
         }
     }
 ]

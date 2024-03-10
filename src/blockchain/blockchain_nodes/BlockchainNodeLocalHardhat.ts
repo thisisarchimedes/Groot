@@ -14,13 +14,12 @@ export class BlockchainNodeLocalHardhat extends BlockchainNode {
   private readonly DEFAULT_HARDHAT_DOCKER_IMAGE_NAME = 'arch-production-node:latest';
 
   constructor(logger: Logger, externalPort: number, nodeName: string) {
-    super(logger);
+    super(logger, nodeName);
 
     this.localRpcUrl = `http://127.0.0.1:${externalPort}`;
     this.web3 = new Web3(this.localRpcUrl);
 
     this.nodePort = externalPort;
-    this.nodeName = nodeName;
 
     this.dockerOperator = new DockerOperator(logger,
         {

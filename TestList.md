@@ -3,6 +3,7 @@
 ## Health Monitor
 [X] Send heart beat to external watchdog service
 [] Check node health and spin new container if needed
+[] Should be able to invoke an overall reset if cannot recover (send a "need reset" event)
 
 - Add Health monitor to main flow
 
@@ -23,6 +24,8 @@
 - TODO: Implement the actual TxQueue class
 - Build pipeline
     - Pack everything in a container and use AWS Fargate to manage it
+
+[] Change Rules to push/pop model and support more than one tx
 
 # Plan 
 

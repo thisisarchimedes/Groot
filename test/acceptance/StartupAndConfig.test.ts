@@ -30,12 +30,14 @@ describe('Startup and Config', function() {
         ruleType: TypeRule.Dummy,
         params: {
           message: 'I AM GROOT 1',
+          NumberOfDummyTxs: 1,
         },
       },
       {
         ruleType: TypeRule.Dummy,
         params: {
           message: 'I AM GROOT 2',
+          NumberOfDummyTxs: 2,
         },
       },
     ];

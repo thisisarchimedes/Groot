@@ -16,10 +16,10 @@ describe('Rule Engine Testings', function() {
   let blockchainReader: BlockchainReader;
 
   beforeEach(async function() {
-    localNodeAlchemy = new BlockchainNodeAdapter(logger);
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
     await localNodeAlchemy.startNode();
 
-    localNodeInfura = new BlockchainNodeAdapter(logger);
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     await localNodeInfura.startNode();
 
     blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
@@ -37,7 +37,7 @@ describe('Rule Engine Testings', function() {
     const tx = ruleEngine.getOutboundTransactions();
 
     expect(tx).not.to.be.undefined;
-    expect(tx.length).to.be.eq(2);
+    expect(tx.length).to.be.eq(3);
     expect(logger.getLatestInfoLogLine()).to.contain('I AM GROOT');
   });
 

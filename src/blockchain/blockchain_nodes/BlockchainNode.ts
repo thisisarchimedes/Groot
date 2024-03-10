@@ -16,8 +16,9 @@ export abstract class BlockchainNode {
   protected isNodeHealthy: boolean = true;
   protected nodeName: string = '';
 
-  constructor(logger: Logger) {
+  constructor(logger: Logger, nodeName: string) {
     this.logger = logger;
+    this.nodeName = nodeName;
   }
 
   abstract startNode(): Promise<void>;
@@ -36,5 +37,9 @@ export abstract class BlockchainNode {
 
   public isHealthy(): boolean {
     return this.isNodeHealthy;
+  }
+
+  public getNodeName(): string {
+    return this.nodeName;
   }
 }

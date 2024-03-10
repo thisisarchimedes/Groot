@@ -9,11 +9,10 @@ export class BlockchainNodeRemoteRPC extends BlockchainNode {
   private readonly SLEEP_DURATION_WHEN_RECOVERING_NODE = 10000;
 
   constructor(logger: Logger, remoteRpcUrl: string, nodeName: string) {
-    super(logger);
+    super(logger, nodeName);
 
     this.remoteRpcUrl = remoteRpcUrl;
     this.web3 = new Web3(remoteRpcUrl);
-    this.nodeName = nodeName;
   }
 
   public async startNode(): Promise<void> {

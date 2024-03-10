@@ -46,9 +46,19 @@ export class RuleEngine {
   }
 
   private getTransactionsFromEvaluateResults(evaluateResults: EvaluateResult[]): OutboundTransaction[] {
-    return evaluateResults
-        .filter(({shouldExecute}) => shouldExecute)
-        .map(({rule}) => rule.getTransaction() as OutboundTransaction);
+    const outboundTransactions: OutboundTransaction[] = [];
+
+    for (const {rule, shouldExecute} of evaluateResults) {
+      if (shouldExecute && rule.getPendingTransactionCount() > 0) {
+        let transaction = rule.popTransactionFromRuleLocalQueue();
+        while (transaction) {
+          outboundTransactions.push(transaction);
+          transaction = rule.popTransactionFromRuleLocalQueue();
+        }
+      }
+    }
+
+    return outboundTransactions;
   }
 
   private addHashToTransactions(transactions: OutboundTransaction[]): OutboundTransaction[] {

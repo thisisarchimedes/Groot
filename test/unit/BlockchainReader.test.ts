@@ -14,9 +14,9 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
   const logger: LoggerAdapter = new LoggerAdapter();
 
   beforeEach(async function() {
-    localNodeAlchemy = new BlockchainNodeAdapter(logger);
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
     await localNodeAlchemy.startNode();
-    localNodeInfura = new BlockchainNodeAdapter(logger);
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     await localNodeInfura.startNode();
   });
 

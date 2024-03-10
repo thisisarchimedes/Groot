@@ -14,10 +14,10 @@ describe('Rule Factory Testings', function() {
   let blockchainReader: BlockchainReader;
 
   beforeEach(async function() {
-    localNodeAlchemy = new BlockchainNodeAdapter(logger);
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
     await localNodeAlchemy.startNode();
 
-    localNodeInfura = new BlockchainNodeAdapter(logger);
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     await localNodeInfura.startNode();
 
     blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
@@ -31,6 +31,7 @@ describe('Rule Factory Testings', function() {
       ruleType: TypeRule.Dummy,
       params: {
         message: 'I AM GROOT',
+        NumberOfTxs: 1,
       },
     };
 
@@ -40,5 +41,35 @@ describe('Rule Factory Testings', function() {
       await rule.evaluate();
     }
     expect(logger.getLatestInfoLogLine()).to.contain('I AM GROOT');
+  });
+
+  it('should generate more than one tx per rule', async function() {
+    const dummyRule: RuleJSONConfigItem = {
+      ruleType: TypeRule.Dummy,
+      params: {
+        message: 'I AM GROOT',
+        NumberOfDummyTxs: 3,
+      },
+    };
+
+    const ruleFactory = new FactoryRule(logger, blockchainReader);
+    const rule = ruleFactory.createRule(dummyRule.ruleType, dummyRule.params as RuleParams);
+    if (rule) {
+      await rule.evaluate();
+    } else {
+      expect.fail('Rule is undefined');
+    }
+
+    expect(rule.getPendingTransactionCount()).be.eq(3);
+    expect(rule.popTransactionFromRuleLocalQueue()).not.to.be.undefined;
+
+    expect(rule.getPendingTransactionCount()).be.eq(2);
+    expect(rule.popTransactionFromRuleLocalQueue()).not.to.be.undefined;
+
+    expect(rule.getPendingTransactionCount()).be.eq(1);
+    expect(rule.popTransactionFromRuleLocalQueue()).not.to.be.undefined;
+
+    expect(rule.getPendingTransactionCount()).be.eq(0);
+    expect(rule.popTransactionFromRuleLocalQueue()).to.be.undefined;
   });
 });
