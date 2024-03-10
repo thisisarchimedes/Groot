@@ -7,6 +7,8 @@ import {
   BlockchainNodeHealthMonitor,
   ErrorBlockchainNodeHealthMonitor,
 } from '../../src/service/health_monitor/BlockchainNodeHealthMonitor';
+import {HealthMonitor} from '../../src/service/health_monitor/HealthMonitor';
+import {SignalAdapter} from './adapters/SignalAdapter';
 
 chai.use(chaiAsPromised);
 const {expect} = chai;
@@ -54,5 +56,21 @@ describe('Health Monitor tests', function() {
 
     await expect(blockchainNodeHealth.checkBlockchainNodesHealth())
         .to.be.rejectedWith(ErrorBlockchainNodeHealthMonitor);
+  });
+
+  it('Should correctly invoke Health Monitor start of cycle sequence', function() {
+    localNodeAlchemy.setNodeHealthy(true);
+    localNodeInfura.setNodeHealthy(true);
+
+    const signalHeartbeat: SignalAdapter = new SignalAdapter();
+    const signalCriticalFailure: SignalAdapter = new SignalAdapter();
+
+    const healthMonitor: HealthMonitor = new HealthMonitor(
+        logger, blockchainNodeHealth, signalHeartbeat, signalCriticalFailure);
+
+    healthMonitor.startOfCycleSequence();
+
+    expect(signalHeartbeat.isHeartbeatSent()).to.be.true;
+    expect(signalCriticalFailure.isCriticalFailureSent()).to.be.false;
   });
 });
