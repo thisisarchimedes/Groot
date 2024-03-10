@@ -2,10 +2,11 @@
 
 ## Health Monitor
 [X] Send heart beat to external watchdog service
-[] Check node health and spin new container if needed
+[X] Check node health and spin new container if needed
 [] Should be able to invoke an overall reset if cannot recover (send a "need reset" event)
 
-- Add Health monitor to main flow
+**Refactor**
+[] Add Health monitor to main flow
 
 ## Tx Broadcaster (Seperate process)
 [] Can sign a tx with the correct key without exposing the key (KMS)
