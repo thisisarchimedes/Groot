@@ -12,12 +12,32 @@ export class HealthMonitor {
 
   public async checkBlockchainNodesHealth(): Promise<void> {
     const unhealthyNodes = this.nodes.filter((node) => !node.isHealthy());
-    for (const node of unhealthyNodes) {
-      this.logger.warn(`Node ${node.getNodeName()} is unhealthy. Attempting to recover it...`);
-      // Do in parrallel
-      // if all nodes cannot recover throw
-      await node.recoverNode();
-      this.logger.info(`Node ${node.getNodeName()} has been recovered.`);
+
+    if (unhealthyNodes.length === 0) {
+      return;
+    }
+
+    const recoveryResults = await Promise.allSettled(
+        unhealthyNodes.map(async (node) => {
+          this.logger.warn(`Node ${node.getNodeName()} is unhealthy. Attempting to recover it...`);
+          try {
+            await node.recoverNode();
+            this.logger.info(`Node ${node.getNodeName()} has been recovered.`);
+            return true;
+          } catch (error) {
+            this.logger.error(`Health Monitor failed to recover node ${node.getNodeName()}: ${error}`);
+            return false;
+          }
+        }),
+    );
+
+    const failedRecoveries = recoveryResults.filter(
+        (result) => result.status === 'rejected' || result.value === false,
+    );
+
+    if (failedRecoveries.length === unhealthyNodes.length) {
+      this.logger.error('Health Monitor: All nodes are down and failed to recover');
+      throw new Error('Health Monitor: All nodes are down and failed to recover');
     }
   }
 }

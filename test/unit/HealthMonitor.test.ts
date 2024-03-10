@@ -32,6 +32,7 @@ describe('Health Monitor tests', function() {
   it('Should be able to recover node that is currently unhealthy', async function() {
     localNodeAlchemy.setNodeHealthy(true);
     localNodeInfura.setNodeHealthy(false);
+    localNodeInfura.setExpectRecoverToSucceed(true);
 
     await healthMonitor.checkBlockchainNodesHealth();
 
@@ -39,5 +40,17 @@ describe('Health Monitor tests', function() {
         .to.be.true;
     expect(localNodeInfura.isHealthy()).to.be.true;
     expect(localNodeAlchemy.isHealthy()).to.be.true;
+  });
+
+  it('Should throw if all nodes failed and cannot recover', async function() {
+    localNodeAlchemy.setNodeHealthy(false);
+    localNodeAlchemy.setExpectRecoverToSucceed(false);
+
+    localNodeInfura.setNodeHealthy(false);
+    localNodeAlchemy.setExpectRecoverToSucceed(false);
+
+    await healthMonitor.checkBlockchainNodesHealth();
+
+    await expect(healthMonitor.checkBlockchainNodesHealth()).to.be.rejectedWith(Error);
   });
 });
