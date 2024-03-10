@@ -99,7 +99,7 @@ export class Groot {
     this.txQueuer = new TransactionQueuer(this.logger, queue);
   }
 
-  public async runGroot(): Promise<void> {
+  public async runGrootCycle(): Promise<void> {
     this.logger.info('Running Groot...');
 
     this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
@@ -123,7 +123,7 @@ export async function grootStartHere(runInfinite: boolean = true): Promise<void>
 
   do {
     await groot.prepareForAnotherCycle();
-    await groot.runGroot();
+    await groot.runGrootCycle();
   } while (runInfinite);
 
   await groot.shutdownGroot();
