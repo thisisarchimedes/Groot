@@ -29,6 +29,6 @@
 - TODO: Implement the actual TxQueue class
 
 # CICD
-- CloudWatch Event: DemoApp/Groot/Heartbeat - when spining container add a heartbeat event to CloudWatch
-- Build pipeline
-    - Pack everything in a container and use AWS Fargate to manage it
+[] Deploy to AWS Fargate
+[] Add a build pipeline - Pack everything in a container and use AWS Fargate to manage it
+[] CloudWatch Event: DemoApp/Groot/Heartbeat - when spining container add a heartbeat event to CloudWatch
