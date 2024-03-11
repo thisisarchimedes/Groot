@@ -93,19 +93,14 @@ export class Groot {
 
   public async prepareForAnotherCycle() {
     this.logger.info('Preparing Groot for another cycle...');
-
     await this.healthMonitor.startOfCycleSequence();
 
     await this.configService.refreshConfig();
-
     await this.setLocalNodesToNewestBlock();
-
     this.resetRulesEngine();
-
     this.resetTransactionQueuer();
 
     this.healthMonitor.endOfCycleSequence();
-
     this.logger.info('Groot is ready for another cycle.');
   }
 
@@ -127,8 +122,8 @@ export class Groot {
     this.txQueuer = new TransactionQueuer(this.logger, queue);
   }
 
-  public async runGrootCycle(): Promise<void> {
-    this.logger.info('Running Groot...');
+  public async runOneGrootCycle(): Promise<void> {
+    this.logger.info('Running Groot cycle...');
 
     this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
 
@@ -155,7 +150,7 @@ export async function grootStartHere(runInfinite: boolean = true): Promise<void>
     *  add a sleep to avoid busy waiting (get sleep parameter from config - add sleep method in Groot)
     */
     await groot.prepareForAnotherCycle();
-    await groot.runGrootCycle();
+    await groot.runOneGrootCycle();
   } while (runInfinite);
 
   await groot.shutdownGroot();
