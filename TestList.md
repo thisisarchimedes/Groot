@@ -5,9 +5,6 @@
 [X] Check node health and spin new container if needed
 [X] Should be able to invoke an overall reset if cannot recover (send a "need reset" event)
 
-**Refactor**
-[] Add Health monitor  - end of cycle - to main flow
-[] Master catch unexpected error on main loop
 
 ## Tx Broadcaster (Seperate process)
 [] Can sign a tx with the correct key without exposing the key (KMS)
@@ -16,6 +13,13 @@
 [] Can boradcast a vaild transaction and report when it is successful
 [] Can set priority level "fees" for a transaction normal/urgent based on current network conditions
 [] Can re-broadcast if tx failed because PRC provider is down
+
+## ATDD
+[] Check that end of cycle works
+
+# Refactor
+[] Add structured log abstraction layer so it is easy to create NewRelic dashboard (rule success/fail, cycle time etc..)
+[] Master catch unexpected error on main loop
 
 # Architecture
 [] There is some kind of ABI repo
