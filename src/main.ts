@@ -8,6 +8,11 @@ import {LoggerAll} from './service/logger/LoggerAll';
 import {TransactionQueuer} from './tx_queue/TransactionQueuer';
 import {BlockchainReader} from './blockchain/blockchain_reader/BlockchainReader';
 import {BlockchainNodeLocalHardhat} from './blockchain/blockchain_nodes/BlockchainNodeLocalHardhat';
+import {HealthMonitor} from './service/health_monitor/HealthMonitor';
+import {BlockchainNodeHealthMonitor} from './service/health_monitor/BlockchainNodeHealthMonitor';
+import {SignalAWSCriticalFailure} from './service/health_monitor/signal/SignalAWSCriticalFailure';
+import {SignalAWSHeartbeat} from './service/health_monitor/signal/SignalAWSHeartbeat';
+import {HostNameProvider} from './service/health_monitor/HostNameProvider';
 
 dotenv.config();
 
@@ -18,6 +23,7 @@ export class Groot {
   private logger!: LoggerAll;
   private ruleEngine!: RuleEngine;
   private txQueuer!: TransactionQueuer;
+  private healthMonitor!: HealthMonitor;
 
   private mainNode!: BlockchainNodeLocalHardhat;
   private altNode!: BlockchainNodeLocalHardhat;
@@ -37,6 +43,8 @@ export class Groot {
 
     await this.initalizeReadOnlyLocalNodes();
 
+    this.initalizeHealthMonitor();
+
     this.logger.info('Groot initialized successfully.');
   }
 
@@ -50,6 +58,22 @@ export class Groot {
     ]);
 
     this.blockchainReader = new BlockchainReader(this.logger, [this.mainNode, this.altNode]);
+  }
+
+  private initalizeHealthMonitor() {
+    if (!this.mainNode || !this.altNode) {
+      throw new Error('Cannot initalize health monitor without nodes');
+    }
+
+    const blockchainHealthMonitor = new BlockchainNodeHealthMonitor(this.logger, [this.mainNode, this.altNode]);
+    const hostNameProvider = new HostNameProvider(this.logger);
+    const signalHeartbeat = new SignalAWSHeartbeat(this.logger, this.configService, hostNameProvider);
+    const signalCriticalFailure = new SignalAWSCriticalFailure(this.logger, this.configService, hostNameProvider);
+    this.healthMonitor = new HealthMonitor(
+        this.logger,
+        blockchainHealthMonitor,
+        signalHeartbeat,
+        signalCriticalFailure);
   }
 
   public async shutdownGroot() {
@@ -70,6 +94,8 @@ export class Groot {
   public async prepareForAnotherCycle() {
     this.logger.info('Preparing Groot for another cycle...');
 
+    await this.healthMonitor.startOfCycleSequence();
+
     await this.configService.refreshConfig();
 
     await this.setLocalNodesToNewestBlock();
@@ -77,6 +103,8 @@ export class Groot {
     this.resetRulesEngine();
 
     this.resetTransactionQueuer();
+
+    // this.healthMonitor.endOfCycleSequence();
 
     this.logger.info('Groot is ready for another cycle.');
   }

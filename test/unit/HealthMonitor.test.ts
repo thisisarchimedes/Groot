@@ -58,7 +58,7 @@ describe('Health Monitor tests', function() {
         .to.be.rejectedWith(ErrorBlockchainNodeHealthMonitor);
   });
 
-  it('Should correctly invoke Health Monitor start of cycle sequence', function() {
+  it('Should correctly invoke Health Monitor start of cycle sequence', async function() {
     localNodeAlchemy.setNodeHealthy(true);
     localNodeInfura.setNodeHealthy(true);
 
@@ -68,9 +68,28 @@ describe('Health Monitor tests', function() {
     const healthMonitor: HealthMonitor = new HealthMonitor(
         logger, blockchainNodeHealth, signalHeartbeat, signalCriticalFailure);
 
-    healthMonitor.startOfCycleSequence();
+    await healthMonitor.startOfCycleSequence();
 
     expect(signalHeartbeat.isHeartbeatSent()).to.be.true;
     expect(signalCriticalFailure.isCriticalFailureSent()).to.be.false;
+  });
+
+  it('Should correctly invoke Health Monitor start of cycle and send critical failure', async function() {
+    localNodeAlchemy.setNodeHealthy(false);
+    localNodeAlchemy.setExpectRecoverToSucceed(false);
+
+    localNodeInfura.setNodeHealthy(false);
+    localNodeInfura.setExpectRecoverToSucceed(false);
+
+    const signalHeartbeat: SignalAdapter = new SignalAdapter();
+    const signalCriticalFailure: SignalAdapter = new SignalAdapter();
+
+    const healthMonitor: HealthMonitor = new HealthMonitor(
+        logger, blockchainNodeHealth, signalHeartbeat, signalCriticalFailure);
+
+    await healthMonitor.startOfCycleSequence();
+
+    expect(signalHeartbeat.isHeartbeatSent()).to.be.true;
+    expect(signalCriticalFailure.isCriticalFailureSent()).to.be.true;
   });
 });

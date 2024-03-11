@@ -12,14 +12,14 @@ export class HealthMonitor {
     private readonly signalHeartbeat: ISignalHeartbeat,
     private readonly signalCriticalFailure: ISignalCriticalFailure) { }
 
-  public startOfCycleSequence() {
+  public async startOfCycleSequence() {
     this.cycleStartTimestamp = new Date();
     this.logger.info(`Cycle start at timestamp: ${this.cycleStartTimestamp}`);
 
     this.signalHeartbeat.sendHeartbeat();
 
     try {
-      this.blockchainHealthMonitor.checkBlockchainNodesHealth();
+      await this.blockchainHealthMonitor.checkBlockchainNodesHealth();
     } catch (error) {
       this.logger.error(`Critical failure detected: ${error}`);
       this.signalCriticalFailure.sendCriticalFailure();

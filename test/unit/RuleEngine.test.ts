@@ -8,97 +8,109 @@ import {RuleEngine} from '../../src/rule_engine/RuleEngine';
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
+import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
 
 describe('Rule Engine Testings', function() {
   const logger: LoggerAdapter = new LoggerAdapter();
   const configService: ConfigServiceAdapter = new ConfigServiceAdapter();
-  let localNodeAlchemy: BlockchainNodeAdapter;
-  let localNodeInfura: BlockchainNodeAdapter;
   let blockchainReader: BlockchainReader;
 
   beforeEach(async function() {
-    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
-    await localNodeAlchemy.startNode();
-
-    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
-    await localNodeInfura.startNode();
-
+    const localNodeAlchemy = await startBlockchainNode('localNodeAlchemy');
+    const localNodeInfura = await startBlockchainNode('localNodeInfura');
     blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
   });
 
   it('should load rules from rule JSON and iterate on them, invoke each one', async function() {
-    logger.lookForInfoLogLineContaining('I AM GROOT');
-    configService.setRulesFromFile('./test/unit/data/dummy_rules.json');
-    await configService.refreshConfig();
+    const expectedLogMessage = 'I AM GROOT';
+    logger.lookForInfoLogLineContaining(expectedLogMessage);
+    const ruleEngine = await createRuleEngineWithConfiguredRules('./test/unit/data/dummy_rules.json');
 
-    const ruleFactory = new FactoryRule(logger, blockchainReader);
-    const ruleEngine = new RuleEngine(logger, ruleFactory);
-
-    ruleEngine.loadRulesFromJSONConfig(configService.getRules());
     await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
-    const tx = ruleEngine.getOutboundTransactions();
+    const transactions = ruleEngine.getOutboundTransactions();
 
-    expect(tx).not.to.be.undefined;
-    expect(tx.length).to.be.eq(3);
+    assertTransactionsValid(transactions, 3);
     expect(logger.isExpectedLogLineInfoFound()).to.be.true;
   });
 
   it('Should attach tx hash to all transactions', async function() {
-    configService.setRulesFromFile('./test/unit/data/dummy_rules.json');
-    await configService.refreshConfig();
+    const ruleEngine = await createRuleEngineWithConfiguredRules('./test/unit/data/dummy_rules.json');
 
-    const ruleFactory = new FactoryRule(logger, blockchainReader);
-    const ruleEngine = new RuleEngine(logger, ruleFactory);
-
-    ruleEngine.loadRulesFromJSONConfig(configService.getRules());
     await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
-    const tx = ruleEngine.getOutboundTransactions();
+    const transactions = ruleEngine.getOutboundTransactions();
 
-    expect(tx).not.to.be.undefined;
-    expect(tx[0].hash).to.be.eq(Web3.utils.sha3(JSON.stringify(tx[0].lowLevelUnsignedTransaction)));
-    expect(tx[1].hash).to.be.eq(Web3.utils.sha3(JSON.stringify(tx[1].lowLevelUnsignedTransaction)));
-    expect(tx[0].hash).to.be.eq(tx[1].hash);
+    assertTransactionsValid(transactions);
+    assertTransactionHashesValid(transactions);
   });
 
   it('Should report on 1 successful rule and 1 failed rule', async function() {
     const testRules: RuleJSONConfigItem[] = [
-      {
-        ruleType: TypeRule.Dummy,
-        label: 'dummyRule',
-        params: {
-          message: 'I AM GROOT',
-          NumberOfDummyTxs: 3,
-          evalSuccess: true,
-        },
-      },
-      {
-        ruleType: TypeRule.Invalid,
-        label: 'invalideRule',
-        params: {
-          message: 'I AM GROOT',
-          NumberOfDummyTxs: 3,
-        },
-      },
-      {
-        ruleType: TypeRule.Dummy,
-        label: 'dummyRule',
-        params: {
-          message: 'I AM GROOT',
-          NumberOfDummyTxs: 1,
-          evalSuccess: false,
-        },
-      },
+      createDummyRule('I AM GROOT', 3, true),
+      createInvalidRule('I AM GROOT', 3),
+      createDummyRule('I AM GROOT', 1, false),
     ];
+    const ruleEngine = createRuleEngine(testRules);
+
+    await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
+    const transactions = ruleEngine.getOutboundTransactions();
+
+    assertRuleEvaluationResult(1, 1);
+    assertTransactionsValid(transactions, 3);
+  });
+
+  async function startBlockchainNode(name: string): Promise<BlockchainNodeAdapter> {
+    const node = new BlockchainNodeAdapter(logger, name);
+    await node.startNode();
+    return node;
+  }
+
+  async function createRuleEngineWithConfiguredRules(rulesFilePath: string): Promise<RuleEngine> {
+    configService.setRulesFromFile(rulesFilePath);
+    await configService.refreshConfig();
+    return createRuleEngine(configService.getRules());
+  }
+
+  function createRuleEngine(rules: RuleJSONConfigItem[]): RuleEngine {
     const ruleFactory = new FactoryRule(logger, blockchainReader);
     const ruleEngine = new RuleEngine(logger, ruleFactory);
+    ruleEngine.loadRulesFromJSONConfig(rules);
+    return ruleEngine;
+  }
 
-    ruleEngine.loadRulesFromJSONConfig(testRules);
-    await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
-    const tx = ruleEngine.getOutboundTransactions();
+  function createDummyRule(message: string, numberOfDummyTxs: number, evalSuccess: boolean): RuleJSONConfigItem {
+    return {
+      ruleType: TypeRule.Dummy,
+      label: 'dummyRule',
+      params: {message, NumberOfDummyTxs: numberOfDummyTxs, evalSuccess},
+    };
+  }
 
+  function createInvalidRule(message: string, numberOfDummyTxs: number): RuleJSONConfigItem {
+    return {
+      ruleType: TypeRule.Invalid,
+      label: 'invalideRule',
+      params: {message, NumberOfDummyTxs: numberOfDummyTxs},
+    };
+  }
+
+  function assertTransactionsValid(transactions: OutboundTransaction[], expectedLength?: number): void {
+    expect(transactions).not.to.be.undefined;
+    if (expectedLength !== undefined) {
+      expect(transactions.length).to.be.eq(expectedLength);
+    }
+  }
+
+  function assertTransactionHashesValid(transactions: OutboundTransaction[]): void {
+    expect(transactions[0].hash).to.be.eq(Web3.utils.sha3(JSON.stringify(transactions[0].lowLevelUnsignedTransaction)));
+    expect(transactions[1].hash).to.be.eq(Web3.utils.sha3(JSON.stringify(transactions[1].lowLevelUnsignedTransaction)));
+    expect(transactions[0].hash).to.be.eq(transactions[1].hash);
+  }
+
+  function assertRuleEvaluationResult(successfulRuleEval: number, failedRuleEval: number): void {
     const logLine = logger.getLatestInfoLogLine();
-    expect(logLine).to.contain('Rule evaluation result: {"successfulRuleEval":1,"failedRuleEval":1}');
-    expect(tx).not.to.be.undefined;
-    expect(tx.length).to.be.eq(3);
-  });
+    expect(logLine).to.contain(
+        `Rule evaluation result: {"successfulRuleEval":${successfulRuleEval},` +
+      `"failedRuleEval":${failedRuleEval}}`,
+    );
+  }
 });
