@@ -20,8 +20,6 @@
 [] Check that end of cycle works
 
 # Refactor
-[X] Add structured log abstraction layer so it is easy to create NewRelic dashboard (rule success/fail, cycle time etc..)
-[] Master catch unexpected error on main loop
 
 # Architecture
 [] Run stress test on Groot with 10K positions
