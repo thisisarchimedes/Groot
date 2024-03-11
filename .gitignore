@@ -134,6 +134,7 @@ dist
 .env.demo
 node_modules
 .env
+.env.keys
 
 # Hardhat files
 /cache

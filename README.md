@@ -13,3 +13,27 @@ FAQ
 
 CloudWatch Heartbeat Event
 `DemoApp/Groot/Heartbeat`
+
+
+## Run Locally
+
+_*Install dependencies*_
+1. Make sure Node.js and Yarn are installed
+2. Install requirements: `yarn install`
+
+_*Get .env file*_
+```bash
+yarn dotenvx hub # open and follow the link printed, copy the keys to .env.keys locally
+set -o allexport && source .env.keys && set +o allexport # export .env.keys to local environment
+yarn dotenvx decrypt # decrypt .env.vault to .env
+set -o allexport && source .env && set +o allexport # export .env to local environment
+```
+
+_*Update .env*_
+```bash
+yarn dotenvx encrypt
+yarn dotenvx hub push # push the keys to the dotenvx hub
+```
+Next: 
+- commit `.env.vault` to github _**DO NOT COMMIT .evn.keys or .env to github**_
+- Update the repo Github Secrets `DOTENV_KEY`
