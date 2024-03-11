@@ -1,11 +1,5 @@
 # Tests
 
-## Health Monitor
-[X] Send heart beat to external watchdog service
-[X] Check node health and spin new container if needed
-[X] Should be able to invoke an overall reset if cannot recover (send a "need reset" event)
-
-
 ## Tx Broadcaster (Seperate process)
 [] Can sign a tx with the correct key (KMS)
 [] Send URGENT from Urgent key and NORMAL from Normal key
