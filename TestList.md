@@ -20,7 +20,7 @@
 [] Check that end of cycle works
 
 # Refactor
-[] Add structured log abstraction layer so it is easy to create NewRelic dashboard (rule success/fail, cycle time etc..)
+[X] Add structured log abstraction layer so it is easy to create NewRelic dashboard (rule success/fail, cycle time etc..)
 [] Master catch unexpected error on main loop
 
 # Architecture
