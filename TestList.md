@@ -14,7 +14,7 @@
 [] Can set priority level "fees" for a transaction normal/urgent based on current network conditions
 [] Can re-broadcast if tx failed because PRC provider is down
 
-## ATDD
+## Acceptance Testing
 [] Check that end of cycle works
 
 # Refactor
