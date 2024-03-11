@@ -109,8 +109,9 @@ describe('Rule Engine Testings', function() {
   function assertRuleEvaluationResult(successfulRuleEval: number, failedRuleEval: number): void {
     const logLine = logger.getLatestInfoLogLine();
     expect(logLine).to.contain(
-        `Rule evaluation result: {"successfulRuleEval":${successfulRuleEval},` +
-      `"failedRuleEval":${failedRuleEval}}`,
+        `"message":"Rule Eval Results",` +
+        `"successfulRuleEval":${successfulRuleEval},` +
+        `"failedRuleEval":${failedRuleEval}`,
     );
   }
 });
