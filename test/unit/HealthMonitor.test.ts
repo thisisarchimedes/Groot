@@ -92,4 +92,19 @@ describe('Health Monitor tests', function() {
     expect(signalHeartbeat.isHeartbeatSent()).to.be.true;
     expect(signalCriticalFailure.isCriticalFailureSent()).to.be.true;
   });
+
+  it('Should correctly invoke Health Monitor end of cycle and report on cycle time', async function() {
+    const signalHeartbeat: SignalAdapter = new SignalAdapter();
+    const signalCriticalFailure: SignalAdapter = new SignalAdapter();
+
+    const healthMonitor: HealthMonitor = new HealthMonitor(
+        logger, blockchainNodeHealth, signalHeartbeat, signalCriticalFailure);
+
+    await healthMonitor.startOfCycleSequence();
+    healthMonitor.endOfCycleSequence();
+
+    expect(signalHeartbeat.isHeartbeatSent()).to.be.true;
+    expect(signalCriticalFailure.isCriticalFailureSent()).to.be.false;
+    expect(logger.getLatestInfoLogLine().includes('Cycle completed - time:')).to.be.true;
+  });
 });

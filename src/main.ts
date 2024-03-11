@@ -104,7 +104,7 @@ export class Groot {
 
     this.resetTransactionQueuer();
 
-    // this.healthMonitor.endOfCycleSequence();
+    this.healthMonitor.endOfCycleSequence();
 
     this.logger.info('Groot is ready for another cycle.');
   }
@@ -150,7 +150,10 @@ export async function grootStartHere(runInfinite: boolean = true): Promise<void>
   await groot.initalizeGroot();
 
   do {
-    // TODO: add catch to catch and report on unexpected errors
+    /* TODO:
+    *  add catch to catch and report on unexpected errors
+    *  add a sleep to avoid busy waiting (get sleep parameter from config - add sleep method in Groot)
+    */
     await groot.prepareForAnotherCycle();
     await groot.runGrootCycle();
   } while (runInfinite);

@@ -12,7 +12,7 @@ export class HealthMonitor {
     private readonly signalHeartbeat: ISignalHeartbeat,
     private readonly signalCriticalFailure: ISignalCriticalFailure) { }
 
-  public async startOfCycleSequence() {
+  public async startOfCycleSequence(): Promise<void> {
     this.cycleStartTimestamp = new Date();
     this.logger.info(`Cycle start at timestamp: ${this.cycleStartTimestamp}`);
 
@@ -24,6 +24,14 @@ export class HealthMonitor {
       this.logger.error(`Critical failure detected: ${error}`);
       this.signalCriticalFailure.sendCriticalFailure();
     }
+  }
+
+  public endOfCycleSequence(): void {
+    const cycleEndTimestamp: Date = new Date();
+    const cycleTime = cycleEndTimestamp.getTime() - this.cycleStartTimestamp.getTime();
+    this.logger.info(`Cycle completed - time: ${cycleTime} ms`);
+
+    this.signalHeartbeat.sendHeartbeat();
   }
 }
 
