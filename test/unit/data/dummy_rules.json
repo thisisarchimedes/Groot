@@ -1,16 +1,20 @@
 [
     {
         "ruleType": "dummy",
+        "label": "dummy1",
         "params": {
             "message": "I AM GROOT 1",
-            "NumberOfDummyTxs": 2
+            "NumberOfDummyTxs": 2,
+            "evalSuccess": true
         }
     },
     {
         "ruleType": "dummy",
+        "label": "dummy2",
         "params": {
             "message": "I AM GROOT 2",
-            "NumberOfDummyTxs": 1
+            "NumberOfDummyTxs": 1,
+            "evalSuccess": true
         }
     }
 ]

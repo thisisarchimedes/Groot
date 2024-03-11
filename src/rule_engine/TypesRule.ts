@@ -10,5 +10,6 @@ export enum UrgencyLevel {
 
 export interface RuleJSONConfigItem {
     ruleType: TypeRule;
+    label: string;
     params: unknown;
 }

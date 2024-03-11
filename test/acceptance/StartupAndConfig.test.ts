@@ -28,6 +28,7 @@ describe('Startup and Config', function() {
     const mockRules: RuleJSONConfigItem[] = [
       {
         ruleType: TypeRule.Dummy,
+        label: 'dummyRule',
         params: {
           message: 'I AM GROOT 1',
           NumberOfDummyTxs: 1,
@@ -35,9 +36,11 @@ describe('Startup and Config', function() {
       },
       {
         ruleType: TypeRule.Dummy,
+        label: 'dummyRule',
         params: {
           message: 'I AM GROOT 2',
           NumberOfDummyTxs: 2,
+          evalSuccess: true,
         },
       },
     ];
@@ -57,14 +60,18 @@ describe('Startup and Config', function() {
     const mockRules: RuleJSONConfigItem[] = [
       {
         ruleType: TypeRule.Invalid,
+        label: 'invalidRule',
         params: {
           message: 'I AM GROOT 1',
         },
       },
       {
         ruleType: TypeRule.Dummy,
+        label: 'dummyRule',
         params: {
           message: 'I AM GROOT 2',
+          NumberOfDummyTxs: 1,
+          evalSuccess: true,
         },
       },
     ];

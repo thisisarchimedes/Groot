@@ -3,7 +3,7 @@ import {Transaction} from 'web3-types';
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Logger} from '../service/logger/Logger';
 import {FactoryRule} from './FactoryRule';
-import {Rule, RuleParams} from './rule/Rule';
+import {Rule} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
 
 
@@ -33,23 +33,39 @@ export class RuleEngine {
 
   private createRulesFromConfig(ruleConfig: RuleJSONConfigItem[]): Rule[] {
     return ruleConfig
-        .map((config) => this.ruleFactory.createRule(config.ruleType, config.params as RuleParams))
+        .map((config) => this.ruleFactory.createRule(config))
         .filter((rule): rule is Rule => rule !== null);
   }
 
-  private evaluateRulesInParallel(): Promise<EvaluateResult[]> {
-    const evaluatePromises = this.rules.map(async (rule) => ({
-      rule,
-      shouldExecute: await rule.evaluate(),
-    }));
-    return Promise.all(evaluatePromises);
+  private async evaluateRulesInParallel(): Promise<EvaluateResult[]> {
+    const evaluatePromises = this.rules.map(async (rule) => {
+      try {
+        await rule.evaluate();
+        return {rule, success: true};
+      } catch (error) {
+        const errorMessage = (error as Error).message;
+        this.logger.error(`Rule evaluation failed for rule: ${rule.getRuleLabel()}. Error: ${errorMessage}`);
+        return {rule, success: false};
+      }
+    });
+
+    const evaluateResults = await Promise.all(evaluatePromises);
+    return evaluateResults;
   }
 
   private getTransactionsFromEvaluateResults(evaluateResults: EvaluateResult[]): OutboundTransaction[] {
     const outboundTransactions: OutboundTransaction[] = [];
+    let successfulRuleEval = 0;
+    let failedRuleEval = 0;
 
-    for (const {rule, shouldExecute} of evaluateResults) {
-      if (shouldExecute && rule.getPendingTransactionCount() > 0) {
+    for (const {rule, success} of evaluateResults) {
+      if (success) {
+        successfulRuleEval++;
+      } else {
+        failedRuleEval++;
+      }
+
+      if (success && rule.getPendingTransactionCount() > 0) {
         let transaction = rule.popTransactionFromRuleLocalQueue();
         while (transaction) {
           outboundTransactions.push(transaction);
@@ -57,6 +73,13 @@ export class RuleEngine {
         }
       }
     }
+
+    const evaluationResult = {
+      successfulRuleEval,
+      failedRuleEval,
+    };
+
+    this.logger.info(`Rule evaluation result: ${JSON.stringify(evaluationResult)}`);
 
     return outboundTransactions;
   }
@@ -81,5 +104,5 @@ export class RuleEngine {
 
 interface EvaluateResult {
   rule: Rule;
-  shouldExecute: boolean;
+  success: boolean;
 }

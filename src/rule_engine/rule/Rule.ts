@@ -12,15 +12,26 @@ export abstract class Rule {
   protected blockchainReader: BlockchainReader;
 
   protected params: RuleParams;
+  protected readonly ruleLabel: string;
   protected pendingTxQueue: OutboundTransaction[] = [];
 
-  constructor(logger: Logger, blockchainReader: BlockchainReader, params: RuleParams) {
+  constructor(
+      logger: Logger,
+      blockchainReader: BlockchainReader,
+      ruleLabel: string,
+      params: RuleParams,
+  ) {
     this.logger = logger;
     this.params = params;
+    this.ruleLabel = ruleLabel;
     this.blockchainReader = blockchainReader;
   }
 
-  abstract evaluate(): Promise<boolean>;
+  abstract evaluate(): Promise<void>;
+
+  public getRuleLabel(): string {
+    return this.ruleLabel;
+  }
 
   public getPendingTransactionCount(): number {
     return this.pendingTxQueue.length;

@@ -122,6 +122,7 @@ export async function grootStartHere(runInfinite: boolean = true): Promise<void>
   await groot.initalizeGroot();
 
   do {
+    // TODO: add catch to catch and report on unexpected errors
     await groot.prepareForAnotherCycle();
     await groot.runGrootCycle();
   } while (runInfinite);

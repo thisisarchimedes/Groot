@@ -3,7 +3,6 @@ import {expect} from 'chai';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
-import {RuleParams} from '../../src/rule_engine/rule/Rule';
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 
@@ -26,16 +25,17 @@ describe('Rule Factory Testings', function() {
   it('should create Rule object from a dummy rule config', async function() {
     const ruleFactory = new FactoryRule(logger, blockchainReader);
 
-
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
+      label: 'dummyRule',
       params: {
         message: 'I AM GROOT',
         NumberOfTxs: 1,
+        evalSuccess: true,
       },
     };
 
-    const rule = ruleFactory.createRule(dummyRule.ruleType, dummyRule.params as RuleParams);
+    const rule = ruleFactory.createRule(dummyRule);
     expect(rule).not.to.be.undefined;
     if (rule) {
       await rule.evaluate();
@@ -46,14 +46,16 @@ describe('Rule Factory Testings', function() {
   it('should generate more than one tx per rule', async function() {
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
+      label: 'dummyRule',
       params: {
         message: 'I AM GROOT',
         NumberOfDummyTxs: 3,
+        evalSuccess: true,
       },
     };
 
     const ruleFactory = new FactoryRule(logger, blockchainReader);
-    const rule = ruleFactory.createRule(dummyRule.ruleType, dummyRule.params as RuleParams);
+    const rule = ruleFactory.createRule(dummyRule);
     if (rule) {
       await rule.evaluate();
     } else {

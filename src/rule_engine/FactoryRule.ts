@@ -2,7 +2,7 @@ import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader
 import {Logger} from '../service/logger/Logger';
 import {Rule, RuleParams} from './rule/Rule';
 import {RuleDummy} from './rule/RuleDummy';
-import {TypeRule} from './TypesRule';
+import {RuleJSONConfigItem, TypeRule} from './TypesRule';
 
 export class ErrorRuleFactory extends Error {
   constructor(message: string) {
@@ -20,12 +20,12 @@ export class FactoryRule {
     this.blockchainReader = blockchainReader;
   }
 
-  public createRule(type: TypeRule, params: RuleParams): Rule | null {
-    switch (type) {
+  public createRule(config: RuleJSONConfigItem): Rule | null {
+    switch (config.ruleType) {
       case TypeRule.Dummy:
-        return new RuleDummy(this.logger, this.blockchainReader, params);
+        return new RuleDummy(this.logger, this.blockchainReader, config.label, config.params as RuleParams);
       default:
-        this.logger.warn(`Unsupported rule type: ${type}`);
+        this.logger.warn(`Unsupported rule type: ${config.ruleType}`);
         return null;
     }
   }

@@ -4,6 +4,9 @@ export class LoggerAdapter extends Logger {
   private latestInfoLogLine: string = '';
   private latestErrorLogLine: string = '';
 
+  private expectedLogLineInfo: string = '';
+  private expectedLogLineInfoFound: boolean = false;
+
   public async flush(): Promise<void> {
     // No-op
   }
@@ -18,6 +21,10 @@ export class LoggerAdapter extends Logger {
     if (this.currentLevel >= LogLevel.Info) {
       console.info('\x1b[36m%s\x1b[0m', '[INFO] ' + message);
       this.latestInfoLogLine = message;
+
+      if (this.expectedLogLineInfo && message.includes(this.expectedLogLineInfo)) {
+        this.expectedLogLineInfoFound = true;
+      }
     }
   }
 
@@ -40,5 +47,13 @@ export class LoggerAdapter extends Logger {
 
   public getLatestErrorLogLine(): string {
     return this.latestErrorLogLine;
+  }
+
+  public lookForInfoLogLineContaining(expected: string): void {
+    this.expectedLogLineInfo = expected;
+  }
+
+  public isExpectedLogLineInfoFound(): boolean {
+    return this.expectedLogLineInfoFound;
   }
 }
