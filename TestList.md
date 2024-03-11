@@ -6,8 +6,8 @@
 [X] Should be able to invoke an overall reset if cannot recover (send a "need reset" event)
 
 **Refactor**
-[] Add Health monitor to main flow
-[] Heartbean might need to be generalized to a "watchdog" service or something
+[] Add Health monitor  - end of cycle - to main flow
+[] Master catch unexpected error on main loop
 
 ## Tx Broadcaster (Seperate process)
 [] Can sign a tx with the correct key without exposing the key (KMS)
@@ -22,19 +22,9 @@
 [] add more logging
 [] Add "group" to each rule and assign instance with a group number, make sure it only run rules under it's group 
 
-- probably want to check each node health flag and call recover. Do it once at the end of the test suite or if all nodes are down
 - TODO: Implement the actual TxQueue class
+
+# CICD
+- CloudWatch Event: DemoApp/Groot/Heartbeat - when spining container add a heartbeat event to CloudWatch
 - Build pipeline
     - Pack everything in a container and use AWS Fargate to manage it
-
-[] Change Rules to push/pop model and support more than one tx
-
-# Plan 
-
-- CloudWatch Event: DemoApp/Groot/Heartbeat - when spining container add a heartbeat event to CloudWatch
-
-
-- HealthMonitor as the master class
-- Seperate the Node recovery to a different class
-- Heatbeat different class
-- critical failure different class
