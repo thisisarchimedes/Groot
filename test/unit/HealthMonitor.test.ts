@@ -105,6 +105,6 @@ describe('Health Monitor tests', function() {
 
     expect(signalHeartbeat.isHeartbeatSent()).to.be.true;
     expect(signalCriticalFailure.isCriticalFailureSent()).to.be.false;
-    expect(logger.getLatestInfoLogLine().includes('Cycle completed - time:')).to.be.true;
+    expect(logger.getLatestInfoLogLine().includes('Cycle time')).to.be.true;
   });
 });

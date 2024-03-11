@@ -33,4 +33,16 @@ describe('Check that we work with NewRelic correctly', function() {
     logger.info('I AM GROOT - ALL');
     await logger.flush();
   });
+
+  it('Should send cycle time to New Relic and console', async function() {
+    const logger = new LoggerAll(configService, 'AcceptanceTest');
+    logger.reportCycleTime(1000);
+    await logger.flush();
+  });
+
+  it('Should send rule eval results New Relic and console', async function() {
+    const logger = new LoggerAll(configService, 'AcceptanceTest');
+    logger.reportRuleEvalResults(11, 3);
+    await logger.flush();
+  });
 });

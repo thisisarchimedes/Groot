@@ -74,12 +74,7 @@ export class RuleEngine {
       }
     }
 
-    const evaluationResult = {
-      successfulRuleEval,
-      failedRuleEval,
-    };
-
-    this.logger.info(`Rule evaluation result: ${JSON.stringify(evaluationResult)}`);
+    this.logger.reportRuleEvalResults(successfulRuleEval, failedRuleEval);
 
     return outboundTransactions;
   }

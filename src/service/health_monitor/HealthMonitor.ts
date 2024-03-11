@@ -29,7 +29,7 @@ export class HealthMonitor {
   public endOfCycleSequence(): void {
     const cycleEndTimestamp: Date = new Date();
     const cycleTime = cycleEndTimestamp.getTime() - this.cycleStartTimestamp.getTime();
-    this.logger.info(`Cycle completed - time: ${cycleTime} ms`);
+    this.logger.reportCycleTime(cycleTime);
 
     this.signalHeartbeat.sendHeartbeat();
   }
