@@ -15,6 +15,7 @@ export class ConfigServiceAWS extends ConfigService {
       this.refreshRPCURL(),
       this.refreshRules(),
       this.refreshNewRelicConfig(),
+      this.refreshSleepTime(),
     ]);
   }
 
@@ -39,5 +40,10 @@ export class ConfigServiceAWS extends ConfigService {
 
     this.newRelicURL = newRelicURL;
     this.newRelicAPIKey = newRelicAPIKey;
+  }
+
+  private async refreshSleepTime(): Promise<void> {
+    const sleepTime = await this.appConfigClient.fetchConfigRawString('GrootSleepMillisecondsBetweenCycles');
+    this.sleepTimeMS = parseInt(sleepTime, 10);
   }
 }

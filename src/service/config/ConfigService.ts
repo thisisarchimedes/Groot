@@ -9,6 +9,8 @@ export abstract class ConfigService {
   protected newRelicURL: string = '';
   protected newRelicAPIKey: string = '';
 
+  protected sleepTimeMS: number = 0;
+
   abstract refreshConfig(): Promise<void>;
 
   public getEnvironment(): string {
@@ -33,5 +35,9 @@ export abstract class ConfigService {
 
   public getNewRelicAPIKey(): string {
     return this.newRelicAPIKey;
+  }
+
+  public getSleepMillisecondsBetweenCycles(): number {
+    return this.sleepTimeMS;
   }
 }

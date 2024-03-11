@@ -34,6 +34,12 @@ describe('Config Service Test', function() {
     expect(rules).to.not.be.undefined;
     expect(rules.length).to.be.greaterThan(0);
   });
+
+  it('should get Groot Sleep time from AWS', function() {
+    const sleepTime: number = configService.getSleepMillisecondsBetweenCycles();
+    expect(sleepTime).to.not.be.undefined;
+    expect(sleepTime).to.be.greaterThan(0);
+  });
 });
 
 
