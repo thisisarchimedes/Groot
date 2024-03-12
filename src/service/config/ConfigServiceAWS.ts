@@ -16,6 +16,7 @@ export class ConfigServiceAWS extends ConfigService {
       this.refreshRules(),
       this.refreshNewRelicConfig(),
       this.refreshSleepTime(),
+      this.refreshEtherscanAPIKey(),
     ]);
   }
 
@@ -45,5 +46,9 @@ export class ConfigServiceAWS extends ConfigService {
   private async refreshSleepTime(): Promise<void> {
     const sleepTime = await this.appConfigClient.fetchConfigRawString('GrootSleepMillisecondsBetweenCycles');
     this.sleepTimeMS = parseInt(sleepTime, 10);
+  }
+
+  private async refreshEtherscanAPIKey(): Promise<void> {
+    this.etherscanAPIKey = await this.appConfigClient.fetchConfigRawString('EtherscanApiKey');
   }
 }

@@ -10,6 +10,7 @@ export abstract class ConfigService {
   protected newRelicAPIKey: string = '';
 
   protected sleepTimeMS: number = 0;
+  protected etherscanAPIKey: string = '';
 
   abstract refreshConfig(): Promise<void>;
 
@@ -39,5 +40,9 @@ export abstract class ConfigService {
 
   public getSleepMillisecondsBetweenCycles(): number {
     return this.sleepTimeMS;
+  }
+
+  public getEtherscanAPIKey(): string {
+    return this.etherscanAPIKey;
   }
 }
