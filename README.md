@@ -23,7 +23,8 @@ _*Install dependencies*_
 
 _*Get .env file*_
 ```bash
-yarn dotenvx hub # open and follow the link printed, copy the keys to .env.keys locally
+yarn dotenvx hub login
+yarn dotenvx hub open # open and follow the link printed, copy the keys to .env.keys locally
 set -o allexport && source .env.keys && set +o allexport # export .env.keys to local environment
 yarn dotenvx decrypt # decrypt .env.vault to .env
 set -o allexport && source .env && set +o allexport # export .env to local environment
