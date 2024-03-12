@@ -1,7 +1,6 @@
 import {Rule, RuleParams} from './Rule';
-import {UrgencyLevel} from '../TypesRule';
-import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
 
+/* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
     pperTriggerThresholdPercentage: number, // trigger rebalance when we are more than (upperThreshold% * upper tick)
     lowerTriggerThresholdPercentage: number, // trigger rebalance when we are less than (lowerThreshold% * lower tick)
@@ -9,6 +8,7 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
     lowerTargetTickPercentage: number, // Where we want to be after rebalance currentUniswapTick * newLowerTickPercentage = newLowerTick
     strategyAddress: string,
 }
+/* eslint-enable max-len */
 
 export class RuleUniswapPSPRebalance extends Rule {
   public async evaluate(): Promise<void> {
