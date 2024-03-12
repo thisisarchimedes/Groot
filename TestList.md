@@ -1,5 +1,9 @@
 # Tests
 
+## ToolUniswap PSP
+
+[] Interface test to make sure we know how to work with the strategy contract 
+
 ## Tx Broadcaster (Seperate process)
 [] Can sign a tx with the correct key (KMS)
 [] Send URGENT from Urgent key and NORMAL from Normal key

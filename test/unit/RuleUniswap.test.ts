@@ -40,4 +40,26 @@ describe('Rule Factory Testings: Uniswap', function() {
     const rule = ruleFactory.createRule(dummyRule);
     expect(rule).not.to.be.null;
   });
+
+  it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', function() {
+    const ruleFactory = new FactoryRule(logger, blockchainReader);
+
+    const uniswapRule: RuleJSONConfigItem = {
+      ruleType: TypeRule.UniswapPSPRebalance,
+      label: 'Uniswap PSP rebalance - test',
+      params: {
+        upperTriggerThresholdPercentage: 70,
+        lowerTriggerThresholdPercentage: 130,
+        upperTargetTickPercentage: 150,
+        lowerTargetTickPercentage: 50,
+        strategyAddress: '0x1234',
+      },
+    };
+
+    const rule = ruleFactory.createRule(uniswapRule);
+    expect(rule).not.to.be.null;
+
+    rule?.evaluate();
+    expect(rule?.getPendingTransactionCount()).to.be.eq(0);
+  });
 });

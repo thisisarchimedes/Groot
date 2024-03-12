@@ -12,7 +12,14 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
 
 export class RuleUniswapPSPRebalance extends Rule {
   public async evaluate(): Promise<void> {
+    // fetch the pool address from strategy
+    // fetch the currentTick from uniswap pool
+    // fetch the upper and lower tick from strategy
+    // check if based on the thresholds if we are in proper range then no action
+    // if not calculate new lowertick and uppertick based on the currentTick
+    // call rebalance function based on the new params
 
+    // const uniswapPool = await strategy.pool()
   }
 
   protected generateUniqueKey(): string {
