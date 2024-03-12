@@ -18,18 +18,13 @@ export class AbiFetcherEtherscan implements IAbiFetcher {
   public async getAbiByAddress(contractAddress: string): Promise<string> {
     const url = `${this.baseUrl}?module=contract&action=getabi&address=${contractAddress}&apikey=${this.apiKey}`;
 
-    try {
-      const response = await fetch(url);
-      const data: EtherscanResponse = await response.json() as EtherscanResponse;
+    const response = await fetch(url);
+    const data: EtherscanResponse = await response.json() as EtherscanResponse;
 
-      if (data.status === '1') {
-        return data.result;
-      } else {
-        throw new Error(`Failed to fetch ABI: ${data.message}`);
-      }
-    } catch (error) {
-      console.error('Error fetching ABI:', error);
-      throw error;
+    if (data.status === '1') {
+      return data.result;
+    } else {
+      throw new Error(`Failed to fetch ABI: ${data.message}`);
     }
   }
 }
