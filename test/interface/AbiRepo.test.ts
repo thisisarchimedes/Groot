@@ -1,8 +1,9 @@
 import {expect} from 'chai';
 import {AbiFetcherEtherscan} from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 
-describe('Using Etherscan to fetch ABI', function() {
+describe('ABI Repo external services', function() {
   let configService: ConfigServiceAWS;
 
   beforeEach(async function() {
@@ -17,5 +18,20 @@ describe('Using Etherscan to fetch ABI', function() {
 
     expect(abi).to.be.not.null;
     expect(abi.length).to.be.greaterThan(100);
+  });
+
+  it('should be able to write ABI to DynamoDB', async function() {
+    const address = '0x123';
+    const abi = 'mockAbi2';
+    const abiStorage = new AbiStorageDynamoDB('ABIRepo', 'us-east-1');
+    await abiStorage.storeAbiForAddress(address, abi);
+  });
+
+  it('should be able to read ABI from DynamoDB', async function() {
+    const address = '0x123';
+    const abiStorage = new AbiStorageDynamoDB('ABIRepo', 'us-east-1');
+    const abi = await abiStorage.getAbiForAddress(address);
+    expect(abi).to.be.not.null;
+    expect(abi?.length).to.be.greaterThan(0);
   });
 });
