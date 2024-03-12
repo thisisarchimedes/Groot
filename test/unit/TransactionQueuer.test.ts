@@ -28,7 +28,7 @@ describe('Rule Factory', function() {
       {
         urgencyLevel: UrgencyLevel.URGENT,
         context: 'test 2',
-        postEvalUniqueKey: '0x1234',
+        postEvalUniqueKey: '',
         lowLevelUnsignedTransaction: {
           nonce: '0x0',
           gasPrice: '0x0',
