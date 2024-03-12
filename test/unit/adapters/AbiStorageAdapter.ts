@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {IAbiStorage} from '../../../src/rule_engine/tool/abi_repository/IAbiStorage';
 
 export class AbiStorageAdapter implements IAbiStorage {
@@ -5,6 +6,7 @@ export class AbiStorageAdapter implements IAbiStorage {
 
   public storeAbiForAddress(contractAddress: string, abi: string): Promise<void> {
     this.returnAbi = abi;
+    return Promise.resolve();
   }
   public getAbiForAddress(contractAddress: string): Promise<string | null> {
     return Promise.resolve(this.returnAbi);

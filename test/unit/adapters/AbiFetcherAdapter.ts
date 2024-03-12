@@ -1,4 +1,5 @@
-import { IAbiFetcher } from "../../../src/rule_engine/tool/abi_repository/IAbiFetcher";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import {IAbiFetcher} from '../../../src/rule_engine/tool/abi_repository/IAbiFetcher';
 
 export class AbiFetcherAdapter implements IAbiFetcher {
   private returnAbi: string = '';
