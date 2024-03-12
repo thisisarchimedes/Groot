@@ -11,6 +11,7 @@ export abstract class ConfigService {
 
   protected sleepTimeMS: number = 0;
   protected etherscanAPIKey: string = '';
+  protected AbiRepoDynamoDBTable: string = '';
 
   abstract refreshConfig(): Promise<void>;
 
@@ -44,5 +45,9 @@ export abstract class ConfigService {
 
   public getEtherscanAPIKey(): string {
     return this.etherscanAPIKey;
+  }
+
+  public getDynamoDBAbiRepoTable(): string {
+    return this.AbiRepoDynamoDBTable;
   }
 }
