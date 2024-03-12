@@ -23,6 +23,6 @@ export class TransactionQueuer {
   }
 
   private isTxValid(tx: OutboundTransaction): boolean {
-    return tx.hash !== '';
+    return tx.postEvalUniqueKey !== '';
   }
 }

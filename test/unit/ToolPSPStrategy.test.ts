@@ -26,7 +26,7 @@ describe('Check we create the PSP strategy tool correctly', function() {
     localNodeAlchemy.setReadResponse(strategyAddress);
     localNodeInfura.setReadResponse(strategyAddress);
 
-    const toolStrategyUniswap = new ToolStrategyUniswap(strategyAddress, blockchainReader, logger);
+    const toolStrategyUniswap = new ToolStrategyUniswap(strategyAddress, blockchainReader);
 
     const poolAddress = await toolStrategyUniswap.getPoolAddress();
     expect(poolAddress).to.be.equal('0x1234');
