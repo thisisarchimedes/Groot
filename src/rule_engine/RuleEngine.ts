@@ -23,7 +23,7 @@ export class RuleEngine {
 
   public async evaluateRulesAndCreateOutboundTransactions(): Promise<void> {
     const evaluateResults = await this.evaluateRulesInParallel();
-    this.updateTransactionStoreFromEvaluateResults(evaluateResults);
+    this.updateTransactionStoreFromEvaluationResults(evaluateResults);
   }
 
   public getOutboundTransactions(): OutboundTransaction[] {
@@ -52,7 +52,7 @@ export class RuleEngine {
     return evaluateResults;
   }
 
-  private updateTransactionStoreFromEvaluateResults(evaluateResults: EvaluateResult[]): void {
+  private updateTransactionStoreFromEvaluationResults(evaluateResults: EvaluateResult[]): void {
     const outboundTransactions: OutboundTransaction[] = [];
     let successfulRuleEval = 0;
     let failedRuleEval = 0;
