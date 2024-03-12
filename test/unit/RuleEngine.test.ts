@@ -1,5 +1,4 @@
 import {expect} from 'chai';
-import Web3 from 'web3';
 
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
