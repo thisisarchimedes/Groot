@@ -1,8 +1,8 @@
 import {expect} from 'chai';
 import {ToolStrategyUniswap} from '../../src/rule_engine/tool/ToolStrategyUniswap';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
-import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
+import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 
 describe('Check we create the PSP strategy tool correctly', function() {
   const logger: LoggerAdapter = new LoggerAdapter();
