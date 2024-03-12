@@ -1,6 +1,7 @@
 export enum TypeRule {
     Invalid = 'invalid',
     Dummy = 'dummy',
+    UniswapPSPRebalance = 'uniswapPSPRebalance',
 }
 
 export enum UrgencyLevel {

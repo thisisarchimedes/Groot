@@ -2,6 +2,7 @@ import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader
 import {Logger} from '../service/logger/Logger';
 import {Rule, RuleParams} from './rule/Rule';
 import {RuleDummy} from './rule/RuleDummy';
+import { RuleUniswapPSPRebalance } from './rule/RuleUniswapPSPRebalance';
 import {RuleJSONConfigItem, TypeRule} from './TypesRule';
 
 export class ErrorRuleFactory extends Error {
@@ -24,6 +25,8 @@ export class FactoryRule {
     switch (config.ruleType) {
       case TypeRule.Dummy:
         return new RuleDummy(this.logger, this.blockchainReader, config.label, config.params as RuleParams);
+      case TypeRule.UniswapPSPRebalance:
+        return new RuleUniswapPSPRebalance(this.logger, this.blockchainReader, config.label, config.params as RuleParams);
       default:
         this.logger.warn(`Unsupported rule type: ${config.ruleType}`);
         return null;
