@@ -27,7 +27,9 @@ export abstract class Rule {
     this.blockchainReader = blockchainReader;
   }
 
-  abstract evaluate(): Promise<void>;
+  public abstract evaluate(): Promise<void>;
+
+  protected abstract generateUniqueKey(): string;
 
   public getRuleLabel(): string {
     return this.ruleLabel;

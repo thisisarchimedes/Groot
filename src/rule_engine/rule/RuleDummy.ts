@@ -29,8 +29,13 @@ export class RuleDummy extends Rule {
     return {
       urgencyLevel: UrgencyLevel.NORMAL,
       context: `this is a dummy context - number: ${txNumber} - block: ${currentBlockNumber}`,
-      postEvalUniqueKey: 'dummyKey',
+      hash: 'dummyHash',
+      postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction: {},
     };
+  }
+
+  protected generateUniqueKey(): string {
+    return 'dummyKey';
   }
 }

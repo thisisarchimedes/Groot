@@ -15,6 +15,7 @@ describe('Rule Factory', function() {
         urgencyLevel: UrgencyLevel.URGENT,
         context: 'test 1',
         hash: '0x1234',
+        postEvalUniqueKey: '0x1234',
         lowLevelUnsignedTransaction: {
           nonce: '0x0',
           gasPrice: '0x0',
@@ -29,6 +30,7 @@ describe('Rule Factory', function() {
         urgencyLevel: UrgencyLevel.URGENT,
         context: 'test 2',
         hash: '',
+        postEvalUniqueKey: '0x1234',
         lowLevelUnsignedTransaction: {
           nonce: '0x0',
           gasPrice: '0x0',
@@ -43,6 +45,7 @@ describe('Rule Factory', function() {
         urgencyLevel: UrgencyLevel.NORMAL,
         context: 'test 3',
         hash: '0x345',
+        postEvalUniqueKey: '0x1234',
         lowLevelUnsignedTransaction: {
           nonce: '0x0',
           gasPrice: '0x0',
