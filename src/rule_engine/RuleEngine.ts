@@ -23,9 +23,7 @@ export class RuleEngine {
 
   public async evaluateRulesAndCreateOutboundTransactions(): Promise<void> {
     const evaluateResults = await this.evaluateRulesInParallel();
-    const outboundTransactions = this.getTransactionsFromEvaluateResults(evaluateResults);
-    // TODO: Do we really need this hash?
-    this.OutboundTransactions = this.addHashToTransactions(outboundTransactions);
+    this.updateTransactionStoreFromEvaluateResults(evaluateResults);
   }
 
   public getOutboundTransactions(): OutboundTransaction[] {
@@ -54,7 +52,7 @@ export class RuleEngine {
     return evaluateResults;
   }
 
-  private getTransactionsFromEvaluateResults(evaluateResults: EvaluateResult[]): OutboundTransaction[] {
+  private updateTransactionStoreFromEvaluateResults(evaluateResults: EvaluateResult[]): void {
     const outboundTransactions: OutboundTransaction[] = [];
     let successfulRuleEval = 0;
     let failedRuleEval = 0;
@@ -77,14 +75,7 @@ export class RuleEngine {
 
     this.logger.reportRuleEvalResults(successfulRuleEval, failedRuleEval);
 
-    return outboundTransactions;
-  }
-
-  private addHashToTransactions(transactions: OutboundTransaction[]): OutboundTransaction[] {
-    return transactions.map((transaction) => ({
-      ...transaction,
-      hash: this.generateTransactionHash(transaction.lowLevelUnsignedTransaction),
-    }));
+    this.OutboundTransactions = outboundTransactions;
   }
 
   private generateTransactionHash(transaction: Transaction): string {

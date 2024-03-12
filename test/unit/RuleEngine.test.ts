@@ -33,16 +33,6 @@ describe('Rule Engine Testings', function() {
     expect(logger.isExpectedLogLineInfoFound()).to.be.true;
   });
 
-  it('Should attach tx hash to all transactions', async function() {
-    const ruleEngine = await createRuleEngineWithConfiguredRules('./test/unit/data/dummy_rules.json');
-
-    await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
-    const transactions = ruleEngine.getOutboundTransactions();
-
-    assertTransactionsValid(transactions);
-    assertTransactionHashesValid(transactions);
-  });
-
   it('Should report on 1 successful rule and 1 failed rule', async function() {
     const testRules: RuleJSONConfigItem[] = [
       createDummyRule('I AM GROOT', 3, true),
@@ -98,12 +88,6 @@ describe('Rule Engine Testings', function() {
     if (expectedLength !== undefined) {
       expect(transactions.length).to.be.eq(expectedLength);
     }
-  }
-
-  function assertTransactionHashesValid(transactions: OutboundTransaction[]): void {
-    expect(transactions[0].hash).to.be.eq(Web3.utils.sha3(JSON.stringify(transactions[0].lowLevelUnsignedTransaction)));
-    expect(transactions[1].hash).to.be.eq(Web3.utils.sha3(JSON.stringify(transactions[1].lowLevelUnsignedTransaction)));
-    expect(transactions[0].hash).to.be.eq(transactions[1].hash);
   }
 
   function assertRuleEvaluationResult(successfulRuleEval: number, failedRuleEval: number): void {
