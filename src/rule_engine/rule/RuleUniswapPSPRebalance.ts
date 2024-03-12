@@ -1,3 +1,6 @@
+import { BlockchainReader } from '../../blockchain/blockchain_reader/BlockchainReader';
+import { Logger } from '../../service/logger/Logger';
+import { ToolStrategyUniswap } from '../tool/ToolStrategyUniswap';
 import {Rule, RuleParams} from './Rule';
 
 /* eslint-disable max-len */
@@ -11,6 +14,17 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
 /* eslint-enable max-len */
 
 export class RuleUniswapPSPRebalance extends Rule {
+  private uniswapStrategy: ToolStrategyUniswap;
+  constructor(
+      logger: Logger,
+      blockchainReader: BlockchainReader,
+      ruleLabel: string,
+      params: RuleParams,
+  ) {
+    super(logger, blockchainReader, ruleLabel, params);
+    this.uniswapStrategy = new ToolStrategyUniswap((params as RuleParamsUniswapPSPRebalance).strategyAddress, blockchainReader);
+
+  }
   public async evaluate(): Promise<void> {
     // fetch the pool address from strategy
     // fetch the currentTick from uniswap pool
@@ -19,7 +33,7 @@ export class RuleUniswapPSPRebalance extends Rule {
     // if not calculate new lowertick and uppertick based on the currentTick
     // call rebalance function based on the new params
 
-    // const uniswapPool = await strategy.pool()
+    const pool = await this.uniswapStrategy.getPoolAddress();
   }
 
   protected generateUniqueKey(): string {
