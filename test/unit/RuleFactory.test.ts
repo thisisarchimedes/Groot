@@ -30,7 +30,7 @@ describe('Rule Factory Testings', function() {
       label: 'dummyRule',
       params: {
         message: 'I AM GROOT',
-        NumberOfTxs: 1,
+        NumberOfDummyTxs: 1,
         evalSuccess: true,
       },
     };
@@ -73,5 +73,28 @@ describe('Rule Factory Testings', function() {
 
     expect(rule.getPendingTransactionCount()).be.eq(0);
     expect(rule.popTransactionFromRuleLocalQueue()).to.be.undefined;
+  });
+
+  it('should create identifier when the Rule evaluates itself', async function() {
+    const ruleFactory = new FactoryRule(logger, blockchainReader);
+
+    const dummyRule: RuleJSONConfigItem = {
+      ruleType: TypeRule.Dummy,
+      label: 'dummyRule',
+      params: {
+        message: 'I AM GROOT',
+        NumberOfDummyTxs: 1,
+        evalSuccess: true,
+      },
+    };
+
+    const rule = ruleFactory.createRule(dummyRule);
+    expect(rule).not.to.be.undefined;
+    if (rule) {
+      await rule.evaluate();
+    }
+
+    const tx = rule?.popTransactionFromRuleLocalQueue();
+    expect(tx!.postEvalUniqueKey === 'dummyKey').to.be.true;
   });
 });

@@ -11,16 +11,15 @@ export interface RuleParamsDummy extends RuleParams {
 export class RuleDummy extends Rule {
   public async evaluate(): Promise<void> {
     const params = this.params as RuleParamsDummy;
-    this.logger.info('RuleDummy.evaluate() called: ' + params.message);
-
     const blockNumber = await this.blockchainReader.getBlockNumber();
+
+    this.logger.info('RuleDummy.evaluate() called: ' + params.message);
 
     if (params.evalSuccess === false) {
       throw new Error('RuleDummy.evaluate() failed');
     }
 
-    const NumberOfDummyTxs = params.NumberOfDummyTxs;
-    for (let i = 0; i < NumberOfDummyTxs; i++) {
+    for (let i = 0; i < params.NumberOfDummyTxs; i++) {
       const dummyTx = this.createDummyTransaction(i, blockNumber);
       this.pushTransactionToRuleLocalQueue(dummyTx);
     }
@@ -30,7 +29,7 @@ export class RuleDummy extends Rule {
     return {
       urgencyLevel: UrgencyLevel.NORMAL,
       context: `this is a dummy context - number: ${txNumber} - block: ${currentBlockNumber}`,
-      hash: '',
+      postEvalUniqueKey: 'dummyKey',
       lowLevelUnsignedTransaction: {},
     };
   }
