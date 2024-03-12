@@ -35,3 +35,5 @@ function reportCriticalError(environment: string, region: string, error: unknown
   const logger: LoggerAll = new LoggerAll(configService, 'Groot');
   logger.error(errorMessage);
 }
+
+grootStartHere();
