@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
 import {BlockchainNodeLocalHardhat} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocalHardhat';
-import {BlockchainNodeError} from '../../src/blockchain/blockchain_nodes/BlockchainNode';
+import {BlockchainNodeError, BlockchainNodeProxyInfo} from '../../src/blockchain/blockchain_nodes/BlockchainNode';
 import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 
 dotenv.config();
@@ -72,5 +72,20 @@ describe('Check that we work with local Hardhat node correctly', function() {
     await localNode.recoverNode();
     const blockNumber = await localNode.getBlockNumber();
     expect(blockNumber > 1934000n).to.be.true;
+  });
+
+  it('Should be able to get implementation address out of proxy address', async function() {
+    const USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
+    const res: BlockchainNodeProxyInfo = await localNode.getProxyInfoForAddress(USDC);
+    expect(res.isProxy).to.be.true;
+    expect(res.implementationAddress).to.contain('0x');
+    expect(res.implementationAddress.length).to.be.equal(42);
+  });
+
+  it('Should be able to get detect none proxy address', async function() {
+    const USDCImp = '0x43506849D7C04F9138D1A2050bbF3A0c054402dd';
+    const res: BlockchainNodeProxyInfo = await localNode.getProxyInfoForAddress(USDCImp);
+    expect(res.isProxy).to.be.false;
+    expect(res.implementationAddress.length).to.be.equal(0);
   });
 });

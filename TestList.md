@@ -21,7 +21,7 @@
 
 # Architecture
 [] Run stress test on Groot with 10K positions
-[] There is some kind of ABI repo
+[X] There is some kind of ABI repo
 [] add more logging
 [] Add "group" to each rule and assign instance with a group number, make sure it only run rules under it's group 
 

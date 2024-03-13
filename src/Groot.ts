@@ -13,6 +13,9 @@ import {BlockchainNodeHealthMonitor} from './service/health_monitor/BlockchainNo
 import {SignalAWSCriticalFailure} from './service/health_monitor/signal/SignalAWSCriticalFailure';
 import {SignalAWSHeartbeat} from './service/health_monitor/signal/SignalAWSHeartbeat';
 import {HostNameProvider} from './service/health_monitor/HostNameProvider';
+import {AbiRepo} from './rule_engine/tool/abi_repository/AbiRepo';
+import {AbiStorageDynamoDB} from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
+import {AbiFetcherEtherscan} from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 
 dotenv.config();
 
@@ -30,6 +33,8 @@ export class Groot {
   private blockchainReader!: BlockchainReader;
   private nextAvailablePortNumber: number;
 
+  private abiRepo!: AbiRepo;
+
   constructor(environment: string, region: string) {
     this.configService = new ConfigServiceAWS(environment, region);
     this.nextAvailablePortNumber = 8545;
@@ -44,6 +49,8 @@ export class Groot {
     await this.initalizeReadOnlyLocalNodes();
 
     this.initalizeHealthMonitor();
+
+    this.initalizeAbiRepo();
 
     this.logger.info('Groot initialized successfully.');
   }
@@ -74,6 +81,18 @@ export class Groot {
         blockchainHealthMonitor,
         signalHeartbeat,
         signalCriticalFailure);
+  }
+
+  private initalizeAbiRepo() {
+    if (!this.blockchainReader) {
+      throw new Error('Cannot initalize abi repo without blockchain reader');
+    }
+
+    const abiStorage = new AbiStorageDynamoDB(
+        this.configService.getDynamoDBAbiRepoTable(),
+        this.configService.getAWSRegion());
+    const abiFetcher = new AbiFetcherEtherscan(this.configService.getEtherscanAPIKey());
+    this.abiRepo = new AbiRepo(this.blockchainReader, abiStorage, abiFetcher);
   }
 
   public async shutdownGroot() {
@@ -112,7 +131,7 @@ export class Groot {
   }
 
   private resetRulesEngine() {
-    const ruleFactory = new FactoryRule(this.logger, this.blockchainReader);
+    const ruleFactory = new FactoryRule(this.logger, this.blockchainReader, this.abiRepo);
     this.ruleEngine = new RuleEngine(this.logger, ruleFactory);
   }
 

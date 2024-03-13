@@ -4,7 +4,6 @@ import {BlockchainNode} from './BlockchainNode';
 import {Logger} from '../../service/logger/Logger';
 
 export class BlockchainNodeRemoteRPC extends BlockchainNode {
-  private readonly web3: Web3;
   private readonly remoteRpcUrl: string;
   private readonly SLEEP_DURATION_WHEN_RECOVERING_NODE = 10000;
 

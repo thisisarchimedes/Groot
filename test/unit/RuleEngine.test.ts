@@ -8,6 +8,9 @@ import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
+import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
+import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 
 describe('Rule Engine Testings', function() {
   const logger: LoggerAdapter = new LoggerAdapter();
@@ -60,7 +63,11 @@ describe('Rule Engine Testings', function() {
   }
 
   function createRuleEngine(rules: RuleJSONConfigItem[]): RuleEngine {
-    const ruleFactory = new FactoryRule(logger, blockchainReader);
+    const abiStorage = new AbiStorageAdapter();
+    const abiFetcher = new AbiFetcherAdapter();
+    const abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+
+    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
     const ruleEngine = new RuleEngine(logger, ruleFactory);
     ruleEngine.loadRulesFromJSONConfig(rules);
     return ruleEngine;

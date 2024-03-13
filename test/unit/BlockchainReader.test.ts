@@ -2,7 +2,7 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
-import {BlockChainReaderError, BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import {BlockchainReaderError, BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
 
 chai.use(chaiAsPromised);
@@ -86,7 +86,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
       await blockchainReader.getBlockNumber();
       expect.fail('Expected getBlockNumber to throw an error');
     } catch (error) {
-      expect(error).to.be.instanceOf(BlockChainReaderError);
+      expect(error).to.be.instanceOf(BlockchainReaderError);
     }
   });
 
@@ -132,7 +132,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
       await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals');
       expect.fail('Expected callViewFunction to throw an error');
     } catch (error) {
-      expect(error).to.be.instanceOf(BlockChainReaderError);
+      expect(error).to.be.instanceOf(BlockchainReaderError);
     }
   });
 
@@ -158,7 +158,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
       await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals');
       expect.fail('Expected callViewFunction to throw an error');
     } catch (error) {
-      expect(error).to.be.instanceOf(BlockChainReaderError);
+      expect(error).to.be.instanceOf(BlockchainReaderError);
     }
   });
 
@@ -184,7 +184,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
       await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals');
       expect.fail('Expected callViewFunction to throw an error');
     } catch (error) {
-      expect(error).to.be.instanceOf(BlockChainReaderError);
+      expect(error).to.be.instanceOf(BlockchainReaderError);
     }
   });
 
