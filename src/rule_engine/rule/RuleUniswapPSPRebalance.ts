@@ -1,7 +1,7 @@
 import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
 import {Logger} from '../../service/logger/Logger';
 import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
-import {Rule, RuleParams} from './Rule';
+import {Rule, RuleConstractorInput, RuleParams} from './Rule';
 
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
@@ -15,14 +15,11 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
 
 export class RuleUniswapPSPRebalance extends Rule {
   private uniswapStrategy: ToolStrategyUniswap;
-  constructor(
-      logger: Logger,
-      blockchainReader: BlockchainReader,
-      ruleLabel: string,
-      params: RuleParams,
-  ) {
-    super(logger, blockchainReader, ruleLabel, params);
-    this.uniswapStrategy = new ToolStrategyUniswap((params as RuleParamsUniswapPSPRebalance).strategyAddress, blockchainReader);
+  constructor(constractorInput: RuleConstractorInput) {
+    super(constractorInput);
+    this.uniswapStrategy = new ToolStrategyUniswap(
+        (this.params as RuleParamsUniswapPSPRebalance).strategyAddress,
+        this.blockchainReader);
   }
   public async evaluate(): Promise<void> {
     // fetch the pool address from strategy
@@ -33,6 +30,7 @@ export class RuleUniswapPSPRebalance extends Rule {
     // call rebalance function based on the new params
 
     const pool = await this.uniswapStrategy.getPoolAddress();
+    // --> this.abiRepo.getAbiByAddress(pool);
   }
 
   protected generateUniqueKey(): string {

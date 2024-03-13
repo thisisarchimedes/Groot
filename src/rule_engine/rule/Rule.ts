@@ -2,29 +2,36 @@ import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
 import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
 import {Logger} from '../../service/logger/Logger';
 import {UrgencyLevel} from '../TypesRule';
+import {AbiRepo} from '../tool/abi_repository/AbiRepo';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
 }
 
+export interface RuleConstractorInput {
+  logger: Logger;
+  blockchainReader: BlockchainReader;
+  abiRepo: AbiRepo
+  ruleLabel: string;
+  params: RuleParams;
+
+}
+
 export abstract class Rule {
   protected logger: Logger;
   protected blockchainReader: BlockchainReader;
+  protected abiRepo: AbiRepo;
 
   protected params: RuleParams;
   protected readonly ruleLabel: string;
   protected pendingTxQueue: OutboundTransaction[] = [];
 
-  constructor(
-      logger: Logger,
-      blockchainReader: BlockchainReader,
-      ruleLabel: string,
-      params: RuleParams,
-  ) {
-    this.logger = logger;
-    this.params = params;
-    this.ruleLabel = ruleLabel;
-    this.blockchainReader = blockchainReader;
+  constructor(constractorInput: RuleConstractorInput) {
+    this.logger = constractorInput.logger;
+    this.params = constractorInput.params;
+    this.abiRepo = constractorInput.abiRepo;
+    this.ruleLabel = constractorInput.ruleLabel;
+    this.blockchainReader = constractorInput.blockchainReader;
   }
 
   public abstract evaluate(): Promise<void>;

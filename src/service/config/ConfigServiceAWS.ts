@@ -3,10 +3,12 @@ import {ConfigService} from './ConfigService';
 
 export class ConfigServiceAWS extends ConfigService {
   private readonly appConfigClient: AppConfigClient;
+  private readonly awsRegion: string;
 
   constructor(environment: string, region: string) {
     super();
     this.environment = environment;
+    this.awsRegion = region;
     this.appConfigClient = new AppConfigClient(environment, region);
   }
 
@@ -19,6 +21,10 @@ export class ConfigServiceAWS extends ConfigService {
       this.refreshEtherscanAPIKey(),
       this.refreshAbiStorageConfig(),
     ]);
+  }
+
+  public getAWSRegion(): string {
+    return this.awsRegion;
   }
 
   private async refreshRPCURL(): Promise<void> {
