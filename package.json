@@ -16,6 +16,7 @@
   },
   "scripts": {
     "test": "mocha --import=tsx test/**/*.test.ts",
+    "test:unit": "mocha --import=tsx test/unit/**/*.test.ts",
     "lint": "eslint --ext .ts,.tsx -c .eslintrc.cjs ."
   },
   "dependencies": {
