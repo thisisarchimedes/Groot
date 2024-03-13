@@ -1,17 +1,15 @@
 import {expect} from 'chai';
+import * as dotenv from 'dotenv';
 
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
-import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
-import { AbiStorageDynamoDB } from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
-import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
-import * as dotenv from 'dotenv';
-import { AbiFetcherEtherscan } from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
+import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {AbiFetcherEtherscan} from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 
 dotenv.config();
 
