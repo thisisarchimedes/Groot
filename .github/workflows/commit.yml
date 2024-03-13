@@ -4,6 +4,8 @@ on:
   push:
     branches-ignore:
       - 'main' 
+  workflow_dispatch:
+
 
 env:
   ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
