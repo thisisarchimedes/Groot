@@ -26,7 +26,6 @@ export abstract class BlockchainNode {
   abstract stopNode(): Promise<void>;
   abstract resetNode(externalProviderRpcUrl: string): Promise<void>;
   abstract recoverNode(): Promise<void>;
-
   abstract getBlockNumber(): Promise<number>;
 
   abstract callViewFunction(
@@ -45,45 +44,52 @@ export abstract class BlockchainNode {
   }
 
   public async getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo> {
-    const PROXY_STORAGE_POSITION_OPZEP = '0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3';
-    const PROXY_STORAGE_POSITION_EIP1967 = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc';
-    const PROXY_INVALID_IMPLEMENTATION_ADDRESS = '0x0000000000000000000000000000000000000000000000000000000000000000';
-
     const [eip1967Result, openzeppelinResult] = await Promise.all([
-      this.web3.eth.getStorageAt(proxyAddress, PROXY_STORAGE_POSITION_EIP1967),
-      this.web3.eth.getStorageAt(proxyAddress, PROXY_STORAGE_POSITION_OPZEP),
+      this.getStorageAt(proxyAddress, ProxyStoragePosition.EIP1967),
+      this.getStorageAt(proxyAddress, ProxyStoragePosition.OpenZeppelin),
     ]);
 
-    const removeLeadingZeros = (address: string): string => {
-      return '0x' + address.slice(26);
-    };
-
-    if (eip1967Result === PROXY_INVALID_IMPLEMENTATION_ADDRESS &&
-      openzeppelinResult === PROXY_INVALID_IMPLEMENTATION_ADDRESS) {
-      return {
-        isProxy: false,
-        implementationAddress: '',
-      };
-    } else if (eip1967Result === PROXY_INVALID_IMPLEMENTATION_ADDRESS) {
-      return {
-        isProxy: true,
-        implementationAddress: removeLeadingZeros(openzeppelinResult),
-      };
-    } else if (openzeppelinResult === PROXY_INVALID_IMPLEMENTATION_ADDRESS) {
-      return {
-        isProxy: true,
-        implementationAddress: removeLeadingZeros(eip1967Result),
-      };
+    if (this.isInvalidImplementationAddress(eip1967Result) && this.isInvalidImplementationAddress(openzeppelinResult)) {
+      return BlockchainNodeProxyInfo.notProxy();
+    } else if (this.isInvalidImplementationAddress(eip1967Result)) {
+      return BlockchainNodeProxyInfo.proxy(this.removeLeadingZeros(openzeppelinResult));
+    } else if (this.isInvalidImplementationAddress(openzeppelinResult)) {
+      return BlockchainNodeProxyInfo.proxy(this.removeLeadingZeros(eip1967Result));
     } else {
-      return {
-        isProxy: true,
-        implementationAddress: removeLeadingZeros(eip1967Result),
-      };
+      return BlockchainNodeProxyInfo.proxy(this.removeLeadingZeros(eip1967Result));
     }
+  }
+
+  private async getStorageAt(address: string, position: string): Promise<string> {
+    return await this.web3.eth.getStorageAt(address, position);
+  }
+
+  private isInvalidImplementationAddress(address: string): boolean {
+    return address === ProxyStoragePosition.InvalidImplementationAddress;
+  }
+
+  private removeLeadingZeros(address: string): string {
+    return '0x' + address.slice(26);
   }
 }
 
-export interface BlockchainNodeProxyInfo {
-  isProxy: boolean;
-  implementationAddress: string
+export class BlockchainNodeProxyInfo {
+  private constructor(
+    public readonly isProxy: boolean,
+    public readonly implementationAddress: string,
+  ) {}
+
+  static notProxy(): BlockchainNodeProxyInfo {
+    return new BlockchainNodeProxyInfo(false, '');
+  }
+
+  static proxy(implementationAddress: string): BlockchainNodeProxyInfo {
+    return new BlockchainNodeProxyInfo(true, implementationAddress);
+  }
+}
+
+enum ProxyStoragePosition {
+  OpenZeppelin = '0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3',
+  EIP1967 = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc',
+  InvalidImplementationAddress = '0x0000000000000000000000000000000000000000000000000000000000000000',
 }

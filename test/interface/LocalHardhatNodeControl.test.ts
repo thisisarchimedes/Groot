@@ -81,4 +81,11 @@ describe('Check that we work with local Hardhat node correctly', function() {
     expect(res.implementationAddress).to.contain('0x');
     expect(res.implementationAddress.length).to.be.equal(42);
   });
+
+  it('Should be able to get detect none proxy address', async function() {
+    const USDCImp = '0x43506849D7C04F9138D1A2050bbF3A0c054402dd';
+    const res: BlockchainNodeProxyInfo = await localNode.getProxyInfoForAddress(USDCImp);
+    expect(res.isProxy).to.be.false;
+    expect(res.implementationAddress.length).to.be.equal(0);
+  });
 });
