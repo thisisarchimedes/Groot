@@ -1,5 +1,5 @@
 import {AbiItem} from 'web3';
-import {BlockchainNode, BlockchainNodeError} from '../../../src/blockchain/blockchain_nodes/BlockchainNode';
+import {BlockchainNode, BlockchainNodeError, BlockchainNodeProxyInfo} from '../../../src/blockchain/blockchain_nodes/BlockchainNode';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export class BlockchainNodeAdapter extends BlockchainNode {
@@ -8,6 +8,7 @@ export class BlockchainNodeAdapter extends BlockchainNode {
   private throwErrorOnGetBlockNumber: boolean = false;
   private throwErrorOnCallViewFunction: boolean = false;
   private expectRecoverToSucceed: boolean = true;
+  private proxyInfo: BlockchainNodeProxyInfo;
 
   public async startNode(): Promise<void> {
 
@@ -53,6 +54,10 @@ export class BlockchainNodeAdapter extends BlockchainNode {
     return this.currentReadResponse;
   }
 
+  public getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo> {
+    return Promise.resolve(this.proxyInfo);
+  }
+
   public setThrowErrorOnCallViewFunction(throwError: boolean): void {
     this.throwErrorOnCallViewFunction = throwError;
   }
@@ -75,6 +80,9 @@ export class BlockchainNodeAdapter extends BlockchainNode {
 
   public setExpectRecoverToSucceed(expectRecoverToSucceed: boolean): void {
     this.expectRecoverToSucceed = expectRecoverToSucceed;
+  }
+  public setProxyInfoForAddressResponse(proxyInfo: BlockchainNodeProxyInfo): void {
+    this.proxyInfo = proxyInfo;
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */

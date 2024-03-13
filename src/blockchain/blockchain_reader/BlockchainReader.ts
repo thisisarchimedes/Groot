@@ -1,13 +1,13 @@
 import {AbiItem} from 'web3-types';
-import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
+import {BlockchainNode, BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNode';
 import {Logger} from '../../service/logger/Logger';
 
-export class BlockChainReaderError extends Error {
+export class BlockchainReaderError extends Error {
   constructor(message: string) {
     super(message);
     this.name = 'BlockChainReaderError';
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, BlockChainReaderError);
+      Error.captureStackTrace(this, BlockchainReaderError);
     }
   }
 }
@@ -50,6 +50,22 @@ export class BlockchainReader {
     return this.findResponseFromNodeWithHighestBlockNumber(validNodeResponses);
   }
 
+  public async getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo> {
+    const proxyInfoPromises = this.nodes.map((node) =>
+      node.getProxyInfoForAddress(proxyAddress).catch(() => null),
+    );
+
+    const proxyInfoResults = await Promise.all(proxyInfoPromises);
+
+    for (const proxyInfo of proxyInfoResults) {
+      if (proxyInfo !== null && proxyInfo.isProxy) {
+        return proxyInfo;
+      }
+    }
+
+    throw new BlockchainReaderError('Error when requesting proxy information from node.');
+  }
+
   private fetchBlockNumbersFromNodes(): Promise<(number | null)[]> {
     const blockNumberPromises = this.nodes.map((node) =>
       node.getBlockNumber().catch(() => null),
@@ -64,7 +80,7 @@ export class BlockchainReader {
   private ensureValidBlockNumbers(validBlockNumbers: number[]): void {
     if (validBlockNumbers.length === 0) {
       this.logger.error('All nodes failed to retrieve block number');
-      throw new BlockChainReaderError('All nodes failed to retrieve block number');
+      throw new BlockchainReaderError('All nodes failed to retrieve block number');
     }
   }
 
@@ -110,7 +126,7 @@ export class BlockchainReader {
   private ensureValidNodeResponses(validNodeResponses: ValidNodeResponse[]): void {
     if (validNodeResponses.length === 0) {
       this.logger.error('All nodes failed to retrieve block number');
-      throw new BlockChainReaderError('All nodes failed to execute callViewFunction or getBlockNumber');
+      throw new BlockchainReaderError('All nodes failed to execute callViewFunction or getBlockNumber');
     }
   }
 
