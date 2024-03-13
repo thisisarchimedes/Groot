@@ -21,7 +21,7 @@ env:
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
 
 jobs:
-  test:
+  eval-commit-stage:
     runs-on: ubuntu-latest
     steps:
       - name: Set env variables
