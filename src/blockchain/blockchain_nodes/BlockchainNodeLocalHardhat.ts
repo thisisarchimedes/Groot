@@ -4,7 +4,6 @@ import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
 import {Logger} from '../../service/logger/Logger';
 
 export class BlockchainNodeLocalHardhat extends BlockchainNode {
-  private readonly web3: Web3;
   private readonly dockerOperator: DockerOperator;
 
   private readonly localRpcUrl: string;

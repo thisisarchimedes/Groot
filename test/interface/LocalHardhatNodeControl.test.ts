@@ -2,32 +2,32 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
-import {BlockchainNodeLocalHardhat} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocalHardhat';
-import {BlockchainNodeError} from '../../src/blockchain/blockchain_nodes/BlockchainNode';
-import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
+import { BlockchainNodeLocalHardhat } from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocalHardhat';
+import { BlockchainNodeError, BlockchainNodeProxyInfo } from '../../src/blockchain/blockchain_nodes/BlockchainNode';
+import { LoggerAdapter } from '../unit/adapters/LoggerAdapter';
 
 dotenv.config();
 chai.use(chaiAsPromised);
 
-const {expect} = chai;
+const { expect } = chai;
 
-describe('Check that we work with local Hardhat node correctly', function() {
+describe('Check that we work with local Hardhat node correctly', function () {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
   let localNode: BlockchainNodeLocalHardhat;
   const logger: LoggerAdapter = new LoggerAdapter();
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     localNode = new BlockchainNodeLocalHardhat(logger, 8545, 'archimedes-node-alchemy');
     await localNode.startNode();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await localNode.stopNode();
   });
 
-  it('Should be able to reset node and point it to invalid RPC', async function() {
+  it('Should be able to reset node and point it to invalid RPC', async function () {
     try {
       await localNode.resetNode('invalidRPCUrl');
       expect.fail('Expected resetNode to throw an error');
@@ -36,7 +36,7 @@ describe('Check that we work with local Hardhat node correctly', function() {
     }
   });
 
-  it('Should be able to reset node and point it to valid RPC', async function() {
+  it('Should be able to reset node and point it to valid RPC', async function () {
     const alchemyRpcUrl: string = 'https://eth-mainnet.g.alchemy.com/v2/' + process.env.API_KEY_ALCHEMY;
     await resetAndVerify(alchemyRpcUrl);
 
@@ -51,9 +51,9 @@ describe('Check that we work with local Hardhat node correctly', function() {
     expect(blockNumber > 1934000n).to.be.true;
   }
 
-  it('Should be able to invoke aribtrary view on-chain method', async function() {
+  it('Should be able to invoke aribtrary view on-chain method', async function () {
     // eslint-disable-next-line max-len
-    const abi = [{'inputs': [], 'name': 'decimals', 'outputs': [{'internalType': 'uint8', 'name': '', 'type': 'uint8'}], 'stateMutability': 'view', 'type': 'function'}];
+    const abi = [{ 'inputs': [], 'name': 'decimals', 'outputs': [{ 'internalType': 'uint8', 'name': '', 'type': 'uint8' }], 'stateMutability': 'view', 'type': 'function' }];
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
 
     const res = Number(await localNode.callViewFunction(usdcContractAddress, abi, 'decimals'));
@@ -61,7 +61,7 @@ describe('Check that we work with local Hardhat node correctly', function() {
     expect(res).to.be.equal(6);
   });
 
-  it('Should be able to recover node after getting invalid RPC', async function() {
+  it('Should be able to recover node after getting invalid RPC', async function () {
     try {
       await localNode.resetNode('invalidRPCUrl');
       expect.fail('Expected resetNode to throw an error');
@@ -72,5 +72,13 @@ describe('Check that we work with local Hardhat node correctly', function() {
     await localNode.recoverNode();
     const blockNumber = await localNode.getBlockNumber();
     expect(blockNumber > 1934000n).to.be.true;
+  });
+
+  it('Should be able to get implementation address out of proxy address', async function() {
+    const USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
+    const res: BlockchainNodeProxyInfo = await localNode.getProxyInfoForAddress(USDC);
+    expect(res.isProxy).to.be.true;
+    expect(res.implementationAddress).to.contain('0x');
+    expect(res.implementationAddress.length).to.be.equal(42);
   });
 });
