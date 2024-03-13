@@ -10,7 +10,7 @@ export class AbiStorageDynamoDB implements IAbiStorage {
     this.dynamoDB = new DynamoDB.DocumentClient({region});
   }
 
-  async storeAbiForAddress(contractAddress: string, abi: string): Promise<void> {
+  public async storeAbiForAddress(contractAddress: string, abi: string): Promise<void> {
     const params: DynamoDB.DocumentClient.PutItemInput = {
       TableName: this.tableName,
       Item: {
@@ -22,7 +22,7 @@ export class AbiStorageDynamoDB implements IAbiStorage {
     await this.dynamoDB.put(params).promise();
   }
 
-  async getAbiForAddress(contractAddress: string): Promise<string | null> {
+  public async getAbiForAddress(contractAddress: string): Promise<string | null> {
     const params: DynamoDB.DocumentClient.GetItemInput = {
       TableName: this.tableName,
       Key: {
