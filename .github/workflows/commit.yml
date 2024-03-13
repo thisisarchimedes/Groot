@@ -70,5 +70,4 @@ jobs:
       - name: 'Report DevOps Metrics'
         if: always()
         run: |
-          yarn add axios dotenv
-          node devops/metrics/src/cicd_script/report_devops_event.js ${{ github.repository }} push '{"pass": "${{ env.TEST_PASS }}", "commit_id": "${{ github.sha }}" ,"report_url": "${{ env.REPORT_URL }}"}'
+          yarn tsx devops/metrics/src/cicd_script/report_devops_event.ts ${{ github.repository }} push '{"pass": "${{ env.TEST_PASS }}", "commit_id": "${{ github.sha }}" ,"report_url": "${{ env.REPORT_URL }}"}'
