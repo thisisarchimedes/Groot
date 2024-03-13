@@ -51,12 +51,7 @@ export class BlockchainReader {
   }
 
   public async getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo> {
-    const proxyInfoPromises = this.nodes.map((node) =>
-      node.getProxyInfoForAddress(proxyAddress).catch(() => null),
-    );
-
-    const proxyInfoResults = await Promise.all(proxyInfoPromises);
-
+    const proxyInfoResults = await this.fetchProxyInfoFromNodes(proxyAddress);
     for (const proxyInfo of proxyInfoResults) {
       if (proxyInfo !== null) {
         return proxyInfo;
@@ -137,5 +132,13 @@ export class BlockchainReader {
         0,
     );
     return validNodeResponses[highestBlockNumberIndex].response;
+  }
+
+  private async fetchProxyInfoFromNodes(proxyAddress: string): Promise<BlockchainNodeProxyInfo[]> {
+    const proxyInfoPromises = this.nodes.map((node) =>
+      node.getProxyInfoForAddress(proxyAddress).catch(() => null),
+    );
+    const res: BlockchainNodeProxyInfo[] = await Promise.all(proxyInfoPromises) as BlockchainNodeProxyInfo[];
+    return res;
   }
 }
