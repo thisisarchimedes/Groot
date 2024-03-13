@@ -1,5 +1,5 @@
-import Web3, { AbiItem } from 'web3';
-import { Logger } from '../../service/logger/Logger';
+import Web3, {AbiItem} from 'web3';
+import {Logger} from '../../service/logger/Logger';
 
 export class BlockchainNodeError extends Error {
   constructor(message: string) {

@@ -1,6 +1,6 @@
-import { BlockchainReader } from '../../blockchain/blockchain_reader/BlockchainReader';
-import { Logger } from '../../service/logger/Logger';
-import { ToolStrategyUniswap } from '../tool/ToolStrategyUniswap';
+import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
+import {Logger} from '../../service/logger/Logger';
+import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
 import {Rule, RuleParams} from './Rule';
 
 /* eslint-disable max-len */
@@ -23,7 +23,6 @@ export class RuleUniswapPSPRebalance extends Rule {
   ) {
     super(logger, blockchainReader, ruleLabel, params);
     this.uniswapStrategy = new ToolStrategyUniswap((params as RuleParamsUniswapPSPRebalance).strategyAddress, blockchainReader);
-
   }
   public async evaluate(): Promise<void> {
     // fetch the pool address from strategy
