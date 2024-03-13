@@ -58,7 +58,7 @@ export class BlockchainReader {
     const proxyInfoResults = await Promise.all(proxyInfoPromises);
 
     for (const proxyInfo of proxyInfoResults) {
-      if (proxyInfo !== null && proxyInfo.isProxy) {
+      if (proxyInfo !== null) {
         return proxyInfo;
       }
     }

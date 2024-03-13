@@ -4,6 +4,9 @@ import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 
 describe('ABI Repo external services', function() {
+  // eslint-disable-next-line no-invalid-this
+  this.timeout(12000);
+
   let configService: ConfigServiceAWS;
 
   beforeEach(async function() {
