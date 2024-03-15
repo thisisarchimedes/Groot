@@ -15,21 +15,21 @@ describe('Check that we work with local Hardhat node w/container correctly', fun
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
-  let localNode: BlockchainNodeLocalContainer;
+  let localNodeContainer: BlockchainNodeLocalContainer;
   const logger: LoggerAdapter = new LoggerAdapter();
 
   beforeEach(async function() {
-    localNode = new BlockchainNodeLocalContainer(logger, 8545, 'archimedes-node-alchemy');
-    await localNode.startNode();
+    localNodeContainer = new BlockchainNodeLocalContainer(logger, 9545, 'archimedes-node-alchemy');
+    await localNodeContainer.startNode();
   });
 
   afterEach(async function() {
-    await localNode.stopNode();
+    await localNodeContainer.stopNode();
   });
 
   it('Should be able to reset node and point it to invalid RPC', async function() {
     try {
-      await localNode.resetNode('invalidRPCUrl');
+      await localNodeContainer.resetNode('invalidRPCUrl');
       expect.fail('Expected resetNode to throw an error');
     } catch (error) {
       expect(error).to.be.instanceOf(BlockchainNodeError);
@@ -45,9 +45,9 @@ describe('Check that we work with local Hardhat node w/container correctly', fun
   });
 
   async function resetAndVerify(rpcUrl: string) {
-    await localNode.resetNode(rpcUrl);
+    await localNodeContainer.resetNode(rpcUrl);
 
-    const blockNumber = await localNode.getBlockNumber();
+    const blockNumber = await localNodeContainer.getBlockNumber();
     expect(blockNumber > 1934000n).to.be.true;
   }
 
@@ -56,21 +56,21 @@ describe('Check that we work with local Hardhat node w/container correctly', fun
     const abi = [{'inputs': [], 'name': 'decimals', 'outputs': [{'internalType': 'uint8', 'name': '', 'type': 'uint8'}], 'stateMutability': 'view', 'type': 'function'}];
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
 
-    const res = Number(await localNode.callViewFunction(usdcContractAddress, abi, 'decimals'));
+    const res = Number(await localNodeContainer.callViewFunction(usdcContractAddress, abi, 'decimals'));
 
     expect(res).to.be.equal(6);
   });
 
   it('Should be able to recover node after getting invalid RPC', async function() {
     try {
-      await localNode.resetNode('invalidRPCUrl');
+      await localNodeContainer.resetNode('invalidRPCUrl');
       expect.fail('Expected resetNode to throw an error');
     } catch (error) {
       expect(error).to.be.instanceOf(BlockchainNodeError);
     }
 
-    await localNode.recoverNode();
-    const blockNumber = await localNode.getBlockNumber();
+    await localNodeContainer.recoverNode();
+    const blockNumber = await localNodeContainer.getBlockNumber();
     expect(blockNumber > 1934000n).to.be.true;
   });
 });

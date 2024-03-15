@@ -1,9 +1,10 @@
 import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
+import {spawn} from 'child_process';
 
 import {BlockchainNodeLocal} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
-import {BlockchainNodeError, BlockchainNodeProxyInfo} from '../../src/blockchain/blockchain_nodes/BlockchainNode';
+import {BlockchainNodeProxyInfo} from '../../src/blockchain/blockchain_nodes/BlockchainNode';
 import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 
 dotenv.config();
@@ -17,6 +18,12 @@ describe('Check that we work with local Hardhat node correctly', function() {
 
   let localNode: BlockchainNodeLocal;
   const logger: LoggerAdapter = new LoggerAdapter();
+
+  before(function() {
+    spawn('./scripts/production_reader_node/run_nodes_containers_locally.sh', [], {
+      shell: true,
+    });
+  });
 
   beforeEach(async function() {
     localNode = new BlockchainNodeLocal(logger, 'http://127.0.0.1:8545', 'archimedes-node-alchemy');
