@@ -1,4 +1,4 @@
-import Web3, {AbiItem} from 'web3';
+import Web3 from 'web3';
 import {DockerOperator} from '../blockchain_reader/DockerOperator';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
 import {Logger} from '../../service/logger/Logger';
@@ -56,37 +56,6 @@ export class BlockchainLocalNodeContainer extends BlockchainNode {
     }
 
     await this.waitForNodeToBeReady();
-  }
-
-  public async getBlockNumber(): Promise<number> {
-    try {
-      const blockNumber = await this.web3.eth.getBlockNumber();
-      this.isNodeHealthy = true;
-      return Number(blockNumber);
-    } catch (error) {
-      this.logger.info(`${this.nodeName} cannot get block number: ${(error as Error).message}`);
-      this.isNodeHealthy = false;
-      throw error;
-    }
-  }
-
-  public async callViewFunction(
-      contractAddress: string,
-      abi: AbiItem[],
-      functionName: string,
-      params: unknown[] = [],
-  ): Promise<unknown> {
-    const contract = new this.web3.eth.Contract(abi, contractAddress);
-
-    try {
-      const data = await contract.methods[functionName](...params).call();
-      this.isNodeHealthy = true;
-      return data;
-    } catch (error) {
-      this.logger.info(`${this.nodeName} cannot call view function ${functionName}: ${error}`);
-      this.isNodeHealthy = false;
-      throw error;
-    }
   }
 
   private async waitForNodeToBeReady(maxAttempts: number = 8, interval: number = 3000): Promise<void> {

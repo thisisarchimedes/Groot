@@ -34,41 +34,4 @@ export class BlockchainNodeRemoteRPC extends BlockchainNode {
     this.logger.info('Node recovered successfully.');
     this.isNodeHealthy = true;
   }
-
-  public async getBlockNumber(): Promise<number> {
-    try {
-      const blockNumber = await this.web3.eth.getBlockNumber();
-      this.isNodeHealthy = true;
-      return Number(blockNumber);
-    } catch (error) {
-      this.logger.info(`${this.nodeName} cannot get block number: ${(error as Error).message}`);
-      this.isNodeHealthy = false;
-      throw error;
-    }
-  }
-
-  public async callViewFunction(
-      contractAddress: string,
-      abi: AbiItem[],
-      functionName: string,
-      params: unknown[] = [],
-  ): Promise<unknown> {
-    const contract = new this.web3.eth.Contract(abi, contractAddress);
-
-    try {
-      const data = await contract.methods[functionName](...params).call();
-      this.isNodeHealthy = true;
-      return data;
-    } catch (error) {
-      this.logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error}`);
-      this.isNodeHealthy = false;
-      throw error;
-    }
-  }
-
-  private busySleep(duration: number): Promise<void> {
-    return new Promise((resolve) => {
-      setTimeout(resolve, duration);
-    });
-  }
 }
