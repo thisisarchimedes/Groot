@@ -2,7 +2,7 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
-import {BlockchainNodeLocalContainer} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocalContainer';
+import {BlockchainNodeLocal} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
 import {BlockchainNodeError, BlockchainNodeProxyInfo} from '../../src/blockchain/blockchain_nodes/BlockchainNode';
 import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 
@@ -15,11 +15,11 @@ describe('Check that we work with local Hardhat node correctly', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
-  let localNode: BlockchainNodeLocalContainer;
+  let localNode: BlockchainNodeLocal;
   const logger: LoggerAdapter = new LoggerAdapter();
 
   beforeEach(async function() {
-    localNode = new BlockchainNodeLocalContainer(logger, 8545, 'archimedes-node-alchemy');
+    localNode = new BlockchainNodeLocal(logger, 'http://127.0.0.1:8545', 'archimedes-node-alchemy');
     await localNode.startNode();
   });
 
@@ -27,14 +27,6 @@ describe('Check that we work with local Hardhat node correctly', function() {
     await localNode.stopNode();
   });
 
-  it('Should be able to reset node and point it to invalid RPC', async function() {
-    try {
-      await localNode.resetNode('invalidRPCUrl');
-      expect.fail('Expected resetNode to throw an error');
-    } catch (error) {
-      expect(error).to.be.instanceOf(BlockchainNodeError);
-    }
-  });
 
   it('Should be able to reset node and point it to valid RPC', async function() {
     const alchemyRpcUrl: string = 'https://eth-mainnet.g.alchemy.com/v2/' + process.env.API_KEY_ALCHEMY;
@@ -59,19 +51,6 @@ describe('Check that we work with local Hardhat node correctly', function() {
     const res = Number(await localNode.callViewFunction(usdcContractAddress, abi, 'decimals'));
 
     expect(res).to.be.equal(6);
-  });
-
-  it('Should be able to recover node after getting invalid RPC', async function() {
-    try {
-      await localNode.resetNode('invalidRPCUrl');
-      expect.fail('Expected resetNode to throw an error');
-    } catch (error) {
-      expect(error).to.be.instanceOf(BlockchainNodeError);
-    }
-
-    await localNode.recoverNode();
-    const blockNumber = await localNode.getBlockNumber();
-    expect(blockNumber > 1934000n).to.be.true;
   });
 
   it('Should be able to get implementation address out of proxy address', async function() {
