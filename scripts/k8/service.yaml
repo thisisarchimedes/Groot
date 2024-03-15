@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: groot-service
+spec:
+  selector:
+    app: groot
+  ports:
+  - name: eth-node-1-port-1
+    port: 8545
+    targetPort: 8545
+  - name: eth-node-1-port-2
+    port: 8546
+    targetPort: 8546
+  - name: eth-node-2-port-1
+    port: 18545
+    targetPort: 18545
+  - name: eth-node-2-port-2
+    port: 18546
+    targetPort: 18546
+  type: LoadBalancer

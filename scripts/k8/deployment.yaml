@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: groot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: groot
+  template:
+    metadata:
+      labels:
+        app: groot
+    spec:
+      containers:
+      - name: groot-container
+        image: groot-container
+      - name: eth-node-1
+        image: arch-production-node:latest
+        ports:
+        - containerPort: 8545
+        - containerPort: 8546
+      - name: eth-node-2
+        image: arch-production-node:latest
+        ports:
+        - containerPort: 18545
+        - containerPort: 18546
