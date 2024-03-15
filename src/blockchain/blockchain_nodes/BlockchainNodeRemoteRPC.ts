@@ -1,4 +1,4 @@
-import Web3, {AbiItem} from 'web3';
+import Web3 from 'web3';
 
 import {BlockchainNode} from './BlockchainNode';
 import {Logger} from '../../service/logger/Logger';

@@ -1,41 +1,23 @@
 import Web3 from 'web3';
-import {DockerOperator} from '../blockchain_reader/DockerOperator';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
 import {Logger} from '../../service/logger/Logger';
 
-export class BlockchainLocalNodeContainer extends BlockchainNode {
-  private readonly dockerOperator: DockerOperator;
-
+export class BlockchainNodeLocal extends BlockchainNode {
   private readonly localRpcUrl: string;
-  private readonly nodePort: number;
 
-  private readonly DEFAULT_HARDHAT_NODE_PORT = 8545;
-  private readonly DEFAULT_HARDHAT_DOCKER_IMAGE_NAME = 'arch-production-node:latest';
-
-  constructor(logger: Logger, externalPort: number, nodeName: string) {
+  constructor(logger: Logger, localRpcUrl: string, nodeName: string) {
     super(logger, nodeName);
 
-    this.localRpcUrl = `http://127.0.0.1:${externalPort}`;
+    this.localRpcUrl = localRpcUrl;
     this.web3 = new Web3(this.localRpcUrl);
-
-    this.nodePort = externalPort;
-
-    this.dockerOperator = new DockerOperator(logger,
-        {
-          portExternal: externalPort,
-          portInternal: this.DEFAULT_HARDHAT_NODE_PORT,
-          imageName: this.DEFAULT_HARDHAT_DOCKER_IMAGE_NAME,
-          instanceName: nodeName,
-        });
   }
 
   public async startNode(): Promise<void> {
-    await this.dockerOperator.startContainer();
     await this.waitForNodeToBeReady();
   }
 
   public async stopNode(): Promise<void> {
-    await this.dockerOperator.stopContainer();
+    // Do nothing, as we don't manage this node directly
   }
 
   public async recoverNode(): Promise<void> {
@@ -58,7 +40,7 @@ export class BlockchainLocalNodeContainer extends BlockchainNode {
     await this.waitForNodeToBeReady();
   }
 
-  private async waitForNodeToBeReady(maxAttempts: number = 8, interval: number = 3000): Promise<void> {
+  protected async waitForNodeToBeReady(maxAttempts: number = 8, interval: number = 3000): Promise<void> {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const blockNumber = await this.getBlockNumber();
