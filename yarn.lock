@@ -4065,6 +4065,11 @@ keyv@^4.5.3:
   dependencies:
     json-buffer "3.0.1"
 
+kubectl@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.npmjs.org/kubectl/-/kubectl-0.0.0.tgz#7b9a67fd560240bb2db95855a3163a99a38fa6e6"
+  integrity sha512-+qfXUPeueEJynJpxCMIr5OsuB7OgKb61/YbiHF1cO8glYHeBlA+FZZ3hooxCiv64Mk02QNEZMEjfcH9dHNtrUA==
+
 kuler@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/kuler/-/kuler-2.0.0.tgz#e2c570a3800388fb44407e851531c1d670b061b3"
