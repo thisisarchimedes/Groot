@@ -24,6 +24,6 @@ echo "AWS_REGION=$AWS_REGION" >> "$env_file"
 
 echo ".env file created at: $env_file"
 
-docker build -t groot-container -f scripts/container_main_groot/Dockerfile .
+docker build --no-cache -t groot-container -f scripts/container_main_groot/Dockerfile .
 
 rm $env_file
