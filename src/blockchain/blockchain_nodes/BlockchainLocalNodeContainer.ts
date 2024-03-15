@@ -3,7 +3,7 @@ import {DockerOperator} from '../blockchain_reader/DockerOperator';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
 import {Logger} from '../../service/logger/Logger';
 
-export class BlockchainNodeLocalHardhat extends BlockchainNode {
+export class BlockchainLocalNodeContainer extends BlockchainNode {
   private readonly dockerOperator: DockerOperator;
 
   private readonly localRpcUrl: string;

@@ -7,7 +7,7 @@ import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
 import {LoggerAll} from './service/logger/LoggerAll';
 import {TransactionQueuer} from './tx_queue/TransactionQueuer';
 import {BlockchainReader} from './blockchain/blockchain_reader/BlockchainReader';
-import {BlockchainNodeLocalHardhat} from './blockchain/blockchain_nodes/BlockchainNodeLocalHardhat';
+import {BlockchainLocalNodeContainer} from './blockchain/blockchain_nodes/BlockchainLocalNodeContainer';
 import {HealthMonitor} from './service/health_monitor/HealthMonitor';
 import {BlockchainNodeHealthMonitor} from './service/health_monitor/BlockchainNodeHealthMonitor';
 import {SignalAWSCriticalFailure} from './service/health_monitor/signal/SignalAWSCriticalFailure';
@@ -28,8 +28,8 @@ export class Groot {
   private txQueuer!: TransactionQueuer;
   private healthMonitor!: HealthMonitor;
 
-  private mainNode!: BlockchainNodeLocalHardhat;
-  private altNode!: BlockchainNodeLocalHardhat;
+  private mainNode!: BlockchainLocalNodeContainer;
+  private altNode!: BlockchainLocalNodeContainer;
   private blockchainReader!: BlockchainReader;
   private nextAvailablePortNumber: number;
 
@@ -56,8 +56,8 @@ export class Groot {
   }
 
   private async initalizeReadOnlyLocalNodes() {
-    this.mainNode = new BlockchainNodeLocalHardhat(this.logger, this.nextAvailablePortNumber++, 'alchemy-node');
-    this.altNode = new BlockchainNodeLocalHardhat(this.logger, this.nextAvailablePortNumber++, 'infura-node');
+    this.mainNode = new BlockchainLocalNodeContainer(this.logger, this.nextAvailablePortNumber++, 'alchemy-node');
+    this.altNode = new BlockchainLocalNodeContainer(this.logger, this.nextAvailablePortNumber++, 'infura-node');
 
     await Promise.all([
       this.mainNode.startNode(),

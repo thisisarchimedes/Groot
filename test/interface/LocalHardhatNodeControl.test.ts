@@ -2,7 +2,7 @@ import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
-import {BlockchainNodeLocalHardhat} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocalHardhat';
+import {BlockchainLocalNodeContainer} from '../../src/blockchain/blockchain_nodes/BlockchainLocalNodeContainer';
 import {BlockchainNodeError, BlockchainNodeProxyInfo} from '../../src/blockchain/blockchain_nodes/BlockchainNode';
 import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 
@@ -15,11 +15,11 @@ describe('Check that we work with local Hardhat node correctly', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
-  let localNode: BlockchainNodeLocalHardhat;
+  let localNode: BlockchainLocalNodeContainer;
   const logger: LoggerAdapter = new LoggerAdapter();
 
   beforeEach(async function() {
-    localNode = new BlockchainNodeLocalHardhat(logger, 8545, 'archimedes-node-alchemy');
+    localNode = new BlockchainLocalNodeContainer(logger, 8545, 'archimedes-node-alchemy');
     await localNode.startNode();
   });
 
