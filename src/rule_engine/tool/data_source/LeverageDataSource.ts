@@ -10,16 +10,16 @@ export default class LeverageDataSource extends PostgreDataSourceBase {
             values: [nftIds],
         };
         const resp = await this.executeQuery(query);
-        return resp.rows as LeveragePosition[];
+        return resp ? (resp.rows as LeveragePosition[]) : [];
     }
 
     public async getLivePositions(): Promise<LeveragePosition[]> {
         const resp = await this.executeQuery('SELECT * FROM "LeveragePosition" WHERE "positionState" = \'LIVE\' LIMIT 1000');
-        return resp.rows as LeveragePosition[];
+        return resp ? (resp.rows as LeveragePosition[]) : [];
     }
 
     public async getLivePositionsNftIds(): Promise<number[]> {
         const resp = await this.executeQuery('SELECT "nftId" FROM "LeveragePosition" WHERE "positionState" = \'LIVE\'');
-        return resp.rows.map((row) => row.nftId);
+        return resp ? resp.rows.map((row) => row.nftId) : [];
     }
 }

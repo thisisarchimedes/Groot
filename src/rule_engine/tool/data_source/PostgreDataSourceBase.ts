@@ -20,6 +20,7 @@ export default class PostgreDataSourceBase {
     private configService: ConfigServiceAWS;
 
     constructor() {
+        console.log('dbConfig.host', process.env.DB_HOST)
         const environment = process.env.ENVIRONMENT as string;
         const region = process.env.AWS_REGION as string;
 
@@ -38,7 +39,7 @@ export default class PostgreDataSourceBase {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    protected async executeQuery(query: string | { text: string, values: any[] }): Promise<QueryResult> {
+    protected async executeQuery(query: string | { text: string, values: any[] }): Promise<pg.QueryResult | null> {
         await this.connect();
         try {
             if (this.client) {
@@ -48,5 +49,7 @@ export default class PostgreDataSourceBase {
             this.logger.error((e as Error).message);
             throw e;
         }
+
+        return null;
     }
 }

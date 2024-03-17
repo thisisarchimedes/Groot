@@ -24,7 +24,7 @@ export class RuleExpirePositions extends Rule {
     public async evaluate(): Promise<void> {
         const params = this.params as RuleParamsDummy;
         const blockNumber = await this.blockchainReader.getBlockNumber();
-
+        console.log('blocknumber', blockNumber);
         const livePositions = await this.leverageDataSource.getLivePositions()
         console.log('livePositions', livePositions.length);
         this.logger.info('RuleExpirePositions.evaluate() called: ' + params.message);

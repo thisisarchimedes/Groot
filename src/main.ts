@@ -1,8 +1,8 @@
 import * as dotenv from 'dotenv';
 
-import {Groot} from './Groot';
-import {LoggerAll} from './service/logger/LoggerAll';
-import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
+import { Groot } from './Groot';
+import { LoggerAll } from './service/logger/LoggerAll';
+import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
 
 dotenv.config();
 
@@ -36,4 +36,6 @@ function reportCriticalError(environment: string, region: string, error: unknown
   logger.error(errorMessage);
 }
 
-// grootStartHere();
+grootStartHere().then(a => {
+  console.log(a);
+})
