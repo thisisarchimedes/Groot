@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { IAbiFetcher } from './IAbiFetcher';
+import {IAbiFetcher} from './IAbiFetcher';
 
 interface EtherscanResponse {
   status: string;

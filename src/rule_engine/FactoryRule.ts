@@ -1,11 +1,11 @@
-import { BlockchainReader } from '../blockchain/blockchain_reader/BlockchainReader';
-import { Logger } from '../service/logger/Logger';
-import { Rule, RuleParams } from './rule/Rule';
-import { RuleDummy } from './rule/RuleDummy';
-import { RuleExpirePositions } from './rule/RuleExpirePositions';
-import { RuleUniswapPSPRebalance } from './rule/RuleUniswapPSPRebalance';
-import { AbiRepo } from './tool/abi_repository/AbiRepo';
-import { RuleJSONConfigItem, TypeRule } from './TypesRule';
+import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
+import {Logger} from '../service/logger/Logger';
+import {Rule, RuleParams} from './rule/Rule';
+import {RuleDummy} from './rule/RuleDummy';
+import {RuleExpirePositions} from './rule/RuleExpirePositions';
+import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
+import {AbiRepo} from './tool/abi_repository/AbiRepo';
+import {RuleJSONConfigItem, TypeRule} from './TypesRule';
 
 export class ErrorRuleFactory extends Error {
   constructor(message: string) {
