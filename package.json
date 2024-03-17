@@ -1,5 +1,4 @@
 {
-  "type": "module",
   "name": "groot",
   "version": "1.0.0",
   "main": "index.js",
@@ -41,7 +40,6 @@
     "eslint-plugin-promise": "^6.1.1",
     "ethers": "^6.11.1",
     "nock": "^13.5.4",
-    "node-fetch": "^3.3.2",
     "nyc": "^15.1.0",
     "pg": "^8.11.3",
     "pg-types": "^4.0.2",
