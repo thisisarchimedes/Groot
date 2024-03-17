@@ -27,6 +27,7 @@
     "@types/dockerode": "^3.3.24",
     "@types/mocha": "^10.0.0",
     "@types/node": "^20.11.24",
+    "@types/pg": "^8.11.2",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
     "aws-sdk": "^2.1571.0",
@@ -42,6 +43,8 @@
     "nock": "^13.5.4",
     "node-fetch": "^3.3.2",
     "nyc": "^15.1.0",
+    "pg": "^8.11.3",
+    "pg-types": "^4.0.2",
     "tsx": "^3.11.0",
     "web3": "^4.5.0"
   }
