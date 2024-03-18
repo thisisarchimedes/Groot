@@ -58,8 +58,8 @@ jobs:
 
       - name: Run Tests
         run: |
-          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run --  ./scripts/container_reader_node/run_nodes_containers_locally.sh && yarn test:unit
-          # ./scripts/container_reader_node/run_nodes_containers_locally.sh && yarn test:unit
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:unit
+          # yarn test:unit
           
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
