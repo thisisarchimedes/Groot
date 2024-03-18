@@ -58,7 +58,7 @@ jobs:
 
       - name: Build Docker images
         run: |        
-          ./scripts/container_reader_node/build_read_node_container.sh
+          ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
 
       - name: Start main-eth-node container
         run: |
