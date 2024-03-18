@@ -7,7 +7,7 @@ import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
 import {LoggerAll} from './service/logger/LoggerAll';
 import {TransactionQueuer} from './tx_queue/TransactionQueuer';
 import {BlockchainReader} from './blockchain/blockchain_reader/BlockchainReader';
-import {BlockchainNodeLocalHardhat} from './blockchain/blockchain_nodes/BlockchainNodeLocalHardhat';
+import {BlockchainNodeLocal} from './blockchain/blockchain_nodes/BlockchainNodeLocal';
 import {HealthMonitor} from './service/health_monitor/HealthMonitor';
 import {BlockchainNodeHealthMonitor} from './service/health_monitor/BlockchainNodeHealthMonitor';
 import {SignalAWSCriticalFailure} from './service/health_monitor/signal/SignalAWSCriticalFailure';
@@ -28,16 +28,14 @@ export class Groot {
   private txQueuer!: TransactionQueuer;
   private healthMonitor!: HealthMonitor;
 
-  private mainNode!: BlockchainNodeLocalHardhat;
-  private altNode!: BlockchainNodeLocalHardhat;
+  private mainNode!: BlockchainNodeLocal;
+  private altNode!: BlockchainNodeLocal;
   private blockchainReader!: BlockchainReader;
-  private nextAvailablePortNumber: number;
 
   private abiRepo!: AbiRepo;
 
   constructor(environment: string, region: string) {
     this.configService = new ConfigServiceAWS(environment, region);
-    this.nextAvailablePortNumber = 8545;
   }
 
   public async initalizeGroot() {
@@ -56,8 +54,8 @@ export class Groot {
   }
 
   private async initalizeReadOnlyLocalNodes() {
-    this.mainNode = new BlockchainNodeLocalHardhat(this.logger, this.nextAvailablePortNumber++, 'alchemy-node');
-    this.altNode = new BlockchainNodeLocalHardhat(this.logger, this.nextAvailablePortNumber++, 'infura-node');
+    this.mainNode = new BlockchainNodeLocal(this.logger, 'http://localhost:8545', 'alchemy-node');
+    this.altNode = new BlockchainNodeLocal(this.logger, 'http://localhost:18545', 'infura-node');
 
     await Promise.all([
       this.mainNode.startNode(),

@@ -38,3 +38,30 @@ yarn dotenvx hub push # push the keys to the dotenvx hub
 Next: 
 - commit `.env.vault` to github _**DO NOT COMMIT .evn.keys or .env to github**_
 - Update the repo Github Secrets `DOTENV_KEY`
+
+
+
+# K8
+
+## Install
+
+- Docker Desktop
+- Kind
+- kubectl
+- Helm
+
+
+### Kind
+- kind create cluster --name groot-cluster
+- create namespace - kubectl create namespace groop
+- create cluster: kind create cluster --name groot-cluster 
+- Loand container to cluster
+    - kind load docker-image groot-container --name groot-cluster
+    - kind load docker-image arch-production-node:latest --name groot-cluster
+- deploy pod
+    - kubectl apply -f service.yaml
+    - kubectl apply -f deployment.yaml
+- kubectl get pods
+
+# no K8
+./scripts/container_reader_node/run_nodes_containers_locally.sh

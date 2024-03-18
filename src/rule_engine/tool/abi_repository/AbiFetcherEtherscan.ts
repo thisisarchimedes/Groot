@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import axios from 'axios';
 import {IAbiFetcher} from './IAbiFetcher';
 
 interface EtherscanResponse {
@@ -18,13 +18,12 @@ export class AbiFetcherEtherscan implements IAbiFetcher {
   public async getAbiByAddress(contractAddress: string): Promise<string> {
     const url = `${this.baseUrl}?module=contract&action=getabi&address=${contractAddress}&apikey=${this.apiKey}`;
 
-    const response = await fetch(url);
-    const data: EtherscanResponse = await response.json() as EtherscanResponse;
+    const response = await axios.get<EtherscanResponse>(url);
 
-    if (data.status === '1') {
-      return data.result;
+    if (response.data.status === '1') {
+      return response.data.result;
     } else {
-      throw new Error(`Failed to fetch ABI: ${data.message}`);
+      throw new Error(`Failed to fetch ABI: ${response.data.message}`);
     }
   }
 }
