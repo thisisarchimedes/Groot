@@ -6,7 +6,7 @@ import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
 import {TxQueueAdapter} from './adapters/TxQueueAdapter';
 import {TransactionQueuer} from '../../src/tx_queue/TransactionQueuer';
 
-describe('Rule Factory', function() {
+describe('Transaction Queuer', function() {
   const logger: LoggerAdapter = new LoggerAdapter();
 
   it('should filter out and report on all tx that dont have a hash', async function() {
