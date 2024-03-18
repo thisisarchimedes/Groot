@@ -1,21 +1,19 @@
-import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
-import {Logger} from '../../service/logger/Logger';
 import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
-import {Rule, RuleConstractorInput, RuleParams} from './Rule';
+import {Rule, RuleConstructorInput, RuleParams} from './Rule';
 
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
-    pperTriggerThresholdPercentage: number, // trigger rebalance when we are more than (upperThreshold% * upper tick)
-    lowerTriggerThresholdPercentage: number, // trigger rebalance when we are less than (lowerThreshold% * lower tick)
-    upperTargetTickPercentage: number, // Where we want to be after rebalance currentUniswapTick * newUpperTickPercentage = newUpperTick
-    lowerTargetTickPercentage: number, // Where we want to be after rebalance currentUniswapTick * newLowerTickPercentage = newLowerTick
-    strategyAddress: string,
+  pperTriggerThresholdPercentage: number, // trigger rebalance when we are more than (upperThreshold% * upper tick)
+  lowerTriggerThresholdPercentage: number, // trigger rebalance when we are less than (lowerThreshold% * lower tick)
+  upperTargetTickPercentage: number, // Where we want to be after rebalance currentUniswapTick * newUpperTickPercentage = newUpperTick
+  lowerTargetTickPercentage: number, // Where we want to be after rebalance currentUniswapTick * newLowerTickPercentage = newLowerTick
+  strategyAddress: string,
 }
 /* eslint-enable max-len */
 
 export class RuleUniswapPSPRebalance extends Rule {
   private uniswapStrategy: ToolStrategyUniswap;
-  constructor(constractorInput: RuleConstractorInput) {
+  constructor(constractorInput: RuleConstructorInput) {
     super(constractorInput);
     this.uniswapStrategy = new ToolStrategyUniswap(
         (this.params as RuleParamsUniswapPSPRebalance).strategyAddress,
@@ -29,7 +27,7 @@ export class RuleUniswapPSPRebalance extends Rule {
     // if not calculate new lowertick and uppertick based on the currentTick
     // call rebalance function based on the new params
 
-    const pool = await this.uniswapStrategy.getPoolAddress();
+    // const pool = await this.uniswapStrategy.getPoolAddress();
     // --> this.abiRepo.getAbiByAddress(pool);
   }
 

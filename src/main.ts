@@ -36,4 +36,6 @@ function reportCriticalError(environment: string, region: string, error: unknown
   logger.error(errorMessage);
 }
 
-// grootStartHere();
+grootStartHere().then((a) => {
+  console.log(a);
+});
