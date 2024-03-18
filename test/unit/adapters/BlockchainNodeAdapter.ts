@@ -1,9 +1,11 @@
-import {AbiItem} from 'web3';
+import { ContractInterface } from 'ethers';
+
 import {
   BlockchainNode,
   BlockchainNodeError,
   BlockchainNodeProxyInfo,
 } from '../../../src/blockchain/blockchain_nodes/BlockchainNode';
+
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export class BlockchainNodeAdapter extends BlockchainNode {
@@ -46,10 +48,10 @@ export class BlockchainNodeAdapter extends BlockchainNode {
 
   // eslint-disable-next-line require-await
   public async callViewFunction(
-      contractAddress: string,
-      abi: AbiItem[],
-      functionName: string,
-      params: unknown[],
+    contractAddress: string,
+    abi: ContractInterface,
+    functionName: string,
+    params: unknown[],
   ): Promise<unknown> {
     if (this.throwErrorOnCallViewFunction) {
       throw new Error('callViewFunction: Error');

@@ -1,5 +1,5 @@
-import Web3, {AbiItem} from 'web3';
-import {Logger} from '../../service/logger/Logger';
+import { ethers, Contract } from 'ethers';
+import { Logger } from '../../service/logger/Logger';
 
 export class BlockchainNodeError extends Error {
   constructor(message: string) {
@@ -12,44 +12,45 @@ export class BlockchainNodeError extends Error {
 }
 
 export abstract class BlockchainNode {
-  protected web3!: Web3;
+  protected provider!: ethers.Provider;
   protected readonly logger: Logger;
   protected isNodeHealthy: boolean = true;
   protected nodeName: string = '';
 
-  constructor(logger: Logger, nodeName: string) {
+  constructor(logger: Logger, nodeName: string, rpcUrl: string) {
     this.logger = logger;
     this.nodeName = nodeName;
+    this.provider = new ethers.JsonRpcProvider(rpcUrl);
   }
 
   public async getBlockNumber(): Promise<number> {
     try {
-      const blockNumber = await this.web3.eth.getBlockNumber();
+      const blockNumber = await this.provider.getBlockNumber();
       this.isNodeHealthy = true;
-      return Number(blockNumber);
+      return blockNumber;
     } catch (error) {
-      this.logger.info(`${this.nodeName} cannot get block number: ${(error as Error).message}`);
+      this.logger.info(`${this.nodeName} cannot get block number: ${error.message}`);
       this.isNodeHealthy = false;
-      throw error;
+      throw new BlockchainNodeError(error.message);
     }
   }
 
   public async callViewFunction(
-      contractAddress: string,
-      abi: AbiItem[],
-      functionName: string,
-      params: unknown[] = [],
+    contractAddress: string,
+    abi: ethers.ContractInterface,
+    functionName: string,
+    params: unknown[] = [],
   ): Promise<unknown> {
-    const contract = new this.web3.eth.Contract(abi, contractAddress);
+    const contract = new Contract(contractAddress, abi, this.provider);
 
     try {
-      const data = await contract.methods[functionName](...params).call();
+      const data = await contract[functionName](...params);
       this.isNodeHealthy = true;
       return data;
     } catch (error) {
       this.logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error}`);
       this.isNodeHealthy = false;
-      throw error;
+      throw new BlockchainNodeError(error.message);
     }
   }
 
@@ -84,7 +85,7 @@ export abstract class BlockchainNode {
   }
 
   private async getStorageAt(address: string, position: string): Promise<string> {
-    return await this.web3.eth.getStorageAt(address, position);
+    return await this.provider.getStorage(address, position);
   }
 
   private isInvalidImplementationAddress(address: string): boolean {
@@ -92,7 +93,7 @@ export abstract class BlockchainNode {
   }
 
   private removeLeadingZeros(address: string): string {
-    return '0x' + address.slice(26);
+    return ethers.getAddress('0x' + address.slice(26));
   }
 
   protected busySleep(duration: number): Promise<void> {
@@ -106,7 +107,7 @@ export class BlockchainNodeProxyInfo {
   private constructor(
     public readonly isProxy: boolean,
     public readonly implementationAddress: string,
-  ) {}
+  ) { }
 
   static notProxy(): BlockchainNodeProxyInfo {
     return new BlockchainNodeProxyInfo(false, '');
@@ -120,5 +121,5 @@ export class BlockchainNodeProxyInfo {
 enum ProxyStoragePosition {
   OpenZeppelin = '0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3',
   EIP1967 = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc',
-  InvalidImplementationAddress = '0x0000000000000000000000000000000000000000000000000000000000000000',
+  InvalidImplementationAddress = '0x000000000000000000000000000000000000'
 }

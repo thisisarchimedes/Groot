@@ -1,6 +1,7 @@
-import {AbiItem} from 'web3-types';
-import {BlockchainNode, BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNode';
-import {Logger} from '../../service/logger/Logger';
+import { BlockchainNode, BlockchainNodeProxyInfo } from '../blockchain_nodes/BlockchainNode';
+import { Logger } from '../../service/logger/Logger';
+import { ContractInterface } from 'ethers';
+
 
 export class BlockchainReaderError extends Error {
   constructor(message: string) {
@@ -39,10 +40,10 @@ export class BlockchainReader {
   }
 
   public async callViewFunction(
-      contractAddress: string,
-      abi: AbiItem[],
-      functionName: string,
-      params: unknown[] = [],
+    contractAddress: string,
+    abi: ContractInterface, // Using ContractInterface for the ABI
+    functionName: string,
+    params: unknown[] = [],
   ): Promise<unknown> {
     const nodeResponses = await this.fetchNodeResponses(contractAddress, abi, functionName, params);
     const validNodeResponses = this.extractValidNodeResponses(nodeResponses);
@@ -84,10 +85,10 @@ export class BlockchainReader {
   }
 
   private async fetchNodeResponses(
-      contractAddress: string,
-      abi: AbiItem[],
-      functionName: string,
-      params: unknown[],
+    contractAddress: string,
+    abi: ContractInterface,
+    functionName: string,
+    params: unknown[],
   ): Promise<NodeResponse[]> {
     const functionCalls = this.nodes.map((node) =>
       node.callViewFunction(contractAddress, abi, functionName, params).catch(() => null),
@@ -113,8 +114,8 @@ export class BlockchainReader {
 
   private extractValidNodeResponses(nodeResponses: NodeResponse[]): ValidNodeResponse[] {
     return nodeResponses.filter(
-        (nodeResponse): nodeResponse is ValidNodeResponse =>
-          nodeResponse.response !== null && nodeResponse.blockNumber !== null,
+      (nodeResponse): nodeResponse is ValidNodeResponse =>
+        nodeResponse.response !== null && nodeResponse.blockNumber !== null,
     );
   }
 
@@ -127,9 +128,9 @@ export class BlockchainReader {
 
   private findResponseFromNodeWithHighestBlockNumber(validNodeResponses: ValidNodeResponse[]): unknown {
     const highestBlockNumberIndex = validNodeResponses.reduce(
-        (highestIndex, currentNode, currentIndex) =>
+      (highestIndex, currentNode, currentIndex) =>
         currentNode.blockNumber > validNodeResponses[highestIndex].blockNumber ? currentIndex : highestIndex,
-        0,
+      0,
     );
     return validNodeResponses[highestBlockNumberIndex].response;
   }
