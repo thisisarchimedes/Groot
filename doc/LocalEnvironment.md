@@ -2,13 +2,12 @@
 
 Groot is running in a K8s pod: 1 Groot container + 2 ETH nodes containers.
 
-- [Configure Local Dev Environment](#configure-local-dev-environment)
-  - [Notes](#notes)
-  - [Initial Setup](#initial-setup)
-    - [Get .env file](#get-env-file)
-  - [Running Unit Tests](#running-unit-tests)
-  - [Running node containers without K8s](#running-node-containers-without-k8s)
-  - [Setting up local K8s](#setting-up-local-k8s)
+- [Notes](#notes)
+- [Initial Setup](#initial-setup)
+- [Get .env file](#get-env-file)
+- [Running Unit Tests](#running-unit-tests)
+- [Running node containers without K8s](#running-node-containers-without-k8s)
+- [Setting up local K8s](#setting-up-local-k8s)
 
 ## Notes
 
