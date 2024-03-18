@@ -1,6 +1,7 @@
 import Web3 from 'web3';
-import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
-import {Logger} from '../../service/logger/Logger';
+import axios from 'axios';
+import { BlockchainNode, BlockchainNodeError } from './BlockchainNode';
+import { Logger } from '../../service/logger/Logger';
 
 export class BlockchainNodeLocal extends BlockchainNode {
   private readonly localRpcUrl: string;
@@ -55,22 +56,20 @@ export class BlockchainNodeLocal extends BlockchainNode {
   }
 
   private async performResetRpcCall(externalProviderRpcUrl: string): Promise<unknown> {
-    const response = await fetch(this.localRpcUrl, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'hardhat_reset',
-        params: [{forking: {jsonRpcUrl: externalProviderRpcUrl}}],
-        id: 1,
-      }),
+    const response = await axios.post(this.localRpcUrl, {
+      jsonrpc: '2.0',
+      method: 'hardhat_reset',
+      params: [{ forking: { jsonRpcUrl: externalProviderRpcUrl } }],
+      id: 1,
+    }, {
+      headers: { 'Content-Type': 'application/json' },
     });
 
-    if (!response.ok) {
+    if (response.status !== 200) {
       throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
     }
 
-    return response.json();
+    return response.data;
   }
 
   private handleResetResponse(data: unknown): void {

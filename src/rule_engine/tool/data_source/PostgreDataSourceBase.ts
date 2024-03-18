@@ -1,18 +1,8 @@
-import {LoggerAll} from '../../../service/logger/LoggerAll';
+import { LoggerAll } from '../../../service/logger/LoggerAll';
 import pg from 'pg'; // Import Client instead of Pool
-import {ConfigServiceAWS} from '../../../service/config/ConfigServiceAWS';
+import { ConfigServiceAWS } from '../../../service/config/ConfigServiceAWS';
 
-// RDS database configuration
-const dbConfig = {
-  user: process.env.DB_USER!,
-  host: process.env.DB_HOST!,
-  database: process.env.DB_NAME!,
-  password: process.env.DB_PASSWORD!,
-  port: Number(process.env.DB_PORT!),
-  ssl: {
-    rejectUnauthorized: false,
-  },
-};
+
 
 export default class PostgreDataSourceBase {
   private client: pg.Client | null = null;
@@ -30,6 +20,18 @@ export default class PostgreDataSourceBase {
 
   private async connect() {
     if (!this.client) {
+      // RDS database configuration
+      const dbConfig = {
+        user: process.env.DB_USER!,
+        host: process.env.DB_HOST!,
+        database: process.env.DB_NAME!,
+        password: process.env.DB_PASSWORD!,
+        port: Number(process.env.DB_PORT!),
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      };
+
       this.client = new pg.Client(dbConfig); // Initialize a new Client
       await this.client.connect().catch((err) => {
         this.logger.error(`Could not connect to the database: ${(err as Error).message}`);
