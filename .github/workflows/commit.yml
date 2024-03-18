@@ -59,7 +59,8 @@ jobs:
       - name: Build Docker images
         run: |        
           cd scripts/container_reader_node
-          ./build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}    
+          ./build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
+          cd -    
 
       - name: Run Tests
         run: |
