@@ -51,7 +51,7 @@ describe('Rule Factory Testings: Expire Positions', function() {
   });
 
   // TODO: Test breaks pipeline - comment out to unblock
-  /*it('should create expire positions rule and evaluate', function() {
+  /* it('should create expire positions rule and evaluate', function() {
     const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
 
     const expirePositionsRule: RuleJSONConfigItem = {
