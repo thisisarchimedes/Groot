@@ -62,3 +62,6 @@ Next:
     - kubectl apply -f service.yaml
     - kubectl apply -f deployment.yaml
 - kubectl get pods
+
+# no K8
+./scripts/container_reader_node/run_nodes_containers_locally.sh
