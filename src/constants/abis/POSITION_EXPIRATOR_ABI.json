@@ -1,0 +1,27 @@
+[
+            {
+                "type": "function",
+                "name": "expirePosition",
+                "inputs": [
+                    {
+                        "name": "nftId",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "params",
+                        "type": "tuple",
+                        "internalType": "struct ClosePositionParams",
+                        "components": [
+                            { "name": "nftId", "type": "uint256", "internalType": "uint256" },
+                            { "name": "minWBTC", "type": "uint256", "internalType": "uint256" },
+                            { "name": "swapRoute", "type": "uint8", "internalType": "enum SwapManager.SwapRoute" },
+                            { "name": "swapData", "type": "bytes", "internalType": "bytes" },
+                            { "name": "exchange", "type": "address", "internalType": "address" }
+                        ]
+                    }
+                ],
+                "outputs": [],
+                "stateMutability": "nonpayable"
+            }
+        ]

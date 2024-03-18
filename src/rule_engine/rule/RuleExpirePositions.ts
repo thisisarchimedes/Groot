@@ -25,18 +25,16 @@ export class RuleExpirePositions extends Rule {
     console.log('blocknumber', blockNumber);
     const livePositions = await this.leverageDataSource.getLivePositions();
 
+    const tx = this.createExpireTransaction(0, 0);
+
+    this.pushTransactionToRuleLocalQueue(tx);
 
     if (params.evalSuccess === false) {
       throw new Error('RuleExpirePositions.evaluate() failed');
     }
-
-    for (let i = 0; i < params.NumberOfDummyTxs; i++) {
-      const dummyTx = this.createDummyTransaction(i, blockNumber);
-      this.pushTransactionToRuleLocalQueue(dummyTx);
-    }
   }
 
-  private createDummyTransaction(txNumber: number, currentBlockNumber: number): OutboundTransaction {
+  private createExpireTransaction(txNumber: number, currentBlockNumber: number): OutboundTransaction {
     return {
       urgencyLevel: UrgencyLevel.NORMAL,
       context: `this is a dummy context - number: ${txNumber} - block: ${currentBlockNumber}`,
