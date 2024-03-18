@@ -9,10 +9,12 @@ dotenv.config();
 export async function grootStartHere(runInfinite: boolean = true): Promise<void> {
   const environment = process.env.ENVIRONMENT as string;
   const region = process.env.AWS_REGION as string;
+  const mainLocalNodePort = process.env.MAIN_LOCAL_NODE_PORT as string;
+  const altLocalNodePort = process.env.ALT_LOCAL_NODE_PORT as string;
 
   console.log(`Starting Groot in ${environment} environment and ${region} region`);
 
-  const groot = new Groot(environment, region);
+  const groot = new Groot(environment, region, mainLocalNodePort, altLocalNodePort);
   await groot.initalizeGroot();
 
   do {
