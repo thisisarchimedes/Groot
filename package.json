@@ -14,8 +14,11 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "test": "mocha --import=tsx test/**/*.test.ts",
+    "test": "mocha --import=tsx test/unit/**/*.test.ts test/acceptance/**/*.test.ts",
     "test:unit": "mocha --import=tsx test/unit/**/*.test.ts",
+    "test:acceptance": "mocha --import=tsx test/acceptance/**/*.test.ts",
+    "test:interface": "mocha --import=tsx test/interface/**/*.test.ts",
+    "test:all": "mocha --import=tsx test/**/*.test.ts",
     "lint": "eslint --ext .ts,.tsx -c .eslintrc.cjs ."
   },
   "dependencies": {
@@ -39,6 +42,7 @@
     "eslint-plugin-mocha": "^10.3.0",
     "eslint-plugin-promise": "^6.1.1",
     "ethers": "^6.11.1",
+    "kubectl": "^0.0.0",
     "nock": "^13.5.4",
     "nyc": "^15.1.0",
     "pg": "^8.11.3",

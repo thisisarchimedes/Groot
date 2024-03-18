@@ -22,18 +22,41 @@ export abstract class BlockchainNode {
     this.nodeName = nodeName;
   }
 
+  public async getBlockNumber(): Promise<number> {
+    try {
+      const blockNumber = await this.web3.eth.getBlockNumber();
+      this.isNodeHealthy = true;
+      return Number(blockNumber);
+    } catch (error) {
+      this.logger.info(`${this.nodeName} cannot get block number: ${(error as Error).message}`);
+      this.isNodeHealthy = false;
+      throw error;
+    }
+  }
+
+  public async callViewFunction(
+      contractAddress: string,
+      abi: AbiItem[],
+      functionName: string,
+      params: unknown[] = [],
+  ): Promise<unknown> {
+    const contract = new this.web3.eth.Contract(abi, contractAddress);
+
+    try {
+      const data = await contract.methods[functionName](...params).call();
+      this.isNodeHealthy = true;
+      return data;
+    } catch (error) {
+      this.logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error}`);
+      this.isNodeHealthy = false;
+      throw error;
+    }
+  }
+
   abstract startNode(): Promise<void>;
   abstract stopNode(): Promise<void>;
   abstract resetNode(externalProviderRpcUrl: string): Promise<void>;
   abstract recoverNode(): Promise<void>;
-  abstract getBlockNumber(): Promise<number>;
-
-  abstract callViewFunction(
-    contractAddress: string,
-    abi: AbiItem[],
-    functionName: string,
-    params: unknown[],
-  ): Promise<unknown>;
 
   public isHealthy(): boolean {
     return this.isNodeHealthy;
@@ -70,6 +93,12 @@ export abstract class BlockchainNode {
 
   private removeLeadingZeros(address: string): string {
     return '0x' + address.slice(26);
+  }
+
+  protected busySleep(duration: number): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(resolve, duration);
+    });
   }
 }
 
