@@ -1,5 +1,4 @@
 import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
-import {Logger} from '../../service/logger/Logger';
 import UNISWAPV3_STRATEGY_ABI from '../../constants/abis/UNISWAPV3_STRATEGY_ABI.json';
 
 export class ToolStrategyUniswap {
