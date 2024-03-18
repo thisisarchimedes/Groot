@@ -54,8 +54,8 @@ export class Groot {
   }
 
   private async initalizeReadOnlyLocalNodes() {
-    this.mainNode = new BlockchainNodeLocal(this.logger, 'http://127.0.0.1:8545', 'alchemy-node');
-    this.altNode = new BlockchainNodeLocal(this.logger, 'http://127.0.0.1:8546', 'infura-node');
+    this.mainNode = new BlockchainNodeLocal(this.logger, 'http://localhost:8545', 'alchemy-node');
+    this.altNode = new BlockchainNodeLocal(this.logger, 'http://localhost:18545', 'infura-node');
 
     await Promise.all([
       this.mainNode.startNode(),

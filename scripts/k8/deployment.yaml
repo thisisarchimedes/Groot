@@ -14,14 +14,21 @@ spec:
     spec:
       containers:
       - name: groot-container
-        image: groot-container
+        image: groot-container:latest
+        imagePullPolicy: IfNotPresent
       - name: eth-node-1
         image: arch-production-node:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: HARDHAT_PORT
+          value: "8545"
         ports:
         - containerPort: 8545
-        - containerPort: 8546
       - name: eth-node-2
         image: arch-production-node:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: HARDHAT_PORT
+          value: "18545"
         ports:
         - containerPort: 18545
-        - containerPort: 18546
