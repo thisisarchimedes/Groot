@@ -6,7 +6,7 @@ import { ConfigServiceAWS } from '../../../service/config/ConfigServiceAWS';
 
 export default class PostgreDataSourceBase {
   private client: pg.Client | null = null;
-  private logger: LoggerAll;
+  protected logger: LoggerAll;
   private configService: ConfigServiceAWS;
 
   constructor() {

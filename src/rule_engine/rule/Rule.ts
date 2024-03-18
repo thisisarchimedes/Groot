@@ -1,8 +1,8 @@
-import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
-import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
-import {Logger} from '../../service/logger/Logger';
-import {UrgencyLevel} from '../TypesRule';
-import {AbiRepo} from '../tool/abi_repository/AbiRepo';
+import { OutboundTransaction } from '../../blockchain/OutboundTransaction';
+import { BlockchainReader } from '../../blockchain/blockchain_reader/BlockchainReader';
+import { Logger } from '../../service/logger/Logger';
+import { UrgencyLevel } from '../TypesRule';
+import { AbiRepo } from '../tool/abi_repository/AbiRepo';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
@@ -36,7 +36,7 @@ export abstract class Rule {
 
   public abstract evaluate(): Promise<void>;
 
-  protected abstract generateUniqueKey(): string;
+  protected abstract generateUniqueKey(context: any): string;
 
   public getRuleLabel(): string {
     return this.ruleLabel;
