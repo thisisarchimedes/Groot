@@ -26,7 +26,7 @@ describe('Check that we work with local Hardhat node correctly', function() {
   });
 
   beforeEach(async function() {
-    localNode = new BlockchainNodeLocal(logger, 'http://localhost:8545', 'archimedes-node-alchemy');
+    localNode = new BlockchainNodeLocal(logger, 'http://127.0.0.1:8545', 'archimedes-node-alchemy');
     await localNode.startNode();
   });
 
