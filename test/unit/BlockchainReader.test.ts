@@ -1,20 +1,33 @@
 import * as chai from 'chai';
+import * as dotenv from 'dotenv';
 
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { BlockchainReaderError, BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import { LoggerAdapter } from './adapters/LoggerAdapter';
+import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
+import { ethers } from 'ethers';
 
 const { expect } = chai;
+dotenv.config();
 
 describe('Check that blockchain reader works with multiple underlying nodes', function () {
   let localNodeAlchemy: BlockchainNodeAdapter;
   let localNodeInfura: BlockchainNodeAdapter;
   const logger: LoggerAdapter = new LoggerAdapter();
+  const configService = createConfigService();
+
+  function createConfigService(): ConfigServiceAWS {
+    const environment = process.env.ENVIRONMENT as string;
+    const region = process.env.AWS_REGION as string;
+    return new ConfigServiceAWS(environment, region);
+  }
 
   beforeEach(async function () {
-    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
+
+
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy', configService.getMainRPCURL());
     await localNodeAlchemy.startNode();
-    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura', configService.getMainRPCURL());
     await localNodeInfura.startNode();
   });
 
@@ -48,7 +61,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
 
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
-    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals'));
+    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals'));
 
     expect(res).to.be.eq(2);
   });
@@ -103,7 +116,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
 
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
-    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals'));
+    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals'));
 
     expect(res).to.be.eq(1);
   });
@@ -127,7 +140,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
       const abi = getStubAbi();
 
-      await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals');
+      await blockchainReader.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals');
       expect.fail('Expected callViewFunction to throw an error');
     } catch (error) {
       expect(error).to.be.instanceOf(BlockchainReaderError);
@@ -153,7 +166,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
       const abi = getStubAbi();
 
-      await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals');
+      await blockchainReader.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals');
       expect.fail('Expected callViewFunction to throw an error');
     } catch (error) {
       expect(error).to.be.instanceOf(BlockchainReaderError);
@@ -179,7 +192,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
       const abi = getStubAbi();
 
-      await blockchainReader.callViewFunction(usdcContractAddress, abi, 'decimals');
+      await blockchainReader.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals');
       expect.fail('Expected callViewFunction to throw an error');
     } catch (error) {
       expect(error).to.be.instanceOf(BlockchainReaderError);

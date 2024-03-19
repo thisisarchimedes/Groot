@@ -1,29 +1,31 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 
-import {FactoryRule} from '../../src/rule_engine/FactoryRule';
-import {LoggerAdapter} from './adapters/LoggerAdapter';
-import {ConfigServiceAdapter} from './adapters/ConfigServiceAdapter';
-import {RuleEngine} from '../../src/rule_engine/RuleEngine';
-import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
-import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
-import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
-import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
-import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
-import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
+import { FactoryRule } from '../../src/rule_engine/FactoryRule';
+import { LoggerAdapter } from './adapters/LoggerAdapter';
+import { ConfigServiceAdapter } from './adapters/ConfigServiceAdapter';
+import { RuleEngine } from '../../src/rule_engine/RuleEngine';
+import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
+import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
+import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
+import { AbiStorageAdapter } from './adapters/AbiStorageAdapter';
+import { AbiFetcherAdapter } from './adapters/AbiFetcherAdapter';
+import { AbiRepo } from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 
-describe('Rule Engine Testings', function() {
+describe('Rule Engine Testings', function () {
   const logger: LoggerAdapter = new LoggerAdapter();
   const configService: ConfigServiceAdapter = new ConfigServiceAdapter();
   let blockchainReader: BlockchainReader;
 
-  beforeEach(async function() {
+
+
+  beforeEach(async function () {
     const localNodeAlchemy = await startBlockchainNode('localNodeAlchemy');
     const localNodeInfura = await startBlockchainNode('localNodeInfura');
     blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
   });
 
-  it('should load rules from rule JSON and iterate on them, invoke each one', async function() {
+  it('should load rules from rule JSON and iterate on them, invoke each one', async function () {
     const expectedLogMessage = 'I AM GROOT';
     logger.lookForInfoLogLineContaining(expectedLogMessage);
     const ruleEngine = await createRuleEngineWithConfiguredRules('./test/unit/data/dummy_rules.json');
@@ -35,7 +37,7 @@ describe('Rule Engine Testings', function() {
     expect(logger.isExpectedLogLineInfoFound()).to.be.true;
   });
 
-  it('Should report on 1 successful rule and 1 failed rule', async function() {
+  it('Should report on 1 successful rule and 1 failed rule', async function () {
     const testRules: RuleJSONConfigItem[] = [
       createDummyRule('I AM GROOT', 3, true),
       createInvalidRule('I AM GROOT', 3),
@@ -51,7 +53,7 @@ describe('Rule Engine Testings', function() {
   });
 
   async function startBlockchainNode(name: string): Promise<BlockchainNodeAdapter> {
-    const node = new BlockchainNodeAdapter(logger, name);
+    const node = new BlockchainNodeAdapter(logger, name, configService.getMainRPCURL());
     await node.startNode();
     return node;
   }
@@ -77,7 +79,7 @@ describe('Rule Engine Testings', function() {
     return {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
-      params: {message, NumberOfDummyTxs: numberOfDummyTxs, evalSuccess},
+      params: { message, NumberOfDummyTxs: numberOfDummyTxs, evalSuccess },
     };
   }
 
@@ -85,7 +87,7 @@ describe('Rule Engine Testings', function() {
     return {
       ruleType: TypeRule.Invalid,
       label: 'invalideRule',
-      params: {message, NumberOfDummyTxs: numberOfDummyTxs},
+      params: { message, NumberOfDummyTxs: numberOfDummyTxs },
     };
   }
 
@@ -99,9 +101,9 @@ describe('Rule Engine Testings', function() {
   function assertRuleEvaluationResult(successfulRuleEval: number, failedRuleEval: number): void {
     const logLine = logger.getLatestInfoLogLine();
     expect(logLine).to.contain(
-        `"message":"Rule Eval Results",` +
-        `"successfulRuleEval":${successfulRuleEval},` +
-        `"failedRuleEval":${failedRuleEval}`,
+      `"message":"Rule Eval Results",` +
+      `"successfulRuleEval":${successfulRuleEval},` +
+      `"failedRuleEval":${failedRuleEval}`,
     );
   }
 });

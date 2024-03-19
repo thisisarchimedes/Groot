@@ -1,15 +1,15 @@
-import {expect} from 'chai';
+import { expect } from 'chai';
 
-import {LoggerAdapter} from './adapters/LoggerAdapter';
-import {UrgencyLevel} from '../../src/rule_engine/TypesRule';
-import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
-import {TxQueueAdapter} from './adapters/TxQueueAdapter';
-import {TransactionQueuer} from '../../src/tx_queue/TransactionQueuer';
+import { LoggerAdapter } from './adapters/LoggerAdapter';
+import { UrgencyLevel } from '../../src/rule_engine/TypesRule';
+import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
+import { TxQueueAdapter } from './adapters/TxQueueAdapter';
+import { TransactionQueuer } from '../../src/tx_queue/TransactionQueuer';
 
-describe('Transaction Queuer', function() {
+describe('Transaction Queuer', function () {
   const logger: LoggerAdapter = new LoggerAdapter();
 
-  it('should filter out and report on all tx that dont have a hash', async function() {
+  it('should filter out and report on all tx that dont have a hash', async function () {
     const txs: OutboundTransaction[] = [
       {
         urgencyLevel: UrgencyLevel.URGENT,

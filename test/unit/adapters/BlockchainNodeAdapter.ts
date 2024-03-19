@@ -1,11 +1,9 @@
-import { ContractInterface } from 'ethers';
-
+import { ethers } from 'ethers';
 import {
   BlockchainNode,
   BlockchainNodeError,
   BlockchainNodeProxyInfo,
 } from '../../../src/blockchain/blockchain_nodes/BlockchainNode';
-import { Interface } from 'readline';
 
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -50,7 +48,7 @@ export class BlockchainNodeAdapter extends BlockchainNode {
   // eslint-disable-next-line require-await
   public async callViewFunction(
     contractAddress: string,
-    abi: Interface,
+    abi: ethers.Interface,
     functionName: string,
     params?: unknown[],
   ): Promise<unknown> {

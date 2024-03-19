@@ -8,6 +8,7 @@ import {
 } from '../../src/service/health_monitor/BlockchainNodeHealthMonitor';
 import { HealthMonitor } from '../../src/service/health_monitor/HealthMonitor';
 import { SignalAdapter } from './adapters/SignalAdapter';
+import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
 
 const { expect } = chai;
 
@@ -16,12 +17,20 @@ describe('Health Monitor tests', function () {
   let localNodeInfura: BlockchainNodeAdapter;
   const logger: LoggerAdapter = new LoggerAdapter();
 
+  const configService = createConfigService();
+
+  function createConfigService(): ConfigServiceAWS {
+    const environment = process.env.ENVIRONMENT as string;
+    const region = process.env.AWS_REGION as string;
+    return new ConfigServiceAWS(environment, region);
+  }
+
   let blockchainNodeHealth: BlockchainNodeHealthMonitor;
 
   beforeEach(async function () {
-    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy', configService.getMainRPCURL());
     await localNodeAlchemy.startNode();
-    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura', configService.getMainRPCURL());
     await localNodeInfura.startNode();
 
     blockchainNodeHealth = new BlockchainNodeHealthMonitor(logger, [localNodeAlchemy, localNodeInfura]);
