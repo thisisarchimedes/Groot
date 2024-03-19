@@ -1,11 +1,11 @@
 name: Acceptance Stage
 
 on:
-    pull_request:
-      branches:
-        - main 
+  pull_request:
+    branches:
+      - main 
 
-    workflow_dispatch:
+  workflow_dispatch:
 
 env:
   ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
@@ -25,8 +25,8 @@ jobs:
     steps:
       - name: Set env variables
         run: |
-            echo "TEST_PASS=true" >> $GITHUB_ENV
-            echo "REPORT_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"  >> $GITHUB_ENV
+          echo "TEST_PASS=true" >> $GITHUB_ENV
+          echo "REPORT_URL=https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"  >> $GITHUB_ENV
 
       - name: Checkout code
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
           node-version: 20
 
       - name: Install dotenvx
-        run: | 
+        run: |
           curl -fsS https://dotenvx.sh/ | sh
 
       - name: Install dependencies
@@ -49,10 +49,9 @@ jobs:
       - name: Run Tests (Interface)
         run: |
           sudo ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
-          docker run --network host -e HARDHAT_PORT=8545 -d --rm --name main-eth-node -p 8545:8545 arch-production-node:latest
+          docker run -e HARDHAT_PORT=8545 -d --rm --name main-eth-node -p 8545:8545 arch-production-node:latest
           AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:interface
 
       - name: Run Tests (Acceptance)
         run: |
           AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:acceptance
-  
