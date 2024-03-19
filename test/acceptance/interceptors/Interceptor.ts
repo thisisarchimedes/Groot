@@ -1,6 +1,6 @@
 import nock from 'nock';
 
-export class Mock {
+export class Interceptor {
   public cleanup() {
     nock.cleanAll();
   }

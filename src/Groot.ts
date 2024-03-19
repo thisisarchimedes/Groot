@@ -16,14 +16,12 @@ import { HostNameProvider } from './service/health_monitor/HostNameProvider';
 import { AbiRepo } from './rule_engine/tool/abi_repository/AbiRepo';
 import { AbiStorageDynamoDB } from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import { AbiFetcherEtherscan } from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
-import { LocalConfigService } from './service/config/LocalConfigService';
 
 dotenv.config();
 
 export class Groot {
   private readonly logServiceName: string = 'Groot';
   private readonly configService: ConfigServiceAWS;
-  private readonly localConfigService: LocalConfigService;
 
   private logger!: LoggerAll;
   private ruleEngine!: RuleEngine;
@@ -36,9 +34,13 @@ export class Groot {
 
   private abiRepo!: AbiRepo;
 
-  constructor(environment: string, region: string) {
+  private readonly mainLocalNodePort: number;
+  private readonly altLocalNodePort: number;
+
+  constructor(environment: string, region: string, mainLocalNodePort: number = 8545, altLocalNodePort: number = 18545) {
     this.configService = new ConfigServiceAWS(environment, region);
-    this.localConfigService = new LocalConfigService();
+    this.mainLocalNodePort = mainLocalNodePort;
+    this.altLocalNodePort = altLocalNodePort;
   }
 
   public async initalizeGroot() {
@@ -57,8 +59,8 @@ export class Groot {
   }
 
   private async initalizeReadOnlyLocalNodes() {
-    this.mainNode = new BlockchainNodeLocal(this.logger, 'http://localhost:8545', 'alchemy-node');
-    this.altNode = new BlockchainNodeLocal(this.logger, 'http://localhost:18545', 'infura-node');
+    this.mainNode = new BlockchainNodeLocal(this.logger, `http://localhost:${this.mainLocalNodePort}`, 'alchemy-node');
+    this.altNode = new BlockchainNodeLocal(this.logger, `http://localhost:${this.altLocalNodePort}`, 'infura-node');
 
     await Promise.all([
       this.mainNode.startNode(),
@@ -163,6 +165,7 @@ export class Groot {
 
   public async sleepBetweenCycles(): Promise<void> {
     const sleepTime = this.configService.getSleepMillisecondsBetweenCycles();
+    this.logger.debug(`Sleeping for ${sleepTime} milliseconds...`);
     await new Promise((resolve) => setTimeout(resolve, sleepTime));
   }
 }

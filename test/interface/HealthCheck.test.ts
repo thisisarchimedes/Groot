@@ -1,5 +1,4 @@
 import * as chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
 import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
@@ -9,7 +8,6 @@ import {HostNameProvider} from '../../src/service/health_monitor/HostNameProvide
 import {SignalAWSCriticalFailure} from '../../src/service/health_monitor/signal/SignalAWSCriticalFailure';
 
 dotenv.config();
-chai.use(chaiAsPromised);
 
 const {expect} = chai;
 

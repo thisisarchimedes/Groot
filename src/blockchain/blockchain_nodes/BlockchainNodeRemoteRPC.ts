@@ -1,5 +1,4 @@
-import Web3 from 'web3';
-
+import {JsonRpcProvider} from 'ethers';
 import {BlockchainNode} from './BlockchainNode';
 import {Logger} from '../../service/logger/Logger';
 
@@ -9,9 +8,8 @@ export class BlockchainNodeRemoteRPC extends BlockchainNode {
 
   constructor(logger: Logger, remoteRpcUrl: string, nodeName: string) {
     super(logger, nodeName);
-
     this.remoteRpcUrl = remoteRpcUrl;
-    this.web3 = new Web3(remoteRpcUrl);
+    this.provider = new JsonRpcProvider(remoteRpcUrl);
   }
 
   public async startNode(): Promise<void> {

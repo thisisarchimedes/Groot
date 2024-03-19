@@ -5,37 +5,37 @@
   "license": "MIT",
   "devDependencies": {
     "@types/chai": "^4.3.12",
-    "@types/mocha": "^10.0.6",
-    "chai": "^5.1.0",
-    "mocha": "^10.3.0",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.7.1",
-    "typescript": "^5.3.3",
     "@types/dockerode": "^3.3.24",
+    "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.24",
     "@types/pg": "^8.11.2",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
+    "chai": "^5.1.0",
     "eslint": "^8.57.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-mocha": "^10.3.0",
     "eslint-plugin-promise": "^6.1.1",
+    "mocha": "^10.3.0",
     "nock": "^13.5.4",
     "nyc": "^15.1.0",
-    "pg-types": "^4.0.2"
+    "pg-types": "^4.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   },
   "scripts": {
-    "test": "mocha --import=tsx test/unit/**/*.test.ts test/acceptance/**/*.test.ts",
-    "test:unit": "mocha --import=tsx test/unit/**/*.test.ts",
+    "test": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/unit/**/*.test.ts test/acceptance/**/*.test.ts",
+    "test:unit": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/unit/**/*.test.ts",
     "test:acceptance": "mocha --import=tsx test/acceptance/**/*.test.ts",
     "test:interface": "mocha --import=tsx test/interface/**/*.test.ts",
-    "test:all": "mocha --import=tsx test/**/*.test.ts",
+    "test:all": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/**/*.test.ts",
     "lint": "eslint --ext .ts,.tsx -c .eslintrc.cjs ."
   },
   "dependencies": {
     "@aws-sdk/client-appconfig": "^3.525.0",
     "@aws-sdk/client-cloudwatch": "^3.529.1",
     "@dotenvx/dotenvx": "^0.24.0",
+    "@ethersproject/abstract-provider": "^5.7.0",
     "aws-sdk": "^2.1571.0",
     "awssdk": "^1.0.1",
     "axios": "^1.6.7",
@@ -43,11 +43,8 @@
     "dotenv": "^16.4.5",
     "ethers": "^6.11.1",
     "kubectl": "^0.0.0",
+    "nyc": "^15.1.0",
     "pg": "^8.11.3",
-    "web3": "^4.5.0",
-    "@uniswap/router-sdk": "^1.7.1",
-    "@uniswap/sdk-core": "^4.1.2",
-    "@uniswap/smart-order-router": "^3.20.0",
-    "@uniswap/v3-sdk": "^3.10.0"
+    "tsx": "^4.7.1"
   }
 }
