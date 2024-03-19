@@ -23,8 +23,6 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
   }
 
   beforeEach(async function () {
-
-
     localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy', configService.getMainRPCURL());
     await localNodeAlchemy.startNode();
     localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura', configService.getMainRPCURL());

@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { JsonRpcProvider, ethers } from 'ethers';
 import { BlockchainNode } from './BlockchainNode';
 import { Logger } from '../../service/logger/Logger';
 
@@ -7,8 +7,9 @@ export class BlockchainNodeRemoteRPC extends BlockchainNode {
   private readonly SLEEP_DURATION_WHEN_RECOVERING_NODE = 10000;
 
   constructor(logger: Logger, remoteRpcUrl: string, nodeName: string) {
-    super(logger, nodeName, remoteRpcUrl);
+    super(logger, nodeName);
     this.remoteRpcUrl = remoteRpcUrl;
+    this.provider = new JsonRpcProvider(remoteRpcUrl);
   }
 
   public async startNode(): Promise<void> {

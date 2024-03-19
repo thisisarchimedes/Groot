@@ -17,10 +17,9 @@ export abstract class BlockchainNode {
   protected isNodeHealthy: boolean = true;
   protected nodeName: string = '';
 
-  constructor(logger: Logger, nodeName: string, rpcUrl: string) {
+  constructor(logger: Logger, nodeName: string) {
     this.logger = logger;
     this.nodeName = nodeName;
-    this.provider = new ethers.JsonRpcProvider(rpcUrl);
   }
 
   public async getBlockNumber(): Promise<number> {

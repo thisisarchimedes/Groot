@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ethers } from 'ethers';
+import { JsonRpcProvider, ethers } from 'ethers';
 import { BlockchainNode, BlockchainNodeError } from './BlockchainNode';
 import { Logger } from '../../service/logger/Logger';
 
@@ -7,9 +7,9 @@ export class BlockchainNodeLocal extends BlockchainNode {
   private readonly localRpcUrl: string;
 
   constructor(logger: Logger, localRpcUrl: string, nodeName: string) {
-    super(logger, nodeName, localRpcUrl);
+    super(logger, nodeName);
     this.localRpcUrl = localRpcUrl;
-
+    this.provider = new JsonRpcProvider(localRpcUrl);
   }
 
   public async startNode(): Promise<void> {
