@@ -50,6 +50,7 @@ jobs:
         run: |
           sudo ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
           docker run -e HARDHAT_PORT=8545 -d --rm --name main-eth-node -p 8545:8545 arch-production-node:latest
+          sleep 30
           docker ps
           docker logs main-eth-node
 
