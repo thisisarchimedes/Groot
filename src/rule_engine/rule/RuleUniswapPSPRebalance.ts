@@ -1,7 +1,7 @@
-import { BlockchainReader } from "../../blockchain/blockchain_reader/BlockchainReader";
-import { Logger } from "../../service/logger/Logger";
-import { ToolStrategyUniswap } from "../tool/ToolStrategyUniswap";
-import { Rule, RuleParams } from "./Rule";
+import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
+import {Logger} from '../../service/logger/Logger';
+import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
+import {Rule, RuleConstructorInput, RuleParams} from './Rule';
 // import {UNISWAPV3_POOL_ABI} from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json';
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
@@ -15,35 +15,49 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
 
 export class RuleUniswapPSPRebalance extends Rule {
   private uniswapStrategy: ToolStrategyUniswap;
-  constructor(
-    logger: Logger,
-    blockchainReader: BlockchainReader,
-    ruleLabel: string,
-    params: RuleParams
-  ) {
-    super(logger, blockchainReader, ruleLabel, params);
+  constructor(constructorInput: RuleConstructorInput) {
+    super(constructorInput);
     this.uniswapStrategy = new ToolStrategyUniswap(
-      (params as RuleParamsUniswapPSPRebalance).strategyAddress,
-      blockchainReader
+        (
+        constructorInput.params as RuleParamsUniswapPSPRebalance
+        ).strategyAddress,
+        constructorInput.blockchainReader,
     );
   }
   public async evaluate(): Promise<void> {
     // if not calculate new lowertick and uppertick based on the currentTick
     // call rebalance function based on the new params
-    const params = this.params as RuleParamsUniswapPSPRebalance;
-    const currentTick = await this.uniswapStrategy.currentTick();
-    const upperTick = await this.uniswapStrategy.upperTick();
-    const lowerTick = await this.uniswapStrategy.lowerTick();
-    const acceptedUpperTick =
-      (params.upperTriggerThresholdPercentage * upperTick) / 100;
-    const acceptedLowerTick =
-      (params.lowerTriggerThresholdPercentage * lowerTick) / 100;
-    if (currentTick <= acceptedUpperTick || currentTick >= acceptedLowerTick) {
+    const isUpperTickThresholdPassed =
+      await this.isCurrentTickAboveRebalanceUpperTickThreshold();
+    const isLowerTickThresholdPassed =
+      await this.isCurrentTickBelowRebalanceLowerTickThreshold();
+
+    if (!isUpperTickThresholdPassed && !isLowerTickThresholdPassed) {
       return;
     }
+
+    throw new Error('unimplemented yet');
+  }
+
+  private async isCurrentTickAboveRebalanceUpperTickThreshold(): Promise<boolean> {
+    const currentTick = await this.uniswapStrategy.currentTick();
+    const upperTick = await this.uniswapStrategy.upperTick();
+    const params = this.params as RuleParamsUniswapPSPRebalance;
+    const acceptedUpperTick =
+      (params.upperTriggerThresholdPercentage * upperTick) / 100;
+    return currentTick <= acceptedUpperTick;
+  }
+
+  private async isCurrentTickBelowRebalanceLowerTickThreshold(): Promise<boolean> {
+    const currentTick = await this.uniswapStrategy.currentTick();
+    const lowerTick = await this.uniswapStrategy.lowerTick();
+    const params = this.params as RuleParamsUniswapPSPRebalance;
+    const acceptedLowerTick =
+      (params.lowerTriggerThresholdPercentage * lowerTick) / 100;
+    return currentTick >= acceptedLowerTick;
   }
 
   protected generateUniqueKey(): string {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 }

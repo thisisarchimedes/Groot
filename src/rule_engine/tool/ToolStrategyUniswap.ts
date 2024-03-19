@@ -1,6 +1,6 @@
-import { BlockchainReader } from "../../blockchain/blockchain_reader/BlockchainReader";
-import { Logger } from "../../service/logger/Logger";
-import UNISWAPV3_STRATEGY_ABI from "../../constants/abis/UNISWAPV3_STRATEGY_ABI.json";
+import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
+import {Logger} from '../../service/logger/Logger';
+import UNISWAPV3_STRATEGY_ABI from '../../constants/abis/UNISWAPV3_STRATEGY_ABI.json';
 
 export class ToolStrategyUniswap {
   private readonly strategyAddress: string;
@@ -13,33 +13,33 @@ export class ToolStrategyUniswap {
 
   public async getPoolAddress(): Promise<string> {
     const ret = await this.blockchainReader.callViewFunction(
-      this.strategyAddress,
-      UNISWAPV3_STRATEGY_ABI,
-      "pool"
+        this.strategyAddress,
+        UNISWAPV3_STRATEGY_ABI,
+        'pool',
     );
     return ret as string;
   }
   public async upperTick(): Promise<number> {
     const ret = await this.blockchainReader.callViewFunction(
-      this.strategyAddress,
-      UNISWAPV3_STRATEGY_ABI,
-      "upperTick"
+        this.strategyAddress,
+        UNISWAPV3_STRATEGY_ABI,
+        'upperTick',
     );
     return ret as number;
   }
   public async lowerTick(): Promise<number> {
     const ret = await this.blockchainReader.callViewFunction(
-      this.strategyAddress,
-      UNISWAPV3_STRATEGY_ABI,
-      "lowerTick"
+        this.strategyAddress,
+        UNISWAPV3_STRATEGY_ABI,
+        'lowerTick',
     );
     return ret as number;
   }
   public async currentTick(): Promise<number> {
     const ret = await this.blockchainReader.callViewFunction(
-      this.strategyAddress,
-      UNISWAPV3_STRATEGY_ABI,
-      "currentTick"
+        this.strategyAddress,
+        UNISWAPV3_STRATEGY_ABI,
+        'currentTick',
     );
     return ret as number;
   }
