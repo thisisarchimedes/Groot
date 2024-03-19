@@ -27,7 +27,7 @@ yarn dotenvx hub login
 yarn dotenvx hub open # open and follow the link printed, copy the keys to .env.keys locally
 set -o allexport && source .env.keys && set +o allexport # export .env.keys to local environment
 yarn dotenvx decrypt # decrypt .env.vault to .env
-set -o allexport && source .env.local && set +o allexport # export .env to local environment
+set -o allexport && source .env.local && set +o allexport # export .env.local to local environment
 ```
 
 _*Update .env*_
