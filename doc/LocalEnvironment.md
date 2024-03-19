@@ -62,3 +62,12 @@ The script below builds the containers and loads them to the local kind cluster.
 ```bash
  sudo ./scripts/k8s/setup_local_env.sh
 ```
+## Running Acceptance Tests Locally
+
+Acceptance test are a step above unit test. We only test the STU (system under test), so we still use mocks to set the state that we want. However, Acceptance tests only use the natrual interfaces of the STU (e.g. APIs).
+
+To achieve that we use Nock to intercept the outgoing Groot calls and craft a response.
+
+```bash
+yarn test:acceptance
+```

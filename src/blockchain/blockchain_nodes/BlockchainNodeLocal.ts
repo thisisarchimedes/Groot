@@ -1,4 +1,6 @@
 import Web3 from 'web3';
+import fetch from 'node-fetch';
+
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
 import {Logger} from '../../service/logger/Logger';
 

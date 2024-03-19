@@ -33,8 +33,4 @@ export class MockAppConfig extends Mock {
         })
         .reply(200, grootRulesProfile);
   }
-
-  cleanupNock() {
-    nock.cleanAll();
-  }
 }
