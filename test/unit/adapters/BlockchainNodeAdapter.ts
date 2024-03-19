@@ -5,6 +5,7 @@ import {
   BlockchainNodeError,
   BlockchainNodeProxyInfo,
 } from '../../../src/blockchain/blockchain_nodes/BlockchainNode';
+import { Interface } from 'readline';
 
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -49,9 +50,9 @@ export class BlockchainNodeAdapter extends BlockchainNode {
   // eslint-disable-next-line require-await
   public async callViewFunction(
     contractAddress: string,
-    abi: ContractInterface,
+    abi: Interface,
     functionName: string,
-    params: unknown[],
+    params?: unknown[],
   ): Promise<unknown> {
     if (this.throwErrorOnCallViewFunction) {
       throw new Error('callViewFunction: Error');
