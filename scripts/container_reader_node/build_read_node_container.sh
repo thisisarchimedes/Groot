@@ -15,17 +15,20 @@ else
     echo "API_KEY_ALCHEMY is set to '$API_KEY_ALCHEMY'. Proceeding to build Docker image..."
 fi
 
+
 # Ensure container_files directory exists
-if [ ! -d "container_files" ]; then
+if [ ! -d "scripts/container_reader_node/container_files" ]; then
     echo "container_files directory does not exist. Exiting..."
     exit 1
 fi
 
-sed -i '' "s|+ 'API_KEY_ALCHEMY'|+ '$API_KEY_ALCHEMY'|g" container_files/hardhat.config.js
+# adding API_KEY - editing hardhat.config.js
+sed -i '' "s|+ 'API_KEY_ALCHEMY'|+ '$API_KEY_ALCHEMY'|g" scripts/container_reader_node/container_files/hardhat.config.js
 
-docker pull node:latest
-docker build --no-cache -t arch-production-node:latest container_files/
+docker pull node:18
+docker build --no-cache -t arch-production-node:latest scripts/container_reader_node/container_files/
 
-sed -i '' "s|+ '$API_KEY_ALCHEMY'|+ 'API_KEY_ALCHEMY'|g" container_files/hardhat.config.js
+# revert changes
+sed -i '' "s|+ '$API_KEY_ALCHEMY'|+ 'API_KEY_ALCHEMY'|g" scripts/container_reader_node/container_files/hardhat.config.js
 
 echo "Docker image built successfully."

@@ -6,7 +6,7 @@ import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
 import {TxQueueAdapter} from './adapters/TxQueueAdapter';
 import {TransactionQueuer} from '../../src/tx_queue/TransactionQueuer';
 
-describe('Rule Factory', function() {
+describe('Transaction Queuer', function() {
   const logger: LoggerAdapter = new LoggerAdapter();
 
   it('should filter out and report on all tx that dont have a hash', async function() {
@@ -14,7 +14,6 @@ describe('Rule Factory', function() {
       {
         urgencyLevel: UrgencyLevel.URGENT,
         context: 'test 1',
-        hash: '0x1234',
         postEvalUniqueKey: '0x1234',
         lowLevelUnsignedTransaction: {
           nonce: '0x0',
@@ -29,8 +28,7 @@ describe('Rule Factory', function() {
       {
         urgencyLevel: UrgencyLevel.URGENT,
         context: 'test 2',
-        hash: '',
-        postEvalUniqueKey: '0x1234',
+        postEvalUniqueKey: '',
         lowLevelUnsignedTransaction: {
           nonce: '0x0',
           gasPrice: '0x0',
@@ -44,8 +42,7 @@ describe('Rule Factory', function() {
       {
         urgencyLevel: UrgencyLevel.NORMAL,
         context: 'test 3',
-        hash: '0x345',
-        postEvalUniqueKey: '0x1234',
+        postEvalUniqueKey: '0x345',
         lowLevelUnsignedTransaction: {
           nonce: '0x0',
           gasPrice: '0x0',
@@ -63,8 +60,8 @@ describe('Rule Factory', function() {
     await txQueuer.queueTransactions(txs);
 
     const txsInQueue = queue.getTransactions();
-    expect(txsInQueue[0].hash).to.be.eq('0x1234');
-    expect(txsInQueue[1].hash).to.be.eq('0x345');
+    expect(txsInQueue[0].postEvalUniqueKey).to.be.eq('0x1234');
+    expect(txsInQueue[1].postEvalUniqueKey).to.be.eq('0x345');
     expect(txsInQueue[2]).to.be.undefined;
 
     expect(logger.getLatestErrorLogLine()).to.contain('test 2');

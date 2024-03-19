@@ -4,6 +4,8 @@ on:
   push:
     branches-ignore:
       - 'main' 
+  workflow_dispatch:
+
 
 env:
   ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
@@ -19,7 +21,7 @@ env:
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
 
 jobs:
-  test:
+  eval-commit-stage:
     runs-on: ubuntu-latest
     steps:
       - name: Set env variables
@@ -53,7 +55,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run --  yarn test
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:unit
           
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -68,5 +70,4 @@ jobs:
       - name: 'Report DevOps Metrics'
         if: always()
         run: |
-          yarn add axios dotenv
-          node devops/metrics/src/cicd_script/report_devops_event.js ${{ github.repository }} push '{"pass": "${{ env.TEST_PASS }}", "commit_id": "${{ github.sha }}" ,"report_url": "${{ env.REPORT_URL }}"}'
+          yarn tsx devops/metrics/src/cicd_script/report_devops_event.ts ${{ github.repository }} push '{"pass": "${{ env.TEST_PASS }}", "commit_id": "${{ github.sha }}" ,"report_url": "${{ env.REPORT_URL }}"}'

@@ -1,5 +1,4 @@
 import {expect} from 'chai';
-import Web3 from 'web3';
 
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
@@ -9,6 +8,9 @@ import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
+import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
+import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 
 describe('Rule Engine Testings', function() {
   const logger: LoggerAdapter = new LoggerAdapter();
@@ -31,16 +33,6 @@ describe('Rule Engine Testings', function() {
 
     assertTransactionsValid(transactions, 3);
     expect(logger.isExpectedLogLineInfoFound()).to.be.true;
-  });
-
-  it('Should attach tx hash to all transactions', async function() {
-    const ruleEngine = await createRuleEngineWithConfiguredRules('./test/unit/data/dummy_rules.json');
-
-    await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
-    const transactions = ruleEngine.getOutboundTransactions();
-
-    assertTransactionsValid(transactions);
-    assertTransactionHashesValid(transactions);
   });
 
   it('Should report on 1 successful rule and 1 failed rule', async function() {
@@ -71,7 +63,11 @@ describe('Rule Engine Testings', function() {
   }
 
   function createRuleEngine(rules: RuleJSONConfigItem[]): RuleEngine {
-    const ruleFactory = new FactoryRule(logger, blockchainReader);
+    const abiStorage = new AbiStorageAdapter();
+    const abiFetcher = new AbiFetcherAdapter();
+    const abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+
+    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
     const ruleEngine = new RuleEngine(logger, ruleFactory);
     ruleEngine.loadRulesFromJSONConfig(rules);
     return ruleEngine;
@@ -98,12 +94,6 @@ describe('Rule Engine Testings', function() {
     if (expectedLength !== undefined) {
       expect(transactions.length).to.be.eq(expectedLength);
     }
-  }
-
-  function assertTransactionHashesValid(transactions: OutboundTransaction[]): void {
-    expect(transactions[0].hash).to.be.eq(Web3.utils.sha3(JSON.stringify(transactions[0].lowLevelUnsignedTransaction)));
-    expect(transactions[1].hash).to.be.eq(Web3.utils.sha3(JSON.stringify(transactions[1].lowLevelUnsignedTransaction)));
-    expect(transactions[0].hash).to.be.eq(transactions[1].hash);
   }
 
   function assertRuleEvaluationResult(successfulRuleEval: number, failedRuleEval: number): void {
