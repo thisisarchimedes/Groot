@@ -14,11 +14,11 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "test": "mocha --import=tsx test/unit/**/*.test.ts test/acceptance/**/*.test.ts",
-    "test:unit": "mocha --import=tsx test/unit/**/*.test.ts",
+    "test": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/unit/**/*.test.ts test/acceptance/**/*.test.ts",
+    "test:unit": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/unit/**/*.test.ts",
     "test:acceptance": "mocha --import=tsx test/acceptance/**/*.test.ts",
     "test:interface": "mocha --import=tsx test/interface/**/*.test.ts",
-    "test:all": "mocha --import=tsx test/**/*.test.ts",
+    "test:all": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/**/*.test.ts",
     "lint": "eslint --ext .ts,.tsx -c .eslintrc.cjs ."
   },
   "dependencies": {
@@ -44,6 +44,7 @@
     "ethers": "^6.11.1",
     "kubectl": "^0.0.0",
     "nock": "^13.5.4",
+    "node-fetch": "^3.3.2",
     "nyc": "^15.1.0",
     "pg": "^8.11.3",
     "pg-types": "^4.0.2",
