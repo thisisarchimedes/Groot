@@ -3,41 +3,39 @@ import {Mock} from './Mock';
 
 export class MockEthNode extends Mock {
   private readonly mockRpcUrl: string;
+  private blockNumber: number; // Property to store the block number
+
   constructor(mockRpcUrl: string) {
     super();
     this.mockRpcUrl = mockRpcUrl;
   }
 
-  public setupETHNodeBlocknumber(blockNumber: number): void {
-    nock(this.mockRpcUrl)
-        .persist()
-        .post('/', (body) => {
-          return (
-            body.jsonrpc === '2.0' &&
-          body.method === 'eth_blockNumber' &&
-          Array.isArray(body.params) &&
-          body.params.length === 0
-          );
-        })
-        .reply(200, (uri, requestBody: { id: string }) => {
-          return {
-            jsonrpc: '2.0',
-            id: requestBody.id,
-            result: `0x${blockNumber.toString(16)}`,
-          };
-        });
+  public setMockBlockNumber(blockNumber: number): void {
+    this.blockNumber = blockNumber;
   }
 
-  public setupReset(): void {
+  public interceptCalls(): void {
     nock(this.mockRpcUrl)
         .persist()
-        .post('/')
-        .reply(200, (uri, requestBody: { id: number }) => {
-          return {
-            jsonrpc: '2.0',
-            id: requestBody.id,
-            result: true,
-          };
+        .post(/.*/, () => {
+          return true;
+        })
+        .reply(200, (uri, requestBody) => {
+          const requests = Array.isArray(requestBody) ? requestBody : [requestBody];
+
+          const responses = requests.map((request) => {
+            if (request.method === 'eth_chainId') {
+              return {jsonrpc: '2.0', id: request.id, result: '0x1'};
+            } else if (request.method === 'eth_blockNumber') {
+              if (!this.blockNumber) {
+                this.blockNumber = 100;
+              }
+              return {jsonrpc: '2.0', id: request.id, result: `0x${this.blockNumber.toString(16)}`};
+            }
+          // add other methods handlers here
+          });
+
+          return Array.isArray(requestBody) ? responses : responses[0];
         });
   }
 }

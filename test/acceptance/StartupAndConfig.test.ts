@@ -38,8 +38,8 @@ describe('Startup and Config', function() {
   it('Should return block number from mock node', async function() {
     const expectedBlockNumber = 10001;
     ethNodeMainMock = new MockEthNode('http://localhost:8545');
-
-    ethNodeMainMock.setupETHNodeBlocknumber(expectedBlockNumber);
+    ethNodeMainMock.setMockBlockNumber(expectedBlockNumber);
+    ethNodeMainMock.interceptCalls();
     const provider = new ethers.JsonRpcProvider('http://localhost:8545');
     const blockNumber = await provider.getBlockNumber();
     expect(blockNumber).to.be.equal(expectedBlockNumber);
@@ -47,7 +47,7 @@ describe('Startup and Config', function() {
 
   it('Should fake reset', async function() {
     ethNodeMainMock = new MockEthNode('http://localhost:8545');
-    ethNodeMainMock.setupReset();
+    ethNodeMainMock.interceptCalls();
 
     const response = await axios.post('http://localhost:8545', {
       jsonrpc: '2.0',
@@ -60,10 +60,14 @@ describe('Startup and Config', function() {
   });
 
   it('should load dummy rule and emit a log item', async function() {
+    const expectedBlockNumber = 10001;
+
+
     ethNodeMainMock = new MockEthNode('http://localhost:8545');
-    ethNodeMainMock.setupReset();
+    ethNodeMainMock.interceptCalls();
+
     ethNodeAltMock = new MockEthNode('http://localhost:18545');
-    ethNodeAltMock.setupReset();
+    ethNodeAltMock.interceptCalls();
 
     const mockRules: RuleJSONConfigItem[] = [
       {
@@ -86,16 +90,16 @@ describe('Startup and Config', function() {
     ];
     appConfigMock = createAppConfigMock(mockRules);
 
-    const expectedBlockNumber = 10001;
     ethNodeMainMock = new MockEthNode('http://localhost:8545');
-    ethNodeMainMock.setupETHNodeBlocknumber(expectedBlockNumber);
+    ethNodeMainMock.setMockBlockNumber(expectedBlockNumber);
+    ethNodeMainMock.interceptCalls();
 
     ethNodeAltMock = new MockEthNode('http://localhost:18545');
-    ethNodeAltMock.setupETHNodeBlocknumber(expectedBlockNumber);
+    ethNodeAltMock.setMockBlockNumber(expectedBlockNumber);
+    ethNodeAltMock.interceptCalls();
 
     const expectedMessage = 'Queuing transaction: this is a dummy context';
     newRelicMock.setWaitedOnMessage(expectedMessage);
-
     await grootStartHere(false);
     await waitForMessageProcessing();
 
@@ -105,9 +109,9 @@ describe('Startup and Config', function() {
 
   it('Should handle invalid rules gracfully', async function() {
     ethNodeMainMock = new MockEthNode('http://localhost:8545');
-    ethNodeMainMock.setupReset();
+    ethNodeMainMock.interceptCalls();
     ethNodeAltMock = new MockEthNode('http://localhost:18545');
-    ethNodeAltMock.setupReset();
+    ethNodeAltMock.interceptCalls();
 
     const mockRules: RuleJSONConfigItem[] = [
       {
