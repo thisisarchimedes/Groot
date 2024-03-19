@@ -35,20 +35,20 @@ export class BlockchainNodeUniswapAdapter extends BlockchainNodeAdapter {
     return this.currentReadResponse;
   }
 
-  public setPoolResponse(response: unknown): void {
+  public async setPoolResponse(response: unknown): Promise<void> {
     this.poolAddress = response as string;
   }
-  public setUpperTickResponse(response: unknown): void {
-    this.upperTick = response as number;
+  public async setUpperTickResponse(tick: number): Promise<void> {
+    this.upperTick = tick;
   }
-  public setLowerTickResponse(response: unknown): void {
-    this.lowerTick = response as number;
+  public async setLowerTickResponse(tick: number): Promise<void> {
+    this.lowerTick = tick;
   }
-  public setCurrentTickResponse(response: unknown): void {
-    this.currentTick = response as number;
+  public async setCurrentTickResponse(tick: number): Promise<void> {
+    this.currentTick = tick;
   }
-  public setTickSpacingResponse(response: unknown): void {
-    this.tickSpacing = response as number;
+  public async setTickSpacingResponse(tickSpacing: number): Promise<void> {
+    this.tickSpacing = tickSpacing;
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */

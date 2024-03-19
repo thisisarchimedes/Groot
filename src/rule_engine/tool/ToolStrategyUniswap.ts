@@ -43,7 +43,7 @@ export class ToolStrategyUniswap {
     );
     return ret as number;
   }
-  public async tickSpacing(): number {
+  public async tickSpacing(): Promise<number> {
     const poolAddress = await this.getPoolAddress();
     const ret = await this.blockchainReader.callViewFunction(
         poolAddress,

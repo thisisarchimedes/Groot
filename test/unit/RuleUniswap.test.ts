@@ -1,20 +1,20 @@
-import { expect } from "chai";
-import * as dotenv from "dotenv";
+import {expect} from 'chai';
+import * as dotenv from 'dotenv';
 
-import { FactoryRule } from "../../src/rule_engine/FactoryRule";
-import { LoggerAdapter } from "./adapters/LoggerAdapter";
-import { RuleJSONConfigItem, TypeRule } from "../../src/rule_engine/TypesRule";
-import { BlockchainNodeAdapter } from "./adapters/BlockchainNodeAdapter";
-import { BlockchainReader } from "../../src/blockchain/blockchain_reader/BlockchainReader";
-import { AbiRepo } from "../../src/rule_engine/tool/abi_repository/AbiRepo";
-import { AbiStorageDynamoDB } from "../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB";
-import { ConfigServiceAWS } from "../../src/service/config/ConfigServiceAWS";
-import { AbiFetcherEtherscan } from "../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan";
-import { BlockchainNodeUniswapAdapter } from "./adapters/BlockchainNodeUniswapAdapter";
+import {FactoryRule} from '../../src/rule_engine/FactoryRule';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
+import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
+import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
+import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
+import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {AbiFetcherEtherscan} from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import {BlockchainNodeUniswapAdapter} from './adapters/BlockchainNodeUniswapAdapter';
 
 dotenv.config();
 
-describe("Rule Factory Testings: Uniswap", function () {
+describe('Rule Factory Testings: Uniswap', function() {
   const logger: LoggerAdapter = new LoggerAdapter();
   let localNodeAlchemy: BlockchainNodeUniswapAdapter;
   let localNodeInfura: BlockchainNodeUniswapAdapter;
@@ -22,16 +22,16 @@ describe("Rule Factory Testings: Uniswap", function () {
 
   let abiRepo: AbiRepo;
 
-  beforeEach(async function () {
+  beforeEach(async function() {
     localNodeAlchemy = new BlockchainNodeUniswapAdapter(
-      logger,
-      "localNodeAlchemy"
+        logger,
+        'localNodeAlchemy',
     );
     await localNodeAlchemy.startNode();
 
     localNodeInfura = new BlockchainNodeUniswapAdapter(
-      logger,
-      "localNodeInfura"
+        logger,
+        'localNodeInfura',
     );
     await localNodeInfura.startNode();
 
@@ -43,31 +43,31 @@ describe("Rule Factory Testings: Uniswap", function () {
     const environment = process.env.ENVIRONMENT as string;
     const region = process.env.AWS_REGION as string;
     const configSerivce: ConfigServiceAWS = new ConfigServiceAWS(
-      environment,
-      region
+        environment,
+        region,
     );
     const abiStorage = new AbiStorageDynamoDB(
-      configSerivce.getDynamoDBAbiRepoTable(),
-      configSerivce.getAWSRegion()
+        configSerivce.getDynamoDBAbiRepoTable(),
+        configSerivce.getAWSRegion(),
     );
     const abiFetcher = new AbiFetcherEtherscan(
-      configSerivce.getEtherscanAPIKey()
+        configSerivce.getEtherscanAPIKey(),
     );
     abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
   });
 
-  it("should create Uniswap PSP rebalance Rule object from a rule config", function () {
+  it('should create Uniswap PSP rebalance Rule object from a rule config', function() {
     const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
 
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.UniswapPSPRebalance,
-      label: "Uniswap PSP rebalance - test",
+      label: 'Uniswap PSP rebalance - test',
       params: {
         upperTriggerThresholdPercentage: 70,
         lowerTriggerThresholdPercentage: 130,
         upperTargetTickPercentage: 150,
         lowerTargetTickPercentage: 50,
-        strategyAddress: "0x1234",
+        strategyAddress: '0x1234',
       },
     };
 
@@ -75,20 +75,20 @@ describe("Rule Factory Testings: Uniswap", function () {
     expect(rule).not.to.be.null;
   });
 
-  it("should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place", async function () {
+  it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', async function() {
     const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
-    localNodeAlchemy.setLowerTickResponse(100);
-    localNodeAlchemy.setUpperTickResponse(200);
-    localNodeAlchemy.setCurrentTickResponse(150);
+    await localNodeAlchemy.setLowerTickResponse(100);
+    await localNodeAlchemy.setUpperTickResponse(200);
+    await localNodeAlchemy.setCurrentTickResponse(150);
     const uniswapRule: RuleJSONConfigItem = {
       ruleType: TypeRule.UniswapPSPRebalance,
-      label: "Uniswap PSP rebalance - test",
+      label: 'Uniswap PSP rebalance - test',
       params: {
         upperTriggerThresholdPercentage: 70,
         lowerTriggerThresholdPercentage: 130,
         upperTargetTickPercentage: 150,
         lowerTargetTickPercentage: 50,
-        strategyAddress: "0x1234",
+        strategyAddress: '0x1234',
       },
     };
 
@@ -99,39 +99,88 @@ describe("Rule Factory Testings: Uniswap", function () {
     expect(rule?.getPendingTransactionCount()).to.be.eq(0);
   });
 
-  it("should calculate new upper and lower tick correctly when we are too close to upper tick", async function () {
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+  it('should calculate new upper and lower tick correctly when we are too close to upper tick', async function() {
     const currentTick = 170;
     const upperTargetTickPercentage = 150;
+    const lowerTargetTickPercentage = 50;
     const tickSpacing = 15;
-    localNodeAlchemy.setLowerTickResponse(100);
-    localNodeAlchemy.setUpperTickResponse(200);
-    localNodeAlchemy.setCurrentTickResponse(currentTick);
-    localNodeAlchemy.setTickSpacingResponse(tickSpacing);
+
+    await localNodeAlchemy.setLowerTickResponse(100);
+    await localNodeAlchemy.setUpperTickResponse(200);
+    await localNodeAlchemy.setCurrentTickResponse(currentTick);
+    await localNodeAlchemy.setTickSpacingResponse(tickSpacing);
+
     const uniswapRule: RuleJSONConfigItem = {
       ruleType: TypeRule.UniswapPSPRebalance,
-      label: "Uniswap PSP rebalance - test",
+      label: 'Uniswap PSP rebalance - test',
       params: {
         upperTriggerThresholdPercentage: 70,
         lowerTriggerThresholdPercentage: 130,
         upperTargetTickPercentage: upperTargetTickPercentage,
-        lowerTargetTickPercentage: 50,
-        strategyAddress: "0x1234",
+        lowerTargetTickPercentage: lowerTargetTickPercentage,
+        strategyAddress: '0x1234',
       },
     };
+
+    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const rule = ruleFactory.createRule(uniswapRule);
+
     let exptectedNewUpperTick = Number(
-      (currentTick * upperTargetTickPercentage) / 100
+        (currentTick * upperTargetTickPercentage) / 100,
     );
     exptectedNewUpperTick =
       Math.round(exptectedNewUpperTick / tickSpacing) * tickSpacing;
-
-    logger.lookForInfoLogLineContaining(
-      `New upper tick: ${exptectedNewUpperTick}`
+    let expectedNewLowerTick = Number(
+        (currentTick * lowerTargetTickPercentage) / 100,
     );
 
-    const rule = ruleFactory.createRule(uniswapRule);
-    await rule?.evaluate();
+    expectedNewLowerTick =
+      Math.round(expectedNewLowerTick / tickSpacing) * tickSpacing;
 
+    logger.lookForInfoLogLineContaining(
+        `New upper tick: ${exptectedNewUpperTick}`,
+    );
+    await rule?.evaluate();
+    expect(logger.isExpectedLogLineInfoFound()).to.be.true;
+  });
+
+  it('should calculate new upper and lower tick correctly when we are too close to lower tick', async function() {
+    const currentTick = 110;
+    const upperTargetTickPercentage = 150;
+    const lowerTargetTickPercentage = 50;
+    const tickSpacing = 15;
+
+    await localNodeAlchemy.setLowerTickResponse(100);
+    await localNodeAlchemy.setUpperTickResponse(200);
+    await localNodeAlchemy.setCurrentTickResponse(currentTick);
+    await localNodeAlchemy.setTickSpacingResponse(tickSpacing);
+
+    const uniswapRule: RuleJSONConfigItem = {
+      ruleType: TypeRule.UniswapPSPRebalance,
+      label: 'Uniswap PSP rebalance - test',
+      params: {
+        upperTriggerThresholdPercentage: 70,
+        lowerTriggerThresholdPercentage: 130,
+        upperTargetTickPercentage: upperTargetTickPercentage,
+        lowerTargetTickPercentage: lowerTargetTickPercentage,
+        strategyAddress: '0x1234',
+      },
+    };
+
+    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const rule = ruleFactory.createRule(uniswapRule);
+
+    let expectedNewLowerTick = Number(
+        (currentTick * lowerTargetTickPercentage) / 100,
+    );
+
+    expectedNewLowerTick =
+      Math.round(expectedNewLowerTick / tickSpacing) * tickSpacing;
+
+    logger.lookForInfoLogLineContaining(
+        `New lower tick: ${expectedNewLowerTick}`,
+    );
+    await rule?.evaluate();
     expect(logger.isExpectedLogLineInfoFound()).to.be.true;
   });
 });
