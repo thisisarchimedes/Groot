@@ -29,15 +29,17 @@ export abstract class BlockchainNode {
       this.isNodeHealthy = true;
       return blockNumber;
     } catch (error) {
-      this.logger.info(`${this.nodeName} cannot get block number: ${error.message}`);
+      if (error instanceof Error) {
+        this.logger.info(`${this.nodeName} cannot get block number: ${error.message}`);
+      }
       this.isNodeHealthy = false;
-      throw new BlockchainNodeError(error.message);
+      throw new BlockchainNodeError(error instanceof Error ? error.message : 'Unknown error');
     }
   }
 
   public async callViewFunction(
     contractAddress: string,
-    abi: ethers.ContractInterface,
+    abi: ethers.Interface,
     functionName: string,
     params: unknown[] = [],
   ): Promise<unknown> {
@@ -48,9 +50,15 @@ export abstract class BlockchainNode {
       this.isNodeHealthy = true;
       return data;
     } catch (error) {
-      this.logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error}`);
-      this.isNodeHealthy = false;
-      throw new BlockchainNodeError(error.message);
+      if (error instanceof Error) {
+        this.logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error.message}`);
+        this.isNodeHealthy = false;
+        throw new BlockchainNodeError(error.message);
+      } else {
+        this.logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error}`);
+        this.isNodeHealthy = false;
+        throw new BlockchainNodeError('Unknown error');
+      }
     }
   }
 

@@ -33,8 +33,13 @@ export class BlockchainNodeLocal extends BlockchainNode {
       const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
       this.handleResetResponse(responseData);
     } catch (error) {
-      this.logger.error(`Failed to reset node: ${error.message}`);
-      throw error instanceof BlockchainNodeError ? error : new BlockchainNodeError(error.message);
+      if (error instanceof Error) {
+        this.logger.error(`Failed to reset node: ${error.message}`);
+        throw error instanceof BlockchainNodeError ? error : new BlockchainNodeError(error.message);
+      } else {
+        this.logger.error(`Failed to reset node: ${error}`);
+        throw new BlockchainNodeError('Unknown error');
+      }
     }
 
     await this.waitForNodeToBeReady();
@@ -46,7 +51,7 @@ export class BlockchainNodeLocal extends BlockchainNode {
         const blockNumber = await this.getBlockNumber();
         this.logger.debug(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
-      } catch (error) {
+      } catch (error: any) {
         this.logger.debug(`Waiting for blockchain... Attempt ${attempt}/${maxAttempts} - ${error.message}`);
         await new Promise((resolve) => setTimeout(resolve, interval));
       }
@@ -66,7 +71,7 @@ export class BlockchainNodeLocal extends BlockchainNode {
       });
 
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       if (error.response) {
         // The request was made and the server responded with a status code
         // that falls out of the range of 2xx
@@ -76,7 +81,7 @@ export class BlockchainNodeLocal extends BlockchainNode {
         throw new Error('No response received from the server');
       } else {
         // Something happened in setting up the request that triggered an Error
-        throw new Error(error.message);
+        throw new Error(error instanceof Error ? error.message : 'Unknown error');
       }
     }
   }
