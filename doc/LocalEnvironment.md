@@ -27,7 +27,7 @@ yarn dotenvx hub login
 yarn dotenvx hub open # open and follow the link printed, copy the keys to .env.keys locally
 set -o allexport && source .env.keys && set +o allexport # export .env.keys to local environment
 yarn dotenvx decrypt # decrypt .env.vault to .env
-set -o allexport && source .env && set +o allexport # export .env to local environment
+set -o allexport && source .env.local && set +o allexport # export .env.local to local environment
 ```
 
 _*Update .env*_
@@ -61,4 +61,13 @@ yarn test:unit
 The script below builds the containers and loads them to the local kind cluster.
 ```bash
  sudo ./scripts/k8s/setup_local_env.sh
+```
+## Running Acceptance Tests Locally
+
+Acceptance test are a step above unit test. We only test the STU (system under test), so we still use mocks to set the state that we want. However, Acceptance tests only use the natrual interfaces of the STU (e.g. APIs).
+
+To achieve that we use Nock to intercept the outgoing Groot calls and craft a response.
+
+```bash
+yarn test:acceptance
 ```
