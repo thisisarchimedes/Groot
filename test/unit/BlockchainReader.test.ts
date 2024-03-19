@@ -1,33 +1,30 @@
 import * as chai from 'chai';
-import * as dotenv from 'dotenv';
 
-import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
-import { BlockchainReaderError, BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
-import { ethers } from 'ethers';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
+import {BlockchainReaderError, BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
+import {ethers} from 'ethers';
 
-const { expect } = chai;
-dotenv.config();
+const {expect} = chai;
 
-describe('Check that blockchain reader works with multiple underlying nodes', function () {
+describe('Check that blockchain reader works with multiple underlying nodes', function() {
   let localNodeAlchemy: BlockchainNodeAdapter;
   let localNodeInfura: BlockchainNodeAdapter;
   const logger: LoggerAdapter = new LoggerAdapter();
 
-  beforeEach(async function () {
+  beforeEach(async function() {
     localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
     await localNodeAlchemy.startNode();
     localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     await localNodeInfura.startNode();
   });
 
-  afterEach(async function () {
+  afterEach(async function() {
     await localNodeAlchemy.stopNode();
     await localNodeInfura.stopNode();
   });
 
-  it('Should be able to load two nodes and get most recent block number', async function () {
+  it('Should be able to load two nodes and get most recent block number', async function() {
     const blockNumberAlchemy: number = 19364429;
     const blockNumberInfura: number = 19364430;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
@@ -39,7 +36,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     expect(blockNumber).to.be.eq(Math.max(blockNumberAlchemy, blockNumberInfura));
   });
 
-  it('Should be able to facilitate read call, decide which node to use, when both response', async function () {
+  it('Should be able to facilitate read call, decide which node to use, when both response', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setReadResponse('1');
@@ -52,12 +49,13 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
 
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
-    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals'));
+    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress,
+        new ethers.Interface(abi), 'decimals'));
 
     expect(res).to.be.eq(2);
   });
 
-  it('Should call getBlockNumber and handle 1/2 node failed, use another node', async function () {
+  it('Should call getBlockNumber and handle 1/2 node failed, use another node', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(false);
@@ -73,7 +71,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     expect(res).to.be.eq(19364429);
   });
 
-  it('Should throw an error when all nodes fail to retrieve block number', async function () {
+  it('Should throw an error when all nodes fail to retrieve block number', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(true);
@@ -93,7 +91,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
   });
 
 
-  it('Should call callViewFunction and handle 1/2 node failed, use another node', async function () {
+  it('Should call callViewFunction and handle 1/2 node failed, use another node', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setReadResponse('1');
@@ -107,12 +105,13 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
 
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
-    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals'));
+    const res = Number(await blockchainReader.callViewFunction(usdcContractAddress,
+        new ethers.Interface(abi), 'decimals'));
 
     expect(res).to.be.eq(1);
   });
 
-  it('Should throw an error when all nodes fail to call view function', async function () {
+  it('Should throw an error when all nodes fail to call view function', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(false);
@@ -138,7 +137,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     }
   });
 
-  it('Should throw an error when all nodes fail - getBlockNumber fails', async function () {
+  it('Should throw an error when all nodes fail - getBlockNumber fails', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(true);
@@ -164,7 +163,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     }
   });
 
-  it('Should throw an error when all nodes fail - callViewFunction fails', async function () {
+  it('Should throw an error when all nodes fail - callViewFunction fails', async function() {
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(false);

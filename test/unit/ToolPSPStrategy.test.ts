@@ -1,17 +1,16 @@
-import { expect } from 'chai';
-import { ToolStrategyUniswap } from '../../src/rule_engine/tool/ToolStrategyUniswap';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
-import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
+import {expect} from 'chai';
+import {ToolStrategyUniswap} from '../../src/rule_engine/tool/ToolStrategyUniswap';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
+import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 
-describe('Check we create the PSP strategy tool correctly', function () {
+describe('Check we create the PSP strategy tool correctly', function() {
   const logger: LoggerAdapter = new LoggerAdapter();
   let localNodeAlchemy: BlockchainNodeAdapter;
   let localNodeInfura: BlockchainNodeAdapter;
   let blockchainReader: BlockchainReader;
 
-  beforeEach(async function () {
+  beforeEach(async function() {
     localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
     await localNodeAlchemy.startNode();
 
@@ -21,7 +20,7 @@ describe('Check we create the PSP strategy tool correctly', function () {
     blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
   });
 
-  it('should create uniswap strategy object and get pool address', async function () {
+  it('should create uniswap strategy object and get pool address', async function() {
     const strategyAddress: string = '0x1234';
 
     localNodeAlchemy.setReadResponse(strategyAddress);

@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import {ethers} from 'ethers';
 import {
   BlockchainNode,
   BlockchainNodeError,
@@ -47,10 +47,10 @@ export class BlockchainNodeAdapter extends BlockchainNode {
 
   // eslint-disable-next-line require-await
   public async callViewFunction(
-    contractAddress: string,
-    abi: ethers.Interface,
-    functionName: string,
-    params?: unknown[],
+      contractAddress: string,
+      abi: ethers.Interface,
+      functionName: string,
+      params?: unknown[],
   ): Promise<unknown> {
     if (this.throwErrorOnCallViewFunction) {
       throw new Error('callViewFunction: Error');

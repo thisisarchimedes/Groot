@@ -1,15 +1,15 @@
 import axios from 'axios';
-import { ethers } from 'ethers';
-import { expect } from 'chai';
-import { MockNewRelic } from './mocks/MockNewRelic';
-import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
-import { grootStartHere } from '../../src/main';
-import { MockAppConfig } from './mocks/MockAppConfig';
-import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
-import { MockEthNode } from './mocks/MockEthNode';
+import {ethers} from 'ethers';
+import {expect} from 'chai';
+import {MockNewRelic} from './mocks/MockNewRelic';
+import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {grootStartHere} from '../../src/main';
+import {MockAppConfig} from './mocks/MockAppConfig';
+import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
+import {MockEthNode} from './mocks/MockEthNode';
 
 
-describe('Startup and Config', function () {
+describe('Startup and Config', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
@@ -20,7 +20,7 @@ describe('Startup and Config', function () {
 
   let configService: ConfigServiceAWS;
 
-  beforeEach(async function () {
+  beforeEach(async function() {
     configService = createConfigService();
     await initializeConfigService();
 
@@ -31,11 +31,11 @@ describe('Startup and Config', function () {
     ethNodeAltMock = undefined;
   });
 
-  afterEach(function () {
+  afterEach(function() {
     cleanupTestDoubles();
   });
 
-  it('Should return block number from mock node', async function () {
+  it('Should return block number from mock node', async function() {
     const expectedBlockNumber = 10001;
     ethNodeMainMock = new MockEthNode('http://localhost:8545');
 
@@ -45,7 +45,7 @@ describe('Startup and Config', function () {
     expect(blockNumber).to.be.equal(expectedBlockNumber);
   });
 
-  it('Should fake reset', async function () {
+  it('Should fake reset', async function() {
     ethNodeMainMock = new MockEthNode('http://localhost:8545');
     ethNodeMainMock.setupReset();
 
@@ -59,7 +59,7 @@ describe('Startup and Config', function () {
     expect(response.status).to.be.eq(200);
   });
 
-  it('should load dummy rule and emit a log item', async function () {
+  it('should load dummy rule and emit a log item', async function() {
     ethNodeMainMock = new MockEthNode('http://localhost:8545');
     ethNodeMainMock.setupReset();
     ethNodeAltMock = new MockEthNode('http://localhost:18545');
@@ -103,7 +103,7 @@ describe('Startup and Config', function () {
     expect(isMessageObserved).to.be.true;
   });
 
-  it('Should handle invalid rules gracfully', async function () {
+  it('Should handle invalid rules gracfully', async function() {
     ethNodeMainMock = new MockEthNode('http://localhost:8545');
     ethNodeMainMock.setupReset();
     ethNodeAltMock = new MockEthNode('http://localhost:18545');

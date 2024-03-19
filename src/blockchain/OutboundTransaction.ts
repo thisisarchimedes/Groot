@@ -1,5 +1,5 @@
-import { TransactionRequest } from '@ethersproject/abstract-provider';
-import { UrgencyLevel } from '../rule_engine/TypesRule';
+import {TransactionRequest} from '@ethersproject/abstract-provider';
+import {UrgencyLevel} from '../rule_engine/TypesRule';
 
 export interface OutboundTransaction {
   urgencyLevel: UrgencyLevel;

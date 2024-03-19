@@ -1,5 +1,5 @@
-import { ethers, Contract } from 'ethers';
-import { Logger } from '../../service/logger/Logger';
+import {ethers, Contract} from 'ethers';
+import {Logger} from '../../service/logger/Logger';
 
 export class BlockchainNodeError extends Error {
   constructor(message: string) {
@@ -37,10 +37,10 @@ export abstract class BlockchainNode {
   }
 
   public async callViewFunction(
-    contractAddress: string,
-    abi: ethers.Interface,
-    functionName: string,
-    params: unknown[] = [],
+      contractAddress: string,
+      abi: ethers.Interface,
+      functionName: string,
+      params: unknown[] = [],
   ): Promise<unknown> {
     const contract = new Contract(contractAddress, abi, this.provider);
 

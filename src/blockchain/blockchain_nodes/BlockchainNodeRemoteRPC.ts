@@ -1,6 +1,6 @@
-import { JsonRpcProvider, ethers } from 'ethers';
-import { BlockchainNode } from './BlockchainNode';
-import { Logger } from '../../service/logger/Logger';
+import {JsonRpcProvider} from 'ethers';
+import {BlockchainNode} from './BlockchainNode';
+import {Logger} from '../../service/logger/Logger';
 
 export class BlockchainNodeRemoteRPC extends BlockchainNode {
   private readonly remoteRpcUrl: string;

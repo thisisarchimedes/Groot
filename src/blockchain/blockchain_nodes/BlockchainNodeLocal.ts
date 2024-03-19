@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { JsonRpcProvider, ethers } from 'ethers';
-import { BlockchainNode, BlockchainNodeError } from './BlockchainNode';
-import { Logger } from '../../service/logger/Logger';
+import {JsonRpcProvider} from 'ethers';
+import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
+import {Logger} from '../../service/logger/Logger';
 
 export class BlockchainNodeLocal extends BlockchainNode {
   private readonly localRpcUrl: string;
@@ -51,6 +51,7 @@ export class BlockchainNodeLocal extends BlockchainNode {
         const blockNumber = await this.getBlockNumber();
         this.logger.debug(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         this.logger.debug(`Waiting for blockchain... Attempt ${attempt}/${maxAttempts} - ${error.message}`);
         await new Promise((resolve) => setTimeout(resolve, interval));
@@ -59,18 +60,21 @@ export class BlockchainNodeLocal extends BlockchainNode {
     throw new BlockchainNodeError('Blockchain node is not ready after maximum attempts.');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async performResetRpcCall(externalProviderRpcUrl: string): Promise<any> {
     try {
       const response = await axios.post(this.localRpcUrl, {
         jsonrpc: '2.0',
         method: 'hardhat_reset',
-        params: [{ forking: { jsonRpcUrl: externalProviderRpcUrl } }],
+        params: [{forking: {jsonRpcUrl: externalProviderRpcUrl}}],
         id: 1,
       }, {
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
       });
 
       return response.data;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       if (error.response) {
         // The request was made and the server responded with a status code
@@ -86,6 +90,7 @@ export class BlockchainNodeLocal extends BlockchainNode {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private handleResetResponse(data: any): void {
     if (typeof data === 'object' && data !== null && 'error' in data) {
       const error = data.error as { message: string };

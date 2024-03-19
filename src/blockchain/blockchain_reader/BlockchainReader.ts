@@ -1,6 +1,6 @@
-import { BlockchainNode, BlockchainNodeProxyInfo } from '../blockchain_nodes/BlockchainNode';
-import { Logger } from '../../service/logger/Logger';
-import { Interface } from 'ethers';
+import {BlockchainNode, BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNode';
+import {Logger} from '../../service/logger/Logger';
+import {Interface} from 'ethers';
 
 
 export class BlockchainReaderError extends Error {
@@ -40,10 +40,10 @@ export class BlockchainReader {
   }
 
   public async callViewFunction(
-    contractAddress: string,
-    abi: Interface,
-    functionName: string,
-    params: unknown[] = [],
+      contractAddress: string,
+      abi: Interface,
+      functionName: string,
+      params: unknown[] = [],
   ): Promise<unknown> {
     const nodeResponses = await this.fetchNodeResponses(contractAddress, abi, functionName, params);
     const validNodeResponses = this.extractValidNodeResponses(nodeResponses);
@@ -85,10 +85,10 @@ export class BlockchainReader {
   }
 
   private async fetchNodeResponses(
-    contractAddress: string,
-    abi: Interface,
-    functionName: string,
-    params: unknown[],
+      contractAddress: string,
+      abi: Interface,
+      functionName: string,
+      params: unknown[],
   ): Promise<NodeResponse[]> {
     const functionCalls = this.nodes.map((node) =>
       node.callViewFunction(contractAddress, abi, functionName, params).catch(() => null),
@@ -114,8 +114,8 @@ export class BlockchainReader {
 
   private extractValidNodeResponses(nodeResponses: NodeResponse[]): ValidNodeResponse[] {
     return nodeResponses.filter(
-      (nodeResponse): nodeResponse is ValidNodeResponse =>
-        nodeResponse.response !== null && nodeResponse.blockNumber !== null,
+        (nodeResponse): nodeResponse is ValidNodeResponse =>
+          nodeResponse.response !== null && nodeResponse.blockNumber !== null,
     );
   }
 
@@ -128,9 +128,9 @@ export class BlockchainReader {
 
   private findResponseFromNodeWithHighestBlockNumber(validNodeResponses: ValidNodeResponse[]): unknown {
     const highestBlockNumberIndex = validNodeResponses.reduce(
-      (highestIndex, currentNode, currentIndex) =>
+        (highestIndex, currentNode, currentIndex) =>
         currentNode.blockNumber > validNodeResponses[highestIndex].blockNumber ? currentIndex : highestIndex,
-      0,
+        0,
     );
     return validNodeResponses[highestBlockNumberIndex].response;
   }
