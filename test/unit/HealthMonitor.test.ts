@@ -1,5 +1,4 @@
 import * as chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
@@ -10,8 +9,10 @@ import {
 import {HealthMonitor} from '../../src/service/health_monitor/HealthMonitor';
 import {SignalAdapter} from './adapters/SignalAdapter';
 
-chai.use(chaiAsPromised);
 const {expect} = chai;
+
+const should = chai.should();
+
 
 describe('Health Monitor tests', function() {
   let localNodeAlchemy: BlockchainNodeAdapter;
@@ -50,12 +51,15 @@ describe('Health Monitor tests', function() {
   it('Should throw if all nodes failed and cannot recover', async function() {
     localNodeAlchemy.setNodeHealthy(false);
     localNodeAlchemy.setExpectRecoverToSucceed(false);
-
     localNodeInfura.setNodeHealthy(false);
     localNodeInfura.setExpectRecoverToSucceed(false);
 
-    await expect(blockchainNodeHealth.checkBlockchainNodesHealth())
-        .to.be.rejectedWith(ErrorBlockchainNodeHealthMonitor);
+    try {
+      await blockchainNodeHealth.checkBlockchainNodesHealth();
+      should.fail('Expected method to reject');
+    } catch (error) {
+      error.should.be.an.instanceOf(ErrorBlockchainNodeHealthMonitor);
+    }
   });
 
   it('Should correctly invoke Health Monitor start of cycle sequence', async function() {
