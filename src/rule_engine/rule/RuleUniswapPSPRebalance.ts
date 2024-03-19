@@ -1,7 +1,7 @@
-import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
-import {Logger} from '../../service/logger/Logger';
-import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
-import {Rule, RuleConstructorInput, RuleParams} from './Rule';
+import { BlockchainReader } from "../../blockchain/blockchain_reader/BlockchainReader";
+import { Logger } from "../../service/logger/Logger";
+import { ToolStrategyUniswap } from "../tool/ToolStrategyUniswap";
+import { Rule, RuleConstructorInput, RuleParams } from "./Rule";
 // import {UNISWAPV3_POOL_ABI} from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json';
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
@@ -18,10 +18,10 @@ export class RuleUniswapPSPRebalance extends Rule {
   constructor(constructorInput: RuleConstructorInput) {
     super(constructorInput);
     this.uniswapStrategy = new ToolStrategyUniswap(
-        (
+      (
         constructorInput.params as RuleParamsUniswapPSPRebalance
-        ).strategyAddress,
-        constructorInput.blockchainReader,
+      ).strategyAddress,
+      constructorInput.blockchainReader
     );
   }
   public async evaluate(): Promise<void> {
@@ -35,8 +35,8 @@ export class RuleUniswapPSPRebalance extends Rule {
     if (!isUpperTickThresholdPassed && !isLowerTickThresholdPassed) {
       return;
     }
-
-    throw new Error('unimplemented yet');
+    const newUpperTick = await this.calculateNewUpperTick();
+    this.logger.info(`New upper tick: ${newUpperTick}`);
   }
 
   private async isCurrentTickAboveRebalanceUpperTickThreshold(): Promise<boolean> {
@@ -56,8 +56,17 @@ export class RuleUniswapPSPRebalance extends Rule {
       (params.lowerTriggerThresholdPercentage * lowerTick) / 100;
     return currentTick >= acceptedLowerTick;
   }
-
+  private async calculateNewUpperTick(): Promise<number> {
+    const currentTick = await this.uniswapStrategy.currentTick();
+    const tickSpacing = await this.uniswapStrategy.tickSpacing();
+    const params = this.params as RuleParamsUniswapPSPRebalance;
+    let upperTick = Number(
+      (currentTick * params.upperTargetTickPercentage) / 100
+    );
+    upperTick = Math.round(upperTick / tickSpacing) * tickSpacing;
+    return upperTick;
+  }
   protected generateUniqueKey(): string {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 }

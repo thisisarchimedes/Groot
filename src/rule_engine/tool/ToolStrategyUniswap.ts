@@ -43,4 +43,13 @@ export class ToolStrategyUniswap {
     );
     return ret as number;
   }
+  public async tickSpacing(): number {
+    const poolAddress = await this.getPoolAddress();
+    const ret = await this.blockchainReader.callViewFunction(
+        poolAddress,
+        UNISWAPV3_STRATEGY_ABI,
+        'tickSpacing',
+    );
+    return ret as number;
+  }
 }

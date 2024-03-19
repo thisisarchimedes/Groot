@@ -7,6 +7,7 @@ export class BlockchainNodeUniswapAdapter extends BlockchainNodeAdapter {
   upperTick = 100;
   lowerTick = -100;
   currentTick = 0;
+  tickSpacing = 10;
 
   // eslint-disable-next-line require-await
   public async callViewFunction(
@@ -27,6 +28,8 @@ export class BlockchainNodeUniswapAdapter extends BlockchainNodeAdapter {
         return this.lowerTick;
       case 'currentTick':
         return this.currentTick;
+      case 'tickSpacing':
+        return this.tickSpacing;
     }
     this.isNodeHealthy = true;
     return this.currentReadResponse;
@@ -43,6 +46,9 @@ export class BlockchainNodeUniswapAdapter extends BlockchainNodeAdapter {
   }
   public setCurrentTickResponse(response: unknown): void {
     this.currentTick = response as number;
+  }
+  public setTickSpacingResponse(response: unknown): void {
+    this.tickSpacing = response as number;
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
