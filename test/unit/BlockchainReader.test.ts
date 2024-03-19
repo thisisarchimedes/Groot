@@ -14,18 +14,11 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
   let localNodeAlchemy: BlockchainNodeAdapter;
   let localNodeInfura: BlockchainNodeAdapter;
   const logger: LoggerAdapter = new LoggerAdapter();
-  const configService = createConfigService();
-
-  function createConfigService(): ConfigServiceAWS {
-    const environment = process.env.ENVIRONMENT as string;
-    const region = process.env.AWS_REGION as string;
-    return new ConfigServiceAWS(environment, region);
-  }
 
   beforeEach(async function () {
-    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy', configService.getMainRPCURL());
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
     await localNodeAlchemy.startNode();
-    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura', configService.getMainRPCURL());
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     await localNodeInfura.startNode();
   });
 

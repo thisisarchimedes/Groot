@@ -12,25 +12,20 @@ import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
 
 const { expect } = chai;
 
+const should = chai.should();
+
+
 describe('Health Monitor tests', function () {
   let localNodeAlchemy: BlockchainNodeAdapter;
   let localNodeInfura: BlockchainNodeAdapter;
   const logger: LoggerAdapter = new LoggerAdapter();
 
-  const configService = createConfigService();
-
-  function createConfigService(): ConfigServiceAWS {
-    const environment = process.env.ENVIRONMENT as string;
-    const region = process.env.AWS_REGION as string;
-    return new ConfigServiceAWS(environment, region);
-  }
-
   let blockchainNodeHealth: BlockchainNodeHealthMonitor;
 
   beforeEach(async function () {
-    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy', configService.getMainRPCURL());
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
     await localNodeAlchemy.startNode();
-    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura', configService.getMainRPCURL());
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     await localNodeInfura.startNode();
 
     blockchainNodeHealth = new BlockchainNodeHealthMonitor(logger, [localNodeAlchemy, localNodeInfura]);
@@ -57,12 +52,15 @@ describe('Health Monitor tests', function () {
   it('Should throw if all nodes failed and cannot recover', async function () {
     localNodeAlchemy.setNodeHealthy(false);
     localNodeAlchemy.setExpectRecoverToSucceed(false);
-
     localNodeInfura.setNodeHealthy(false);
     localNodeInfura.setExpectRecoverToSucceed(false);
 
-    await expect(blockchainNodeHealth.checkBlockchainNodesHealth())
-      .to.be.rejectedWith(ErrorBlockchainNodeHealthMonitor);
+    try {
+      await blockchainNodeHealth.checkBlockchainNodesHealth();
+      should.fail('Expected method to reject');
+    } catch (error) {
+      error.should.be.an.instanceOf(ErrorBlockchainNodeHealthMonitor);
+    }
   });
 
   it('Should correctly invoke Health Monitor start of cycle sequence', async function () {

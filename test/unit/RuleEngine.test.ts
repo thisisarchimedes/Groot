@@ -53,7 +53,7 @@ describe('Rule Engine Testings', function () {
   });
 
   async function startBlockchainNode(name: string): Promise<BlockchainNodeAdapter> {
-    const node = new BlockchainNodeAdapter(logger, name, configService.getMainRPCURL());
+    const node = new BlockchainNodeAdapter(logger, name);
     await node.startNode();
     return node;
   }
