@@ -128,5 +128,5 @@ export class BlockchainNodeProxyInfo {
 enum ProxyStoragePosition {
   OpenZeppelin = '0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3',
   EIP1967 = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc',
-  InvalidImplementationAddress = '0x000000000000000000000000000000000000'
+  InvalidImplementationAddress = '0x0000000000000000000000000000000000000000000000000000000000000000'
 }
