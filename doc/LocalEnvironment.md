@@ -12,6 +12,11 @@ Groot is running in a K8s pod: 1 Groot container + 2 ETH nodes containers.
 ## Notes
 
 - All scripts are assuming, they've been called from the Groot project root directory
+- Test shortcuts
+    - `yarn test:unit`
+    - `yarn test:acceptance`
+    - `yarn test:interface`
+    - `yarn test:all`
 
 ## Initial Setup
 
