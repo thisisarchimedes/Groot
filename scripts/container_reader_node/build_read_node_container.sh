@@ -23,12 +23,15 @@ if [ ! -d "scripts/container_reader_node/container_files" ]; then
 fi
 
 # adding API_KEY - editing hardhat.config.js
-sed -i '' "s|+ 'API_KEY_ALCHEMY'|+ '$API_KEY_ALCHEMY'|g" scripts/container_reader_node/container_files/hardhat.config.js
+#sed -i '' "s|+ 'API_KEY_ALCHEMY'|+ '$API_KEY_ALCHEMY'|g" scripts/container_reader_node/container_files/hardhat.config.js
+sed -i "s|+ 'API_KEY_ALCHEMY'|+ '$API_KEY_ALCHEMY'|g" scripts/container_reader_node/container_files/hardhat.config.js
+
 
 docker pull node:18
 docker build --no-cache -t arch-production-node:latest scripts/container_reader_node/container_files/
 
 # revert changes
-sed -i '' "s|+ '$API_KEY_ALCHEMY'|+ 'API_KEY_ALCHEMY'|g" scripts/container_reader_node/container_files/hardhat.config.js
+#sed -i '' "s|+ '$API_KEY_ALCHEMY'|+ 'API_KEY_ALCHEMY'|g" scripts/container_reader_node/container_files/hardhat.config.js
+sed -i "s|+ '$API_KEY_ALCHEMY'|+ 'API_KEY_ALCHEMY'|g" scripts/container_reader_node/container_files/hardhat.config.js
 
 echo "Docker image built successfully."
