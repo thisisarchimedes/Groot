@@ -1,5 +1,3 @@
-import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
-import {Logger} from '../../service/logger/Logger';
 import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
 import {Rule, RuleConstructorInput, RuleParams} from './Rule';
 // import {UNISWAPV3_POOL_ABI} from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json';

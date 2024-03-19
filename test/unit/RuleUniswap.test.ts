@@ -4,7 +4,6 @@ import * as dotenv from 'dotenv';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
-import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
@@ -130,12 +129,6 @@ describe('Rule Factory Testings: Uniswap', function() {
     );
     exptectedNewUpperTick =
       Math.round(exptectedNewUpperTick / tickSpacing) * tickSpacing;
-    let expectedNewLowerTick = Number(
-        (currentTick * lowerTargetTickPercentage) / 100,
-    );
-
-    expectedNewLowerTick =
-      Math.round(expectedNewLowerTick / tickSpacing) * tickSpacing;
 
     logger.lookForInfoLogLineContaining(
         `New upper tick: ${exptectedNewUpperTick}`,
