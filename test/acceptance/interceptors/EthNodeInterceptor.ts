@@ -1,7 +1,7 @@
 import nock from 'nock';
-import {Mock} from './Mock';
+import {Interceptor} from './Interceptor';
 
-export class MockEthNode extends Mock {
+export class EthNodeInterceptor extends Interceptor {
   private readonly mockRpcUrl: string;
   private blockNumber: number; // Property to store the block number
 
