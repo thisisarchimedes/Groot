@@ -32,4 +32,5 @@ We run on AWS EKS w/Fargate. Pod has the following containers
 - **2 x Hardhat nodes (read only)**
 
 ### Current K8s clusters
-- groot-demo-app (us-west-1)
+- Cluster: groot-demo-app (us-west-1)
+- ECR Repo: groot (us-west-1)
