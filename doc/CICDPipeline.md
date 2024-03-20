@@ -33,4 +33,25 @@ We run on AWS EKS w/Fargate. Pod has the following containers
 
 ### Current K8s clusters
 - Cluster: groot-demo-app (us-west-1)
+
+## Getting Basic Cluster Information
+
+_*Before you begin*_
+From local environment, make sure aws cli is installed and configured with the right credentials. Also install `kubectl`.
+Then, authenicate and make sure you can get the cluster information.
+
+```bash
+aws eks update-kubeconfig --name groot-demo-app --region us-west-1
+kubectl get pods --all-namespaces
+```
+
+Get all pods
+```bash
+kubectl get pods -n default
+```
+
+Get pod info
+```bash
+kubectl describe pod <pod-name>
+```
 - ECR Repo: groot (us-west-1)
