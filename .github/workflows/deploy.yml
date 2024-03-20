@@ -3,8 +3,7 @@ name: Deploy Stage
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
 
 env:
   ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
@@ -16,11 +15,12 @@ env:
   API_DEVOPS_EVENT_CATCHER: ${{ vars.API_DEVOPS_EVENT_CATCHER }}
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
   EKS_REGION: us-west-1
-  ECR_REPOSITORY: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot
 
 jobs:
-  deploy:
+  build:
+    name: Build and Push Images
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -40,40 +40,42 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Build read node container
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.EKS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push read node container
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: groot/arch-production-node
+          IMAGE_TAG: latest
         run: |
           ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
+          docker tag arch-production-node:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Push read node container to ECR
-        id: ecr-read-node
-        uses: jwalton/gh-ecr-push@v1
-        with:
-          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          region: ${{ env.EKS_REGION }}
-          image: arch-production-node:latest
-          local-image: arch-production-node:latest
-
-      - name: Build main Groot container
+      - name: Build and push main Groot container
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: groot/groot-container
+          IMAGE_TAG: latest
         run: |
           ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ vars.ETH_NODE_CONTAINER_NAME }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
-
-      - name: Push main Groot container to ECR
-        id: ecr-main-groot
-        uses: jwalton/gh-ecr-push@v1
-        with:
-          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          region: ${{ env.EKS_REGION }}
-          image: groot-container:latest
-          local-image: groot-container:latest
+          docker tag groot-container:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
       - name: Install kubectl
         run: |
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
-    
 
       - name: Deploy to EKS (DemoApp)
         run: |
