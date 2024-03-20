@@ -16,13 +16,14 @@ script_dir="$(dirname "$0")"
 env_file="$script_dir/container_files/.env"
 
 # Write environment variables to the .env file
-echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> "$env_file"
-echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> "$env_file"
+echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $env_file
+echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $env_file
 
 echo ".env file created at: $env_file"
 
 docker pull node:20
 docker build --no-cache -t groot-container -f scripts/container_main_groot/Dockerfile .
+cat $env_file
 rm $env_file
 
 
