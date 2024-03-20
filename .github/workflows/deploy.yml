@@ -49,17 +49,13 @@ jobs:
           aws-region: ${{ env.EKS_REGION }}    
 
       - name: Build and push read node container
-        env:
-          ECR_REPOSITORY: groot/arch-production-node
-          IMAGE_TAG: latest
         run: |
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
           ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
-          docker tag arch-production-node:latest 240910251918.dkr.ecr.us-west-1.amazonaws.com/arch-production-node:latest
-          
-          #docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-          docker push 240910251918.dkr.ecr.us-west-1.amazonaws.com/arch-production-node:latest
+
+          docker tag arch-production-node:latest ${{ env.ECR_REGISTRY }}/arch-production-node:latest
+          docker push ${{ env.ECR_REGISTRY }}/arch-production-node:latest
 
       - name: Build and push main Groot container
         env:
