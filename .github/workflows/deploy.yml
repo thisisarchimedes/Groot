@@ -51,14 +51,29 @@ jobs:
       - name: Build and push read node container
         run: |
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
-
+      
           ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
-
-          #docker tag arch-production-node:latest ${{ env.ECR_REGISTRY }}/arch-production-node:latest
-          #docker push ${{ env.ECR_REGISTRY }}/arch-production-node:latest
           
           docker tag arch-production-node:latest 240910251918.dkr.ecr.us-west-1.amazonaws.com/arch-production-node:latest
-          docker push 240910251918.dkr.ecr.us-west-1.amazonaws.com/arch-production-node:latest
+          
+          retry_count=0
+          while [ $retry_count -lt 3 ]; do
+            docker push 240910251918.dkr.ecr.us-west-1.amazonaws.com/arch-production-node:latest --debug
+            exit_code=$?
+            if [ $exit_code -eq 0 ]; then
+              echo "Docker push succeeded"
+              break
+            else
+              echo "Docker push failed with exit code $exit_code, retrying in $((2**retry_count)) seconds..."
+              sleep $((2**retry_count))
+              retry_count=$((retry_count+1))
+            fi
+          done
+          
+          if [ $retry_count -eq 3 ]; then
+            echo "Docker push failed after 3 retries"
+            exit 1
+          fi
 
       - name: Build and push main Groot container
         env:
