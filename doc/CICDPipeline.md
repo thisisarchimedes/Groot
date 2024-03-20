@@ -51,8 +51,9 @@ Get all pods
 kubectl get pods -n default
 ```
 
-Get pod info
+Get pod info & logs
 ```bash
 kubectl describe pod <pod-name>
+kubectl logs <pod-name>
 ```
 
