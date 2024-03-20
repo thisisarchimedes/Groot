@@ -16,11 +16,8 @@ script_dir="$(dirname "$0")"
 env_file="$script_dir/container_files/.env"
 
 # Write environment variables to the .env file
-echo "ENVIRONMENT=$ENVIRONMENT" > "$env_file"
-echo "DOCKER_IMAGE_NAME=$DOCKER_IMAGE_NAME" >> "$env_file"
 echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> "$env_file"
 echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> "$env_file"
-echo "AWS_REGION=$AWS_REGION" >> "$env_file"
 
 echo ".env file created at: $env_file"
 

@@ -155,10 +155,4 @@ export class Groot {
 
     this.logger.info('Groot cycle ran successfully.');
   }
-
-  public async sleepBetweenCycles(): Promise<void> {
-    const sleepTime = this.configService.getSleepMillisecondsBetweenCycles();
-    this.logger.debug(`Sleeping for ${sleepTime} milliseconds...`);
-    await new Promise((resolve) => setTimeout(resolve, sleepTime));
-  }
 }

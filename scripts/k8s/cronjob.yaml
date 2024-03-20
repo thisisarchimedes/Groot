@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: groot-cronjob
+spec:
+  schedule: "*/1 * * * *"   # Run every minute
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl:latest
+            command: ["kubectl"]
+            args: ["delete", "pods", "-l", "app=groot"]
+          restartPolicy: OnFailure
+  
