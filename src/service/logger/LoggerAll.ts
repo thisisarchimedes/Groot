@@ -4,6 +4,8 @@ import { ConfigService } from '../config/ConfigService';
 import { Logger } from './Logger';
 import { LoggerConsole } from './LoggerConsole';
 import { LoggerNewRelic } from './LoggerNewRelic';
+import { IConfigServiceAWS } from '../config/IConfigServiceAWS';
+import { ILoggerAll } from './ILoggerAll';
 
 @injectable()
 export class LoggerAll extends Logger implements ILoggerAll {
@@ -12,7 +14,7 @@ export class LoggerAll extends Logger implements ILoggerAll {
   private loggerNewRelic: LoggerNewRelic;
 
   constructor(
-    configService: ConfigService,
+    configService: IConfigServiceAWS,
     serviceName: string,
   ) {
     super();

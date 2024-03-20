@@ -1,7 +1,3 @@
-interface ILoggerConsole {
-    flush(): Promise<void>;
-    debug(message: string): void;
-    info(message: string): void;
-    warn(message: string): void;
-    error(message: string): void;
-}
+import { ILogger } from "./ILogger";
+
+export interface ILoggerConsole extends ILogger { }

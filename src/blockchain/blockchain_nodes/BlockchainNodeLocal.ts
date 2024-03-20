@@ -1,12 +1,12 @@
 import axios from 'axios';
-import {JsonRpcProvider} from 'ethers';
-import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
-import {Logger} from '../../service/logger/Logger';
+import { JsonRpcProvider } from 'ethers';
+import { BlockchainNode, BlockchainNodeError } from './BlockchainNode';
+import { ILogger } from '../../service/logger/ILogger';
 
 export class BlockchainNodeLocal extends BlockchainNode {
   private readonly localRpcUrl: string;
 
-  constructor(logger: Logger, localRpcUrl: string, nodeName: string) {
+  constructor(logger: ILogger, localRpcUrl: string, nodeName: string) {
     super(logger, nodeName);
     this.localRpcUrl = localRpcUrl;
     this.provider = new JsonRpcProvider(localRpcUrl);
@@ -66,10 +66,10 @@ export class BlockchainNodeLocal extends BlockchainNode {
       const response = await axios.post(this.localRpcUrl, {
         jsonrpc: '2.0',
         method: 'hardhat_reset',
-        params: [{forking: {jsonRpcUrl: externalProviderRpcUrl}}],
+        params: [{ forking: { jsonRpcUrl: externalProviderRpcUrl } }],
         id: 1,
       }, {
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
       });
 
       return response.data;

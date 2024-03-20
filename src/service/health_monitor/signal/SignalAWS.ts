@@ -6,22 +6,22 @@ import {
   MetricDatum,
 } from '@aws-sdk/client-cloudwatch';
 
-import {Logger} from '../../logger/Logger';
-import {ConfigService} from '../../config/ConfigService';
-import {HostNameProvider} from '../HostNameProvider';
+import { HostNameProvider } from '../HostNameProvider';
+import { ILogger } from '../../logger/ILogger';
+import { IConfigService } from '../../config/IConfigService';
 
 export abstract class SignalAWS {
   protected readonly cloudWatchClient: CloudWatchClient;
-  protected readonly logger: Logger;
-  protected readonly configService: ConfigService;
+  protected readonly logger: ILogger;
+  protected readonly configService: IConfigService;
   protected readonly hostNameProvider: HostNameProvider;
   protected readonly metricNamespace: string;
 
   constructor(
-      logger: Logger,
-      configService: ConfigService,
-      hostNameProvider: HostNameProvider,
-      metricNamespace: string,
+    logger: ILogger,
+    configService: IConfigService,
+    hostNameProvider: HostNameProvider,
+    metricNamespace: string,
   ) {
     this.cloudWatchClient = new CloudWatchClient({});
     this.logger = logger;

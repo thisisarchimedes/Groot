@@ -1,15 +1,16 @@
-import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
-import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
-import {Logger} from '../../service/logger/Logger';
-import {UrgencyLevel} from '../TypesRule';
-import {AbiRepo} from '../tool/abi_repository/AbiRepo';
+import { OutboundTransaction } from '../../blockchain/OutboundTransaction';
+import { BlockchainReader } from '../../blockchain/blockchain_reader/BlockchainReader';
+import { ILogger } from '../../service/logger/ILogger';
+import { Logger } from '../../service/logger/Logger';
+import { UrgencyLevel } from '../TypesRule';
+import { AbiRepo } from '../tool/abi_repository/AbiRepo';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
 }
 
 export interface RuleConstructorInput {
-  logger: Logger;
+  logger: ILogger;
   blockchainReader: BlockchainReader;
   abiRepo: AbiRepo
   ruleLabel: string;
@@ -18,7 +19,7 @@ export interface RuleConstructorInput {
 }
 
 export abstract class Rule {
-  protected logger: Logger;
+  protected logger: ILogger;
   protected blockchainReader: BlockchainReader;
   protected abiRepo: AbiRepo;
 

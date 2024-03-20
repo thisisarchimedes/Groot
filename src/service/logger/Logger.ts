@@ -1,7 +1,8 @@
+import { ILogger } from './ILogger';
 import { LogLevel } from './LogLevel';
 import { LogMessageCycleTime } from './TypeLogItem';
 
-export abstract class Logger {
+export abstract class Logger implements ILogger {
   protected currentLevel: LogLevel = LogLevel.Debug;
 
   public setLogLevel(level: LogLevel): void {

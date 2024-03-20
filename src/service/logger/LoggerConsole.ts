@@ -2,6 +2,7 @@ import { injectable, inject } from 'inversify';
 
 import { LogLevel } from './LogLevel';
 import { Logger } from './Logger';
+import { ILoggerConsole } from './ILoggerConsole';
 
 @injectable()
 export class LoggerConsole extends Logger implements ILoggerConsole {

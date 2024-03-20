@@ -17,6 +17,8 @@ import { HostNameProvider } from './service/health_monitor/HostNameProvider';
 import { AbiRepo } from './rule_engine/tool/abi_repository/AbiRepo';
 import { AbiStorageDynamoDB } from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import { AbiFetcherEtherscan } from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import { IConfigServiceAWS } from './service/config/IConfigServiceAWS';
+import { ILoggerAll } from './service/logger/ILoggerAll';
 
 dotenv.config();
 
@@ -37,8 +39,7 @@ export class Groot {
   private readonly mainLocalNodePort: number;
   private readonly altLocalNodePort: number;
 
-  constructor(@inject("IConfigServiceAWS") configService: IConfigServiceAWS,
-    @inject("ILoggerAll") logger: ILoggerAll,
+  constructor(
     environment: string,
     region: string,
     mainLocalNodePort: number = 8545,

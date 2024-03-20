@@ -1,11 +1,12 @@
 import os from 'os';
-import {Logger} from '../logger/Logger';
-import {IHostNameProvider} from './IHostNameProvider';
+import { Logger } from '../logger/Logger';
+import { IHostNameProvider } from './IHostNameProvider';
+import { ILogger } from '../logger/ILogger';
 
 export class HostNameProvider implements IHostNameProvider {
-  private readonly logger: Logger;
+  private readonly logger: ILogger;
 
-  constructor(logger: Logger) {
+  constructor(logger: ILogger) {
     this.logger = logger;
   }
 

@@ -1,5 +1,6 @@
-import {ethers, Contract} from 'ethers';
-import {Logger} from '../../service/logger/Logger';
+import { ethers, Contract } from 'ethers';
+import { Logger } from '../../service/logger/Logger';
+import { ILogger } from '../../service/logger/ILogger';
 
 export class BlockchainNodeError extends Error {
   constructor(message: string) {
@@ -13,11 +14,11 @@ export class BlockchainNodeError extends Error {
 
 export abstract class BlockchainNode {
   protected provider!: ethers.Provider;
-  protected readonly logger: Logger;
+  protected readonly logger: ILogger;
   protected isNodeHealthy: boolean = true;
   protected nodeName: string = '';
 
-  constructor(logger: Logger, nodeName: string) {
+  constructor(logger: ILogger, nodeName: string) {
     this.logger = logger;
     this.nodeName = nodeName;
   }
@@ -37,10 +38,10 @@ export abstract class BlockchainNode {
   }
 
   public async callViewFunction(
-      contractAddress: string,
-      abi: ethers.Interface,
-      functionName: string,
-      params: unknown[] = [],
+    contractAddress: string,
+    abi: ethers.Interface,
+    functionName: string,
+    params: unknown[] = [],
   ): Promise<unknown> {
     const contract = new Contract(contractAddress, abi, this.provider);
 

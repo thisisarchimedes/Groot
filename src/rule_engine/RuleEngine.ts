@@ -1,15 +1,16 @@
-import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {Logger} from '../service/logger/Logger';
-import {Rule} from './rule/Rule';
-import {RuleJSONConfigItem} from './TypesRule';
-import {FactoryRule} from './FactoryRule';
+import { OutboundTransaction } from '../blockchain/OutboundTransaction';
+import { Logger } from '../service/logger/Logger';
+import { Rule } from './rule/Rule';
+import { RuleJSONConfigItem } from './TypesRule';
+import { FactoryRule } from './FactoryRule';
+import { ILogger } from '../service/logger/ILogger';
 
 export class RuleEngine {
   private rules: Rule[] = [];
   private outboundTransactions: OutboundTransaction[] = [];
 
   constructor(
-    private readonly logger: Logger,
+    private readonly logger: ILogger,
     private readonly ruleFactory: FactoryRule,
   ) { }
 
@@ -29,8 +30,8 @@ export class RuleEngine {
 
   private createRules(ruleConfig: RuleJSONConfigItem[]): Rule[] {
     return ruleConfig
-        .map((config) => this.ruleFactory.createRule(config))
-        .filter((rule): rule is Rule => rule !== null);
+      .map((config) => this.ruleFactory.createRule(config))
+      .filter((rule): rule is Rule => rule !== null);
   }
 
   private logRuleCount(): void {
@@ -41,11 +42,11 @@ export class RuleEngine {
     const evaluatePromises = this.rules.map(async (rule) => {
       try {
         await rule.evaluate();
-        return {rule, success: true};
+        return { rule, success: true };
       } catch (error) {
         const errorMessage = (error as Error).message;
         this.logger.error(`Rule evaluation failed for rule: ${rule.getRuleLabel()}. Error: ${errorMessage}`);
-        return {rule, success: false};
+        return { rule, success: false };
       }
     });
 
@@ -53,7 +54,7 @@ export class RuleEngine {
   }
 
   private processEvaluateResults(evaluateResults: EvaluateResult[]): void {
-    const {successfulRuleEval, failedRuleEval, outboundTransactions} = this.aggregateEvaluateResults(evaluateResults);
+    const { successfulRuleEval, failedRuleEval, outboundTransactions } = this.aggregateEvaluateResults(evaluateResults);
     this.logger.reportRuleEvalResults(successfulRuleEval, failedRuleEval);
     this.outboundTransactions = outboundTransactions;
   }
@@ -63,7 +64,7 @@ export class RuleEngine {
     let failedRuleEval = 0;
     const outboundTransactions: OutboundTransaction[] = [];
 
-    for (const {rule, success} of evaluateResults) {
+    for (const { rule, success } of evaluateResults) {
       if (success) {
         successfulRuleEval++;
         this.processSuccessfulRule(rule, outboundTransactions);
@@ -72,7 +73,7 @@ export class RuleEngine {
       }
     }
 
-    return {successfulRuleEval, failedRuleEval, outboundTransactions};
+    return { successfulRuleEval, failedRuleEval, outboundTransactions };
   }
 
   private processSuccessfulRule(rule: Rule, outboundTransactions: OutboundTransaction[]): void {

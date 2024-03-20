@@ -1,13 +1,14 @@
-import {Logger} from '../logger/Logger';
-import {BlockchainNodeHealthMonitor} from './BlockchainNodeHealthMonitor';
-import {ISignalCriticalFailure} from './signal/ISignalCriticalFailure';
-import {ISignalHeartbeat} from './signal/ISignalHeartbeat';
+import { ILogger } from '../logger/ILogger';
+import { Logger } from '../logger/Logger';
+import { BlockchainNodeHealthMonitor } from './BlockchainNodeHealthMonitor';
+import { ISignalCriticalFailure } from './signal/ISignalCriticalFailure';
+import { ISignalHeartbeat } from './signal/ISignalHeartbeat';
 
 export class HealthMonitor {
   private cycleStartTimestamp!: Date;
 
   constructor(
-    private readonly logger: Logger,
+    private readonly logger: ILogger,
     private readonly blockchainHealthMonitor: BlockchainNodeHealthMonitor,
     private readonly signalHeartbeat: ISignalHeartbeat,
     private readonly signalCriticalFailure: ISignalCriticalFailure) { }

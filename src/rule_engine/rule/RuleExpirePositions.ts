@@ -1,13 +1,13 @@
-import {Rule, RuleParams} from './Rule';
-import {UrgencyLevel} from '../TypesRule';
-import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
+import { Rule, RuleParams } from './Rule';
+import { UrgencyLevel } from '../TypesRule';
+import { OutboundTransaction } from '../../blockchain/OutboundTransaction';
 import LeverageDataSource from '../tool/data_source/LeverageDataSource';
-import {RuleConstructorInput} from '../../types/RuleConstructorInput';
+import { RuleConstructorInput } from '../../types/RuleConstructorInput';
 
 export interface RuleParamsDummy extends RuleParams {
-    message: string;
-    NumberOfDummyTxs: number;
-    evalSuccess: boolean;
+  message: string;
+  NumberOfDummyTxs: number;
+  evalSuccess: boolean;
 }
 
 export class RuleExpirePositions extends Rule {

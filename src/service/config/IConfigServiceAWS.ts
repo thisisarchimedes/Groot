@@ -1,4 +1,5 @@
-interface IConfigServiceAWS {
-    refreshConfig(): Promise<void>;
+import { IConfigService } from "./IConfigService";
+
+export interface IConfigServiceAWS extends IConfigService {
     getAWSRegion(): string;
 }

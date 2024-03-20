@@ -1,8 +1,9 @@
-import {BlockchainNode} from '../../blockchain/blockchain_nodes/BlockchainNode';
-import {Logger} from '../logger/Logger';
+import { BlockchainNode } from '../../blockchain/blockchain_nodes/BlockchainNode';
+import { ILogger } from '../logger/ILogger';
+import { Logger } from '../logger/Logger';
 
 export class BlockchainNodeHealthMonitor {
-  constructor(private readonly logger: Logger, private readonly nodes: BlockchainNode[]) { }
+  constructor(private readonly logger: ILogger, private readonly nodes: BlockchainNode[]) { }
 
   public async checkBlockchainNodesHealth(): Promise<void> {
     const unhealthyNodes = this.getUnhealthyNodes();
@@ -25,10 +26,10 @@ export class BlockchainNodeHealthMonitor {
 
   private recoverNodesInParallel(unhealthyNodes: BlockchainNode[]): Promise<PromiseSettledResult<boolean>[]> {
     return Promise.allSettled(
-        unhealthyNodes.map((node) => {
-          this.logAttemptingNodeRecovery(node);
-          return this.recoverNodeWithErrorHandling(node);
-        }),
+      unhealthyNodes.map((node) => {
+        this.logAttemptingNodeRecovery(node);
+        return this.recoverNodeWithErrorHandling(node);
+      }),
     );
   }
 
@@ -52,8 +53,8 @@ export class BlockchainNodeHealthMonitor {
   }
 
   private allNodesFailedToRecover(
-      failedRecoveries: PromiseSettledResult<boolean>[],
-      unhealthyNodes: BlockchainNode[],
+    failedRecoveries: PromiseSettledResult<boolean>[],
+    unhealthyNodes: BlockchainNode[],
   ): boolean {
     return failedRecoveries.length === unhealthyNodes.length;
   }
