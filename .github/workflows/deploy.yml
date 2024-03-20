@@ -58,7 +58,7 @@ jobs:
           
           retry_count=0
           while [ $retry_count -lt 3 ]; do
-            docker push 240910251918.dkr.ecr.us-west-1.amazonaws.com/arch-production-node:latest --debug
+            docker push 240910251918.dkr.ecr.us-west-1.amazonaws.com/arch-production-node:latest
             exit_code=$?
             if [ $exit_code -eq 0 ]; then
               echo "Docker push succeeded"
