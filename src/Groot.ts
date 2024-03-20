@@ -6,7 +6,6 @@ import { injectable, inject } from 'inversify';
 import { TxQueueAdapter } from '../test/unit/adapters/TxQueueAdapter';
 import { FactoryRule } from './rule_engine/FactoryRule';
 import { RuleEngine } from './rule_engine/RuleEngine';
-import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
 import { LoggerAll } from './service/logger/LoggerAll';
 import { TransactionQueuer } from './tx_queue/TransactionQueuer';
 import { BlockchainReader } from './blockchain/blockchain_reader/BlockchainReader';
@@ -21,7 +20,6 @@ import { AbiStorageDynamoDB } from './rule_engine/tool/abi_repository/AbiStorage
 import { AbiFetcherEtherscan } from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 import { IConfigServiceAWS } from './service/config/interfaces/IConfigServiceAWS';
 import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
-import { ILogger } from './service/logger/interfaces/ILogger';
 
 dotenv.config();
 

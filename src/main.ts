@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
 import { container } from './inversify.config'; // Ensure this path is correct
-import { TYPES } from './inversify.config'; // Adjust the path as needed
+import { TYPES } from './inversify.types'; // Adjust the path as needed
 import { Groot } from './Groot';
 import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
 
