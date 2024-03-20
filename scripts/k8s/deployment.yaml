@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: groot-container
-        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot/groot-container:latest
+        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:groot-container
         imagePullPolicy: Always
         env:
         - name: MAIN_LOCAL_NODE_PORT
@@ -22,7 +22,7 @@ spec:
         - name: ALT_LOCAL_NODE_PORT
           value: "18545"
       - name: eth-node-1
-        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot/arch-production-node:latest
+        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
         imagePullPolicy: Always
         env:
         - name: HARDHAT_PORT
@@ -30,7 +30,7 @@ spec:
         ports:
         - containerPort: 8545
       - name: eth-node-2
-        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot/arch-production-node:latest
+        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
         imagePullPolicy: Always
         env:
         - name: HARDHAT_PORT

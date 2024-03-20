@@ -57,16 +57,16 @@ jobs:
       - name: Push main Groot container
         run: |
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
-          docker tag groot-container:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}/groot-container:latest
-          docker push --all-tags ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}
+          docker tag groot-container:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:groot-container
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:groot-container
 
       - name: Build and push read node container
         run: |
           ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
           
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
-          docker tag arch-production-node:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}/arch-production-node:latest
-          docker push --all-tags ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}
+          docker tag arch-production-node:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:arch-production-node
+          docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:arch-production-node
 
       - name: Install kubectl
         run: |
