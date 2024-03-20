@@ -1,7 +1,14 @@
 FROM node:20
 
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+
 # Create app directory
 WORKDIR /usr/src/app
+
+# Create .env file
+RUN echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" > .env && \
+    echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
 
 RUN mkdir /usr/src/app/src
 COPY src ./src

@@ -57,7 +57,7 @@ jobs:
           cd -
         
           docker pull node:20
-          docker build --no-cache -t groot-container -f scripts/container_main_groot/Dockerfile .
+          docker build --no-cache --build-arg AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} --build-arg AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -t groot-container -f scripts/container_main_groot/Dockerfile .
 
       - name: Push main Groot container
         run: |
