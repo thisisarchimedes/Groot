@@ -14,9 +14,9 @@ env:
   PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
   API_DEVOPS_EVENT_CATCHER: ${{ vars.API_DEVOPS_EVENT_CATCHER }}
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
-  EKS_REGION: us-west-1
-  ECR_REGISTRY: 240910251918.dkr.ecr.us-west-1.amazonaws.com
-  ECR_REPO: groot
+  EKS_REGION: ${{ vars.EKS_REGION }}
+  ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+  ECR_REPO: ${{ vars.ECR_REPO }}
 
 jobs:
   build:
