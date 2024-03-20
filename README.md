@@ -11,4 +11,4 @@
 
 ## Tx broadcasting logic
 
-[TxLogic.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/TxLogic.md)
+[doc/TxLogic.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/TxLogic.md)
