@@ -58,9 +58,6 @@ jobs:
           docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
 
       - name: Build and push main Groot container
-        env:
-          ECR_REPOSITORY: groot/groot-container
-          IMAGE_TAG: latest
         run: |
           ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
           echo "HERE 1"
