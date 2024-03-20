@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import * as dotenv from 'dotenv';
-
+import {ethers} from 'ethers';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
@@ -40,7 +40,7 @@ describe('Rule Factory Testings: Uniswap', function() {
 
   it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', async function() {
     const ruleFactory = createRuleFactory();
-    await setupMockResponses(100, 200, 150);
+    await setupMockResponses(100, 200, 135);
     const uniswapRule = createUniswapRule();
 
     const rule = ruleFactory.createRule(uniswapRule);
@@ -130,8 +130,26 @@ describe('Rule Factory Testings: Uniswap', function() {
       rule?.popTransactionFromRuleLocalQueue() as OutboundTransaction;
     expect(pendingTx).not.to.be.null;
 
-    // TODO: check the tx content
-    expect(pendingTx.lowLevelUnsignedTransaction.data === '.....').to.be.true;
+    const upperTick = calculateNewTick(
+        currentTick,
+        upperTargetTickPercentage,
+        tickSpacing,
+    );
+    const lowerTick = calculateNewTick(
+        currentTick,
+        lowerTargetTickPercentage,
+        tickSpacing,
+    );
+    const ABI = ['function rebalance(int24,int24,uint256,uint256)'];
+    const iFace = new ethers.Interface(ABI);
+    const data = iFace.encodeFunctionData('rebalance', [
+      lowerTick,
+      upperTick,
+      BigInt(0),
+      BigInt(0),
+    ]);
+
+    expect(pendingTx.lowLevelUnsignedTransaction.data === data).to.be.true;
   });
 
   function createBlockchainNodeAdapter(

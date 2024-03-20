@@ -1,7 +1,8 @@
 import {ethers} from 'ethers';
 import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
 import UNISWAPV3_STRATEGY_ABI from '../../constants/abis/UNISWAPV3_STRATEGY_ABI.json';
-import {Contract, Transaction} from 'ethers';
+import {Contract} from 'ethers';
+import {RawTransactionData} from '../../blockchain/OutboundTransaction';
 export class ToolStrategyUniswap {
   private readonly strategyAddress: string;
   private readonly blockchainReader: BlockchainReader;
@@ -12,8 +13,11 @@ export class ToolStrategyUniswap {
   }
 
   public async getPoolAddress(): Promise<string> {
-    const ret = await this.blockchainReader.callViewFunction(this.strategyAddress,
-        new ethers.Interface(UNISWAPV3_STRATEGY_ABI), 'pool');
+    const ret = await this.blockchainReader.callViewFunction(
+        this.strategyAddress,
+        new ethers.Interface(UNISWAPV3_STRATEGY_ABI),
+        'pool',
+    );
     return ret as string;
   }
   public async upperTick(): Promise<number> {
@@ -49,23 +53,27 @@ export class ToolStrategyUniswap {
     );
     return ret as number;
   }
-  public createRebalanceTransaction(
+  public async createRebalanceTransaction(
       newUpperTick: number,
       newLowerTick: number,
       amount0OutMin: bigint,
       amount1OutMin: bigint,
-  ): Promise<Transaction> {
+  ): Promise<RawTransactionData> {
     // create transaction
     const strategyContract = new Contract(
         this.strategyAddress,
         UNISWAPV3_STRATEGY_ABI,
     );
-    const tx = strategyContract.rebalance(
-        newUpperTick,
+    const tx = await strategyContract['rebalance'].populateTransaction(
         newLowerTick,
+        newUpperTick,
         amount0OutMin,
         amount1OutMin,
     );
-    return tx;
+    return {
+      to: tx.to,
+      value: tx.value || BigInt(0),
+      data: tx.data,
+    };
   }
 }

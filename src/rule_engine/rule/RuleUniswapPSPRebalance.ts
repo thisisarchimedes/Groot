@@ -26,12 +26,12 @@ export class RuleUniswapPSPRebalance extends Rule {
   }
   public async evaluate(): Promise<void> {
     // call rebalance function based on the new params
-    const isUpperTickThresholdPassed =
-      await this.isCurrentTickAboveRebalanceUpperTickThreshold();
-    const isLowerTickThresholdPassed =
-      await this.isCurrentTickBelowRebalanceLowerTickThreshold();
+    const isUpperTickThresholdNotPassed =
+      await this.isCurrentTickBelowRebalanceUpperTickThreshold();
+    const isLowerTickThresholdNotPassed =
+      await this.isCurrentTickAboveRebalanceLowerTickThreshold();
 
-    if (!isUpperTickThresholdPassed && !isLowerTickThresholdPassed) {
+    if (isUpperTickThresholdNotPassed && isLowerTickThresholdNotPassed) {
       return;
     }
 
@@ -46,7 +46,7 @@ export class RuleUniswapPSPRebalance extends Rule {
     } as OutboundTransaction;
 
     tx.lowLevelUnsignedTransaction =
-      this.uniswapStrategy.createRebalanceTransaction(
+      await this.uniswapStrategy.createRebalanceTransaction(
           newUpperTick,
           newLowerTick,
           BigInt(0), // TODO change this to correct calculation amount
@@ -55,7 +55,7 @@ export class RuleUniswapPSPRebalance extends Rule {
     await this.pushTransactionToRuleLocalQueue(tx);
   }
 
-  private async isCurrentTickAboveRebalanceUpperTickThreshold(): Promise<boolean> {
+  private async isCurrentTickBelowRebalanceUpperTickThreshold(): Promise<boolean> {
     const currentTick = await this.uniswapStrategy.currentTick();
     const upperTick = await this.uniswapStrategy.upperTick();
     const params = this.params as RuleParamsUniswapPSPRebalance;
@@ -64,7 +64,7 @@ export class RuleUniswapPSPRebalance extends Rule {
     return currentTick <= acceptedUpperTick;
   }
 
-  private async isCurrentTickBelowRebalanceLowerTickThreshold(): Promise<boolean> {
+  private async isCurrentTickAboveRebalanceLowerTickThreshold(): Promise<boolean> {
     const currentTick = await this.uniswapStrategy.currentTick();
     const lowerTick = await this.uniswapStrategy.lowerTick();
     const params = this.params as RuleParamsUniswapPSPRebalance;
