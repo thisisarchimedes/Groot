@@ -58,7 +58,6 @@ jobs:
         
           docker pull node:20
           docker build --no-cache -t groot-container -f scripts/container_main_groot/Dockerfile .
-          # ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ env.AWS_REGION }}
 
       - name: Push main Groot container
         run: |
