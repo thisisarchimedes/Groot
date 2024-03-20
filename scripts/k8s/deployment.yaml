@@ -14,31 +14,27 @@ spec:
     spec:
       containers:
       - name: groot-container
-        image: groot-container:latest
-        imagePullPolicy: IfNotPresent
-        envFrom:
-        - configMapRef:
-            name: demoapp-config
+        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot/groot-container:latest
+        imagePullPolicy: Always
+        env:
+        - name: MAIN_LOCAL_NODE_PORT
+          value: "8545"
+        - name: ALT_LOCAL_NODE_PORT
+          value: "18545"
       - name: eth-node-1
-        image: arch-production-node:latest
-        imagePullPolicy: IfNotPresent
+        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot/arch-production-node:latest
+        imagePullPolicy: Always
         env:
         - name: HARDHAT_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: demoapp-config
-              key: HARDHAT_PORT_1
+          value: "8545"
         ports:
         - containerPort: 8545
       - name: eth-node-2
-        image: arch-production-node:latest
-        imagePullPolicy: IfNotPresent
+        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot/arch-production-node:latest
+        imagePullPolicy: Always
         env:
         - name: HARDHAT_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: demoapp-config
-              key: HARDHAT_PORT_2
+          value: "18545"
         ports:
         - containerPort: 18545
       restartPolicy: Always
