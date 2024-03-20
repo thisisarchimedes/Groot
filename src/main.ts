@@ -1,8 +1,10 @@
+import 'reflect-metadata';
+
 import * as dotenv from 'dotenv';
 
-import {Groot} from './Groot';
-import {LoggerAll} from './service/logger/LoggerAll';
-import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
+import { Groot } from './Groot';
+import { LoggerAll } from './service/logger/LoggerAll';
+import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
 
 dotenv.config();
 

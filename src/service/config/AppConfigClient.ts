@@ -1,6 +1,9 @@
-import {AppConfig, GetConfigurationCommandOutput} from '@aws-sdk/client-appconfig';
+import { injectable, inject } from 'inversify';
 
-export class AppConfigClient {
+import { AppConfig, GetConfigurationCommandOutput } from '@aws-sdk/client-appconfig';
+
+@injectable()
+export class AppConfigClient implements IAppConfigClient {
   private readonly DEFAULT_APPCONFIG_ENVIRONMENT = 'env';
 
   private readonly appConfigClient: AppConfig;
@@ -8,7 +11,7 @@ export class AppConfigClient {
   private readonly clientId: string = 'Groot';
 
   constructor(environment: string, region: string) {
-    this.appConfigClient = new AppConfig({region: region});
+    this.appConfigClient = new AppConfig({ region: region });
     this.environment = environment;
   }
 

@@ -1,29 +1,29 @@
 import * as dotenv from 'dotenv';
+import { inject } from 'inversify';
 
-import {TxQueueAdapter} from '../test/unit/adapters/TxQueueAdapter';
-import {FactoryRule} from './rule_engine/FactoryRule';
-import {RuleEngine} from './rule_engine/RuleEngine';
-import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
-import {LoggerAll} from './service/logger/LoggerAll';
-import {TransactionQueuer} from './tx_queue/TransactionQueuer';
-import {BlockchainReader} from './blockchain/blockchain_reader/BlockchainReader';
-import {BlockchainNodeLocal} from './blockchain/blockchain_nodes/BlockchainNodeLocal';
-import {HealthMonitor} from './service/health_monitor/HealthMonitor';
-import {BlockchainNodeHealthMonitor} from './service/health_monitor/BlockchainNodeHealthMonitor';
-import {SignalAWSCriticalFailure} from './service/health_monitor/signal/SignalAWSCriticalFailure';
-import {SignalAWSHeartbeat} from './service/health_monitor/signal/SignalAWSHeartbeat';
-import {HostNameProvider} from './service/health_monitor/HostNameProvider';
-import {AbiRepo} from './rule_engine/tool/abi_repository/AbiRepo';
-import {AbiStorageDynamoDB} from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
-import {AbiFetcherEtherscan} from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import { TxQueueAdapter } from '../test/unit/adapters/TxQueueAdapter';
+import { FactoryRule } from './rule_engine/FactoryRule';
+import { RuleEngine } from './rule_engine/RuleEngine';
+import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
+import { LoggerAll } from './service/logger/LoggerAll';
+import { TransactionQueuer } from './tx_queue/TransactionQueuer';
+import { BlockchainReader } from './blockchain/blockchain_reader/BlockchainReader';
+import { BlockchainNodeLocal } from './blockchain/blockchain_nodes/BlockchainNodeLocal';
+import { HealthMonitor } from './service/health_monitor/HealthMonitor';
+import { BlockchainNodeHealthMonitor } from './service/health_monitor/BlockchainNodeHealthMonitor';
+import { SignalAWSCriticalFailure } from './service/health_monitor/signal/SignalAWSCriticalFailure';
+import { SignalAWSHeartbeat } from './service/health_monitor/signal/SignalAWSHeartbeat';
+import { HostNameProvider } from './service/health_monitor/HostNameProvider';
+import { AbiRepo } from './rule_engine/tool/abi_repository/AbiRepo';
+import { AbiStorageDynamoDB } from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
+import { AbiFetcherEtherscan } from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 
 dotenv.config();
 
 export class Groot {
   private readonly logServiceName: string = 'Groot';
-  private readonly configService: ConfigServiceAWS;
-
-  private logger!: LoggerAll;
+  private logger: ILoggerAll;
+  private configService: IConfigServiceAWS;
   private ruleEngine!: RuleEngine;
   private txQueuer!: TransactionQueuer;
   private healthMonitor!: HealthMonitor;
@@ -37,7 +37,14 @@ export class Groot {
   private readonly mainLocalNodePort: number;
   private readonly altLocalNodePort: number;
 
-  constructor(environment: string, region: string, mainLocalNodePort: number = 8545, altLocalNodePort: number = 18545) {
+  constructor(@inject("IConfigServiceAWS") configService: IConfigServiceAWS,
+    @inject("ILoggerAll") logger: ILoggerAll,
+    environment: string,
+    region: string,
+    mainLocalNodePort: number = 8545,
+    altLocalNodePort: number = 18545) {
+    this.configService = configService;
+    this.logger = logger;
     this.configService = new ConfigServiceAWS(environment, region);
     this.mainLocalNodePort = mainLocalNodePort;
     this.altLocalNodePort = altLocalNodePort;
@@ -80,10 +87,10 @@ export class Groot {
     const signalHeartbeat = new SignalAWSHeartbeat(this.logger, this.configService, hostNameProvider);
     const signalCriticalFailure = new SignalAWSCriticalFailure(this.logger, this.configService, hostNameProvider);
     this.healthMonitor = new HealthMonitor(
-        this.logger,
-        blockchainHealthMonitor,
-        signalHeartbeat,
-        signalCriticalFailure);
+      this.logger,
+      blockchainHealthMonitor,
+      signalHeartbeat,
+      signalCriticalFailure);
   }
 
   private initalizeAbiRepo() {
@@ -92,8 +99,8 @@ export class Groot {
     }
 
     const abiStorage = new AbiStorageDynamoDB(
-        this.configService.getDynamoDBAbiRepoTable(),
-        this.configService.getAWSRegion());
+      this.configService.getDynamoDBAbiRepoTable(),
+      this.configService.getAWSRegion());
     const abiFetcher = new AbiFetcherEtherscan(this.configService.getEtherscanAPIKey());
     this.abiRepo = new AbiRepo(this.blockchainReader, abiStorage, abiFetcher);
   }

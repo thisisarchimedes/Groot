@@ -1,15 +1,19 @@
-import {ConfigService} from '../config/ConfigService';
-import {Logger} from './Logger';
-import {LoggerConsole} from './LoggerConsole';
-import {LoggerNewRelic} from './LoggerNewRelic';
+import { injectable, inject } from 'inversify';
 
-export class LoggerAll extends Logger {
+import { ConfigService } from '../config/ConfigService';
+import { Logger } from './Logger';
+import { LoggerConsole } from './LoggerConsole';
+import { LoggerNewRelic } from './LoggerNewRelic';
+
+@injectable()
+export class LoggerAll extends Logger implements ILoggerAll {
+
   private loggerConsole: LoggerConsole;
   private loggerNewRelic: LoggerNewRelic;
 
   constructor(
-      configService: ConfigService,
-      serviceName: string,
+    configService: ConfigService,
+    serviceName: string,
   ) {
     super();
     this.loggerConsole = new LoggerConsole();

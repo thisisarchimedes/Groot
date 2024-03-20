@@ -1,19 +1,52 @@
 import axios from 'axios';
+import { injectable, inject } from 'inversify';
 
-import {LogLevel, Logger} from './Logger';
-import {ConfigService} from '../config/ConfigService';
+import { Logger } from './Logger';
+import { ConfigService } from '../config/ConfigService';
+import { LogLevel } from './LogLevel';
 
-export class LoggerNewRelic extends Logger {
+
+interface LogRecord {
+  message: string;
+  level: string;
+  timestamp: number;
+  service: string;
+}
+
+interface LogFormatter {
+  format(record: LogRecord): string;
+}
+
+class CustomJsonFormatter implements LogFormatter {
+  format(record: LogRecord): string {
+    return JSON.stringify({
+      ...record,
+      timestamp: new Date().getTime(),
+    });
+  }
+}
+
+interface NewRelicConfig {
+  apiKey: string;
+  environment: string;
+  endpointUrl: string;
+  serviceName: string;
+  maxRetries: number;
+  backoffFactor: number;
+}
+
+@injectable()
+export class LoggerNewRelic extends Logger implements ILoggerNewRelic {
   private readonly config: NewRelicConfig;
   private readonly formatter: LogFormatter;
   private pendingPromises: Promise<void>[] = [];
 
   constructor(
-      configService: ConfigService,
-      serviceName: string,
-      formatter: LogFormatter = new CustomJsonFormatter(),
-      maxRetries = 3,
-      backoffFactor = 2,
+    configService: ConfigService,
+    serviceName: string,
+    formatter: LogFormatter = new CustomJsonFormatter(),
+    maxRetries = 3,
+    backoffFactor = 2,
   ) {
     super();
     this.config = {
@@ -78,13 +111,13 @@ export class LoggerNewRelic extends Logger {
   private async sendLogToNewRelic(payload: Record<string, unknown>, headers: Record<string, string>): Promise<void> {
     for (let attempt = 1; attempt <= this.config.maxRetries; attempt++) {
       try {
-        await axios.post(this.config.endpointUrl, payload, {headers});
+        await axios.post(this.config.endpointUrl, payload, { headers });
         return;
       } catch (error) {
         if (attempt === this.config.maxRetries) {
           console.error(
-              `Failed to send log to New Relic after ${this.config.maxRetries} retries:`,
-              error,
+            `Failed to send log to New Relic after ${this.config.maxRetries} retries:`,
+            error,
           );
         } else {
           await new Promise((resolve) =>
@@ -96,31 +129,3 @@ export class LoggerNewRelic extends Logger {
   }
 }
 
-interface LogRecord {
-    message: string;
-    level: string;
-    timestamp: number;
-    service: string;
-  }
-
-interface LogFormatter {
-    format(record: LogRecord): string;
-  }
-
-class CustomJsonFormatter implements LogFormatter {
-  format(record: LogRecord): string {
-    return JSON.stringify({
-      ...record,
-      timestamp: new Date().getTime(),
-    });
-  }
-}
-
-interface NewRelicConfig {
-    apiKey: string;
-    environment: string;
-    endpointUrl: string;
-    serviceName: string;
-    maxRetries: number;
-    backoffFactor: number;
-  }
