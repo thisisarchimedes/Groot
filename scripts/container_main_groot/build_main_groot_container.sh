@@ -2,24 +2,12 @@
 
 #call: build_container.sh $ENVIRONMENT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY $AWS_REGION
 
-ENVIRONMENT=$1
-AWS_ACCESS_KEY_ID=$2
-AWS_SECRET_ACCESS_KEY=$3
-AWS_REGION=$4
+AWS_ACCESS_KEY_ID=$1
+AWS_SECRET_ACCESS_KEY=$2
 
-echo "Building Groot at ENVIRONMENT: $ENVIRONMENT & REGION: $AWS_REGION"
-
-# Create .env file in the script directory
-env_file="scripts/container_main_groot/container_files/.env"
-
-# Write environment variables to the .env file
-echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" > $env_file
-echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $env_file
-
-echo ".env file created at: $env_file"
+echo "Building Groot"
 
 docker pull node:20
-docker build --no-cache -t groot-container -f scripts/container_main_groot/Dockerfile .
-rm $env_file
+docker build --no-cache --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -t groot-container -f scripts/container_main_groot/Dockerfile .
 
 echo "Groot container built successfully"
