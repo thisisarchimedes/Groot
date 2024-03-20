@@ -1,19 +1,14 @@
 # GROOT
 
-see doc/LocalEnvironment.md for how to build local dev environment
+## Setup & Environments
 
-## PARKING LOT
-- we are using Yarn
-- lint
-- build
+- **Local**: See [doc/LocalEnvironment.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/LocalEnvironment.md)
+- **CICD**: See [doc/CICDPipeline.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/CICDPipeline.md)
 
-- desciption of the production node and build_docker
+## Supported Rules
 
+(doc/RulesLogic.md)[https://github.com/thisisarchimedes/Groot/blob/main/doc/RulesLogic.md]
 
-FAQ
-- Make sure there isn't old  Docker images under the same name locally 
+## Tx broadcasting logic
 
-
-CloudWatch Heartbeat Event
-`DemoApp/Groot/Heartbeat`
-
+(TxLogic.md)[https://github.com/thisisarchimedes/Groot/blob/main/doc/TxLogic.md]
