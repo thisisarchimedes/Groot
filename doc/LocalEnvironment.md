@@ -36,6 +36,9 @@ set -o allexport && source .env.local && set +o allexport # export .env.local to
 ```
 
 _*Update .env*_
+
+Do this only if you happen to update the .env.* and want to share it
+
 ```bash
 yarn dotenvx encrypt
 yarn dotenvx hub push # push the keys to the dotenvx hub
