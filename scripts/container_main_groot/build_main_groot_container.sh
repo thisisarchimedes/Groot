@@ -23,3 +23,5 @@ echo ".env file created at: $env_file"
 docker pull node:20
 docker build --no-cache -t groot-container -f scripts/container_main_groot/Dockerfile .
 rm $env_file
+
+echo "Groot container built successfully"
