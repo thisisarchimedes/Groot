@@ -1,8 +1,8 @@
 import nock from 'nock';
-import {Mock} from './Mock';
+import {Interceptor} from './Interceptor';
 import {RuleJSONConfigItem} from '../../../src/rule_engine/TypesRule';
 
-export class MockAppConfig extends Mock {
+export class AppConfigInterceptor extends Interceptor {
   private readonly awsAppConfigBaseUrl = 'https://appconfig.us-east-1.amazonaws.com';
   private readonly applicationId = 'DemoApp';
   private readonly environmentId = 'env';

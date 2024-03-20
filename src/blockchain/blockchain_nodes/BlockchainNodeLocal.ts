@@ -1,6 +1,5 @@
-import Web3 from 'web3';
-import fetch from 'node-fetch';
-
+import axios from 'axios';
+import {JsonRpcProvider} from 'ethers';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
 import {Logger} from '../../service/logger/Logger';
 
@@ -9,9 +8,8 @@ export class BlockchainNodeLocal extends BlockchainNode {
 
   constructor(logger: Logger, localRpcUrl: string, nodeName: string) {
     super(logger, nodeName);
-
     this.localRpcUrl = localRpcUrl;
-    this.web3 = new Web3(this.localRpcUrl);
+    this.provider = new JsonRpcProvider(localRpcUrl);
   }
 
   public async startNode(): Promise<void> {
@@ -35,8 +33,13 @@ export class BlockchainNodeLocal extends BlockchainNode {
       const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
       this.handleResetResponse(responseData);
     } catch (error) {
-      this.logger.error(`Failed to reset node: ${(error as Error).message}`);
-      throw error instanceof BlockchainNodeError ? error : new BlockchainNodeError((error as Error).message);
+      if (error instanceof Error) {
+        this.logger.error(`Failed to reset node: ${error.message}`);
+        throw error instanceof BlockchainNodeError ? error : new BlockchainNodeError(error.message);
+      } else {
+        this.logger.error(`Failed to reset node: ${error}`);
+        throw new BlockchainNodeError('Unknown error');
+      }
     }
 
     await this.waitForNodeToBeReady();
@@ -48,34 +51,47 @@ export class BlockchainNodeLocal extends BlockchainNode {
         const blockNumber = await this.getBlockNumber();
         this.logger.debug(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
-      } catch (error) {
-        this.logger.debug(`Waiting for blockchain... Attempt ${attempt}/${maxAttempts} - ${(error as Error).message}`);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        this.logger.debug(`Waiting for blockchain... Attempt ${attempt}/${maxAttempts} - ${error.message}`);
         await new Promise((resolve) => setTimeout(resolve, interval));
       }
     }
     throw new BlockchainNodeError('Blockchain node is not ready after maximum attempts.');
   }
 
-  private async performResetRpcCall(externalProviderRpcUrl: string): Promise<unknown> {
-    const response = await fetch(this.localRpcUrl, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async performResetRpcCall(externalProviderRpcUrl: string): Promise<any> {
+    try {
+      const response = await axios.post(this.localRpcUrl, {
         jsonrpc: '2.0',
         method: 'hardhat_reset',
         params: [{forking: {jsonRpcUrl: externalProviderRpcUrl}}],
         id: 1,
-      }),
-    });
+      }, {
+        headers: {'Content-Type': 'application/json'},
+      });
 
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+      return response.data;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        throw new Error(`HTTP Error: ${error.response.status} ${error.response.statusText}`);
+      } else if (error.request) {
+        // The request was made but no response was received
+        throw new Error('No response received from the server');
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        throw new Error(error instanceof Error ? error.message : 'Unknown error');
+      }
     }
-
-    return response.json();
   }
 
-  private handleResetResponse(data: unknown): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private handleResetResponse(data: any): void {
     if (typeof data === 'object' && data !== null && 'error' in data) {
       const error = data.error as { message: string };
       const msg = `RPC Error: ${error.message}`;
