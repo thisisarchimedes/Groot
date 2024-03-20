@@ -9,10 +9,9 @@ AWS_REGION=$4
 
 echo "Building Groot at ENVIRONMENT: $ENVIRONMENT & REGION: $AWS_REGION"
 
-script_dir="$(dirname "$0")"
 
 # Create .env file in the script directory
-env_file="$script_dir/container_files/.env"
+env_file="scripts/container_main_groot/container_files/.env"
 
 # Write environment variables to the .env file
 echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" > $env_file
