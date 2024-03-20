@@ -19,6 +19,17 @@ spec:
         envFrom:
         - configMapRef:
             name: demoapp-config
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-access-key-id
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-secret-access-key
+              key: AWS_SECRET_ACCESS_KEY
       - name: eth-node-1
         image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
         imagePullPolicy: Always
