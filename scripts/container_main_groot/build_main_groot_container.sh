@@ -1,12 +1,13 @@
 #!/bin/bash
 
+#call: build_container.sh $ENVIRONMENT $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY $AWS_REGION
+
 ENVIRONMENT=$1
 AWS_ACCESS_KEY_ID=$2
 AWS_SECRET_ACCESS_KEY=$3
 AWS_REGION=$4
 
 echo "Building Groot at ENVIRONMENT: $ENVIRONMENT & REGION: $AWS_REGION"
-
 
 # Create .env file in the script directory
 env_file="scripts/container_main_groot/container_files/.env"
