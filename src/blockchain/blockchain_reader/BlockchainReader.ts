@@ -1,6 +1,7 @@
-import {AbiItem} from 'web3-types';
 import {BlockchainNode, BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNode';
 import {Logger} from '../../service/logger/Logger';
+import {Interface} from 'ethers';
+
 
 export class BlockchainReaderError extends Error {
   constructor(message: string) {
@@ -40,7 +41,7 @@ export class BlockchainReader {
 
   public async callViewFunction(
       contractAddress: string,
-      abi: AbiItem[],
+      abi: Interface,
       functionName: string,
       params: unknown[] = [],
   ): Promise<unknown> {
@@ -85,7 +86,7 @@ export class BlockchainReader {
 
   private async fetchNodeResponses(
       contractAddress: string,
-      abi: AbiItem[],
+      abi: Interface,
       functionName: string,
       params: unknown[],
   ): Promise<NodeResponse[]> {

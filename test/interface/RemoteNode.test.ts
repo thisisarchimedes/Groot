@@ -1,5 +1,4 @@
 import * as chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
 import {BlockchainNodeRemoteRPC} from '../../src/blockchain/blockchain_nodes/BlockchainNodeRemoteRPC';
@@ -7,7 +6,6 @@ import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 
 dotenv.config();
-chai.use(chaiAsPromised);
 
 const {expect} = chai;
 
