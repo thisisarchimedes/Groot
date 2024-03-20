@@ -15,6 +15,7 @@ env:
   API_DEVOPS_EVENT_CATCHER: ${{ vars.API_DEVOPS_EVENT_CATCHER }}
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
   EKS_REGION: us-west-1
+  ECR_REGISTRY: 240910251918.dkr.ecr.us-west-1.amazonaws.com
 
 jobs:
   build:
@@ -48,28 +49,26 @@ jobs:
           aws-region: ${{ env.EKS_REGION }}
 
       - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        run: |
+          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
       - name: Build and push read node container
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: groot/arch-production-node
           IMAGE_TAG: latest
         run: |
           ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
-          docker tag arch-production-node:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag arch-production-node:latest ${{ env.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push ${{ env.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG
 
       - name: Build and push main Groot container
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: groot/groot-container
           IMAGE_TAG: latest
         run: |
           ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ vars.ETH_NODE_CONTAINER_NAME }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
-          docker tag groot-container:latest $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag groot-container:latest ${{ env.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push ${{ env.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG
 
       - name: Install kubectl
         run: |
