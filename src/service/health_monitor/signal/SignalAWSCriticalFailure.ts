@@ -1,5 +1,5 @@
-import { IConfigService } from '../../config/IConfigService';
-import { ILogger } from '../../logger/ILogger';
+import { IConfigService } from '../../config/interfaces/IConfigService';
+import { ILogger } from '../../logger/interfaces/ILogger';
 import { HostNameProvider } from '../HostNameProvider';
 import { ISignalCriticalFailure } from './ISignalCriticalFailure';
 import { SignalAWS } from './SignalAWS';

@@ -1,6 +1,6 @@
 import { OutboundTransaction } from '../../blockchain/OutboundTransaction';
 import { BlockchainReader } from '../../blockchain/blockchain_reader/BlockchainReader';
-import { ILogger } from '../../service/logger/ILogger';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
 import { Logger } from '../../service/logger/Logger';
 import { UrgencyLevel } from '../TypesRule';
 import { AbiRepo } from '../tool/abi_repository/AbiRepo';

@@ -1,6 +1,6 @@
 import { ethers, Contract } from 'ethers';
 import { Logger } from '../../service/logger/Logger';
-import { ILogger } from '../../service/logger/ILogger';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
 
 export class BlockchainNodeError extends Error {
   constructor(message: string) {

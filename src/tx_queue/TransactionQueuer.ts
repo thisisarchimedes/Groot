@@ -1,5 +1,5 @@
 import { OutboundTransaction } from '../blockchain/OutboundTransaction';
-import { ILogger } from '../service/logger/ILogger';
+import { ILogger } from '../service/logger/interfaces/ILogger';
 import { ITxQueue } from './ITxQueue';
 
 export class TransactionQueuer {

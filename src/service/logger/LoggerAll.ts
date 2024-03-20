@@ -4,8 +4,8 @@ import { ConfigService } from '../config/ConfigService';
 import { Logger } from './Logger';
 import { LoggerConsole } from './LoggerConsole';
 import { LoggerNewRelic } from './LoggerNewRelic';
-import { IConfigServiceAWS } from '../config/IConfigServiceAWS';
-import { ILoggerAll } from './ILoggerAll';
+import { IConfigServiceAWS } from '../config/interfaces/IConfigServiceAWS';
+import { ILoggerAll } from './interfaces/ILoggerAll';
 
 @injectable()
 export class LoggerAll extends Logger implements ILoggerAll {

@@ -1,22 +1,19 @@
 import 'reflect-metadata';
-
 import * as dotenv from 'dotenv';
-
+import { container } from './inversify.config'; // Ensure this path is correct
+import { TYPES } from './inversify.config'; // Adjust the path as needed
 import { Groot } from './Groot';
-import { LoggerAll } from './service/logger/LoggerAll';
-import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
+import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
 
 dotenv.config();
 
 export async function grootStartHere(): Promise<void> {
   const environment = process.env.ENVIRONMENT as string;
   const region = process.env.AWS_REGION as string;
-  const mainLocalNodePort = Number(process.env.MAIN_LOCAL_NODE_PORT as string);
-  const altLocalNodePort = Number(process.env.ALT_LOCAL_NODE_PORT as string);
-
   console.log(`${new Date().toISOString()} - Starting Groot in ${environment} environment and ${region} region`);
 
-  const groot = new Groot(environment, region, mainLocalNodePort, altLocalNodePort);
+  // Resolve Groot from the container instead of directly instantiating it
+  const groot = container.get<Groot>(TYPES.Groot);
 
   setShutdownOnSigTerm();
 
@@ -34,8 +31,8 @@ export async function grootStartHere(): Promise<void> {
 
 function reportCriticalError(environment: string, region: string, error: unknown): void {
   const errorMessage = `Unexpected CRITICAL ERROR in main loop: ${error}`;
-  const configService: ConfigServiceAWS = new ConfigServiceAWS(environment, region);
-  const logger: LoggerAll = new LoggerAll(configService, 'Groot');
+  // Use the container to resolve ILoggerAll for logging errors
+  const logger = container.get<ILoggerAll>(TYPES.ILoggerAll);
   logger.error(errorMessage);
 }
 

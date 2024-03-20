@@ -1,4 +1,4 @@
-import { ILogger } from '../logger/ILogger';
+import { ILogger } from '../logger/interfaces/ILogger';
 import { Logger } from '../logger/Logger';
 import { BlockchainNodeHealthMonitor } from './BlockchainNodeHealthMonitor';
 import { ISignalCriticalFailure } from './signal/ISignalCriticalFailure';

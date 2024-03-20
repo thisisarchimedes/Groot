@@ -7,8 +7,8 @@ import {
 } from '@aws-sdk/client-cloudwatch';
 
 import { HostNameProvider } from '../HostNameProvider';
-import { ILogger } from '../../logger/ILogger';
-import { IConfigService } from '../../config/IConfigService';
+import { ILogger } from '../../logger/interfaces/ILogger';
+import { IConfigService } from '../../config/interfaces/IConfigService';
 
 export abstract class SignalAWS {
   protected readonly cloudWatchClient: CloudWatchClient;

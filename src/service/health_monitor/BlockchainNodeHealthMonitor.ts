@@ -1,5 +1,5 @@
 import { BlockchainNode } from '../../blockchain/blockchain_nodes/BlockchainNode';
-import { ILogger } from '../logger/ILogger';
+import { ILogger } from '../logger/interfaces/ILogger';
 import { Logger } from '../logger/Logger';
 
 export class BlockchainNodeHealthMonitor {

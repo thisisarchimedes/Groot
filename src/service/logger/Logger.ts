@@ -1,4 +1,4 @@
-import { ILogger } from './ILogger';
+import { ILogger } from './interfaces/ILogger';
 import { LogLevel } from './LogLevel';
 import { LogMessageCycleTime } from './TypeLogItem';
 

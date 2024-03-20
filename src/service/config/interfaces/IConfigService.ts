@@ -1,4 +1,4 @@
-import { RuleJSONConfigItem } from '../../rule_engine/TypesRule';
+import { RuleJSONConfigItem } from '../../../rule_engine/TypesRule';
 
 export interface IConfigService {
     refreshConfig(): Promise<void>;

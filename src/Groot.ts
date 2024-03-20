@@ -1,5 +1,7 @@
+import 'reflect-metadata';
+
 import * as dotenv from 'dotenv';
-import { inject } from 'inversify';
+import { injectable, inject } from 'inversify';
 
 import { TxQueueAdapter } from '../test/unit/adapters/TxQueueAdapter';
 import { FactoryRule } from './rule_engine/FactoryRule';
@@ -17,15 +19,15 @@ import { HostNameProvider } from './service/health_monitor/HostNameProvider';
 import { AbiRepo } from './rule_engine/tool/abi_repository/AbiRepo';
 import { AbiStorageDynamoDB } from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import { AbiFetcherEtherscan } from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
-import { IConfigServiceAWS } from './service/config/IConfigServiceAWS';
-import { ILoggerAll } from './service/logger/ILoggerAll';
+import { IConfigServiceAWS } from './service/config/interfaces/IConfigServiceAWS';
+import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
+import { ILogger } from './service/logger/interfaces/ILogger';
 
 dotenv.config();
 
+@injectable()
 export class Groot {
   private readonly logServiceName: string = 'Groot';
-  private logger: ILoggerAll;
-  private configService: IConfigServiceAWS;
   private ruleEngine!: RuleEngine;
   private txQueuer!: TransactionQueuer;
   private healthMonitor!: HealthMonitor;
@@ -40,13 +42,11 @@ export class Groot {
   private readonly altLocalNodePort: number;
 
   constructor(
-    environment: string,
-    region: string,
+    @inject("IConfigServiceAWS") private configService: IConfigServiceAWS,
+    @inject("ILoggerAll") private logger: ILoggerAll,
     mainLocalNodePort: number = 8545,
-    altLocalNodePort: number = 18545) {
-    this.configService = configService;
-    this.logger = logger;
-    this.configService = new ConfigServiceAWS(environment, region);
+    altLocalNodePort: number = 18545
+  ) {
     this.mainLocalNodePort = mainLocalNodePort;
     this.altLocalNodePort = altLocalNodePort;
   }

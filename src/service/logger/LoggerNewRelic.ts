@@ -4,8 +4,8 @@ import { injectable, inject } from 'inversify';
 import { Logger } from './Logger';
 import { ConfigService } from '../config/ConfigService';
 import { LogLevel } from './LogLevel';
-import { IConfigServiceAWS } from '../config/IConfigServiceAWS';
-import { ILoggerNewRelic } from './ILoggerNewRelic';
+import { IConfigServiceAWS } from '../config/interfaces/IConfigServiceAWS';
+import { ILoggerNewRelic } from './interfaces/ILoggerNewRelic';
 
 
 interface LogRecord {

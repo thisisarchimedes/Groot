@@ -1,5 +1,5 @@
 import { BlockchainReader } from '../blockchain/blockchain_reader/BlockchainReader';
-import { ILogger } from '../service/logger/ILogger';
+import { ILogger } from '../service/logger/interfaces/ILogger';
 import { Logger } from '../service/logger/Logger';
 import { Rule, RuleParams } from './rule/Rule';
 import { RuleDummy } from './rule/RuleDummy';

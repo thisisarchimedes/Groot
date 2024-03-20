@@ -3,7 +3,7 @@ import { Logger } from '../service/logger/Logger';
 import { Rule } from './rule/Rule';
 import { RuleJSONConfigItem } from './TypesRule';
 import { FactoryRule } from './FactoryRule';
-import { ILogger } from '../service/logger/ILogger';
+import { ILogger } from '../service/logger/interfaces/ILogger';
 
 export class RuleEngine {
   private rules: Rule[] = [];

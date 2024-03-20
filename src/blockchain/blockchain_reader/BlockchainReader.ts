@@ -1,7 +1,7 @@
 import { BlockchainNode, BlockchainNodeProxyInfo } from '../blockchain_nodes/BlockchainNode';
 import { Logger } from '../../service/logger/Logger';
 import { Interface } from 'ethers';
-import { ILogger } from '../../service/logger/ILogger';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
 
 
 export class BlockchainReaderError extends Error {

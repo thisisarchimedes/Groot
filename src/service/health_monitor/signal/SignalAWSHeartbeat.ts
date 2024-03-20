@@ -1,6 +1,6 @@
 import { ConfigService } from '../../config/ConfigService';
-import { IConfigService } from '../../config/IConfigService';
-import { ILogger } from '../../logger/ILogger';
+import { IConfigService } from '../../config/interfaces/IConfigService';
+import { ILogger } from '../../logger/interfaces/ILogger';
 import { Logger } from '../../logger/Logger';
 import { HostNameProvider } from '../HostNameProvider';
 import { ISignalHeartbeat } from './ISignalHeartbeat';
