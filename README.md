@@ -7,8 +7,8 @@
 
 ## Supported Rules
 
-(doc/RulesLogic.md)[https://github.com/thisisarchimedes/Groot/blob/main/doc/RulesLogic.md]
+[doc/RulesLogic.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/RulesLogic.md)
 
 ## Tx broadcasting logic
 
-(TxLogic.md)[https://github.com/thisisarchimedes/Groot/blob/main/doc/TxLogic.md]
+[doc/TxLogic.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/TxLogic.md)
