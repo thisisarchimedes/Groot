@@ -31,6 +31,11 @@ We run on AWS EKS w/Fargate. Pod has the following containers
 - **Groot main process**: Using K8s chron to run every minute
 - **2 x Hardhat nodes (read only)**
 
+We've created this cluster with
+```bash
+eksctl create cluster --name groot-demo-app --region us-west-1 --fargate
+```
+
 ### Current K8s clusters
 - Cluster: groot-demo-app (us-west-1)
 - ECR Repo: groot (us-west-1)
