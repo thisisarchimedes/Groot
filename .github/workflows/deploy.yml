@@ -40,39 +40,40 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.EKS_REGION }}
+      - name: Build read node container
+        run: |
+          ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: Push read node container to ECR
+        id: ecr-read-node
+        uses: jwalton/gh-ecr-push@v1
+        with:
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: ${{ env.EKS_REGION }}
+          image: arch-production-node:latest
+          local-image: arch-production-node:latest
+
+      - name: Build main Groot container
+        run: |
+          ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ vars.ETH_NODE_CONTAINER_NAME }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
+
+      - name: Push main Groot container to ECR
+        id: ecr-main-groot
+        uses: jwalton/gh-ecr-push@v1
+        with:
+          access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          region: ${{ env.EKS_REGION }}
+          image: groot-container:latest
+          local-image: groot-container:latest
 
       - name: Install kubectl
         run: |
           curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
-
-      - name: Build and push containers
-        run: |
-          # Build the read node container
-          ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
-      
-          # Tag and push the read node container to ECR
-          docker tag arch-production-node:latest ${{ env.ECR_REPOSITORY }}/arch-production-node:latest
-          docker push ${{ env.ECR_REPOSITORY }}/arch-production-node:latest
-      
-          # Build the main Groot container
-          ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ vars.ETH_NODE_CONTAINER_NAME }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
-      
-          # Tag and push the main Groot container to ECR
-          docker tag groot-container:latest ${{ env.ECR_REPOSITORY }}/groot-container:latest
-          docker push ${{ env.ECR_REPOSITORY }}/groot-container:latest
-
+    
 
       - name: Deploy to EKS (DemoApp)
         run: |
