@@ -56,7 +56,6 @@ jobs:
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
           docker tag arch-production-node:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
           docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
-            
 
       - name: Build and push main Groot container
         env:
