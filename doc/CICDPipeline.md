@@ -33,6 +33,7 @@ We run on AWS EKS w/Fargate. Pod has the following containers
 
 ### Current K8s clusters
 - Cluster: groot-demo-app (us-west-1)
+- ECR Repo: groot (us-west-1)
 
 ## Getting Basic Cluster Information
 
@@ -54,4 +55,4 @@ Get pod info
 ```bash
 kubectl describe pod <pod-name>
 ```
-- ECR Repo: groot (us-west-1)
+
