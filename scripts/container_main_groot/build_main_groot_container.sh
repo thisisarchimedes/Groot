@@ -21,13 +21,5 @@ echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $env_file
 echo ".env file created at: $env_file"
 
 docker pull node:20
-echo "FINISH -1"
 docker build --no-cache -t groot-container -f scripts/container_main_groot/Dockerfile .
-echo "FINISH 0"
-cat $env_file
-echo "FINISH 1"
 rm $env_file
-echo "FINISH 2"
-
-
-
