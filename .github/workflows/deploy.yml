@@ -63,7 +63,7 @@ jobs:
           ECR_REPOSITORY: groot/groot-container
           IMAGE_TAG: latest
         run: |
-          ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ vars.ETH_NODE_CONTAINER_NAME }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
+          ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
 
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
           docker tag groot-container:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
