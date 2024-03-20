@@ -1,3 +1,5 @@
+import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
+import {UrgencyLevel} from '../TypesRule';
 import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
 import {Rule, RuleConstructorInput, RuleParams} from './Rule';
 // import {UNISWAPV3_POOL_ABI} from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json';
@@ -23,7 +25,6 @@ export class RuleUniswapPSPRebalance extends Rule {
     );
   }
   public async evaluate(): Promise<void> {
-    // if not calculate new lowertick and uppertick based on the currentTick
     // call rebalance function based on the new params
     const isUpperTickThresholdPassed =
       await this.isCurrentTickAboveRebalanceUpperTickThreshold();
@@ -36,8 +37,22 @@ export class RuleUniswapPSPRebalance extends Rule {
 
     const newUpperTick = await this.calculateNewUpperTick();
     const newLowerTick = await this.calculateNewLowerTick();
-    this.logger.info(`New upper tick: ${newUpperTick}`);
-    this.logger.info(`New lower tick: ${newLowerTick}`);
+
+    const tx = {
+      urgencyLevel: UrgencyLevel.URGENT,
+      context: 'UniswapPSPRebalance',
+      postEvalUniqueKey: 'uniqueKey',
+      lowLevelUnsignedTransaction: {},
+    } as OutboundTransaction;
+
+    tx.lowLevelUnsignedTransaction =
+      this.uniswapStrategy.createRebalanceTransaction(
+          newUpperTick,
+          newLowerTick,
+          BigInt(0), // TODO change this to correct calculation amount
+          BigInt(0), // TODO change this to correct calculation amount
+      );
+    await this.pushTransactionToRuleLocalQueue(tx);
   }
 
   private async isCurrentTickAboveRebalanceUpperTickThreshold(): Promise<boolean> {
@@ -57,6 +72,7 @@ export class RuleUniswapPSPRebalance extends Rule {
       (params.lowerTriggerThresholdPercentage * lowerTick) / 100;
     return currentTick >= acceptedLowerTick;
   }
+
   private async calculateNewUpperTick(): Promise<number> {
     const currentTick = await this.uniswapStrategy.currentTick();
     const tickSpacing = await this.uniswapStrategy.tickSpacing();
@@ -65,8 +81,12 @@ export class RuleUniswapPSPRebalance extends Rule {
         (currentTick * params.upperTargetTickPercentage) / 100,
     );
     upperTick = Math.round(upperTick / tickSpacing) * tickSpacing;
+
+    this.logger.info(`New upper tick: ${upperTick}`);
+
     return upperTick;
   }
+
   private async calculateNewLowerTick(): Promise<number> {
     const currentTick = await this.uniswapStrategy.currentTick();
     const tickSpacing = await this.uniswapStrategy.tickSpacing();
@@ -77,6 +97,8 @@ export class RuleUniswapPSPRebalance extends Rule {
     );
 
     lowerTick = Math.round(lowerTick / tickSpacing) * tickSpacing;
+
+    this.logger.info(`New lower tick: ${lowerTick}`);
 
     return lowerTick;
   }

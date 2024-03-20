@@ -1,6 +1,6 @@
 import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
 import UNISWAPV3_STRATEGY_ABI from '../../constants/abis/UNISWAPV3_STRATEGY_ABI.json';
-
+import {Contract, Transaction} from 'ethers';
 export class ToolStrategyUniswap {
   private readonly strategyAddress: string;
   private readonly blockchainReader: BlockchainReader;
@@ -50,5 +50,24 @@ export class ToolStrategyUniswap {
         'tickSpacing',
     );
     return ret as number;
+  }
+  public createRebalanceTransaction(
+      newUpperTick: number,
+      newLowerTick: number,
+      amount0OutMin: bigint,
+      amount1OutMin: bigint,
+  ): Promise<Transaction> {
+    // create transaction
+    const strategyContract = new Contract(
+        this.strategyAddress,
+        UNISWAPV3_STRATEGY_ABI,
+    );
+    const tx = strategyContract.rebalance(
+        newUpperTick,
+        newLowerTick,
+        amount0OutMin,
+        amount1OutMin,
+    );
+    return tx;
   }
 }
