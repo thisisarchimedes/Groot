@@ -49,7 +49,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.EKS_REGION }}    
 
-      - name: Build and push main Groot container
+      - name: Build main Groot container
         run: |
           cd scripts/container_main_groot/container_files
           echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" > .env
@@ -60,6 +60,8 @@ jobs:
           docker build --no-cache -t groot-container -f scripts/container_main_groot/Dockerfile .
           # ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ env.AWS_REGION }}
 
+      - name: Push main Groot container
+        run: |
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
           docker tag groot-container:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:latest
           docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:latest
