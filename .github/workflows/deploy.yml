@@ -56,8 +56,10 @@ jobs:
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
           ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
-          docker tag arch-production-node:latest ${{ env.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push ${{ env.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag arch-production-node:latest 240910251918.dkr.ecr.us-west-1.amazonaws.com/arch-production-node:latest
+          
+          #docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          docker push 240910251918.dkr.ecr.us-west-1.amazonaws.com/arch-production-node:latest
 
       - name: Build and push main Groot container
         env:
@@ -67,8 +69,8 @@ jobs:
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
 
           ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ vars.ETH_NODE_CONTAINER_NAME }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
-          docker tag groot-container:latest ${{ env.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG
-          docker push ${{ env.ECR_REGISTRY }}/$ECR_REPOSITORY:$IMAGE_TAG
+          docker tag groot-container:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
       - name: Install kubectl
         run: |
