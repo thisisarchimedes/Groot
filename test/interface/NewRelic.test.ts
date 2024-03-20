@@ -1,12 +1,9 @@
-import * as chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {LoggerNewRelic} from '../../src/service/logger/LoggerNewRelic';
 import {LoggerAll} from '../../src/service/logger/LoggerAll';
 
-chai.use(chaiAsPromised);
 dotenv.config();
 
 describe('Check that we work with NewRelic correctly', function() {

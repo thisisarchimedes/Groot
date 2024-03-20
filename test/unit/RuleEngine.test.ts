@@ -17,6 +17,7 @@ describe('Rule Engine Testings', function() {
   const configService: ConfigServiceAdapter = new ConfigServiceAdapter();
   let blockchainReader: BlockchainReader;
 
+
   beforeEach(async function() {
     const localNodeAlchemy = await startBlockchainNode('localNodeAlchemy');
     const localNodeInfura = await startBlockchainNode('localNodeInfura');
@@ -100,8 +101,8 @@ describe('Rule Engine Testings', function() {
     const logLine = logger.getLatestInfoLogLine();
     expect(logLine).to.contain(
         `"message":"Rule Eval Results",` +
-        `"successfulRuleEval":${successfulRuleEval},` +
-        `"failedRuleEval":${failedRuleEval}`,
+      `"successfulRuleEval":${successfulRuleEval},` +
+      `"failedRuleEval":${failedRuleEval}`,
     );
   }
 });

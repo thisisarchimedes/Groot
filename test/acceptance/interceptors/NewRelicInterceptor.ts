@@ -1,7 +1,7 @@
 import nock from 'nock';
-import {Mock} from './Mock';
+import {Interceptor} from './Interceptor';
 
-export class MockNewRelic extends Mock {
+export class NewRelicInterceptor extends Interceptor {
   private baseUrl: string;
   private waitedOnMessage!: string;
   private waitedOnMessageObserved: boolean = false;
