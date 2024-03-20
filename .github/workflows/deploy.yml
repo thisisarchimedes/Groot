@@ -16,6 +16,7 @@ env:
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
   EKS_REGION: us-west-1
   ECR_REGISTRY: 240910251918.dkr.ecr.us-west-1.amazonaws.com
+  ECR_REPO: groot
 
 jobs:
   build:
@@ -50,13 +51,11 @@ jobs:
 
       - name: Build and push read node container
         run: |
-          
-      
           ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
           
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 240910251918.dkr.ecr.us-east-1.amazonaws.com
-          docker tag arch-production-node:latest 240910251918.dkr.ecr.us-east-1.amazonaws.com/groot:latest
-          docker push 240910251918.dkr.ecr.us-east-1.amazonaws.com/groot:latest
+          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
+          docker tag arch-production-node:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
+          docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
             
 
       - name: Build and push main Groot container
@@ -80,16 +79,16 @@ jobs:
         run: |
           # Update kubeconfig
           aws eks update-kubeconfig --name groot-demo-app --region ${{ env.EKS_REGION }}
-
+      
           # Create namespace if it doesn't exist
           kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
-
+      
           # Deploy Kubernetes manifests
           kubectl apply -f scripts/k8s/demoapp-configmap.yaml
           kubectl apply -f scripts/k8s/deployment.yaml
           kubectl apply -f scripts/k8s/service.yaml
           kubectl apply -f scripts/k8s/cronjob.yaml
-
+      
           # Verify deployment
           kubectl get pods -n groot
 
