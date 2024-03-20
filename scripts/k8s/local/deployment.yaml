@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: groot-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: groot
+  template:
+    metadata:
+      labels:
+        app: groot
+    spec:
+      containers:
+      - name: groot-container
+        image: groot-container:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: demoapp-config
+      - name: eth-node-1
+        image: arch-production-node:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: HARDHAT_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: demoapp-config
+              key: HARDHAT_PORT_1
+        ports:
+        - containerPort: 8545
+      - name: eth-node-2
+        image: arch-production-node:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: HARDHAT_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: demoapp-config
+              key: HARDHAT_PORT_2
+        ports:
+        - containerPort: 18545
+      restartPolicy: Always

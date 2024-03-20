@@ -14,10 +14,10 @@ kind load docker-image groot-container --name groot-cluster
 kind load docker-image arch-production-node:latest --name groot-cluster
 
  # deploy pod
-kubectl apply -f scripts/k8s/demoapp-configmap.yaml
-kubectl apply -f scripts/k8s/deployment.yaml
-kubectl apply -f scripts/k8s/service.yaml
-kubectl apply -f scripts/k8s/cronjob.yaml
+kubectl apply -f scripts/k8s/local/demoapp-configmap.yaml
+kubectl apply -f scripts/k8s/local/deployment.yaml
+kubectl apply -f scripts/k8s/local/service.yaml
+kubectl apply -f scripts/k8s/local/cronjob.yaml
 
 
  kubectl get pods
