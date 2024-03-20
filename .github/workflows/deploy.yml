@@ -47,15 +47,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.EKS_REGION }}
 
-      - name: Install Amazon ECR Docker Credential Helper
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y amazon-ecr-credential-helper
-
-      - name: Configure Docker to use the Amazon ECR Credential Helper
-        run: |
-          mkdir -p ~/.docker
-          echo '{"credsStore": "ecr-login"}' > ~/.docker/config.json
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Install kubectl
         run: |
@@ -78,6 +72,7 @@ jobs:
           # Tag and push the main Groot container to ECR
           docker tag groot-container:latest ${{ env.ECR_REPOSITORY }}/groot-container:latest
           docker push ${{ env.ECR_REPOSITORY }}/groot-container:latest
+
 
       - name: Deploy to EKS (DemoApp)
         run: |
