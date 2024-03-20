@@ -69,15 +69,15 @@ jobs:
           ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
 
           # Tag and push the read node container to ECR
-          docker tag arch-production-node:latest ${{ env.ECR_REPOSITORY }}/arch-production-node:latest
-          docker push ${{ env.ECR_REPOSITORY }}/arch-production-node:latest
+          # docker tag arch-production-node:latest ${{ env.ECR_REPOSITORY }}/arch-production-node:latest
+          # docker push ${{ env.ECR_REPOSITORY }}/arch-production-node:latest
 
           # Build the main Groot container
           ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ vars.ETH_NODE_CONTAINER_NAME }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
 
           # Tag and push the main Groot container to ECR
-          docker tag groot-container:latest ${{ env.ECR_REPOSITORY }}/groot-container:latest
-          docker push ${{ env.ECR_REPOSITORY }}/groot-container:latest
+          # docker tag groot-container:latest ${{ env.ECR_REPOSITORY }}/groot-container:latest
+          # docker push ${{ env.ECR_REPOSITORY }}/groot-container:latest
 
       - name: Deploy to EKS (DemoApp)
         run: |
