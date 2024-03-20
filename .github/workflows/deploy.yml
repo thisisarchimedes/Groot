@@ -70,22 +70,14 @@ jobs:
       
           # Tag and push the read node container to ECR (with retries and timeout)
           docker tag arch-production-node:latest ${{ env.ECR_REPOSITORY }}/arch-production-node:latest
-          nick-invision/retry@v1
-            with:
-              timeout_minutes: 10
-              max_attempts: 3
-              command: docker push ${{ env.ECR_REPOSITORY }}/arch-production-node:latest --timeout 600s --debug
+          docker push ${{ env.ECR_REPOSITORY }}/arch-production-node:latest --timeout 600s --debug
       
           # Build the main Groot container
           ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ vars.ETH_NODE_CONTAINER_NAME }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
       
           # Tag and push the main Groot container to ECR (with retries and timeout)
           docker tag groot-container:latest ${{ env.ECR_REPOSITORY }}/groot-container:latest
-          nick-invision/retry@v1
-            with:
-              timeout_minutes: 10
-              max_attempts: 3
-              command: docker push ${{ env.ECR_REPOSITORY }}/groot-container:latest --timeout 600s --debug
+          docker push ${{ env.ECR_REPOSITORY }}/groot-container:latest --timeout 600s --debug
 
       - name: Deploy to EKS (DemoApp)
         run: |
