@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: groot
+  name: groot-deployment
 spec:
   replicas: 1
   selector:
@@ -16,17 +16,18 @@ spec:
       - name: groot-container
         image: groot-container:latest
         imagePullPolicy: IfNotPresent
-        env:
-        - name: MAIN_LOCAL_NODE_PORT
-          value: "8545"
-        - name: ALT_LOCAL_NODE_PORT
-          value: "18545"
+        envFrom:
+        - configMapRef:
+            name: demoapp-config
       - name: eth-node-1
         image: arch-production-node:latest
         imagePullPolicy: IfNotPresent
         env:
         - name: HARDHAT_PORT
-          value: "8545"
+          valueFrom:
+            configMapKeyRef:
+              name: demoapp-config
+              key: HARDHAT_PORT_1
         ports:
         - containerPort: 8545
       - name: eth-node-2
@@ -34,6 +35,10 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
         - name: HARDHAT_PORT
-          value: "18545"
+          valueFrom:
+            configMapKeyRef:
+              name: demoapp-config
+              key: HARDHAT_PORT_2
         ports:
         - containerPort: 18545
+      restartPolicy: Always

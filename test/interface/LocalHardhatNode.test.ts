@@ -1,5 +1,4 @@
 import * as chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import * as dotenv from 'dotenv';
 import {spawn} from 'child_process';
 
@@ -8,7 +7,6 @@ import {BlockchainNodeProxyInfo} from '../../src/blockchain/blockchain_nodes/Blo
 import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 
 dotenv.config();
-chai.use(chaiAsPromised);
 
 const {expect} = chai;
 
