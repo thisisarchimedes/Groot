@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -o allexport && source .env.local && set +o allexport
+unset KUBECONFIG
 
 kind create cluster --name groot-cluster
 kubectl create namespace groot
@@ -13,7 +14,10 @@ kind load docker-image groot-container --name groot-cluster
 kind load docker-image arch-production-node:latest --name groot-cluster
 
  # deploy pod
- kubectl apply -f scripts/k8s/service.yaml
- kubectl apply -f scripts/k8s/deployment.yaml
+kubectl apply -f scripts/k8s/demoapp-configmap.yaml
+kubectl apply -f scripts/k8s/deployment.yaml
+kubectl apply -f scripts/k8s/service.yaml
+kubectl apply -f scripts/k8s/cronjob.yaml
+
 
  kubectl get pods
