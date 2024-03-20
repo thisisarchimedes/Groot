@@ -10,6 +10,7 @@ COPY src ./src
 RUN mkdir /usr/src/app/test
 COPY test ./test
 
+COPY scripts/container_main_groot/container_files/* /usr/src/app/
 COPY package.json /usr/src/app
 COPY tsconfig.json /usr/src/app
 
@@ -17,4 +18,4 @@ COPY tsconfig.json /usr/src/app
 RUN yarn install
 
 # Run the app
-CMD ["yarn", "tsx", "src/main.ts"]
+CMD ["./run_groot.sh"]

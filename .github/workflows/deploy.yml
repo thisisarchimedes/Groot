@@ -78,19 +78,26 @@ jobs:
         run: |
           # Update kubeconfig
           aws eks update-kubeconfig --name groot-demo-app --region ${{ env.EKS_REGION }}
-      
+          
           # Create namespace if it doesn't exist
           kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
-      
-          kubectl create secret generic aws-access-key-id --from-literal=AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          kubectl create secret generic aws-secret-access-key --from-literal=AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            
-          # Deploy Kubernetes manifests
+          
+          # Create secrets
+          kubectl create secret generic aws-access-key-id --from-literal=AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic aws-secret-access-key --from-literal=AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Deploy or update Kubernetes manifests
           kubectl apply -f scripts/k8s/demoapp-configmap.yaml
           kubectl apply -f scripts/k8s/deployment.yaml
           kubectl apply -f scripts/k8s/service.yaml
           kubectl apply -f scripts/k8s/cronjob.yaml
-      
+          
+          # Perform a rolling update on the deployment
+          kubectl rollout restart deployment groot-deployment -n groot
+          
+          # Wait for the deployment to complete
+          kubectl rollout status deployment groot-deployment -n groot --timeout=300s
+          
           # Verify deployment
           kubectl get pods -n groot
 
