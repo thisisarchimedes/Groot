@@ -39,19 +39,23 @@ export class Groot {
   private readonly mainLocalNodePort: number;
   private readonly altLocalNodePort: number;
 
+  private readonly logger: ILoggerAll;
+  private readonly configService: IConfigServiceAWS
+
   constructor(
-    @inject("IConfigServiceAWS") private configService: IConfigServiceAWS,
-    @inject("ILoggerAll") private logger: ILoggerAll,
+    @inject("IConfigServiceAWS") private _configService: IConfigServiceAWS,
+    @inject("ILoggerAll") private _logger: ILoggerAll,
     mainLocalNodePort: number = 8545,
     altLocalNodePort: number = 18545
   ) {
+    this.logger = _logger;
+    this.configService = _configService;
     this.mainLocalNodePort = mainLocalNodePort;
     this.altLocalNodePort = altLocalNodePort;
   }
 
   public async initalizeGroot() {
     await this.configService.refreshConfig();
-    this.logger = new LoggerAll(this.configService, this.logServiceName);
 
     this.logger.info('Initializing Groot...');
 
