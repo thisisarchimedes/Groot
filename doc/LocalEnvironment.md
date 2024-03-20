@@ -35,7 +35,7 @@ yarn dotenvx decrypt # decrypt .env.vault to .env
 set -o allexport && source .env.local && set +o allexport # export .env.local to local environment
 ```
 
-_*Update .env*_
+#### Update .env
 
 Do this only if you happen to update the .env.* and want to share it
 
