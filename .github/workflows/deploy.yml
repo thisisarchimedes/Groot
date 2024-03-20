@@ -49,6 +49,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.EKS_REGION }}    
 
+      - name: Build and push main Groot container
+        run: |
+          ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
+          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
+          docker tag groot-container:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
+          docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
+
       - name: Build and push read node container
         run: |
           ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
@@ -56,17 +63,6 @@ jobs:
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
           docker tag arch-production-node:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
           docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
-
-      - name: Build and push main Groot container
-        run: |
-          ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
-          echo "HERE 1"
-          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
-          echo "HERE 2"
-          docker tag groot-container:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
-          echo "HERE 3"
-          docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:latest
-          echo "HERE 4"
 
       - name: Install kubectl
         run: |
