@@ -52,8 +52,8 @@ jobs:
       - name: Build main Groot container
         run: |
           cd scripts/container_main_groot/container_files
-          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" > .env
-          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" > .env
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env
           cd -
         
           docker pull node:20
@@ -107,7 +107,7 @@ jobs:
       - name: Report DevOps Event
         run: |
           yarn add axios dotenv
-          node devops/metrics/src/cicd_script/report_devops_event.ts ${{ github.repository }} deploy '{"commit_ids": ${{ steps.format_commits.outputs.commit_shas }} }'
+          node devops/metrics/src/cicd_script/report_devops_event.js ${{ github.repository }} deploy '{"commit_ids": ${{ steps.format_commits.outputs.commit_shas }} }'
 
       - name: Slack Notification
         if: always()
