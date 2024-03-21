@@ -6,7 +6,6 @@ import { injectable, inject } from 'inversify';
 import { TxQueueAdapter } from '../test/unit/adapters/TxQueueAdapter';
 import { FactoryRule } from './rule_engine/FactoryRule';
 import { RuleEngine } from './rule_engine/RuleEngine';
-import { LoggerAll } from './service/logger/LoggerAll';
 import { TransactionQueuer } from './tx_queue/TransactionQueuer';
 import { BlockchainReader } from './blockchain/blockchain_reader/BlockchainReader';
 import { BlockchainNodeLocal } from './blockchain/blockchain_nodes/BlockchainNodeLocal';
@@ -43,8 +42,8 @@ export class Groot {
   private readonly configService: IConfigServiceAWS
 
   constructor(
-    @inject("IConfigServiceAWS") private _configService: IConfigServiceAWS,
-    @inject("ILoggerAll") private _logger: ILoggerAll,
+    @inject("IConfigServiceAWS") _configService: IConfigServiceAWS,
+    @inject("ILoggerAll") _logger: ILoggerAll,
     mainLocalNodePort: number = 8545,
     altLocalNodePort: number = 18545
   ) {

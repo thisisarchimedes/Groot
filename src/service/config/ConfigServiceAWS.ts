@@ -1,4 +1,4 @@
-import { injectable, inject } from 'inversify';
+import { injectable, postConstruct } from 'inversify';
 
 import { AppConfigClient } from './AppConfigClient';
 import { ConfigService } from './ConfigService';
