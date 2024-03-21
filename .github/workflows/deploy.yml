@@ -104,6 +104,17 @@ jobs:
           stringData:
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           EOF
+
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: alchemy-api-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          EOF
           
           # Deploy or update Kubernetes manifests
           kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot

@@ -19,6 +19,12 @@ spec:
         envFrom:
         - configMapRef:
             name: demoapp-config
+        env:
+        - name: ALCHEMY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: alchemy-api-key
+              key: ALCHEMY_API_KEY
         ports:
         - containerPort: 8545
       - name: eth-node-2
@@ -27,6 +33,12 @@ spec:
         envFrom:
         - configMapRef:
             name: demoapp-config
+        env:
+        - name: ALCHEMY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: alchemy-api-key
+              key: ALCHEMY_API_KEY
         ports:
         - containerPort: 18545
       restartPolicy: Always
