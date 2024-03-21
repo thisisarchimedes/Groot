@@ -6,12 +6,15 @@ unset KUBECONFIG
 kind create cluster --name groot-cluster
 kubectl create namespace groot
 
-sudo ./scripts/container_reader_node/build_read_node_container.sh $API_KEY_ALCHEMY
-sudo ./scripts/container_main_groot/build_main_groot_container.sh
+docker pull node:18
+sudo docker build --no-cache -t arch-production-node scripts/container_reader_node/container_files/
+
+docker pull node:20
+sudo docker build --no-cache -t groot-container -f scripts/container_main_groot/Dockerfile .
 
 # Load containers to Kind cluster
 kind load docker-image groot-container --name groot-cluster
-kind load docker-image arch-production-node:latest --name groot-cluster
+kind load docker-image arch-production-node --name groot-cluster
 
 kubectl create secret generic aws-access-key-id --from-literal=AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
 kubectl create secret generic aws-secret-access-key --from-literal=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
