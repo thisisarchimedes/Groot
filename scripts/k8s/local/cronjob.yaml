@@ -8,6 +8,7 @@ spec:
     spec:
       template:
         spec:
+          hostNetwork: true
           containers:
           - name: groot-container
             image: docker.io/library/groot-container:latest

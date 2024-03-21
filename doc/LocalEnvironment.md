@@ -87,3 +87,9 @@ yarn test:acceptance
 If hitting `ImagePullBackOff`:
 1. SSH into kind control panel: `docker exec -it groot-cluster-control-plane bash`
 2. Get list of images: `crictl images`
+
+### Container is not working properly
+
+Try to fetch logs:
+- `kubectl logs -l app=groot-eth-nodes --all-containers --namespace groot`
+- `kubectl logs -l app=groot-container --all-containers --namespace groot`

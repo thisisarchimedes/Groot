@@ -12,6 +12,7 @@ spec:
       labels:
         app: groot-eth-nodes
     spec:
+      hostNetwork: true
       containers:
       - name: eth-node-1
         image: docker.io/library/arch-production-node:latest
