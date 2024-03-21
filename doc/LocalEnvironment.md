@@ -12,6 +12,11 @@ Groot is running in a K8s pod: 1 Groot container + 2 ETH nodes containers.
 ## Notes
 
 - All scripts are assuming, they've been called from the Groot project root directory
+- Test shortcuts
+    - `yarn test:unit`
+    - `yarn test:acceptance`
+    - `yarn test:interface`
+    - `yarn test:all`
 
 ## Initial Setup
 
@@ -30,7 +35,10 @@ yarn dotenvx decrypt # decrypt .env.vault to .env
 set -o allexport && source .env.local && set +o allexport # export .env.local to local environment
 ```
 
-_*Update .env*_
+#### Update .env
+
+Do this only if you happen to update the .env.* and want to share it
+
 ```bash
 yarn dotenvx encrypt
 yarn dotenvx hub push # push the keys to the dotenvx hub
@@ -60,7 +68,7 @@ yarn test:unit
 
 The script below builds the containers and loads them to the local kind cluster.
 ```bash
- sudo ./scripts/k8s/setup_local_env.sh
+ sudo ./scripts/k8s/local/setup_local_env.sh
 ```
 ## Running Acceptance Tests Locally
 

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: eth-node-1
-        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
+        image: arch-production-node
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
@@ -33,7 +33,7 @@ spec:
         ports:
         - containerPort: 8545
       - name: eth-node-2
-        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
+        image: arch-production-node
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
