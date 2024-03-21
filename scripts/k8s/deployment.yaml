@@ -12,7 +12,6 @@ spec:
       labels:
         app: groot-eth-nodes
     spec:
-      hostNetwork: true
       tolerations:
       - key: "eks.amazonaws.com/compute-type"
         operator: "Equal"

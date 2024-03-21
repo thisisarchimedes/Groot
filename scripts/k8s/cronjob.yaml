@@ -8,7 +8,6 @@ spec:
     spec:
       template:
         spec:
-          hostNetwork: true
           tolerations:
           - key: "eks.amazonaws.com/compute-type"
             operator: "Equal"
