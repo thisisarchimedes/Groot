@@ -79,7 +79,7 @@ jobs:
           # Update kubeconfig
           aws eks update-kubeconfig --name groot-demo-app --region ${{ env.EKS_REGION }}
           
-          # Create namespace if it doesn't exist
+          # Create the groot namespace if it doesn't exist
           kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
           
           # Create secrets
@@ -93,7 +93,7 @@ jobs:
           stringData:
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           EOF
-
+      
           kubectl apply -f - <<EOF
           apiVersion: v1
           kind: Secret
@@ -106,19 +106,16 @@ jobs:
           EOF
           
           # Deploy or update Kubernetes manifests
-          kubectl apply -f scripts/k8s/demoapp-configmap.yaml
-          kubectl apply -f scripts/k8s/deployment.yaml
-          kubectl apply -f scripts/k8s/service.yaml
-          kubectl apply -f scripts/k8s/cronjob.yaml
+          kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
+          kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
+          kubectl apply -f scripts/k8s/service.yaml --namespace groot
+          kubectl apply -f scripts/k8s/cronjob.yaml --namespace groot
           
-          # Perform a rolling update on the deployment
-          kubectl rollout restart deployment groot-deployment -n groot
-          
-          # Wait for the deployment to complete
-          kubectl rollout status deployment groot-deployment -n groot --timeout=300s
+          # Wait for the deployment to be ready
+          kubectl rollout status deployment groot-deployment --namespace groot --timeout=300s
           
           # Verify deployment
-          kubectl get pods -n groot
+          kubectl get pods --namespace groot
 
       - name: List all commit SHAs involved in the push
         id: format_commits

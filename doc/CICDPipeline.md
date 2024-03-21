@@ -34,6 +34,7 @@ We run on AWS EKS w/Fargate. Pod has the following containers
 We've created this cluster with
 ```bash
 eksctl create cluster --name groot-demo-app --region us-west-1 --fargate
+kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
 ```
 
 ### Current K8s clusters
@@ -48,12 +49,12 @@ Then, authenicate and make sure you can get the cluster information.
 
 ```bash
 aws eks update-kubeconfig --name groot-demo-app --region us-west-1
-kubectl get pods --all-namespaces
+kubectl get pods --namespace groot
 ```
 
 Get all pods
 ```bash
-kubectl get pods -n default
+kubectl get pods -n groot
 ```
 
 Get pod info & logs
