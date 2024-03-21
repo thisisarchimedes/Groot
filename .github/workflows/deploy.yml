@@ -112,7 +112,7 @@ jobs:
           kubectl apply -f scripts/k8s/cronjob.yaml --namespace groot
           
           # Wait for the deployment to be ready
-          kubectl rollout status deployment groot-deployment --namespace groot --timeout=300s
+          kubectl rollout status deployment groot-deployment --namespace groot --timeout=600s
           
           # Verify deployment
           kubectl get pods --namespace groot
