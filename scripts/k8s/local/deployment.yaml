@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: eth-node-1
-        image: arch-production-node
-        imagePullPolicy: Always
+        image: docker.io/library/arch-production-node:latest
+        imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: demoapp-config
@@ -33,8 +33,8 @@ spec:
         ports:
         - containerPort: 8545
       - name: eth-node-2
-        image: arch-production-node
-        imagePullPolicy: Always
+        image: docker.io/library/arch-production-node:latest
+        imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: demoapp-config

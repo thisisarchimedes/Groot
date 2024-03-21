@@ -10,8 +10,8 @@ spec:
         spec:
           containers:
           - name: groot-container
-            image: groot-container
-            imagePullPolicy: Always
+            image: docker.io/library/groot-container:latest
+            imagePullPolicy: IfNotPresent
             envFrom:
             - configMapRef:
                 name: demoapp-config

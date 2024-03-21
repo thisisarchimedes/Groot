@@ -10,8 +10,8 @@ sudo ./scripts/container_main_groot/build_main_groot_container.sh
 sudo ./scripts/container_reader_node/build_read_node_container.sh
 
 # Load containers to Kind cluster
-kind load docker-image groot-container --name groot-cluster
-kind load docker-image arch-production-node --name groot-cluster
+kind load docker-image groot-container:latest --name groot-cluster
+kind load docker-image arch-production-node:latest --name groot-cluster
 
 # Create secrets
 kubectl apply -f - <<EOF
