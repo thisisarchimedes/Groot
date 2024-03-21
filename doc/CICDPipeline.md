@@ -60,15 +60,17 @@ Get all pods
 kubectl get pods -n groot
 ```
 
-Get pod info & logs
-```bash
-kubectl describe pod <pod-name> --namespace groot
-kubectl logs <pod-name>
-```
-
 Delete  all pods from Groot
 ```bash
 kubectl delete all --all --namespace groot
 ```
 
+## Troubleshooting
 
+### Why does it stuck in `pending` or any other error state?
+
+Get pod info & logs and check for errors
+```bash
+kubectl describe pod <pod-name> --namespace groot
+kubectl logs <pod-name>
+```
