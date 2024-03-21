@@ -9,6 +9,7 @@ export class BlockchainNodeLocal extends BlockchainNode {
   constructor(logger: Logger, localRpcUrl: string, nodeName: string) {
     super(logger, nodeName);
     this.localRpcUrl = localRpcUrl;
+    this.logger.debug(`Initializing ${this.nodeName} with local RPC URL: ${localRpcUrl}`);
     this.provider = new JsonRpcProvider(localRpcUrl);
   }
 

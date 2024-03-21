@@ -63,3 +63,9 @@ kubectl describe pod <pod-name>
 kubectl logs <pod-name>
 ```
 
+Delete  all pods from Groot
+```bash
+kubectl delete all --all --namespace groot
+```
+
+

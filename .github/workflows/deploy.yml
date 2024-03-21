@@ -78,9 +78,7 @@ jobs:
         run: |
           # Update kubeconfig
           aws eks update-kubeconfig --name groot-demo-app --region ${{ env.EKS_REGION }}
-          
-          kubectl delete all --all --namespace groot
-          
+                    
           # Create the groot namespace if it doesn't exist
           kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
           
