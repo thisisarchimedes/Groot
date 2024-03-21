@@ -68,7 +68,7 @@ yarn test:unit
 
 The script below builds the containers and loads them to the local kind cluster.
 ```bash
- sudo ./scripts/k8s/setup_local_env.sh
+ sudo ./scripts/k8s/local/setup_local_env.sh
 ```
 ## Running Acceptance Tests Locally
 
