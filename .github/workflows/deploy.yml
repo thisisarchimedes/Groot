@@ -83,8 +83,27 @@ jobs:
           kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
           
           # Create secrets
-          kubectl create secret generic aws-access-key-id --from-literal=AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} --dry-run=client -o yaml | kubectl apply -f -
-          kubectl create secret generic aws-secret-access-key --from-literal=AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f - <<EOF
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: aws-access-key-id
+              namespace: groot
+            type: Opaque
+            data:
+              AWS_ACCESS_KEY_ID: $(echo -n "${{ secrets.AWS_ACCESS_KEY_ID }}" | base64)
+            EOF
+
+            kubectl apply -f - <<EOF
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: aws-secret-access-key
+              namespace: groot
+            type: Opaque
+            data:
+              AWS_SECRET_ACCESS_KEY: $(echo -n "${{ secrets.AWS_SECRET_ACCESS_KEY }}" | base64)
+          EOF
           
           # Deploy or update Kubernetes manifests
           kubectl apply -f scripts/k8s/demoapp-configmap.yaml
