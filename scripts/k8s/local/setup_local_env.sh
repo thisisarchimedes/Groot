@@ -13,14 +13,44 @@ sudo ./scripts/container_reader_node/build_read_node_container.sh
 kind load docker-image groot-container --name groot-cluster
 kind load docker-image arch-production-node --name groot-cluster
 
-kubectl create secret generic aws-access-key-id --from-literal=AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
-kubectl create secret generic aws-secret-access-key --from-literal=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
-kubectl create secret generic alchemy-api-key --from-literal=ALCHEMY_API_KEY=$ALCHEMY_API_KEY
+# Create secrets
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-access-key-id
+  namespace: groot
+type: Opaque
+stringData:
+  AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+EOF
 
- # deploy pod
-kubectl apply -f scripts/k8s/local/demoapp-configmap.yaml
-kubectl apply -f scripts/k8s/local/deployment.yaml
-kubectl apply -f scripts/k8s/local/service.yaml
-kubectl apply -f scripts/k8s/local/cronjob.yaml
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-secret-access-key
+  namespace: groot
+type: Opaque
+stringData:
+  AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+EOF
 
- kubectl get pods
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alchemy-api-key
+  namespace: groot
+type: Opaque
+stringData:
+  ALCHEMY_API_KEY: $ALCHEMY_API_KEY
+EOF
+
+# deploy pod
+kubectl apply -f scripts/k8s/local/demoapp-configmap.yaml --namespace groot
+kubectl apply -f scripts/k8s/local/deployment.yaml --namespace groot
+kubectl apply -f scripts/k8s/local/service.yaml --namespace groot
+kubectl apply -f scripts/k8s/local/cronjob.yaml --namespace groot
+
+kubectl get pods --namespace groot
