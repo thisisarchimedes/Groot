@@ -30,6 +30,9 @@ If Commit & Aceeptance stages are green, it means there is nothing else needed. 
 We run on AWS EKS w/Fargate. Pod has the following containers
 - **Groot main process**: Using K8s chron to run every minute
 - **2 x Hardhat nodes (read only)**
+- **Fargate profile:** groot-fargate-profile
+- **Namespace:**: groot
+
 
 We've created this cluster with
 ```bash
