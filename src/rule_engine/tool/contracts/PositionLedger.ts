@@ -7,8 +7,8 @@ import { LedgerEntry, populateLedgerEntry } from '../../../types/LedgerEntry';
 class PositionLedger {
     private contract: ethers.Contract;
 
-    constructor(private wallet: ethers.Wallet, contractAddress: EthereumAddress) {
-        this.contract = new ethers.Contract(contractAddress.toString(), POSITION_LEDGER_ABI, wallet);
+    constructor(contractAddress: EthereumAddress) {
+        this.contract = new ethers.Contract(contractAddress.toString(), POSITION_LEDGER_ABI);
     }
 
     async getPosition(nftId: number): Promise<LedgerEntry> {

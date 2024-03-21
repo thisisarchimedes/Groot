@@ -16,6 +16,7 @@ import { HostNameProvider } from './service/health_monitor/HostNameProvider';
 import { AbiRepo } from './rule_engine/tool/abi_repository/AbiRepo';
 import { AbiStorageDynamoDB } from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import { AbiFetcherEtherscan } from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import { LocalConfigService } from './service/config/LocalConfigService';
 
 dotenv.config();
 
@@ -118,7 +119,6 @@ export class Groot {
     await this.healthMonitor.startOfCycleSequence();
 
     await this.configService.refreshConfig();
-    this.localConfigService.refreshConfig();
     await this.setLocalNodesToNewestBlock();
     this.resetRulesEngine();
     this.resetTransactionQueuer();
@@ -148,9 +148,13 @@ export class Groot {
   public async runOneGrootCycle(): Promise<void> {
     this.logger.info('Running Groot cycle...');
 
-    //get config service rules
     const awsRules = this.configService.getRules();
-    const localRules = this.localConfigService.getRules();
+
+    //local config service -- TEMPORARY for local dev
+    const localConfig = new LocalConfigService();
+    localConfig.refreshConfig();
+
+    const localRules = localConfig.getRules();
 
     const rules = [...awsRules, ...localRules];
 

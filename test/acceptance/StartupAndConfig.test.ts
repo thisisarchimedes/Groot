@@ -1,15 +1,15 @@
 import axios from 'axios';
-import {ethers} from 'ethers';
-import {expect} from 'chai';
-import {NewRelicInterceptor} from './interceptors/NewRelicInterceptor';
-import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {grootStartHere} from '../../src/main';
-import {AppConfigInterceptor} from './interceptors/AppConfigInterceptor';
-import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
-import {EthNodeInterceptor} from './interceptors/EthNodeInterceptor';
+import { ethers } from 'ethers';
+import { expect } from 'chai';
+import { NewRelicInterceptor } from './interceptors/NewRelicInterceptor';
+import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
+import { grootStartHere } from '../../src/main';
+import { AppConfigInterceptor } from './interceptors/AppConfigInterceptor';
+import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
+import { EthNodeInterceptor } from './interceptors/EthNodeInterceptor';
 
 
-describe('Startup and Config', function() {
+describe('Startup and Config', function () {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
@@ -20,7 +20,7 @@ describe('Startup and Config', function() {
 
   let configService: ConfigServiceAWS;
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     configService = createConfigService();
     await initializeConfigService();
 
@@ -31,11 +31,11 @@ describe('Startup and Config', function() {
     ethNodeAltInterceptor = undefined;
   });
 
-  afterEach(function() {
+  afterEach(function () {
     cleanupTestDoubles();
   });
 
-  it('Should return block number from mock node', async function() {
+  it('Should return block number from mock node', async function () {
     const expectedBlockNumber = 10001;
     ethNodeMainInterceptor = new EthNodeInterceptor('http://localhost:8545');
     ethNodeMainInterceptor.setMockBlockNumber(expectedBlockNumber);
@@ -45,7 +45,7 @@ describe('Startup and Config', function() {
     expect(blockNumber).to.be.equal(expectedBlockNumber);
   });
 
-  it('Should fake reset', async function() {
+  it('Should fake reset', async function () {
     ethNodeMainInterceptor = new EthNodeInterceptor('http://localhost:8545');
     ethNodeMainInterceptor.interceptCalls();
 
@@ -59,7 +59,7 @@ describe('Startup and Config', function() {
     expect(response.status).to.be.eq(200);
   });
 
-  it('should load dummy rule and emit a log item', async function() {
+  it('should load dummy rule and emit a log item', async function () {
     const expectedBlockNumber = 10001;
 
 
@@ -100,14 +100,14 @@ describe('Startup and Config', function() {
 
     const expectedMessage = 'Queuing transaction: this is a dummy context';
     newRelicInterceptor.setWaitedOnMessage(expectedMessage);
-    await grootStartHere(false);
+    await grootStartHere();
     await waitForMessageProcessing();
 
     const isMessageObserved = newRelicInterceptor.isWaitedOnMessageObserved();
     expect(isMessageObserved).to.be.true;
   });
 
-  it('Should handle invalid rules gracfully', async function() {
+  it('Should handle invalid rules gracfully', async function () {
     ethNodeMainInterceptor = new EthNodeInterceptor('http://localhost:8545');
     ethNodeMainInterceptor.interceptCalls();
     ethNodeAltInterceptor = new EthNodeInterceptor('http://localhost:18545');
@@ -136,7 +136,7 @@ describe('Startup and Config', function() {
     const expectedMessage = 'Rule Engine loaded 1 rules';
     newRelicInterceptor.setWaitedOnMessage(expectedMessage);
 
-    await grootStartHere(false);
+    await grootStartHere();
     console.log('Waiting for message: ', expectedMessage);
     await waitForMessageProcessing();
 

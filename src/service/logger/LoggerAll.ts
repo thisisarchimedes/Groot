@@ -1,15 +1,15 @@
-import {ConfigService} from '../config/ConfigService';
-import {Logger} from './Logger';
-import {LoggerConsole} from './LoggerConsole';
-import {LoggerNewRelic} from './LoggerNewRelic';
+import { ConfigService } from '../config/ConfigService';
+import { Logger } from './Logger';
+import { LoggerConsole } from './LoggerConsole';
+import { LoggerNewRelic } from './LoggerNewRelic';
 
 export class LoggerAll extends Logger {
   private loggerConsole: LoggerConsole;
   private loggerNewRelic: LoggerNewRelic;
 
   constructor(
-      configService: ConfigService,
-      serviceName: string,
+    configService: ConfigService,
+    serviceName: string,
   ) {
     super();
     this.loggerConsole = new LoggerConsole();
@@ -38,8 +38,14 @@ export class LoggerAll extends Logger {
     this.loggerNewRelic.warn(message);
   }
 
-  public error(message: string): void {
-    this.loggerConsole.error(message);
-    this.loggerNewRelic.error(message);
+  public error(error: unknown): void {
+    if (error instanceof Error) {
+      this.loggerConsole.error((error as Error).message);
+      this.loggerConsole.error((error as Error).stack ?? '');
+
+      this.loggerNewRelic.error((error as Error).message);
+      this.loggerNewRelic.error((error as Error).stack ?? '');
+    }
   }
 }
+
