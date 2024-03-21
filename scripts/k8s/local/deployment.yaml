@@ -25,6 +25,11 @@ spec:
             secretKeyRef:
               name: alchemy-api-key
               key: ALCHEMY_API_KEY
+        - name: HARDHAT_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: demoapp-config
+              key: MAIN_LOCAL_NODE_PORT
         ports:
         - containerPort: 8545
       - name: eth-node-2
@@ -39,6 +44,11 @@ spec:
             secretKeyRef:
               name: alchemy-api-key
               key: ALCHEMY_API_KEY
+        - name: HARDHAT_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: demoapp-config
+              key: ALT_LOCAL_NODE_PORT
         ports:
         - containerPort: 18545
       restartPolicy: Always

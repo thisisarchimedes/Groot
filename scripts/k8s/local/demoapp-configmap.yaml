@@ -7,5 +7,4 @@ data:
   ALT_LOCAL_NODE_PORT: "18545"
   ENVIRONMENT: "DemoApp"
   AWS_REGION: "us-east-1"
-  HARDHAT_PORT_1: "8545"
-  HARDHAT_PORT_2: "18545"
+  
