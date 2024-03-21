@@ -9,6 +9,11 @@ spec:
       template:
         spec:
           hostNetwork: true
+          tolerations:
+          - key: "eks.amazonaws.com/compute-type"
+            operator: "Equal"
+            value: "fargate"
+            effect: "NoSchedule"
           containers:
           - name: groot-container
             image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:groot-container
@@ -48,7 +53,3 @@ spec:
                   name: demoapp-config
                   key: AWS_REGION
           restartPolicy: OnFailure
-
-
-
-          
