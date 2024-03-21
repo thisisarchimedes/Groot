@@ -29,7 +29,6 @@ export class RuleExpirePositions extends Rule {
     super(constractorInput);
     this.leverageDataSource = new LeverageDataSource();
     // this.uniswap = new Uniswap('');
-    // this.positionLedger = new PositionLedger(new EthereumAddress(''));
   }
 
   public async evaluate(): Promise<void> {
