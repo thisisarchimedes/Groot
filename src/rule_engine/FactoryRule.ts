@@ -1,6 +1,5 @@
-import { BlockchainReader } from '../blockchain/blockchain_reader/BlockchainReader';
+import { IBlockchainReader } from '../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import { ILogger } from '../service/logger/interfaces/ILogger';
-import { Logger } from '../service/logger/Logger';
 import { Rule, RuleParams } from './rule/Rule';
 import { RuleDummy } from './rule/RuleDummy';
 import { RuleExpirePositions } from './rule/RuleExpirePositions';
@@ -17,10 +16,10 @@ export class ErrorRuleFactory extends Error {
 
 export class FactoryRule {
   private readonly logger: ILogger;
-  private readonly blockchainReader: BlockchainReader;
+  private readonly blockchainReader: IBlockchainReader;
   private readonly abiRepo: AbiRepo;
 
-  constructor(logger: ILogger, blockchainReader: BlockchainReader, abiRepo: AbiRepo) {
+  constructor(logger: ILogger, blockchainReader: IBlockchainReader, abiRepo: AbiRepo) {
     this.logger = logger;
     this.blockchainReader = blockchainReader;
     this.abiRepo = abiRepo;

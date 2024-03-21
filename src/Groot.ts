@@ -7,8 +7,6 @@ import { TxQueueAdapter } from '../test/unit/adapters/TxQueueAdapter';
 import { FactoryRule } from './rule_engine/FactoryRule';
 import { RuleEngine } from './rule_engine/RuleEngine';
 import { TransactionQueuer } from './tx_queue/TransactionQueuer';
-import { BlockchainReader } from './blockchain/blockchain_reader/BlockchainReader';
-import { BlockchainNodeLocal } from './blockchain/blockchain_nodes/BlockchainNodeLocal';
 import { HealthMonitor } from './service/health_monitor/HealthMonitor';
 import { BlockchainNodeHealthMonitor } from './service/health_monitor/BlockchainNodeHealthMonitor';
 import { SignalAWSCriticalFailure } from './service/health_monitor/signal/SignalAWSCriticalFailure';
@@ -19,6 +17,8 @@ import { AbiStorageDynamoDB } from './rule_engine/tool/abi_repository/AbiStorage
 import { AbiFetcherEtherscan } from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 import { IConfigServiceAWS } from './service/config/interfaces/IConfigServiceAWS';
 import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
+import { IBlockchainReader } from './blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 
 dotenv.config();
 
@@ -29,36 +29,33 @@ export class Groot {
   private txQueuer!: TransactionQueuer;
   private healthMonitor!: HealthMonitor;
 
-  private mainNode!: BlockchainNodeLocal;
-  private altNode!: BlockchainNodeLocal;
-  private blockchainReader!: BlockchainReader;
-
   private abiRepo!: AbiRepo;
-
-  private readonly mainLocalNodePort: number;
-  private readonly altLocalNodePort: number;
 
   private readonly logger: ILoggerAll;
   private readonly configService: IConfigServiceAWS
+  private readonly blockchainReader: IBlockchainReader;
+  private readonly mainNode: IBlockchainNodeLocal;
+  private readonly altNode: IBlockchainNodeLocal;
 
   constructor(
     @inject("IConfigServiceAWS") _configService: IConfigServiceAWS,
     @inject("ILoggerAll") _logger: ILoggerAll,
-    mainLocalNodePort: number = 8545,
-    altLocalNodePort: number = 18545
+    @inject("BlockchainNodeLocalMain") _mainLocalNode: IBlockchainNodeLocal,
+    @inject("BlockchainNodeLocalAlt") _altLocalNode: IBlockchainNodeLocal,
+    @inject("IBlockchainReader") _blockchainReader: IBlockchainReader,
+
   ) {
     this.logger = _logger;
     this.configService = _configService;
-    this.mainLocalNodePort = mainLocalNodePort;
-    this.altLocalNodePort = altLocalNodePort;
+    this.blockchainReader = _blockchainReader;
+    this.mainNode = _mainLocalNode;
+    this.altNode = _altLocalNode;
   }
 
   public async initalizeGroot() {
     await this.configService.refreshConfig();
 
     this.logger.info('Initializing Groot...');
-
-    await this.initalizeReadOnlyLocalNodes();
 
     this.initalizeHealthMonitor();
 
@@ -67,22 +64,7 @@ export class Groot {
     this.logger.info('Groot initialized successfully.');
   }
 
-  private async initalizeReadOnlyLocalNodes() {
-    this.mainNode = new BlockchainNodeLocal(this.logger, `http://localhost:${this.mainLocalNodePort}`, 'alchemy-node');
-    this.altNode = new BlockchainNodeLocal(this.logger, `http://localhost:${this.altLocalNodePort}`, 'infura-node');
-
-    await Promise.all([
-      this.mainNode.startNode(),
-      this.altNode.startNode(),
-    ]);
-
-    this.blockchainReader = new BlockchainReader(this.logger, [this.mainNode, this.altNode]);
-  }
-
   private initalizeHealthMonitor() {
-    if (!this.mainNode || !this.altNode) {
-      throw new Error('Cannot initalize health monitor without nodes');
-    }
 
     const blockchainHealthMonitor = new BlockchainNodeHealthMonitor(this.logger, [this.mainNode, this.altNode]);
     const hostNameProvider = new HostNameProvider(this.logger);

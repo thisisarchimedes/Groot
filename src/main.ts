@@ -9,7 +9,7 @@ import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
 
 dotenv.config();
 
-class Application {
+class GrootApplication {
   private container: Container;
 
   constructor() {
@@ -59,7 +59,7 @@ class Application {
   }
 }
 
-const app = new Application();
+const app = new GrootApplication();
 app.bootstrap().catch((error) => {
   console.error('Failed to start the application:', error);
 });

@@ -1,13 +1,13 @@
-import {BlockchainReader} from '../../../blockchain/blockchain_reader/BlockchainReader';
-import {IAbiFetcher} from './IAbiFetcher';
-import {IAbiStorage} from './IAbiStorage';
+import { IBlockchainReader } from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { IAbiFetcher } from './IAbiFetcher';
+import { IAbiStorage } from './IAbiStorage';
 
 export class AbiRepo {
   constructor(
-    private readonly blockchainReader: BlockchainReader,
+    private readonly blockchainReader: IBlockchainReader,
     private readonly abiStorage: IAbiStorage,
     private readonly abiFetcher: IAbiFetcher,
-  ) {}
+  ) { }
 
   public async getAbiByAddress(contractAddress: string): Promise<string> {
     const implementationAddress = await this.getImplementationAddress(contractAddress);
