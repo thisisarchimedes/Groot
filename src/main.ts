@@ -12,7 +12,7 @@ export async function grootStartHere(): Promise<void> {
   const mainLocalNodePort = Number(process.env.MAIN_LOCAL_NODE_PORT as string);
   const altLocalNodePort = Number(process.env.ALT_LOCAL_NODE_PORT as string);
 
-  console.log(`${new Date().toISOString()} - Starting Groot in ${environment} environment and ${region} region`);
+  console.log(`Starting Groot in ${environment} and ${region} - ports ${mainLocalNodePort}, ${altLocalNodePort}`);
 
   const groot = new Groot(environment, region, mainLocalNodePort, altLocalNodePort);
 

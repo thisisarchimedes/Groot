@@ -14,6 +14,7 @@ export class BlockchainNodeLocal extends BlockchainNode {
   }
 
   public async startNode(): Promise<void> {
+    this.logger.debug(`Starting local node...${this.localRpcUrl}`);
     await this.waitForNodeToBeReady();
   }
 

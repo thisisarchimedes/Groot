@@ -26,4 +26,28 @@ spec:
                 secretKeyRef:
                   name: aws-secret-access-key
                   key: AWS_SECRET_ACCESS_KEY
+            - name: MAIN_LOCAL_NODE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: demoapp-config
+                  key: MAIN_LOCAL_NODE_PORT
+            - name: ALT_LOCAL_NODE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: demoapp-config
+                  key: ALT_LOCAL_NODE_PORT
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: demoapp-config
+                  key: ENVIRONMENT
+            - name: AWS_REGION
+              valueFrom:
+                configMapKeyRef:
+                  name: demoapp-config
+                  key: AWS_REGION
           restartPolicy: OnFailure
+
+
+
+          
