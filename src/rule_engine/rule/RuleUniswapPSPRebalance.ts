@@ -10,6 +10,11 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
   upperTargetTickPercentage: number; // Where we want to be after rebalance currentUniswapTick * newUpperTickPercentage = newUpperTick
   lowerTargetTickPercentage: number; // Where we want to be after rebalance currentUniswapTick * newLowerTickPercentage = newLowerTick
   strategyAddress: string;
+  slippagePercentage: bigint; // slippage percentage for the rebalance in 10000 scale
+}
+export interface MinOutputAmounts {
+  minOut0Amount: bigint;
+  minOut1Amount: bigint;
 }
 /* eslint-enable max-len */
 
@@ -37,6 +42,7 @@ export class RuleUniswapPSPRebalance extends Rule {
 
     const newUpperTick = await this.calculateNewUpperTick();
     const newLowerTick = await this.calculateNewLowerTick();
+    const minOutputAmounts = await this.calculateMinOOutAndMin1Out();
 
     const tx = {
       urgencyLevel: UrgencyLevel.URGENT,
@@ -49,8 +55,8 @@ export class RuleUniswapPSPRebalance extends Rule {
       await this.uniswapStrategy.createRebalanceTransaction(
           newUpperTick,
           newLowerTick,
-          BigInt(0), // TODO change this to correct calculation amount
-          BigInt(0), // TODO change this to correct calculation amount
+          minOutputAmounts.minOut0Amount,
+          minOutputAmounts.minOut1Amount,
       );
     await this.pushTransactionToRuleLocalQueue(tx);
   }
@@ -104,5 +110,17 @@ export class RuleUniswapPSPRebalance extends Rule {
   }
   protected generateUniqueKey(): string {
     throw new Error('Method not implemented.');
+  }
+  private async calculateMinOOutAndMin1Out(): Promise<MinOutputAmounts> {
+    const position = await this.uniswapStrategy.getPosition();
+    const params = this.params as RuleParamsUniswapPSPRebalance;
+    const minOut0Amount =
+      position.amount0 -
+      (position.amount0 * params.slippagePercentage) / BigInt(10000);
+    const minOut1Amount =
+      position.amount1 -
+      (position.amount1 * params.slippagePercentage) / BigInt(10000);
+
+    return {minOut0Amount, minOut1Amount};
   }
 }

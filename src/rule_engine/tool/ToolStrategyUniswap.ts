@@ -3,6 +3,11 @@ import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainRea
 import UNISWAPV3_STRATEGY_ABI from '../../constants/abis/UNISWAPV3_STRATEGY_ABI.json';
 import {Contract} from 'ethers';
 import {RawTransactionData} from '../../blockchain/OutboundTransaction';
+export interface UniswapStrategyPosition {
+  liquidity: bigint;
+  amount0: bigint;
+  amount1: bigint;
+}
 export class ToolStrategyUniswap {
   private readonly strategyAddress: string;
   private readonly blockchainReader: BlockchainReader;
@@ -18,6 +23,7 @@ export class ToolStrategyUniswap {
         new ethers.Interface(UNISWAPV3_STRATEGY_ABI),
         'pool',
     );
+
     return ret as string;
   }
   public async upperTick(): Promise<number> {
@@ -52,6 +58,20 @@ export class ToolStrategyUniswap {
         'tickSpacing',
     );
     return ret as number;
+  }
+  public async getPosition(): Promise<UniswapStrategyPosition> {
+    const ret = (await this.blockchainReader.callViewFunction(
+        this.strategyAddress,
+        new ethers.Interface(UNISWAPV3_STRATEGY_ABI),
+        'getPosition',
+    )) as Array<bigint>;
+
+    const response: UniswapStrategyPosition = {
+      liquidity: ret[0],
+      amount0: ret[1],
+      amount1: ret[2],
+    };
+    return response;
   }
   public async createRebalanceTransaction(
       newUpperTick: number,

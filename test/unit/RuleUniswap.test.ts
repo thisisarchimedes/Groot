@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import * as dotenv from 'dotenv';
-import {ethers} from 'ethers';
+import {ethers, parseUnits} from 'ethers';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
@@ -55,8 +55,17 @@ describe('Rule Factory Testings: Uniswap', function() {
     const upperTargetTickPercentage = 150;
     const lowerTargetTickPercentage = 50;
     const tickSpacing = 15;
+    const amount0 = parseUnits('10', 8);
+    const amount1 = parseUnits('10', 18);
 
-    await setupMockResponses(100, 200, currentTick, tickSpacing);
+    await setupMockResponses(
+        100,
+        200,
+        currentTick,
+        tickSpacing,
+        amount0,
+        amount1,
+    );
     const uniswapRule = createUniswapRule(
         upperTargetTickPercentage,
         lowerTargetTickPercentage,
@@ -84,8 +93,17 @@ describe('Rule Factory Testings: Uniswap', function() {
     const upperTargetTickPercentage = 150;
     const lowerTargetTickPercentage = 50;
     const tickSpacing = 15;
+    const amount0 = parseUnits('10', 8);
+    const amount1 = parseUnits('10', 18);
 
-    await setupMockResponses(100, 200, currentTick, tickSpacing);
+    await setupMockResponses(
+        100,
+        200,
+        currentTick,
+        tickSpacing,
+        amount0,
+        amount1,
+    );
     const uniswapRule = createUniswapRule(
         upperTargetTickPercentage,
         lowerTargetTickPercentage,
@@ -113,8 +131,17 @@ describe('Rule Factory Testings: Uniswap', function() {
     const upperTargetTickPercentage = 150;
     const lowerTargetTickPercentage = 50;
     const tickSpacing = 15;
+    const amount0 = parseUnits('10', 8);
+    const amount1 = parseUnits('10', 18);
 
-    await setupMockResponses(100, 200, currentTick, tickSpacing);
+    await setupMockResponses(
+        100,
+        200,
+        currentTick,
+        tickSpacing,
+        amount0,
+        amount1,
+    );
     const uniswapRule = createUniswapRule(
         upperTargetTickPercentage,
         lowerTargetTickPercentage,
@@ -142,11 +169,13 @@ describe('Rule Factory Testings: Uniswap', function() {
     );
     const ABI = ['function rebalance(int24,int24,uint256,uint256)'];
     const iFace = new ethers.Interface(ABI);
+    const amountOut0Min = amount0 - (amount0 * BigInt(50)) / BigInt(10000);
+    const amountOut1Min = amount1 - (amount1 * BigInt(50)) / BigInt(10000);
     const data = iFace.encodeFunctionData('rebalance', [
       lowerTick,
       upperTick,
-      BigInt(0),
-      BigInt(0),
+      amountOut0Min,
+      amountOut1Min,
     ]);
 
     expect(pendingTx.lowLevelUnsignedTransaction.data === data).to.be.true;
@@ -192,6 +221,7 @@ describe('Rule Factory Testings: Uniswap', function() {
         upperTargetTickPercentage: 150,
         lowerTargetTickPercentage: 50,
         strategyAddress: '0x1234',
+        slippagePercentage: BigInt(50),
       },
     };
   }
@@ -209,6 +239,7 @@ describe('Rule Factory Testings: Uniswap', function() {
         upperTargetTickPercentage,
         lowerTargetTickPercentage,
         strategyAddress: '0x1234',
+        slippagePercentage: BigInt(50),
       },
     };
   }
@@ -218,11 +249,18 @@ describe('Rule Factory Testings: Uniswap', function() {
       upperTick: number,
       currentTick: number,
       tickSpacing = 15,
+      amount0 = BigInt(0),
+      amount1 = BigInt(0),
   ): Promise<void> {
     await localNodeAlchemy.setLowerTickResponse(lowerTick);
     await localNodeAlchemy.setUpperTickResponse(upperTick);
     await localNodeAlchemy.setCurrentTickResponse(currentTick);
     await localNodeAlchemy.setTickSpacingResponse(tickSpacing);
+    await localNodeAlchemy.setCurrentPositionResponse(
+        BigInt(0),
+        amount0,
+        amount1,
+    );
   }
 
   function calculateNewTick(
