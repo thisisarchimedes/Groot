@@ -12,6 +12,7 @@ spec:
       labels:
         app: groot-eth-nodes
     spec:
+      schedulerName: fargate-scheduler
       tolerations:
       - key: "eks.amazonaws.com/compute-type"
         operator: "Equal"

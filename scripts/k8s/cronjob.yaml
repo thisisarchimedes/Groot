@@ -8,6 +8,7 @@ spec:
     spec:
       template:
         spec:
+          schedulerName: fargate-scheduler
           tolerations:
           - key: "eks.amazonaws.com/compute-type"
             operator: "Equal"
