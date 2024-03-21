@@ -10,7 +10,7 @@ spec:
         spec:
           containers:
           - name: groot-container
-            image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:groot-container
+            image: groot-container
             imagePullPolicy: Always
             envFrom:
             - configMapRef:

@@ -6,39 +6,39 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: groot
+      app: groot-eth-nodes
   template:
     metadata:
       labels:
-        app: groot
+        app: groot-eth-nodes
     spec:
       containers:
-      - name: groot-container
-        image: groot-container:latest
-        imagePullPolicy: IfNotPresent
+      - name: eth-node-1
+        image: arch-production-node
+        imagePullPolicy: Always
         envFrom:
         - configMapRef:
             name: demoapp-config
-      - name: eth-node-1
-        image: arch-production-node:latest
-        imagePullPolicy: IfNotPresent
         env:
-        - name: HARDHAT_PORT
+        - name: ALCHEMY_API_KEY
           valueFrom:
-            configMapKeyRef:
-              name: demoapp-config
-              key: HARDHAT_PORT_1
+            secretKeyRef:
+              name: alchemy-api-key
+              key: ALCHEMY_API_KEY
         ports:
         - containerPort: 8545
       - name: eth-node-2
-        image: arch-production-node:latest
-        imagePullPolicy: IfNotPresent
+        image: arch-production-node
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: demoapp-config
         env:
-        - name: HARDHAT_PORT
+        - name: ALCHEMY_API_KEY
           valueFrom:
-            configMapKeyRef:
-              name: demoapp-config
-              key: HARDHAT_PORT_2
+            secretKeyRef:
+              name: alchemy-api-key
+              key: ALCHEMY_API_KEY
         ports:
         - containerPort: 18545
       restartPolicy: Always

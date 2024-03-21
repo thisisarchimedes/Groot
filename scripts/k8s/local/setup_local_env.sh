@@ -15,6 +15,7 @@ kind load docker-image arch-production-node:latest --name groot-cluster
 
 kubectl create secret generic aws-access-key-id --from-literal=AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
 kubectl create secret generic aws-secret-access-key --from-literal=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+kubectl create secret generic alchemy-api-key --from-literal=ALCHEMY_API_KEY=$ALCHEMY_API_KEY
 
  # deploy pod
 kubectl apply -f scripts/k8s/local/demoapp-configmap.yaml
