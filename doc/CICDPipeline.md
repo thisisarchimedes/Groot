@@ -59,7 +59,7 @@ kubectl get pods -n groot
 
 Get pod info & logs
 ```bash
-kubectl describe pod <pod-name>
+kubectl describe pod <pod-name> --namespace groot
 kubectl logs <pod-name>
 ```
 

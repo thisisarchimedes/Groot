@@ -9,7 +9,7 @@ spec:
       template:
         metadata:
           labels:
-            eks.amazonaws.com/fargate-profile: fp-default
+            eks.amazonaws.com/fargate-profile: groot-fargate-profile
         spec:
           schedulerName: fargate-scheduler
           tolerations:
