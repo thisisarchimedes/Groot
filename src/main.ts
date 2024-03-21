@@ -1,46 +1,65 @@
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
-import { container } from './inversify.config'; // Ensure this path is correct
+import { Container } from 'inversify';
+import { InversifyConfig } from './inversify.config'; // Ensure this path is correct
 import { TYPES } from './inversify.types'; // Adjust the path as needed
 import { Groot } from './Groot';
 import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
+import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
 
 dotenv.config();
 
-export async function grootStartHere(): Promise<void> {
-  const environment = process.env.ENVIRONMENT as string;
-  const region = process.env.AWS_REGION as string;
-  console.log(`${new Date().toISOString()} - Starting Groot in ${environment} environment and ${region} region`);
+class Application {
+  private container: Container;
 
-  // Resolve Groot from the container instead of directly instantiating it
-  const groot = container.get<Groot>(TYPES.Groot);
-
-  setShutdownOnSigTerm();
-
-  try {
-    await groot.initalizeGroot();
-    await groot.prepareForAnotherCycle();
-    await groot.runOneGrootCycle();
-  } catch (error) {
-    reportCriticalError(environment, region, error);
-    process.exit(1);
+  constructor() {
+    this.container = new Container();
   }
 
-  await groot.shutdownGroot();
+  public async bootstrap(): Promise<void> {
+    const environment = process.env.ENVIRONMENT as string;
+    const region = process.env.AWS_REGION as string;
+    console.log(`${new Date().toISOString()} - Starting Groot in ${environment} environment and ${region} region`);
+
+    // Initialize configService
+    const configServiceAWS = new ConfigServiceAWS(environment, region);
+    await configServiceAWS.refreshConfig();
+
+    // Create the Inversify container with the pre-initialized ConfigServiceAWS
+    const inversifyConfig = new InversifyConfig(configServiceAWS);
+    this.container = inversifyConfig.getContainer();
+
+    this.setShutdownOnSigTerm();
+
+    try {
+      const groot = this.container.get<Groot>(TYPES.Groot);
+      await groot.initalizeGroot();
+      await groot.prepareForAnotherCycle();
+      await groot.runOneGrootCycle();
+    } catch (error) {
+      this.reportCriticalError(environment, region, error);
+      process.exit(1);
+    }
+
+    const groot = this.container.get<Groot>(TYPES.Groot);
+    await groot.shutdownGroot();
+  }
+
+  private reportCriticalError(environment: string, region: string, error: unknown): void {
+    const errorMessage = `Unexpected CRITICAL ERROR in ${environment} ${region} main loop: ${error}`;
+    const logger = this.container.get<ILoggerAll>(TYPES.ILoggerAll);
+    logger.error(errorMessage);
+  }
+
+  private setShutdownOnSigTerm(): void {
+    process.on('SIGTERM', () => {
+      console.log('Received SIGTERM signal. Shutting down gracefully...');
+      process.exit(0);
+    });
+  }
 }
 
-function reportCriticalError(environment: string, region: string, error: unknown): void {
-  const errorMessage = `Unexpected CRITICAL ERROR in main loop: ${error}`;
-  // Use the container to resolve ILoggerAll for logging errors
-  const logger = container.get<ILoggerAll>(TYPES.ILoggerAll);
-  logger.error(errorMessage);
-}
-
-function setShutdownOnSigTerm(): void {
-  process.on('SIGTERM', () => {
-    console.log('Received SIGTERM signal. Shutting down gracefully...');
-    process.exit(0);
-  });
-}
-
-grootStartHere();
+const app = new Application();
+app.bootstrap().catch((error) => {
+  console.error('Failed to start the application:', error);
+});
