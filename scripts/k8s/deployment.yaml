@@ -11,6 +11,7 @@ spec:
     metadata:
       labels:
         app: groot-eth-nodes
+        eks.amazonaws.com/fargate-profile: fp-default
     spec:
       schedulerName: fargate-scheduler
       tolerations:

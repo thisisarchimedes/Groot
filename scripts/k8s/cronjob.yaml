@@ -3,10 +3,13 @@ kind: CronJob
 metadata:
   name: groot-cronjob
 spec:
-  schedule: "*/1 * * * *"   # Run every minute
+  schedule: "*/1 * * * *"
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            eks.amazonaws.com/fargate-profile: fp-default
         spec:
           schedulerName: fargate-scheduler
           tolerations:
