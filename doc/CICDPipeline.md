@@ -72,5 +72,5 @@ kubectl delete all --all --namespace groot
 Get pod info & logs and check for errors
 ```bash
 kubectl describe pod <pod-name> --namespace groot
-kubectl logs <pod-name>
+kubectl logs <pod-name> --namespace groot
 ```
