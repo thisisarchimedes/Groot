@@ -70,10 +70,8 @@ export default class Uniswap {
     private mapRouteData = (route: SwapRoute | null) => {
         if (!route) throw new Error('Please enter a valid route');
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         const pools = route.route[0].route.pools;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         const tokenPath = route.route[0].route.tokenPath;
         const swapOutputAmount = route.quote.toExact() || '0';
         return { pools, tokenPath, swapOutputAmount };

@@ -1,7 +1,9 @@
+import EthereumAddress from "./EthereumAddress";
+
 export type ClosePositionParamsStruct = {
     nftId: number;
     minWBTC: bigint;
-    swapRoute: BigNumberish;
-    swapData: BytesLike;
-    exchange: AddressLike;
+    swapRoute: bigint;
+    swapData: string;
+    exchange: EthereumAddress;
 };
