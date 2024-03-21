@@ -1,5 +1,7 @@
-import {AppConfigClient} from './AppConfigClient';
-import {ConfigService} from './ConfigService';
+import EthereumAddress from '../../types/EthereumAddress';
+import LeverageContract from '../../types/LeverageContract';
+import { AppConfigClient } from './AppConfigClient';
+import { ConfigService } from './ConfigService';
 
 export class ConfigServiceAWS extends ConfigService {
   private readonly appConfigClient: AppConfigClient;
@@ -20,6 +22,7 @@ export class ConfigServiceAWS extends ConfigService {
       this.refreshSleepTime(),
       this.refreshEtherscanAPIKey(),
       this.refreshAbiStorageConfig(),
+      this.refreshLeverageContractAddresses()
     ]);
   }
 
@@ -48,6 +51,19 @@ export class ConfigServiceAWS extends ConfigService {
 
     this.newRelicURL = newRelicURL;
     this.newRelicAPIKey = newRelicAPIKey;
+  }
+
+  private async refreshLeverageContractAddresses(): Promise<void> {
+    const leverageContractsConfig = await this.appConfigClient.fetchConfigRawString('LeverageContractInfo');
+    const leverageContractsJson = JSON.parse(leverageContractsConfig);
+    const leverageContracts = leverageContractsJson.map((e: any) => {
+      return {
+        name: e.name,
+        address: new EthereumAddress(e.address)
+      } as LeverageContract
+    })
+
+    this.leverageContractAddresses = leverageContracts;
   }
 
   private async refreshSleepTime(): Promise<void> {

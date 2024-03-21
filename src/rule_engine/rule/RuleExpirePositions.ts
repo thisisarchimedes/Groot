@@ -1,6 +1,6 @@
 import { Rule, RuleParams } from './Rule';
 import { UrgencyLevel } from '../TypesRule';
-import { OutboundTransaction } from '../../blockchain/OutboundTransaction';
+import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
 import LeverageDataSource from '../tool/data_source/LeverageDataSource';
 import { RuleConstructorInput } from '../../types/RuleConstructorInput';
 import LeveragePosition from '../../types/LeveragePosition';
@@ -8,6 +8,7 @@ import EthereumAddress from '../../types/EthereumAddress';
 import ethers from 'ethers';
 // import Uniswap from '../tool/uniswap/Uniswap';
 import PositionLedger from '../tool/contracts/PositionLedger';
+import MultiPoolStrategy from '../tool/contracts/MultiPoolStrategy';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -56,28 +57,29 @@ export class RuleExpirePositions extends Rule {
   //   minimumWBTC: bigint;
   //   payload: string;
   // }> {
-  //   // const strategyInstance = this.multiPoolStrategyFactory.create(new EthereumAddress(position.strategy));
+  //   const strategyInstance = new MultiPoolStrategy(new EthereumAddress(position.strategy));
+  //   const positionLedger = new PositionLedger(new EthereumAddress(position.strategy))
 
   //   // get blockchain position
-  //   const blockchainPosition = await this.positionLedger.getPosition(position.nftId);
+  //   const blockchainPosition = await positionLedger.getPosition(position.nftId);
 
-  //   // const minimumExpectedAssets = await strategyInstance.convertToAssets(blockchainPosition.strategyShares);
+  //   const minimumExpectedAssets = await strategyInstance.convertToAssets(blockchainPosition.strategyShares);
 
-  //   // const strategyAsset = await strategyInstance.asset();
-  //   // const assetDecimals = await strategyInstance.decimals();
+  //   const strategyAsset = await strategyInstance.asset();
+  //   const assetDecimals = await strategyInstance.decimals();
 
-  //   // const { payload, swapOutputAmount } = await this.uniswap.buildPayload(
-  //   //   ethers.formatUnits(minimumExpectedAssets, assetDecimals),
-  //   //   new EthereumAddress(strategyAsset),
-  //   //   Number(assetDecimals),
-  //   //   new EthereumAddress(WBTC_ADDRESS),
-  //   //   WBTC_DECIMALS,
-  //   // );
+  //   const { payload, swapOutputAmount } = await this.uniswap.buildPayload(
+  //     ethers.formatUnits(minimumExpectedAssets, assetDecimals),
+  //     new EthereumAddress(strategyAsset),
+  //     Number(assetDecimals),
+  //     new EthereumAddress(WBTC_ADDRESS),
+  //     WBTC_DECIMALS,
+  //   );
 
-  //   // return {
-  //   //   minimumWBTC: BigInt(ethers.parseUnits(swapOutputAmount, WBTC_DECIMALS)),
-  //   //   payload,
-  //   // };
+  //   return {
+  //     minimumWBTC: BigInt(ethers.parseUnits(swapOutputAmount, WBTC_DECIMALS)),
+  //     payload,
+  //   };
   // }
 
   private createExpireTransaction(position: LeveragePosition): OutboundTransaction {
@@ -93,7 +95,7 @@ export class RuleExpirePositions extends Rule {
       urgencyLevel: UrgencyLevel.NORMAL,
       context: `Position expired transaction`,
       postEvalUniqueKey: this.generateUniqueKey(position),
-      lowLevelUnsignedTransaction: {},
+      lowLevelUnsignedTransaction: {} as RawTransactionData,
     };
   }
 

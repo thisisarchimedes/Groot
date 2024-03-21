@@ -5,8 +5,8 @@ import EthereumAddress from '../../../types/EthereumAddress';
 class MultiPoolStrategy {
     private contract: ethers.Contract;
 
-    constructor(private wallet: ethers.Wallet, contractAddress: EthereumAddress) {
-        this.contract = new ethers.Contract(contractAddress.toString(), MULTI_POOL_STRATEGY_ABI, wallet);
+    constructor(contractAddress: EthereumAddress) {
+        this.contract = new ethers.Contract(contractAddress.toString(), MULTI_POOL_STRATEGY_ABI);
     }
 
     async convertToAssets(shares: bigint): Promise<bigint> {

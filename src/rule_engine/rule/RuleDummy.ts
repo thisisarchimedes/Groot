@@ -1,6 +1,6 @@
-import {Rule, RuleParams} from './Rule';
-import {UrgencyLevel} from '../TypesRule';
-import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
+import { Rule, RuleParams } from './Rule';
+import { UrgencyLevel } from '../TypesRule';
+import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -30,7 +30,7 @@ export class RuleDummy extends Rule {
       urgencyLevel: UrgencyLevel.NORMAL,
       context: `this is a dummy context - number: ${txNumber} - block: ${currentBlockNumber}`,
       postEvalUniqueKey: this.generateUniqueKey(),
-      lowLevelUnsignedTransaction: {},
+      lowLevelUnsignedTransaction: {} as RawTransactionData,
     };
   }
 
