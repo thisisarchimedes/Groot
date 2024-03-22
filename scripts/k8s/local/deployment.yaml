@@ -11,18 +11,12 @@ spec:
     metadata:
       labels:
         app: groot-eth-nodes
-        eks.amazonaws.com/fargate-profile: groot-fargate-profile
     spec:
-      schedulerName: fargate-scheduler
-      tolerations:
-      - key: "eks.amazonaws.com/compute-type"
-        operator: "Equal"
-        value: "fargate"
-        effect: "NoSchedule"
+      hostNetwork: false
       containers:
       - name: eth-node-1
-        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
-        imagePullPolicy: Always
+        image: docker.io/library/arch-production-node:latest
+        imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: demoapp-config
@@ -40,8 +34,8 @@ spec:
         ports:
         - containerPort: 8545
       - name: eth-node-2
-        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
-        imagePullPolicy: Always
+        image: docker.io/library/arch-production-node:latest
+        imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: demoapp-config

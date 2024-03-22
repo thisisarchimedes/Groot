@@ -30,6 +30,47 @@ If Commit & Aceeptance stages are green, it means there is nothing else needed. 
 We run on AWS EKS w/Fargate. Pod has the following containers
 - **Groot main process**: Using K8s chron to run every minute
 - **2 x Hardhat nodes (read only)**
+- **Fargate profile:** groot-fargate-profile
+- **Namespace:**: groot
+
+
+We've created this cluster with
+```bash
+eksctl create cluster --name groot-demo-app --region us-west-1 --fargate
+kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
+```
 
 ### Current K8s clusters
-- groot-demo-app (us-west-1)
+- Cluster: groot-demo-app (us-west-1)
+- ECR Repo: groot (us-west-1)
+
+## Getting Basic Cluster Information
+
+_*Before you begin*_
+From local environment, make sure aws cli is installed and configured with the right credentials. Also install `kubectl`.
+Then, authenicate and make sure you can get the cluster information.
+
+```bash
+aws eks update-kubeconfig --name groot-demo-app --region us-west-1
+kubectl get pods --namespace groot
+```
+
+Get all pods
+```bash
+kubectl get pods -n groot
+```
+
+Delete  all pods from Groot
+```bash
+kubectl delete all --all --namespace groot
+```
+
+## Troubleshooting
+
+### Why does it stuck in `pending` or any other error state?
+
+Get pod info & logs and check for errors
+```bash
+kubectl describe pod <pod-name> --namespace groot
+kubectl logs <pod-name> --namespace groot
+```

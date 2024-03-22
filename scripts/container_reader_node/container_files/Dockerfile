@@ -18,5 +18,4 @@ ENV GENERATE_SOURCEMAP=false
 ENV NODE_OPTIONS=--max-old-space-size=12288
 
 # Start the Hardhat node
-#CMD ["npx", "hardhat", "node", "--max-memory", "12288"]
 CMD ["./run_node.sh"]

@@ -3,8 +3,7 @@ name: Deploy Stage
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [main]
 
 env:
   ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
@@ -15,12 +14,15 @@ env:
   PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
   API_DEVOPS_EVENT_CATCHER: ${{ vars.API_DEVOPS_EVENT_CATCHER }}
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
-  EKS_REGION: us-west-1
-  ECR_REPOSITORY: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot
+  EKS_REGION: ${{ vars.EKS_REGION }}
+  ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+  ECR_REPO: ${{ vars.ECR_REPO }}
 
 jobs:
-  deploy:
+  build:
+    name: Build and Push Images
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -41,15 +43,27 @@ jobs:
         run: yarn install
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.EKS_REGION }}
+          aws-region: ${{ env.EKS_REGION }}    
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and Push main Groot container
+        run: |
+          ./scripts/container_main_groot/build_main_groot_container.sh
+
+          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+          docker tag groot-container:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:groot-container
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:groot-container
+
+      - name: Build and push read node container
+        run: |
+          ./scripts/container_reader_node/build_read_node_container.sh
+          
+          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
+          docker tag arch-production-node:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:arch-production-node
+          docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:arch-production-node
 
       - name: Install kubectl
         run: |
@@ -57,39 +71,56 @@ jobs:
           chmod +x kubectl
           sudo mv kubectl /usr/local/bin/
 
-      - name: Build and push containers
-        run: |
-          # Build the read node container
-          ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
-      
-          # Tag and push the read node container to ECR
-          docker tag arch-production-node:latest ${{ env.ECR_REPOSITORY }}/arch-production-node:latest
-          docker push ${{ env.ECR_REPOSITORY }}/arch-production-node:latest
-      
-          # Build the main Groot container
-          ./scripts/container_main_groot/build_main_groot_container.sh DemoApp ${{ vars.ETH_NODE_CONTAINER_NAME }} ${{ secrets.AWS_ACCESS_KEY_ID }} ${{ secrets.AWS_SECRET_ACCESS_KEY }} ${{ vars.AWS_REGION }}
-      
-          # Tag and push the main Groot container to ECR
-          docker tag groot-container:latest ${{ env.ECR_REPOSITORY }}/groot-container:latest
-          docker push ${{ env.ECR_REPOSITORY }}/groot-container:latest
-
-
       - name: Deploy to EKS (DemoApp)
         run: |
           # Update kubeconfig
           aws eks update-kubeconfig --name groot-demo-app --region ${{ env.EKS_REGION }}
-
-          # Create namespace if it doesn't exist
+                    
+          # Create the groot namespace if it doesn't exist
           kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Create secrets
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: aws-access-key-id
+            namespace: groot
+          type: Opaque
+          stringData:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          EOF
+      
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: aws-secret-access-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          EOF
 
-          # Deploy Kubernetes manifests
-          kubectl apply -f scripts/k8s/demoapp-configmap.yaml
-          kubectl apply -f scripts/k8s/deployment.yaml
-          kubectl apply -f scripts/k8s/service.yaml
-          kubectl apply -f scripts/k8s/cronjob.yaml
-
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: alchemy-api-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          EOF
+          
+          # Deploy or update Kubernetes manifests
+          kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
+          kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
+          kubectl apply -f scripts/k8s/service.yaml --namespace groot
+          kubectl apply -f scripts/k8s/cronjob.yaml --namespace groot
+                    
           # Verify deployment
-          kubectl get pods -n groot
+          kubectl get pods --namespace groot
 
       - name: List all commit SHAs involved in the push
         id: format_commits
@@ -102,7 +133,7 @@ jobs:
       - name: Report DevOps Event
         run: |
           yarn add axios dotenv
-          node devops/metrics/src/cicd_script/report_devops_event.ts ${{ github.repository }} deploy '{"commit_ids": ${{ steps.format_commits.outputs.commit_shas }} }'
+          node devops/metrics/src/cicd_script/report_devops_event.js ${{ github.repository }} deploy '{"commit_ids": ${{ steps.format_commits.outputs.commit_shas }} }'
 
       - name: Slack Notification
         if: always()

@@ -35,7 +35,10 @@ yarn dotenvx decrypt # decrypt .env.vault to .env
 set -o allexport && source .env.local && set +o allexport # export .env.local to local environment
 ```
 
-_*Update .env*_
+#### Update .env
+
+Do this only if you happen to update the .env.* and want to share it
+
 ```bash
 yarn dotenvx encrypt
 yarn dotenvx hub push # push the keys to the dotenvx hub
@@ -65,7 +68,7 @@ yarn test:unit
 
 The script below builds the containers and loads them to the local kind cluster.
 ```bash
- sudo ./scripts/k8s/setup_local_env.sh
+ sudo ./scripts/k8s/local/setup_local_env.sh
 ```
 ## Running Acceptance Tests Locally
 
@@ -76,3 +79,17 @@ To achieve that we use Nock to intercept the outgoing Groot calls and craft a re
 ```bash
 yarn test:acceptance
 ```
+
+## Troubleshooting
+
+### Kind cannot pull local Docker image
+
+If hitting `ImagePullBackOff`:
+1. SSH into kind control panel: `docker exec -it groot-cluster-control-plane bash`
+2. Get list of images: `crictl images`
+
+### Container is not working properly
+
+Try to fetch logs:
+- `kubectl logs -l app=groot-eth-nodes --all-containers --namespace groot`
+- `kubectl logs -l app=groot-container --all-containers --namespace groot`
