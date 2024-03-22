@@ -5,14 +5,13 @@ import LeverageDataSource from '../tool/data_source/LeverageDataSource';
 import {RuleConstructorInput} from '../../types/RuleConstructorInput';
 
 export interface RuleParamsDummy extends RuleParams {
-    message: string;
-    NumberOfDummyTxs: number;
-    evalSuccess: boolean;
+  message: string;
+  NumberOfDummyTxs: number;
+  evalSuccess: boolean;
 }
 
 export class RuleExpirePositions extends Rule {
   private leverageDataSource: LeverageDataSource;
-
 
   constructor(constractorInput: RuleConstructorInput) {
     super(constractorInput);
@@ -25,8 +24,9 @@ export class RuleExpirePositions extends Rule {
     console.log('blocknumber', blockNumber);
     const livePositions = await this.leverageDataSource.getLivePositions();
     console.log('livePositions', livePositions.length);
-    this.logger.info('RuleExpirePositions.evaluate() called: ' + params.message);
-
+    this.logger.info(
+        'RuleExpirePositions.evaluate() called: ' + params.message,
+    );
 
     if (params.evalSuccess === false) {
       throw new Error('RuleExpirePositions.evaluate() failed');
@@ -38,12 +38,19 @@ export class RuleExpirePositions extends Rule {
     }
   }
 
-  private createDummyTransaction(txNumber: number, currentBlockNumber: number): OutboundTransaction {
+  private createDummyTransaction(
+      txNumber: number,
+      currentBlockNumber: number,
+  ): OutboundTransaction {
     return {
       urgencyLevel: UrgencyLevel.NORMAL,
       context: `this is a dummy context - number: ${txNumber} - block: ${currentBlockNumber}`,
       postEvalUniqueKey: this.generateUniqueKey(),
-      lowLevelUnsignedTransaction: {},
+      lowLevelUnsignedTransaction: {
+        to: '0x1234',
+        value: BigInt(0),
+        data: '0x',
+      },
     };
   }
 
