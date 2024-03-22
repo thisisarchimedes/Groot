@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'scripts/**'
 
 env:
   ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
