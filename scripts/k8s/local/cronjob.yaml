@@ -8,7 +8,7 @@ spec:
     spec:
       template:
         spec:
-          hostNetwork: true
+          hostNetwork: false
           containers:
           - name: groot-container
             image: docker.io/library/groot-container:latest
@@ -27,11 +27,15 @@ spec:
                 secretKeyRef:
                   name: aws-secret-access-key
                   key: AWS_SECRET_ACCESS_KEY
+            - name: MAIN_LOCAL_NODE_URL
+              value: "http://groot-service"
             - name: MAIN_LOCAL_NODE_PORT
               valueFrom:
                 configMapKeyRef:
                   name: demoapp-config
                   key: MAIN_LOCAL_NODE_PORT
+            - name: ALT_LOCAL_NODE_URL
+              value: "http://groot-service"
             - name: ALT_LOCAL_NODE_PORT
               valueFrom:
                 configMapKeyRef:

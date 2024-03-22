@@ -34,13 +34,18 @@ export class Groot {
 
   private abiRepo!: AbiRepo;
 
-  private readonly mainLocalNodePort: number;
-  private readonly altLocalNodePort: number;
+  private readonly mainLocalNodeUrl: string;
+  private readonly altLocalNodeUrl: string;
 
-  constructor(environment: string, region: string, mainLocalNodePort: number = 8545, altLocalNodePort: number = 18545) {
+  constructor(
+      environment: string,
+      region: string,
+      mainLocalNodeUrl: string = 'http://localhost:8545',
+      altLocalNodeUrl: string = 'http://localhost:18545',
+  ) {
     this.configService = new ConfigServiceAWS(environment, region);
-    this.mainLocalNodePort = mainLocalNodePort;
-    this.altLocalNodePort = altLocalNodePort;
+    this.mainLocalNodeUrl = mainLocalNodeUrl;
+    this.altLocalNodeUrl = altLocalNodeUrl;
   }
 
   public async initalizeGroot() {
@@ -59,8 +64,8 @@ export class Groot {
   }
 
   private async initalizeReadOnlyLocalNodes() {
-    this.mainNode = new BlockchainNodeLocal(this.logger, `http://localhost:${this.mainLocalNodePort}`, 'alchemy-node');
-    this.altNode = new BlockchainNodeLocal(this.logger, `http://localhost:${this.altLocalNodePort}`, 'infura-node');
+    this.mainNode = new BlockchainNodeLocal(this.logger, this.mainLocalNodeUrl, 'main-node');
+    this.altNode = new BlockchainNodeLocal(this.logger, this.altLocalNodeUrl, 'alt-node');
 
     await Promise.all([
       this.mainNode.startNode(),
