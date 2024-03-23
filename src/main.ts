@@ -6,11 +6,9 @@ import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
 
 dotenv.config();
 
-export async function grootStartHere(runInfinite: boolean = true): Promise<void> {
+export async function startGroot(runInfinite: boolean = true): Promise<void> {
   const grootParams = getGrootParamsFromEnv();
-
-  console.log(`Starting Groot: ${JSON.stringify(grootParams)}`);
-
+  reportGrootStartup(grootParams);
   const groot = new Groot(grootParams);
 
   setShutdownOnSigTerm();
@@ -46,6 +44,11 @@ function getGrootParamsFromEnv(): GrootParams {
   return {environment, region, mainLocalNodeUrl, altLocalNodeUrl};
 }
 
+function reportGrootStartup(grootParams: GrootParams): void {
+  const currentDateTime = new Date().toLocaleString();
+  console.log(`[${currentDateTime}] Starting Groot: ${JSON.stringify(grootParams)}`);
+}
+
 function reportCriticalError(environment: string, region: string, error: unknown): void {
   const errorMessage = `Unexpected CRITICAL ERROR in main loop: ${error}`;
   const configService: ConfigServiceAWS = new ConfigServiceAWS(environment, region);
@@ -59,5 +62,3 @@ function setShutdownOnSigTerm(): void {
     process.exit(0);
   });
 }
-
-grootStartHere();
