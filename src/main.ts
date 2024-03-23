@@ -16,11 +16,11 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
   try {
     await groot.initalizeGroot();
 
-    while (runInfinite) {
+    do {
       await groot.prepareForAnotherCycle();
       await groot.runOneGrootCycle();
       await groot.sleepBetweenCycles();
-    }
+    } while (runInfinite);
   } catch (error) {
     reportCriticalError(grootParams.environment, grootParams.region, error);
     process.exit(1);
