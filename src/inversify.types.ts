@@ -1,15 +1,17 @@
 const TYPES = {
     ILoggerAll: "ILoggerAll",
     IConfigServiceAWS: "IConfigServiceAWS",
-    Environment: Symbol.for("Environment"),
-    Region: Symbol.for("Region"),
-    MainLocalNodeURI: Symbol.for("MainLocalNodeURI"),
-    AltLocalNodeURI: Symbol.for("AltLocalNodeURI"),
-    BlockchainNodeLocalMain: Symbol.for("BlockchainNodeLocalMain"),
-    BlockchainNodeLocalAlt: Symbol.for("BlockchainNodeLocalAlt"),
+    Environment: "Environment",
+    Region: "Region",
+    MainLocalNodeURI: "MainLocalNodeURI",
+    AltLocalNodeURI: "AltLocalNodeURI",
+    BlockchainNodeLocalMain: "BlockchainNodeLocalMain",
+    BlockchainNodeLocalAlt: "BlockchainNodeLocalAlt",
     Groot: "Groot",
-    ServiceName: Symbol.for("ServiceName"),
-    IBlockchainReader: Symbol.for("IBlockchainReader"),
+    ServiceName: "ServiceName",
+    IBlockchainReader: "IBlockchainReader",
+    AlchemyNodeLabel: "AlchemyNodeLabel",
+    InfuraNodeLabel: "InfuraNodeLabel",
 };
 
 export { TYPES };

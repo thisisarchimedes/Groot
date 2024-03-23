@@ -25,6 +25,10 @@ export class InversifyConfig {
 
         this.container.bind<string>(TYPES.ServiceName).toConstantValue("Groot");
 
+        this.container.bind<string>(TYPES.AlchemyNodeLabel).toConstantValue("alchemy-node");
+
+        this.container.bind<string>(TYPES.InfuraNodeLabel).toConstantValue("infura-node");
+
         this.container.bind<IConfigServiceAWS>(TYPES.IConfigServiceAWS).toConstantValue(configServiceAWS);
 
         this.container.bind<ILoggerAll>(TYPES.ILoggerAll).to(LoggerAll).inSingletonScope();
@@ -33,7 +37,9 @@ export class InversifyConfig {
             .toDynamicValue((context: interfaces.Context) => {
                 const logger = context.container.get<ILoggerAll>(TYPES.ILoggerAll);
                 const mainRpcUrl = context.container.get<string>(TYPES.MainLocalNodeURI);
-                return new BlockchainNodeLocal(logger, mainRpcUrl, "alchemy-node");
+                const alchemyNodeLabel = context.container.get<string>(TYPES.AlchemyNodeLabel);
+
+                return new BlockchainNodeLocal(logger, mainRpcUrl, alchemyNodeLabel);
             }).inSingletonScope();
 
         this.container.bind<IBlockchainNodeLocal>(TYPES.BlockchainNodeLocalAlt)
@@ -44,9 +50,9 @@ export class InversifyConfig {
             }).inSingletonScope();
 
 
-        this.container.bind<IBlockchainReader>(TYPES.IBlockchainReader).to(BlockchainReader).inRequestScope();
+        this.container.bind<IBlockchainReader>(TYPES.IBlockchainReader).to(BlockchainReader).inSingletonScope();
 
-        this.container.bind<Groot>(TYPES.Groot).to(Groot).inSingletonScope();
+        this.container.bind<IGroot>(TYPES.Groot).to(Groot).inSingletonScope();
     }
 
     public getContainer(): Container {

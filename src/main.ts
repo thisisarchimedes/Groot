@@ -9,7 +9,7 @@ import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
 
 dotenv.config();
 
-class GrootApplication {
+class GrootBootstrapper {
   private container: Container;
 
   constructor() {
@@ -30,9 +30,9 @@ class GrootApplication {
     this.container = inversifyConfig.getContainer();
 
     this.setShutdownOnSigTerm();
+    const groot = this.container.get<IGroot>(TYPES.Groot);
 
     try {
-      const groot = this.container.get<Groot>(TYPES.Groot);
       await groot.initalizeGroot();
       await groot.prepareForAnotherCycle();
       await groot.runOneGrootCycle();
@@ -40,9 +40,10 @@ class GrootApplication {
       this.reportCriticalError(environment, region, error);
       process.exit(1);
     }
+    finally {
+      await groot.shutdownGroot();
+    }
 
-    const groot = this.container.get<Groot>(TYPES.Groot);
-    await groot.shutdownGroot();
   }
 
   private reportCriticalError(environment: string, region: string, error: unknown): void {
@@ -59,7 +60,7 @@ class GrootApplication {
   }
 }
 
-const app = new GrootApplication();
+const app = new GrootBootstrapper();
 app.bootstrap().catch((error) => {
   console.error('Failed to start the application:', error);
 });

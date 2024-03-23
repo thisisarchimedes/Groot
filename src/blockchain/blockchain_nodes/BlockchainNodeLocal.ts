@@ -1,17 +1,22 @@
 import axios from 'axios';
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 
 import { JsonRpcProvider } from 'ethers';
 import { BlockchainNode, BlockchainNodeError } from './BlockchainNode';
 import { ILogger } from '../../service/logger/interfaces/ILogger';
 import { IBlockchainNodeLocal } from './interfaces/IBlockchainNodeLocal';
+import { ILoggerAll } from '../../service/logger/interfaces/ILoggerAll';
 
 @injectable()
 export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNodeLocal {
   private readonly localRpcUrl: string;
 
-  constructor(logger: ILogger, localRpcUrl: string, nodeName: string) {
-    super(logger, nodeName);
+  constructor(
+    @inject("ILoggerAll") _logger: ILoggerAll,
+    @inject("MainLocalNodeURI") localRpcUrl: string,
+    @inject("AlchemyNodeLabel") nodeName: string
+  ) {
+    super(_logger, nodeName);
     this.localRpcUrl = localRpcUrl;
     this.provider = new JsonRpcProvider(localRpcUrl);
   }

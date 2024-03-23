@@ -19,11 +19,13 @@ import { IConfigServiceAWS } from './service/config/interfaces/IConfigServiceAWS
 import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
 import { IBlockchainReader } from './blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
+import { BlockchainNodeLocal } from './blockchain/blockchain_nodes/BlockchainNodeLocal';
+import { BlockchainReader } from './blockchain/blockchain_reader/BlockchainReader';
 
 dotenv.config();
 
 @injectable()
-export class Groot {
+export class Groot implements IGroot {
   private readonly logServiceName: string = 'Groot';
   private ruleEngine!: RuleEngine;
   private txQueuer!: TransactionQueuer;
@@ -47,9 +49,9 @@ export class Groot {
   ) {
     this.logger = _logger;
     this.configService = _configService;
-    this.blockchainReader = _blockchainReader;
     this.mainNode = _mainLocalNode;
     this.altNode = _altLocalNode;
+    this.blockchainReader = _blockchainReader;
   }
 
   public async initalizeGroot() {
