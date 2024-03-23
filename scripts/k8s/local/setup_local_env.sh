@@ -51,6 +51,5 @@ EOF
 kubectl apply -f scripts/k8s/local/demoapp-configmap.yaml --namespace groot
 kubectl apply -f scripts/k8s/local/deployment.yaml --namespace groot
 kubectl apply -f scripts/k8s/local/service.yaml --namespace groot
-kubectl apply -f scripts/k8s/local/cronjob.yaml --namespace groot
 
 kubectl get pods --namespace groot

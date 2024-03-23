@@ -18,6 +18,7 @@ env:
   PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
   API_DEVOPS_EVENT_CATCHER: ${{ vars.API_DEVOPS_EVENT_CATCHER }}
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
+  ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
 
 jobs:
   eval-acceptance-stage:
@@ -46,13 +47,13 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Build Container
+      - name: Build Node Container
         run: |
-          sudo ./scripts/container_reader_node/build_read_node_container.sh ${{ secrets.ALCHEMY_API_KEY }}
-          docker run -e HARDHAT_PORT=8545 -d --rm --name main-eth-node -p 8545:8545 arch-production-node:latest
-          sleep 30
-          docker ps
-          docker logs main-eth-node
+          ./scripts/container_reader_node/build_read_node_container.sh
+
+      - name: Run Node Container
+        run: |
+          ./scripts/container_reader_node/run_nodes_containers_locally.sh
 
       - name: Run Tests (Interface)
         run: |

@@ -19,6 +19,13 @@ import {AbiFetcherEtherscan} from './rule_engine/tool/abi_repository/AbiFetcherE
 
 dotenv.config();
 
+export interface GrootParams {
+  readonly environment: string;
+  readonly region: string;
+  readonly mainLocalNodeUrl: string;
+  readonly altLocalNodeUrl: string;
+}
+
 export class Groot {
   private readonly logServiceName: string = 'Groot';
   private readonly configService: ConfigServiceAWS;
@@ -37,15 +44,10 @@ export class Groot {
   private readonly mainLocalNodeUrl: string;
   private readonly altLocalNodeUrl: string;
 
-  constructor(
-      environment: string,
-      region: string,
-      mainLocalNodeUrl: string = 'http://localhost:8545',
-      altLocalNodeUrl: string = 'http://localhost:18545',
-  ) {
-    this.configService = new ConfigServiceAWS(environment, region);
-    this.mainLocalNodeUrl = mainLocalNodeUrl;
-    this.altLocalNodeUrl = altLocalNodeUrl;
+  constructor(grootParams: GrootParams) {
+    this.configService = new ConfigServiceAWS(grootParams.environment, grootParams.region);
+    this.mainLocalNodeUrl = grootParams.mainLocalNodeUrl;
+    this.altLocalNodeUrl = grootParams.altLocalNodeUrl;
   }
 
   public async initalizeGroot() {
@@ -159,5 +161,11 @@ export class Groot {
     await this.txQueuer.queueTransactions(txs);
 
     this.logger.info('Groot cycle ran successfully.');
+  }
+
+  public async sleepBetweenCycles(): Promise<void> {
+    const sleepTime = this.configService.getSleepMillisecondsBetweenCycles();
+    this.logger.debug(`Sleeping for ${sleepTime} seconds...`);
+    await new Promise((resolve) => setTimeout(resolve, sleepTime));
   }
 }

@@ -1,12 +1,35 @@
 import * as dotenv from 'dotenv';
 
-import {Groot} from './Groot';
+import {Groot, GrootParams} from './Groot';
 import {LoggerAll} from './service/logger/LoggerAll';
 import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
 
 dotenv.config();
 
-export async function grootStartHere(): Promise<void> {
+export async function startGroot(runInfinite: boolean = true): Promise<void> {
+  const grootParams = getGrootParamsFromEnv();
+  reportGrootStartup(grootParams);
+  const groot = new Groot(grootParams);
+
+  setShutdownOnSigTerm();
+
+  try {
+    await groot.initalizeGroot();
+
+    do {
+      await groot.prepareForAnotherCycle();
+      await groot.runOneGrootCycle();
+      await groot.sleepBetweenCycles();
+    } while (runInfinite);
+  } catch (error) {
+    reportCriticalError(grootParams.environment, grootParams.region, error);
+    process.exit(1);
+  }
+
+  await groot.shutdownGroot();
+}
+
+function getGrootParamsFromEnv(): GrootParams {
   const environment = process.env.ENVIRONMENT as string;
   const region = process.env.AWS_REGION as string;
   const mainLocalNodePort = Number(process.env.MAIN_LOCAL_NODE_PORT as string);
@@ -14,22 +37,16 @@ export async function grootStartHere(): Promise<void> {
   const mainLocalNodeUrl = process.env.MAIN_LOCAL_NODE_URL + ':' + mainLocalNodePort;
   const altLocalNodeUrl = process.env.ALT_LOCAL_NODE_URL + ':' + altLocalNodePort;
 
-  console.log(`Starting Groot in ${environment} and ${region} - ports ${mainLocalNodePort}, ${altLocalNodePort}`);
-
-  const groot = new Groot(environment, region, mainLocalNodeUrl, altLocalNodeUrl);
-
-  setShutdownOnSigTerm();
-
-  try {
-    await groot.initalizeGroot();
-    await groot.prepareForAnotherCycle();
-    await groot.runOneGrootCycle();
-  } catch (error) {
-    reportCriticalError(environment, region, error);
-    process.exit(1);
+  if (!environment || !region || !mainLocalNodeUrl || !altLocalNodeUrl) {
+    reportCriticalError(environment, region, 'Cannot boot. Missing environment variables');
   }
 
-  await groot.shutdownGroot();
+  return {environment, region, mainLocalNodeUrl, altLocalNodeUrl};
+}
+
+function reportGrootStartup(grootParams: GrootParams): void {
+  const currentDateTime = new Date().toLocaleString();
+  console.log(`[${currentDateTime}] Starting Groot: ${JSON.stringify(grootParams)}`);
 }
 
 function reportCriticalError(environment: string, region: string, error: unknown): void {
@@ -45,5 +62,3 @@ function setShutdownOnSigTerm(): void {
     process.exit(0);
   });
 }
-
-grootStartHere();
