@@ -24,6 +24,7 @@ We'll add E2E* and other tests later.
 ### Deployment stage
 
 If Commit & Aceeptance stages are green, it means there is nothing else needed. We deploy to production
+Everytime we run deployment we rebuild the containers and assign a new version to them, so K8s updates to the newest version.
 
 ## Environments
 
