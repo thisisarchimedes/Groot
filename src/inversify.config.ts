@@ -10,6 +10,14 @@ import { BlockchainNodeLocal } from './blockchain/blockchain_nodes/BlockchainNod
 import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import { IBlockchainReader } from './blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import { BlockchainReader } from './blockchain/blockchain_reader/BlockchainReader';
+import { BlockchainNodeHealthMonitor } from './service/health_monitor/BlockchainNodeHealthMonitor';
+import { IHostNameProvider } from './service/health_monitor/IHostNameProvider';
+import { HostNameProvider } from './service/health_monitor/HostNameProvider';
+import { ISignalHeartbeat } from './service/health_monitor/signal/interfaces/ISignalHeartbeat';
+import { SignalAWSHeartbeat } from './service/health_monitor/signal/SignalAWSHeartbeat';
+import { ISignalCriticalFailure } from './service/health_monitor/signal/interfaces/ISignalCriticalFailure';
+import { SignalAWSCriticalFailure } from './service/health_monitor/signal/SignalAWSCriticalFailure';
+import { HealthMonitor } from './service/health_monitor/HealthMonitor';
 
 export class InversifyConfig {
     private container: Container;
@@ -24,6 +32,9 @@ export class InversifyConfig {
             .toConstantValue(`http://localhost:${process.env.ALT_LOCAL_NODE_PORT || 18545}`);
 
         this.container.bind<string>(TYPES.ServiceName).toConstantValue("Groot");
+
+        this.container.bind<string>(TYPES.MetricNamespaceHeartBeat).toConstantValue("Heartbeat");
+        this.container.bind<string>(TYPES.MetricNamespaceCriticalFailure).toConstantValue("CriticalFailure");
 
         this.container.bind<string>(TYPES.AlchemyNodeLabel).toConstantValue("alchemy-node");
 
@@ -51,6 +62,16 @@ export class InversifyConfig {
 
 
         this.container.bind<IBlockchainReader>(TYPES.IBlockchainReader).to(BlockchainReader).inSingletonScope();
+
+        this.container.bind<IBlockchainNodeHealthMonitor>(TYPES.IBlockchainNodeHealthMonitor).to(BlockchainNodeHealthMonitor).inRequestScope();
+
+        this.container.bind<IHostNameProvider>(TYPES.IHostNameProvider).to(HostNameProvider).inRequestScope();
+
+        this.container.bind<ISignalHeartbeat>(TYPES.ISignalHeartbeat).to(SignalAWSHeartbeat).inRequestScope();
+
+        this.container.bind<ISignalCriticalFailure>(TYPES.ISignalCriticalFailure).to(SignalAWSCriticalFailure).inRequestScope();
+
+        this.container.bind<IHealthMonitor>(TYPES.IHealthMonitor).to(HealthMonitor).inRequestScope();
 
         this.container.bind<IGroot>(TYPES.Groot).to(Groot).inSingletonScope();
     }

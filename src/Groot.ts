@@ -8,7 +8,6 @@ import { FactoryRule } from './rule_engine/FactoryRule';
 import { RuleEngine } from './rule_engine/RuleEngine';
 import { TransactionQueuer } from './tx_queue/TransactionQueuer';
 import { HealthMonitor } from './service/health_monitor/HealthMonitor';
-import { BlockchainNodeHealthMonitor } from './service/health_monitor/BlockchainNodeHealthMonitor';
 import { SignalAWSCriticalFailure } from './service/health_monitor/signal/SignalAWSCriticalFailure';
 import { SignalAWSHeartbeat } from './service/health_monitor/signal/SignalAWSHeartbeat';
 import { HostNameProvider } from './service/health_monitor/HostNameProvider';
@@ -19,17 +18,13 @@ import { IConfigServiceAWS } from './service/config/interfaces/IConfigServiceAWS
 import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
 import { IBlockchainReader } from './blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
-import { BlockchainNodeLocal } from './blockchain/blockchain_nodes/BlockchainNodeLocal';
-import { BlockchainReader } from './blockchain/blockchain_reader/BlockchainReader';
 
 dotenv.config();
 
 @injectable()
 export class Groot implements IGroot {
-  private readonly logServiceName: string = 'Groot';
   private ruleEngine!: RuleEngine;
   private txQueuer!: TransactionQueuer;
-  private healthMonitor!: HealthMonitor;
 
   private abiRepo!: AbiRepo;
 
@@ -38,6 +33,8 @@ export class Groot implements IGroot {
   private readonly blockchainReader: IBlockchainReader;
   private readonly mainNode: IBlockchainNodeLocal;
   private readonly altNode: IBlockchainNodeLocal;
+  private readonly healthMonitor: IHealthMonitor;
+
 
   constructor(
     @inject("IConfigServiceAWS") _configService: IConfigServiceAWS,
@@ -45,6 +42,7 @@ export class Groot implements IGroot {
     @inject("BlockchainNodeLocalMain") _mainLocalNode: IBlockchainNodeLocal,
     @inject("BlockchainNodeLocalAlt") _altLocalNode: IBlockchainNodeLocal,
     @inject("IBlockchainReader") _blockchainReader: IBlockchainReader,
+    @inject("IHealthMonitor") _healthMonitor: IHealthMonitor,
 
   ) {
     this.logger = _logger;
@@ -52,6 +50,7 @@ export class Groot implements IGroot {
     this.mainNode = _mainLocalNode;
     this.altNode = _altLocalNode;
     this.blockchainReader = _blockchainReader;
+    this.healthMonitor = _healthMonitor;
   }
 
   public async initalizeGroot() {
@@ -59,24 +58,9 @@ export class Groot implements IGroot {
 
     this.logger.info('Initializing Groot...');
 
-    this.initalizeHealthMonitor();
-
     this.initalizeAbiRepo();
 
     this.logger.info('Groot initialized successfully.');
-  }
-
-  private initalizeHealthMonitor() {
-
-    const blockchainHealthMonitor = new BlockchainNodeHealthMonitor(this.logger, [this.mainNode, this.altNode]);
-    const hostNameProvider = new HostNameProvider(this.logger);
-    const signalHeartbeat = new SignalAWSHeartbeat(this.logger, this.configService, hostNameProvider);
-    const signalCriticalFailure = new SignalAWSCriticalFailure(this.logger, this.configService, hostNameProvider);
-    this.healthMonitor = new HealthMonitor(
-      this.logger,
-      blockchainHealthMonitor,
-      signalHeartbeat,
-      signalCriticalFailure);
   }
 
   private initalizeAbiRepo() {

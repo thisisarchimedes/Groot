@@ -3,7 +3,6 @@ import { injectable, inject } from 'inversify';
 
 import { JsonRpcProvider } from 'ethers';
 import { BlockchainNode, BlockchainNodeError } from './BlockchainNode';
-import { ILogger } from '../../service/logger/interfaces/ILogger';
 import { IBlockchainNodeLocal } from './interfaces/IBlockchainNodeLocal';
 import { ILoggerAll } from '../../service/logger/interfaces/ILoggerAll';
 

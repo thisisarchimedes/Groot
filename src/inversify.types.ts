@@ -12,6 +12,13 @@ const TYPES = {
     IBlockchainReader: "IBlockchainReader",
     AlchemyNodeLabel: "AlchemyNodeLabel",
     InfuraNodeLabel: "InfuraNodeLabel",
+    IBlockchainNodeHealthMonitor: "IBlockchainNodeHealthMonitor",
+    IHostNameProvider: "IHostNameProvider",
+    ISignalHeartbeat: "ISignalHeartbeat",
+    ISignalCriticalFailure: "ISignalCriticalFailure",
+    IHealthMonitor: "IHealthMonitor",
+    MetricNamespaceHeartBeat: 'MetricNamespaceHeartBeat',
+    MetricNamespaceCriticalFailure: 'MetricNamespaceCriticalFailure'
 };
 
 export { TYPES };

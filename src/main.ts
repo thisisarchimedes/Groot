@@ -3,7 +3,6 @@ import * as dotenv from 'dotenv';
 import { Container } from 'inversify';
 import { InversifyConfig } from './inversify.config'; // Ensure this path is correct
 import { TYPES } from './inversify.types'; // Adjust the path as needed
-import { Groot } from './Groot';
 import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
 import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
 
