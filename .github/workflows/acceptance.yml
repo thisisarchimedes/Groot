@@ -50,8 +50,7 @@ jobs:
         run: |
           ./scripts/container_reader_node/build_read_node_container.sh
           
-          docker run -e HARDHAT_PORT=8545 \
-                -e ALCHEMY_API_KEY=${{ secrets.ALCHEMY_API_KEY }} \
+          docker run -e HARDHAT_PORT=8545 -e ALCHEMY_API_KEY=${{ secrets.ALCHEMY_API_KEY }} \
                 -d --rm --network host --name main-eth-node -p 8545:8545 arch-production-node:latest
 
       - name: Run Tests (Interface)
