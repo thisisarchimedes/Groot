@@ -18,6 +18,7 @@ env:
   PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
   API_DEVOPS_EVENT_CATCHER: ${{ vars.API_DEVOPS_EVENT_CATCHER }}
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
+  ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
 
 jobs:
   eval-acceptance-stage:
@@ -49,10 +50,7 @@ jobs:
       - name: Build Node Container
         run: |
           ./scripts/container_reader_node/build_read_node_container.sh
-          ls
-          docker run -e HARDHAT_PORT=8545 -e ALCHEMY_API_KEY=${{ secrets.ALCHEMY_API_KEY }} \
-                -d --rm --network host --name main-eth-node -p 8545:8545 arch-production-node:latest
-
+          ./scripts/container_reader_node/run_nodes_containers_locally.sh
       - name: Run Tests (Interface)
         run: |
           AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:interface
