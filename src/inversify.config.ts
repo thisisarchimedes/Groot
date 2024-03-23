@@ -18,6 +18,15 @@ import { SignalAWSHeartbeat } from './service/health_monitor/signal/SignalAWSHea
 import { ISignalCriticalFailure } from './service/health_monitor/signal/interfaces/ISignalCriticalFailure';
 import { SignalAWSCriticalFailure } from './service/health_monitor/signal/SignalAWSCriticalFailure';
 import { HealthMonitor } from './service/health_monitor/HealthMonitor';
+import { IAbiStorage } from './rule_engine/tool/abi_repository/interfaces/IAbiStorage';
+import { AbiStorageDynamoDB } from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
+import { IAbiFetcher } from './rule_engine/tool/abi_repository/interfaces/IAbiFetcher';
+import { AbiFetcherEtherscan } from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import { AbiRepo } from './rule_engine/tool/abi_repository/AbiRepo';
+import { IFactoryRule } from './rule_engine/interfaces/IFactoryRule';
+import { FactoryRule } from './rule_engine/FactoryRule';
+import { IRuleEngine } from './rule_engine/interfaces/IRuleEngine';
+import { RuleEngine } from './rule_engine/RuleEngine';
 
 export class InversifyConfig {
     private container: Container;
@@ -72,6 +81,16 @@ export class InversifyConfig {
         this.container.bind<ISignalCriticalFailure>(TYPES.ISignalCriticalFailure).to(SignalAWSCriticalFailure).inRequestScope();
 
         this.container.bind<IHealthMonitor>(TYPES.IHealthMonitor).to(HealthMonitor).inRequestScope();
+
+        this.container.bind<IAbiStorage>(TYPES.IAbiStorageDynamoDB).to(AbiStorageDynamoDB).inRequestScope();
+
+        this.container.bind<IAbiFetcher>(TYPES.IAbiFetcherEtherScan).to(AbiFetcherEtherscan).inRequestScope();
+
+        this.container.bind<IAbiRepo>(TYPES.IAbiRepo).to(AbiRepo).inRequestScope();
+
+        this.container.bind<IFactoryRule>(TYPES.IFactoryRule).to(FactoryRule).inRequestScope();
+
+        this.container.bind<IRuleEngine>(TYPES.IRuleEngine).to(RuleEngine).inRequestScope();
 
         this.container.bind<IGroot>(TYPES.Groot).to(Groot).inSingletonScope();
     }

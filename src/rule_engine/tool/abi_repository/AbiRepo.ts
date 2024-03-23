@@ -1,13 +1,26 @@
-import { IBlockchainReader } from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { IAbiFetcher } from './IAbiFetcher';
-import { IAbiStorage } from './IAbiStorage';
+import { injectable, inject } from 'inversify';
 
-export class AbiRepo {
+import { IBlockchainReader } from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { IAbiFetcher } from './interfaces/IAbiFetcher';
+import { IAbiStorage } from './interfaces/IAbiStorage';
+
+@injectable()
+export class AbiRepo implements IAbiRepo {
+
+  private readonly blockchainReader: IBlockchainReader;
+  private readonly abiStorage: IAbiStorage;
+  private readonly abiFetcher: IAbiFetcher;
+
+
   constructor(
-    private readonly blockchainReader: IBlockchainReader,
-    private readonly abiStorage: IAbiStorage,
-    private readonly abiFetcher: IAbiFetcher,
-  ) { }
+    @inject("IBlockchainReader") _blockchainReader: IBlockchainReader,
+    @inject("IAbiStorageDynamoDB") _abiStorage: IAbiStorage,
+    @inject("IAbiFetcherEtherScan") _abiFetcher: IAbiFetcher,
+  ) {
+    this.blockchainReader = _blockchainReader;
+    this.abiStorage = _abiStorage;
+    this.abiFetcher = _abiFetcher;
+  }
 
   public async getAbiByAddress(contractAddress: string): Promise<string> {
     const implementationAddress = await this.getImplementationAddress(contractAddress);

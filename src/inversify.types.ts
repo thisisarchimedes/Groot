@@ -18,7 +18,12 @@ const TYPES = {
     ISignalCriticalFailure: "ISignalCriticalFailure",
     IHealthMonitor: "IHealthMonitor",
     MetricNamespaceHeartBeat: 'MetricNamespaceHeartBeat',
-    MetricNamespaceCriticalFailure: 'MetricNamespaceCriticalFailure'
+    MetricNamespaceCriticalFailure: 'MetricNamespaceCriticalFailure',
+    IAbiStorageDynamoDB: "IAbiStorageDynamoDB",
+    IAbiFetcherEtherScan: 'IAbiFetcherEtherScan',
+    IAbiRepo: 'IAbiRepo',
+    IFactoryRule: 'IFactoryRule',
+    IRuleEngine: 'IRuleEngine'
 };
 
 export { TYPES };

@@ -7,26 +7,17 @@ import { TxQueueAdapter } from '../test/unit/adapters/TxQueueAdapter';
 import { FactoryRule } from './rule_engine/FactoryRule';
 import { RuleEngine } from './rule_engine/RuleEngine';
 import { TransactionQueuer } from './tx_queue/TransactionQueuer';
-import { HealthMonitor } from './service/health_monitor/HealthMonitor';
-import { SignalAWSCriticalFailure } from './service/health_monitor/signal/SignalAWSCriticalFailure';
-import { SignalAWSHeartbeat } from './service/health_monitor/signal/SignalAWSHeartbeat';
-import { HostNameProvider } from './service/health_monitor/HostNameProvider';
-import { AbiRepo } from './rule_engine/tool/abi_repository/AbiRepo';
-import { AbiStorageDynamoDB } from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
-import { AbiFetcherEtherscan } from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 import { IConfigServiceAWS } from './service/config/interfaces/IConfigServiceAWS';
 import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
 import { IBlockchainReader } from './blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
+import { IRuleEngine } from './rule_engine/interfaces/IRuleEngine';
 
 dotenv.config();
 
 @injectable()
 export class Groot implements IGroot {
-  private ruleEngine!: RuleEngine;
   private txQueuer!: TransactionQueuer;
-
-  private abiRepo!: AbiRepo;
 
   private readonly logger: ILoggerAll;
   private readonly configService: IConfigServiceAWS
@@ -34,7 +25,8 @@ export class Groot implements IGroot {
   private readonly mainNode: IBlockchainNodeLocal;
   private readonly altNode: IBlockchainNodeLocal;
   private readonly healthMonitor: IHealthMonitor;
-
+  private readonly abiRepo: IAbiRepo;
+  private ruleEngine!: IRuleEngine;
 
   constructor(
     @inject("IConfigServiceAWS") _configService: IConfigServiceAWS,
@@ -43,6 +35,8 @@ export class Groot implements IGroot {
     @inject("BlockchainNodeLocalAlt") _altLocalNode: IBlockchainNodeLocal,
     @inject("IBlockchainReader") _blockchainReader: IBlockchainReader,
     @inject("IHealthMonitor") _healthMonitor: IHealthMonitor,
+    @inject("IAbiRepo") _abiRepo: IAbiRepo,
+    @inject("IRuleEngine") _ruleEngine: IRuleEngine,
 
   ) {
     this.logger = _logger;
@@ -51,28 +45,14 @@ export class Groot implements IGroot {
     this.altNode = _altLocalNode;
     this.blockchainReader = _blockchainReader;
     this.healthMonitor = _healthMonitor;
+    this.abiRepo = _abiRepo;
+    this.ruleEngine = _ruleEngine;
   }
 
   public async initalizeGroot() {
-    await this.configService.refreshConfig();
-
     this.logger.info('Initializing Groot...');
-
-    this.initalizeAbiRepo();
-
+    await this.configService.refreshConfig();
     this.logger.info('Groot initialized successfully.');
-  }
-
-  private initalizeAbiRepo() {
-    if (!this.blockchainReader) {
-      throw new Error('Cannot initalize abi repo without blockchain reader');
-    }
-
-    const abiStorage = new AbiStorageDynamoDB(
-      this.configService.getDynamoDBAbiRepoTable(),
-      this.configService.getAWSRegion());
-    const abiFetcher = new AbiFetcherEtherscan(this.configService.getEtherscanAPIKey());
-    this.abiRepo = new AbiRepo(this.blockchainReader, abiStorage, abiFetcher);
   }
 
   public async shutdownGroot() {
@@ -96,7 +76,6 @@ export class Groot implements IGroot {
 
     await this.configService.refreshConfig();
     await this.setLocalNodesToNewestBlock();
-    this.resetRulesEngine();
     this.resetTransactionQueuer();
 
     this.healthMonitor.endOfCycleSequence();
@@ -108,11 +87,6 @@ export class Groot implements IGroot {
       this.mainNode.resetNode(this.configService.getMainRPCURL()),
       this.altNode.resetNode(this.configService.getAlternativeRPCURL()),
     ]);
-  }
-
-  private resetRulesEngine() {
-    const ruleFactory = new FactoryRule(this.logger, this.blockchainReader, this.abiRepo);
-    this.ruleEngine = new RuleEngine(this.logger, ruleFactory);
   }
 
   private resetTransactionQueuer() {

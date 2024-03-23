@@ -11,7 +11,7 @@ export interface RuleParams {
 export interface RuleConstructorInput {
   logger: ILogger;
   blockchainReader: IBlockchainReader;
-  abiRepo: AbiRepo
+  abiRepo: IAbiRepo
   ruleLabel: string;
   params: RuleParams;
 
@@ -20,7 +20,7 @@ export interface RuleConstructorInput {
 export abstract class Rule {
   protected logger: ILogger;
   protected blockchainReader: IBlockchainReader;
-  protected abiRepo: AbiRepo;
+  protected abiRepo: IAbiRepo;
 
   protected params: RuleParams;
   protected readonly ruleLabel: string;
