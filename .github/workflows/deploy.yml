@@ -120,7 +120,6 @@ jobs:
           kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
           kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
           kubectl apply -f scripts/k8s/service.yaml --namespace groot
-          kubectl apply -f scripts/k8s/cronjob.yaml --namespace groot
                     
           # Verify deployment
           kubectl get pods --namespace groot
