@@ -7,6 +7,7 @@ on:
     paths:
       - 'src/**'
       - 'scripts/**'
+      - '.github/workflows/deploy.yml'
 
 env:
   ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
