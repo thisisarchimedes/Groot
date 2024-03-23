@@ -50,23 +50,30 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.EKS_REGION }}    
+          aws-region: ${{ env.EKS_REGION }}
+
+      - name: Generate version tag
+        id: generate_version
+        run: |
+          TIMESTAMP=$(date +%s)
+          VERSION_TAG="v$TIMESTAMP"
+          echo "::set-output name=version_tag::$VERSION_TAG"
 
       - name: Build and Push main Groot container
         run: |
           ./scripts/container_main_groot/build_main_groot_container.sh
 
           aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
-          docker tag groot-container:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:groot-container
-          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:groot-container
+          docker tag groot-container:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:groot-container-${{ steps.generate_version.outputs.version_tag }}
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:groot-container-${{ steps.generate_version.outputs.version_tag }}
 
       - name: Build and push read node container
         run: |
           ./scripts/container_reader_node/build_read_node_container.sh
           
-          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
-          docker tag arch-production-node:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:arch-production-node
-          docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:arch-production-node
+          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+          docker tag arch-production-node:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:arch-production-node-${{ steps.generate_version.outputs.version_tag }}
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:arch-production-node-${{ steps.generate_version.outputs.version_tag }}
 
       - name: Install kubectl
         run: |
@@ -120,6 +127,9 @@ jobs:
           kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
           kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
           kubectl apply -f scripts/k8s/service.yaml --namespace groot
+
+          # Trigger a rolling restart of the deployment
+          kubectl rollout restart deployment/groot-deployment --namespace groot
                     
           # Verify deployment
           kubectl get pods --namespace groot
@@ -142,4 +152,3 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-  
