@@ -12,7 +12,7 @@ spec:
       labels:
         app: groot-eth-nodes
     spec:
-      hostNetwork: false
+      hostNetwork: true
       containers:
       - name: eth-node-1
         image: docker.io/library/arch-production-node:latest
@@ -31,8 +31,26 @@ spec:
             configMapKeyRef:
               name: demoapp-config
               key: MAIN_LOCAL_NODE_PORT
+        - name: NEW_RELIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: newrelic-api-key
+              key: NEW_RELIC_API_KEY
         ports:
         - containerPort: 8545
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - >
+              curl -X POST
+              -H "Content-Type: application/json"
+              --data '{"method":"eth_blockNumber","params":[],"id":1,"jsonrpc":"2.0"}'
+              http://localhost:8545
+          initialDelaySeconds: 10
+          periodSeconds: 2
+          failureThreshold: 30
       - name: eth-node-2
         image: docker.io/library/arch-production-node:latest
         imagePullPolicy: IfNotPresent
@@ -50,8 +68,26 @@ spec:
             configMapKeyRef:
               name: demoapp-config
               key: ALT_LOCAL_NODE_PORT
+        - name: NEW_RELIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: newrelic-api-key
+              key: NEW_RELIC_API_KEY
         ports:
         - containerPort: 18545
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - >
+              curl -X POST
+              -H "Content-Type: application/json"
+              --data '{"method":"eth_blockNumber","params":[],"id":1,"jsonrpc":"2.0"}'
+              http://localhost:18545
+          initialDelaySeconds: 10
+          periodSeconds: 2
+          failureThreshold: 30
       - name: groot-container
         image: docker.io/library/groot-container:latest
         imagePullPolicy: IfNotPresent
@@ -70,14 +106,14 @@ spec:
               name: aws-secret-access-key
               key: AWS_SECRET_ACCESS_KEY
         - name: MAIN_LOCAL_NODE_URL
-          value: "http://groot-service"
+          value: "http://localhost"
         - name: MAIN_LOCAL_NODE_PORT
           valueFrom:
             configMapKeyRef:
               name: demoapp-config
               key: MAIN_LOCAL_NODE_PORT
         - name: ALT_LOCAL_NODE_URL
-          value: "http://groot-service"
+          value: "http://localhost"
         - name: ALT_LOCAL_NODE_PORT
           valueFrom:
             configMapKeyRef:
@@ -93,4 +129,9 @@ spec:
             configMapKeyRef:
               name: demoapp-config
               key: AWS_REGION
+        - name: NEW_RELIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: newrelic-api-key
+              key: NEW_RELIC_API_KEY
       restartPolicy: Always
