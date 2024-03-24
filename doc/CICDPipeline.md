@@ -41,10 +41,6 @@ eksctl create cluster --name groot-demo-app --region us-west-1 --fargate
 kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
 ```
 
-### Prometheus
-
-We have Prometheus under the namespace `prometheus`
-
 
 ### Current K8s clusters
 - Cluster: groot-demo-app (us-west-1)
