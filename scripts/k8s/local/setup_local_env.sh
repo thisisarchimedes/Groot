@@ -68,7 +68,7 @@ helm repo add prometheus-community https://prometheus-community.github.io/helm-c
 helm repo update
 helm install prometheus prometheus-community/prometheus --namespace prometheus
 
-kubectl apply -f prometheus-config.yaml --namespace prometheus
+kubectl apply -f scripts/k8s/local/prometheus-config.yaml --namespace prometheus
 
 kubectl get pods --namespace prometheus
 kubectl get pods --namespace groot

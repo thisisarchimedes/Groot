@@ -40,7 +40,7 @@ data:
       - url: "https://metric-api.newrelic.com/prometheus/v1/write?prometheus_server=groot-prometheus-server"
         bearer_token: "$NEW_RELIC_API_KEY"
 
-  rules/container-readiness.yml: |
+  container-readiness.yml: |
     groups:
       - name: container-readiness
         rules:
