@@ -13,6 +13,7 @@ spec:
         app: groot-eth-nodes
         eks.amazonaws.com/fargate-profile: groot-fargate-profile
     spec:
+      hostNetwork: true
       schedulerName: fargate-scheduler
       tolerations:
       - key: "eks.amazonaws.com/compute-type"
@@ -53,7 +54,7 @@ spec:
               curl -X POST
               -H "Content-Type: application/json"
               --data '{"method":"eth_blockNumber","params":[],"id":1,"jsonrpc":"2.0"}'
-              http://groot-service:8545
+              http://localhost:8545
           initialDelaySeconds: 60
           periodSeconds: 3
           failureThreshold: 30
@@ -91,7 +92,7 @@ spec:
               curl -X POST
               -H "Content-Type: application/json"
               --data '{"method":"eth_blockNumber","params":[],"id":1,"jsonrpc":"2.0"}'
-              http://groot-service:18545
+              http://localhost:18545
           initialDelaySeconds: 60
           periodSeconds: 3
           failureThreshold: 30
@@ -114,14 +115,14 @@ spec:
               name: aws-secret-access-key
               key: AWS_SECRET_ACCESS_KEY
         - name: MAIN_LOCAL_NODE_URL
-          value: "http://groot-service"
+          value: "http://localhost"
         - name: MAIN_LOCAL_NODE_PORT
           valueFrom:
             configMapKeyRef:
               name: demoapp-config
               key: MAIN_LOCAL_NODE_PORT
         - name: ALT_LOCAL_NODE_URL
-          value: "http://groot-service"
+          value: "http://localhost"
         - name: ALT_LOCAL_NODE_PORT
           valueFrom:
             configMapKeyRef:
