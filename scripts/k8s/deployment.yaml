@@ -25,6 +25,9 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
+            cpu: "2"
+            memory: "16Gi"
+          limits:
             cpu: "4"
             memory: "64Gi"
         envFrom:
@@ -67,6 +70,9 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
+            cpu: "2"
+            memory: "16Gi"
+          limits:
             cpu: "4"
             memory: "64Gi"
         envFrom:
@@ -109,6 +115,9 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
+            cpu: "2"
+            memory: "16Gi"
+          limits:
             cpu: "4"
             memory: "64Gi"
         envFrom:
