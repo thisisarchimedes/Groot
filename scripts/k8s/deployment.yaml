@@ -37,8 +37,27 @@ spec:
             configMapKeyRef:
               name: demoapp-config
               key: MAIN_LOCAL_NODE_PORT
+        - name: NEW_RELIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: newrelic-api-key
+              key: NEW_RELIC_API_KEY
         ports:
         - containerPort: 8545
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - >
+              curl -X POST
+              -H "Content-Type: application/json"
+              --data '{"method":"eth_blockNumber","params":[],"id":1,"jsonrpc":"2.0"}'
+              http://groot-service:8545
+          initialDelaySeconds: 60
+          periodSeconds: 3
+          failureThreshold: 30
+        
       - name: eth-node-2
         image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
         imagePullPolicy: Always
@@ -56,8 +75,27 @@ spec:
             configMapKeyRef:
               name: demoapp-config
               key: ALT_LOCAL_NODE_PORT
+        - name: NEW_RELIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: newrelic-api-key
+              key: NEW_RELIC_API_KEY
         ports:
         - containerPort: 18545
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - >
+              curl -X POST
+              -H "Content-Type: application/json"
+              --data '{"method":"eth_blockNumber","params":[],"id":1,"jsonrpc":"2.0"}'
+              http://groot-service:18545
+          initialDelaySeconds: 60
+          periodSeconds: 3
+          failureThreshold: 30
+
       - name: groot-container
         image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:groot-container
         imagePullPolicy: Always
@@ -99,4 +137,9 @@ spec:
             configMapKeyRef:
               name: demoapp-config
               key: AWS_REGION
+        - name: NEW_RELIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: newrelic-api-key
+              key: NEW_RELIC_API_KEY
       restartPolicy: Always

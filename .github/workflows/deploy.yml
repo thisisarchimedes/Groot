@@ -123,6 +123,17 @@ jobs:
           stringData:
             ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
           EOF
+
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: newrelic-api-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
+          EOF
           
           # Deploy or update Kubernetes manifests
           kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
@@ -143,6 +154,17 @@ jobs:
           helm upgrade --install prometheus prometheus-community/prometheus --namespace prometheus
 
           kubectl apply -f scripts/k8s/prometheus-config.yaml --namespace prometheus
+
+          kubectl get pods --namespace prometheus
+
+      - name: Setting Prometheus
+        run: |
+          kubectl create namespace prometheus --dry-run=client -o yaml | kubectl apply -f -
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+          helm upgrade --install prometheus prometheus-community/prometheus --namespace prometheus
+
+          kubectl apply -f prometheus-config.yaml --namespace prometheus
 
           kubectl get pods --namespace prometheus
 
