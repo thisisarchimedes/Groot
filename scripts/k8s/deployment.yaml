@@ -23,6 +23,10 @@ spec:
       - name: eth-node-1
         image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "4"
+            memory: "64Gi"
         envFrom:
         - configMapRef:
             name: demoapp-config
@@ -61,6 +65,10 @@ spec:
       - name: eth-node-2
         image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "4"
+            memory: "64Gi"
         envFrom:
         - configMapRef:
             name: demoapp-config
@@ -99,6 +107,10 @@ spec:
       - name: groot-container
         image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:groot-container
         imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "4"
+            memory: "64Gi"
         envFrom:
         - configMapRef:
             name: demoapp-config
