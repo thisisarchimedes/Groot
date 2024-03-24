@@ -13,7 +13,6 @@ spec:
         app: groot-eth-nodes
         eks.amazonaws.com/fargate-profile: groot-fargate-profile
     spec:
-      hostNetwork: true
       schedulerName: fargate-scheduler
       tolerations:
       - key: "eks.amazonaws.com/compute-type"
