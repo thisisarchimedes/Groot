@@ -77,9 +77,3 @@ Get pod info & logs and check for errors
 kubectl describe pod <pod-name> --namespace groot
 kubectl logs <pod-name> --namespace groot
 ```
-
-### Connect to Prometheus UI 
-
-```bash
-kubectl port-forward -n prometheus service/prometheus-server 9090:80
-```
