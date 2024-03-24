@@ -58,7 +58,6 @@ Then, authenicate and make sure you can get the cluster information.
 
 ```bash
 aws eks update-kubeconfig --name groot-demo-app --region us-west-1
-kubectl get pods --namespace groot
 ```
 
 Get all pods
