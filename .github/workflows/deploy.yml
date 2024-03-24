@@ -157,17 +157,6 @@ jobs:
 
           kubectl get pods --namespace prometheus
 
-      - name: Setting Prometheus
-        run: |
-          kubectl create namespace prometheus --dry-run=client -o yaml | kubectl apply -f -
-          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-          helm repo update
-          helm upgrade --install prometheus prometheus-community/prometheus --namespace prometheus
-
-          kubectl apply -f prometheus-config.yaml --namespace prometheus
-
-          kubectl get pods --namespace prometheus
-
       - name: List all commit SHAs involved in the push
         id: format_commits
         shell: bash

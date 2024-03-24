@@ -69,6 +69,7 @@ kubectl get pods -n groot
 Delete  all pods from Groot
 ```bash
 kubectl delete all --all --namespace groot
+kubectl delete all --all --namespace prometheus
 ```
 
 ## Troubleshooting
