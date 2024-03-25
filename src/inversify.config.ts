@@ -27,6 +27,7 @@ import { IFactoryRule } from './rule_engine/interfaces/IFactoryRule';
 import { FactoryRule } from './rule_engine/FactoryRule';
 import { IRuleEngine } from './rule_engine/interfaces/IRuleEngine';
 import { RuleEngine } from './rule_engine/RuleEngine';
+import { IGroot } from './interfaces/IGroot';
 
 export class InversifyConfig {
     private container: Container;

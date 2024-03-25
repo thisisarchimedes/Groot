@@ -9,6 +9,7 @@ import { IConfigServiceAWS } from './service/config/interfaces/IConfigServiceAWS
 import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
 import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import { IRuleEngine } from './rule_engine/interfaces/IRuleEngine';
+import { IGroot } from './interfaces/IGroot';
 
 dotenv.config();
 
@@ -16,7 +17,7 @@ dotenv.config();
 export class Groot implements IGroot {
   private txQueuer!: TransactionQueuer;
 
-  private readonly logger: ILoggerAll;
+  public readonly logger: ILoggerAll;
   private readonly configService: IConfigServiceAWS
   private readonly mainNode: IBlockchainNodeLocal;
   private readonly altNode: IBlockchainNodeLocal;
@@ -30,7 +31,6 @@ export class Groot implements IGroot {
     @inject("BlockchainNodeLocalAlt") _altLocalNode: IBlockchainNodeLocal,
     @inject("IHealthMonitor") _healthMonitor: IHealthMonitor,
     @inject("IRuleEngine") _ruleEngine: IRuleEngine,
-
   ) {
     this.logger = _logger;
     this.configService = _configService;
