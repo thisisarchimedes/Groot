@@ -4,12 +4,9 @@ import * as dotenv from 'dotenv';
 import { injectable, inject } from 'inversify';
 
 import { TxQueueAdapter } from '../test/unit/adapters/TxQueueAdapter';
-import { FactoryRule } from './rule_engine/FactoryRule';
-import { RuleEngine } from './rule_engine/RuleEngine';
 import { TransactionQueuer } from './tx_queue/TransactionQueuer';
 import { IConfigServiceAWS } from './service/config/interfaces/IConfigServiceAWS';
 import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
-import { IBlockchainReader } from './blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import { IRuleEngine } from './rule_engine/interfaces/IRuleEngine';
 
@@ -21,11 +18,9 @@ export class Groot implements IGroot {
 
   private readonly logger: ILoggerAll;
   private readonly configService: IConfigServiceAWS
-  private readonly blockchainReader: IBlockchainReader;
   private readonly mainNode: IBlockchainNodeLocal;
   private readonly altNode: IBlockchainNodeLocal;
   private readonly healthMonitor: IHealthMonitor;
-  private readonly abiRepo: IAbiRepo;
   private ruleEngine!: IRuleEngine;
 
   constructor(
@@ -33,9 +28,7 @@ export class Groot implements IGroot {
     @inject("ILoggerAll") _logger: ILoggerAll,
     @inject("BlockchainNodeLocalMain") _mainLocalNode: IBlockchainNodeLocal,
     @inject("BlockchainNodeLocalAlt") _altLocalNode: IBlockchainNodeLocal,
-    @inject("IBlockchainReader") _blockchainReader: IBlockchainReader,
     @inject("IHealthMonitor") _healthMonitor: IHealthMonitor,
-    @inject("IAbiRepo") _abiRepo: IAbiRepo,
     @inject("IRuleEngine") _ruleEngine: IRuleEngine,
 
   ) {
@@ -43,9 +36,7 @@ export class Groot implements IGroot {
     this.configService = _configService;
     this.mainNode = _mainLocalNode;
     this.altNode = _altLocalNode;
-    this.blockchainReader = _blockchainReader;
     this.healthMonitor = _healthMonitor;
-    this.abiRepo = _abiRepo;
     this.ruleEngine = _ruleEngine;
   }
 
@@ -71,7 +62,7 @@ export class Groot implements IGroot {
   }
 
   public async prepareForAnotherCycle() {
-    this.logger.info('Preparing Groot for another cycle...');
+    this.logger.info('Preparing Groot for cycle...');
     await this.healthMonitor.startOfCycleSequence();
 
     await this.configService.refreshConfig();
@@ -79,7 +70,7 @@ export class Groot implements IGroot {
     this.resetTransactionQueuer();
 
     this.healthMonitor.endOfCycleSequence();
-    this.logger.info('Groot is ready for another cycle.');
+    this.logger.info('Groot is ready for cycle.');
   }
 
   private async setLocalNodesToNewestBlock() {
@@ -98,12 +89,19 @@ export class Groot implements IGroot {
   public async runOneGrootCycle(): Promise<void> {
     this.logger.info('Running Groot cycle...');
 
-    this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
+    try {
+      this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
 
-    await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
-    const txs = this.ruleEngine.getOutboundTransactions();
-    await this.txQueuer.queueTransactions(txs);
+      await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
+      const txs = this.ruleEngine.getOutboundTransactions();
+      await this.txQueuer.queueTransactions(txs);
+    }
+    catch (ex) {
 
-    this.logger.info('Groot cycle ran successfully.');
+    }
+    finally {
+      this.logger.info('Groot cycle ran successfully.');
+      await this.logger.flush();
+    }
   }
 }

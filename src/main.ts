@@ -42,7 +42,6 @@ class GrootBootstrapper {
     finally {
       await groot.shutdownGroot();
     }
-
   }
 
   private reportCriticalError(environment: string, region: string, error: unknown): void {
