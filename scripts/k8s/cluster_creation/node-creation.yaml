@@ -1,0 +1,23 @@
+# ksctl create nodegroup --config-file=scripts/k8s/cluster_creation/node-creation.yaml
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: groot-stable-app
+  region: us-west-1
+
+managedNodeGroups:
+  - name: ng-1-workers
+    labels: { role: workers }
+    instanceType: m5.xlarge
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 8
+    volumeSize: 80
+    privateNetworking: true
+  - name: ng-2-builders
+    labels: { role: builders }
+    instanceType: m5.2xlarge
+    desiredCapacity: 2
+    volumeSize: 100
+    privateNetworking: true

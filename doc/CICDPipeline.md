@@ -35,12 +35,20 @@ We run on AWS EKS w/Fargate. Pod has the following containers
 - **Namespace:**: groot
 
 
-We've created this cluster with
+### Cluster creation
+We've `eksctl` to create the clusters. 
+
+A default Fargate based (groot-demo-app cluster):
 ```bash
 eksctl create cluster --name groot-demo-app --region us-west-1 --fargate
 kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
 ```
 
+Non Fargate (groot-stable-app cluster):
+```bash
+eksctl create cluster  -f scripts/k8s/cluster_creation/config.yaml
+eksctl create nodegroup --config-file=scripts/k8s/cluster_creation/node-creation.yaml
+```
 
 ### Current K8s clusters
 - Cluster: groot-demo-app (us-west-1)
