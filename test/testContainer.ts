@@ -13,6 +13,7 @@ import { ConfigServiceAdapter } from './unit/adapters/ConfigServiceAdapter';
 import { IAbiStorage } from '../src/rule_engine/tool/abi_repository/interfaces/IAbiStorage';
 import { AbiStorageDynamoDB } from '../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import { AbiRepoAdapter } from './unit/adapters/AbiRepoAdapter';
+import { TxQueueAdapter } from './unit/adapters/TxQueueAdapter';
 // Import other dependencies and adapters...
 
 // Function to setup and return a new test container
@@ -40,6 +41,8 @@ export const createTestContainer = (): Container => {
     // Binding the BlockchainReader
     container.bind<IBlockchainReader>(TYPES.IBlockchainReader).to(BlockchainReader).inSingletonScope();
     container.bind<AbiStorageAdapter>(AbiStorageAdapter).toSelf().inSingletonScope();
+    container.bind<TxQueueAdapter>(TxQueueAdapter).toSelf().inSingletonScope();
+
 
     container.bind<AbiFetcherAdapter>(AbiFetcherAdapter).toSelf().inSingletonScope();
     container.bind<IAbiRepo>(TYPES.IAbiRepo).to(AbiRepoAdapter).inRequestScope();
