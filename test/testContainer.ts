@@ -8,6 +8,7 @@ import { LoggerAdapter } from './unit/adapters/LoggerAdapter';
 import { BlockchainNodeAdapter } from './unit/adapters/BlockchainNodeAdapter';
 import { AbiStorageAdapter } from './unit/adapters/AbiStorageAdapter';
 import { AbiFetcherAdapter } from './unit/adapters/AbiFetcherAdapter';
+import { BlockchainNodeHealthMonitor } from '../src/service/health_monitor/BlockchainNodeHealthMonitor';
 // Import other dependencies and adapters...
 
 // Function to setup and return a new test container
@@ -27,6 +28,9 @@ export const createTestContainer = (): Container => {
         const logger = container.get<LoggerAdapter>(TYPES.ILoggerAll);
         return new BlockchainNodeAdapter(logger, 'localNodeInfura');
     }).inSingletonScope();
+
+    container.bind<IBlockchainNodeHealthMonitor>(TYPES.IBlockchainNodeHealthMonitor).to(BlockchainNodeHealthMonitor).inSingletonScope();
+
 
     // Binding the BlockchainReader
     container.bind<IBlockchainReader>(TYPES.IBlockchainReader).to(BlockchainReader).inSingletonScope();
