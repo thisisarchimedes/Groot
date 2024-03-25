@@ -3,26 +3,24 @@ import { AbiRepo } from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import { AbiStorageAdapter } from './adapters/AbiStorageAdapter';
 import { AbiFetcherAdapter } from './adapters/AbiFetcherAdapter';
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import { TYPES } from '../../src/inversify.types';
 import { IBlockchainReader } from '../../src/blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import { createTestContainer } from '../testContainer';
+import { Container } from 'inversify';
+const container = createTestContainer();
 
 
 describe('ABI Repo', function () {
+
+  let container: Container;
+
   let abiStorage: AbiStorageAdapter;
   let abiFetcher: AbiFetcherAdapter;
   let abiRepo: AbiRepo;
 
-  let localNodeAlchemy: BlockchainNodeAdapter;
-  let localNodeInfura: BlockchainNodeAdapter;
-
-  const logger: LoggerAdapter = new LoggerAdapter();
-
   beforeEach(async function () {
 
-    const container = createTestContainer();
+    container = createTestContainer();
 
     abiStorage = container.resolve(AbiStorageAdapter);
     abiFetcher = container.resolve(AbiFetcherAdapter);
@@ -61,6 +59,8 @@ describe('ABI Repo', function () {
   it('should fetch ABI from external service and traverse proxy', async function () {
     abiStorage.setReturnValue(null);
     abiFetcher.setReturnValue('mockAbiImplementation');
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
     localNodeAlchemy.setProxyInfoForAddressResponse({ isProxy: true, implementationAddress: 'mockAbiImplementation' });
     localNodeInfura.setProxyInfoForAddressResponse({ isProxy: true, implementationAddress: 'mockAbiImplementation' });
 
