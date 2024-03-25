@@ -44,6 +44,7 @@ kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
 
 ### Current K8s clusters
 - Cluster: groot-demo-app (us-west-1)
+- Cluster: groot-stable-app (us-west-1)
 - ECR Repo: groot (us-west-1)
 
 ## Getting Basic Cluster Information
@@ -54,6 +55,7 @@ Then, authenicate and make sure you can get the cluster information.
 
 ```bash
 aws eks update-kubeconfig --name groot-demo-app --region us-west-1
+aws eks update-kubeconfig --name groot-stable-app --region us-west-1
 ```
 
 Get all pods

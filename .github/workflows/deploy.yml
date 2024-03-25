@@ -130,7 +130,7 @@ jobs:
           
           # Deploy or update Kubernetes manifests
           kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
-          kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
+          kubectl apply -f scripts/k8s/demoapp-deployment.yaml --namespace groot
           kubectl apply -f scripts/k8s/service.yaml --namespace groot
 
           # Trigger a rolling restart of the deployment
@@ -142,7 +142,7 @@ jobs:
       - name: Deploy to EKS (StableApp)
         run: |
           # Update kubeconfig
-          aws eks update-kubeconfig --name groot-production --region ${{ env.EKS_REGION }}
+          aws eks update-kubeconfig --name groot-stable-app --region ${{ env.EKS_REGION }}
                     
           # Create the groot namespace if it doesn't exist
           kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
@@ -193,8 +193,8 @@ jobs:
           EOF
           
           # Deploy or update Kubernetes manifests
-          kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
-          kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
+          kubectl apply -f scripts/k8s/stableapp-configmap.yaml --namespace groot
+          kubectl apply -f scripts/k8s/stableapp-deployment.yaml --namespace groot
           kubectl apply -f scripts/k8s/service.yaml --namespace groot
 
           # Trigger a rolling restart of the deployment
