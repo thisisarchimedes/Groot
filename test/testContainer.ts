@@ -10,10 +10,8 @@ import { AbiStorageAdapter } from './unit/adapters/AbiStorageAdapter';
 import { AbiFetcherAdapter } from './unit/adapters/AbiFetcherAdapter';
 import { BlockchainNodeHealthMonitor } from '../src/service/health_monitor/BlockchainNodeHealthMonitor';
 import { ConfigServiceAdapter } from './unit/adapters/ConfigServiceAdapter';
-import { AbiRepo } from '../src/rule_engine/tool/abi_repository/AbiRepo';
 import { IAbiStorage } from '../src/rule_engine/tool/abi_repository/interfaces/IAbiStorage';
 import { AbiStorageDynamoDB } from '../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
-import { IConfigServiceAWS } from '../src/service/config/interfaces/IConfigServiceAWS';
 import { AbiRepoAdapter } from './unit/adapters/AbiRepoAdapter';
 // Import other dependencies and adapters...
 
