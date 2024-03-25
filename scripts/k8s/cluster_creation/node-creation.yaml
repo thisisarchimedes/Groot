@@ -3,8 +3,8 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: groot-stable-app
-  region: us-west-1
+  name: groot-demo-app
+  region: us-west-2
 
 managedNodeGroups:
   - name: ng-1-workers
@@ -12,7 +12,7 @@ managedNodeGroups:
     instanceType: m5.xlarge
     desiredCapacity: 2
     minSize: 2
-    maxSize: 8
+    maxSize: 4
     volumeSize: 80
     privateNetworking: true
   - name: ng-2-builders

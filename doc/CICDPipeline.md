@@ -28,32 +28,23 @@ Everytime we run deployment we rebuild the containers and assign a new version t
 
 ## Environments
 
-We run on AWS EKS w/Fargate. Pod has the following containers
+We run on AWS EKS . Pod has the following containers
 - **Groot main process**: Using K8s chron to run every minute
 - **2 x Hardhat nodes (read only)**
-- **Fargate profile:** groot-fargate-profile
 - **Namespace:**: groot
 
 
 ### Cluster creation
 We've `eksctl` to create the clusters. 
 
-A default Fargate based (groot-demo-app cluster):
-```bash
-eksctl create cluster --name groot-demo-app --region us-west-1 --fargate
-kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
-```
-
-Non Fargate (groot-stable-app cluster):
 ```bash
 eksctl create cluster  -f scripts/k8s/cluster_creation/config.yaml
 eksctl create nodegroup --config-file=scripts/k8s/cluster_creation/node-creation.yaml
 ```
 
 ### Current K8s clusters
-- Cluster: groot-demo-app (us-west-1)
-- Cluster: groot-stable-app (us-west-1)
-- ECR Repo: groot (us-west-1)
+- Cluster: groot-demo-app (us-west-2)
+- ECR Repo: groot (us-west-2)
 
 ## Getting Basic Cluster Information
 
@@ -62,8 +53,7 @@ From local environment, make sure aws cli is installed and configured with the r
 Then, authenicate and make sure you can get the cluster information.
 
 ```bash
-aws eks update-kubeconfig --name groot-demo-app --region us-west-1
-aws eks update-kubeconfig --name groot-stable-app --region us-west-1
+aws eks update-kubeconfig --name groot-demo-app --region us-west-2
 ```
 
 Get all pods
