@@ -36,3 +36,5 @@ export abstract class Logger implements ILogger {
     this.info(JSON.stringify(message));
   }
 }
+
+export { LogLevel };

@@ -82,13 +82,12 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     });
 
     it('Should call getBlockNumber and handle 1/2 node failed, use another node', async function () {
-        const blockNumberAlchemy: number = 19364429;
 
         const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
         const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
         const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);
 
-
+        const blockNumberAlchemy: number = 19364429;
         localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
         localNodeAlchemy.setThrowErrorOnGetBlockNumber(false);
 
@@ -98,7 +97,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
 
         const res = await blockchainReader.getBlockNumber();
 
-        expect(res).to.be.eq(19364429);
+        expect(res).to.be.eq(blockNumberAlchemy);
     });
 
     it('Should throw an error when all nodes fail to retrieve block number', async function () {

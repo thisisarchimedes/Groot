@@ -15,11 +15,10 @@ let container: Container = new Container();
 export async function startGroot(runInfinite: boolean = true): Promise<void> {
   const grootParams = getGrootParamsFromEnv();
   reportGrootStartup(grootParams);
-  // Initialize configService
+
   const configServiceAWS = new ConfigServiceAWS(grootParams.environment, grootParams.region);
   await configServiceAWS.refreshConfig();
 
-  // Create the Inversify container with the pre-initialized ConfigServiceAWS
   const inversifyConfig = new InversifyConfig(configServiceAWS);
   container = inversifyConfig.getContainer();
   const groot = container.get<IGroot>(TYPES.Groot);

@@ -1,42 +1,68 @@
+import 'reflect-metadata';
+import { Container } from 'inversify';
 import * as chai from 'chai';
+import { BlockchainReader, BlockchainReaderError } from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
+import { LoggerAdapter } from './adapters/LoggerAdapter';
+import { TYPES } from '../../src/inversify.types';
+import { ethers } from 'ethers';
+import { IBlockchainReader } from '../../src/blockchain/blockchain_reader/interfaces/IBlockchainReader';
 
-import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
-import {BlockchainReaderError, BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import {LoggerAdapter} from './adapters/LoggerAdapter';
-import {ethers} from 'ethers';
+const { expect } = chai;
 
-const {expect} = chai;
+describe('Check that blockchain reader works with multiple underlying nodes', function () {
+  let container: Container;
 
-describe('Check that blockchain reader works with multiple underlying nodes', function() {
-  let localNodeAlchemy: BlockchainNodeAdapter;
-  let localNodeInfura: BlockchainNodeAdapter;
-  const logger: LoggerAdapter = new LoggerAdapter();
+  beforeEach(function () {
+    container = new Container();
 
-  beforeEach(async function() {
-    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
-    await localNodeAlchemy.startNode();
-    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
-    await localNodeInfura.startNode();
+    // Binding logger
+    container.bind<LoggerAdapter>(TYPES.ILoggerAll).to(LoggerAdapter).inSingletonScope();
+
+    // Binding the BlockchainNode with the adapter for testing
+    container.bind<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain).toDynamicValue(() => {
+      const logger = container.get<LoggerAdapter>(TYPES.ILoggerAll);
+      return new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
+    }).inSingletonScope();
+
+    container.bind<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt).toDynamicValue(() => {
+      const logger = container.get<LoggerAdapter>(TYPES.ILoggerAll);
+      return new BlockchainNodeAdapter(logger, 'localNodeInfura');
+    }).inSingletonScope();
+
+    // Binding the BlockchainReader
+    container.bind<IBlockchainReader>(TYPES.IBlockchainReader).to(BlockchainReader).inSingletonScope();
+
+    // Starting nodes
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    return Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
   });
 
-  afterEach(async function() {
-    await localNodeAlchemy.stopNode();
-    await localNodeInfura.stopNode();
+  afterEach(function () {
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    return Promise.all([localNodeAlchemy.stopNode(), localNodeInfura.stopNode()]);
   });
 
-  it('Should be able to load two nodes and get most recent block number', async function() {
+  it('Should be able to load two nodes and get most recent block number', async function () {
     const blockNumberAlchemy: number = 19364429;
     const blockNumberInfura: number = 19364430;
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeInfura.setBlockNumber(blockNumberInfura);
 
-    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
+    const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);
     const blockNumber = await blockchainReader.getBlockNumber();
     expect(blockNumber).to.be.a('number');
     expect(blockNumber).to.be.eq(Math.max(blockNumberAlchemy, blockNumberInfura));
   });
 
-  it('Should be able to facilitate read call, decide which node to use, when both response', async function() {
+  it('Should be able to facilitate read call, decide which node to use, when both response', async function () {
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setReadResponse('1');
@@ -45,17 +71,22 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setBlockNumber(blockNumberInfura);
     localNodeInfura.setReadResponse('2');
 
-    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
+    const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);
 
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
     const res = Number(await blockchainReader.callViewFunction(usdcContractAddress,
-        new ethers.Interface(abi), 'decimals'));
+      new ethers.Interface(abi), 'decimals'));
 
     expect(res).to.be.eq(2);
   });
 
-  it('Should call getBlockNumber and handle 1/2 node failed, use another node', async function() {
+  it('Should call getBlockNumber and handle 1/2 node failed, use another node', async function () {
+
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);
+
     const blockNumberAlchemy: number = 19364429;
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(false);
@@ -64,23 +95,24 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setBlockNumber(blockNumberInfura);
     localNodeInfura.setThrowErrorOnGetBlockNumber(true);
 
-    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
-
     const res = await blockchainReader.getBlockNumber();
 
-    expect(res).to.be.eq(19364429);
+    expect(res).to.be.eq(blockNumberAlchemy);
   });
 
-  it('Should throw an error when all nodes fail to retrieve block number', async function() {
+  it('Should throw an error when all nodes fail to retrieve block number', async function () {
     const blockNumberAlchemy: number = 19364429;
+
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);
+
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(true);
 
     const blockNumberInfura: number = 19364430;
     localNodeInfura.setBlockNumber(blockNumberInfura);
     localNodeInfura.setThrowErrorOnGetBlockNumber(true);
-
-    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
 
     try {
       await blockchainReader.getBlockNumber();
@@ -91,8 +123,13 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
   });
 
 
-  it('Should call callViewFunction and handle 1/2 node failed, use another node', async function() {
+  it('Should call callViewFunction and handle 1/2 node failed, use another node', async function () {
     const blockNumberAlchemy: number = 19364429;
+
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);
+
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setReadResponse('1');
 
@@ -101,18 +138,21 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setReadResponse('2');
     localNodeInfura.setThrowErrorOnCallViewFunction(true);
 
-    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
-
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
     const res = Number(await blockchainReader.callViewFunction(usdcContractAddress,
-        new ethers.Interface(abi), 'decimals'));
+      new ethers.Interface(abi), 'decimals'));
 
     expect(res).to.be.eq(1);
   });
 
-  it('Should throw an error when all nodes fail to call view function', async function() {
+  it('Should throw an error when all nodes fail to call view function', async function () {
     const blockNumberAlchemy: number = 19364429;
+
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);
+
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(false);
     localNodeAlchemy.setReadResponse('1');
@@ -123,8 +163,6 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setThrowErrorOnGetBlockNumber(false);
     localNodeInfura.setReadResponse('2');
     localNodeInfura.setThrowErrorOnCallViewFunction(true);
-
-    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
 
     try {
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
@@ -137,8 +175,14 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     }
   });
 
-  it('Should throw an error when all nodes fail - getBlockNumber fails', async function() {
+  it('Should throw an error when all nodes fail - getBlockNumber fails', async function () {
     const blockNumberAlchemy: number = 19364429;
+
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);
+
+
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(true);
     localNodeAlchemy.setReadResponse('1');
@@ -150,8 +194,6 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setReadResponse('2');
     localNodeInfura.setThrowErrorOnCallViewFunction(false);
 
-    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
-
     try {
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
       const abi = getStubAbi();
@@ -163,8 +205,14 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     }
   });
 
-  it('Should throw an error when all nodes fail - callViewFunction fails', async function() {
+  it('Should throw an error when all nodes fail - callViewFunction fails', async function () {
     const blockNumberAlchemy: number = 19364429;
+
+    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
+    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);
+
+
     localNodeAlchemy.setBlockNumber(blockNumberAlchemy);
     localNodeAlchemy.setThrowErrorOnGetBlockNumber(false);
     localNodeAlchemy.setReadResponse('1');
@@ -175,8 +223,6 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     localNodeInfura.setThrowErrorOnGetBlockNumber(false);
     localNodeInfura.setReadResponse('2');
     localNodeInfura.setThrowErrorOnCallViewFunction(true);
-
-    const blockchainReader = new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
 
     try {
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
@@ -207,3 +253,4 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     ];
   }
 });
+

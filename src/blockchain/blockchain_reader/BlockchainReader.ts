@@ -7,7 +7,6 @@ import { IBlockchainNodeLocal } from '../blockchain_nodes/interfaces/IBlockchain
 import { BlockchainNodeProxyInfo } from '../blockchain_nodes/BlockchainNodeProxyInfo';
 import { IBlockchainReader } from './interfaces/IBlockchainReader';
 
-@injectable()
 export class BlockchainReaderError extends Error {
   constructor(message: string) {
     super(message);
