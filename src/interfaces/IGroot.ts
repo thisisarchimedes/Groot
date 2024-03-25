@@ -1,4 +1,4 @@
-import { ILoggerAll } from "../service/logger/interfaces/ILoggerAll";
+import {ILoggerAll} from '../service/logger/interfaces/ILoggerAll';
 
 export interface IGroot {
     initalizeGroot(): Promise<void>;

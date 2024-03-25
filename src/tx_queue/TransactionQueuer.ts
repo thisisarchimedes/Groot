@@ -1,6 +1,6 @@
-import { OutboundTransaction } from '../blockchain/OutboundTransaction';
-import { ILogger } from '../service/logger/interfaces/ILogger';
-import { ITxQueue } from './ITxQueue';
+import {OutboundTransaction} from '../blockchain/OutboundTransaction';
+import {ILogger} from '../service/logger/interfaces/ILogger';
+import {ITxQueue} from './ITxQueue';
 
 export class TransactionQueuer {
   private readonly logger: ILogger;

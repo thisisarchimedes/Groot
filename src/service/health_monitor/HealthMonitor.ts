@@ -4,6 +4,8 @@ import { ILogger } from '../logger/interfaces/ILogger';
 import { ISignalCriticalFailure } from './signal/interfaces/ISignalCriticalFailure';
 import { ISignalHeartbeat } from './signal/interfaces/ISignalHeartbeat';
 import { ILoggerAll } from '../logger/interfaces/ILoggerAll';
+import { IHealthMonitor } from './signal/interfaces/IHealthMonitor';
+import { IBlockchainNodeHealthMonitor } from './interfaces/BlockchainNodeHealthMonitor';
 
 @injectable()
 export class HealthMonitor implements IHealthMonitor {
@@ -15,10 +17,10 @@ export class HealthMonitor implements IHealthMonitor {
   private readonly signalCriticalFailure: ISignalCriticalFailure;
 
   constructor(
-    @inject("ILoggerAll") _logger: ILoggerAll,
-    @inject("IBlockchainNodeHealthMonitor") blockchainHealthMonitor: IBlockchainNodeHealthMonitor,
-    @inject("ISignalHeartbeat") signalHeartbeat: ISignalHeartbeat,
-    @inject("ISignalCriticalFailure") signalCriticalFailure: ISignalCriticalFailure) {
+    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('IBlockchainNodeHealthMonitor') blockchainHealthMonitor: IBlockchainNodeHealthMonitor,
+    @inject('ISignalHeartbeat') signalHeartbeat: ISignalHeartbeat,
+    @inject('ISignalCriticalFailure') signalCriticalFailure: ISignalCriticalFailure) {
     this.logger = _logger;
     this.blockchainHealthMonitor = blockchainHealthMonitor;
     this.signalHeartbeat = signalHeartbeat;

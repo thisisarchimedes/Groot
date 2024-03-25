@@ -1,12 +1,12 @@
 import * as dotenv from 'dotenv';
 
-import { GrootParams } from './GrootParams';
-import { IGroot } from './interfaces/IGroot';
-import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
-import { InversifyConfig } from './inversify.config';
-import { Container } from 'inversify';
-import { TYPES } from './inversify.types';
-import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
+import {GrootParams} from './GrootParams';
+import {IGroot} from './interfaces/IGroot';
+import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
+import {InversifyConfig} from './inversify.config';
+import {Container} from 'inversify';
+import {TYPES} from './inversify.types';
+import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
 
 dotenv.config();
 
@@ -37,8 +37,7 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
   } catch (error) {
     reportCriticalError(grootParams.environment, grootParams.region, error);
     process.exit(1);
-  }
-  finally {
+  } finally {
     await groot.logger.flush();
   }
 
@@ -57,7 +56,7 @@ function getGrootParamsFromEnv(): GrootParams {
     reportCriticalError(environment, region, 'Cannot boot. Missing environment variables');
   }
 
-  return { environment, region, mainLocalNodeUrl, altLocalNodeUrl };
+  return {environment, region, mainLocalNodeUrl, altLocalNodeUrl};
 }
 
 function reportGrootStartup(grootParams: GrootParams): void {

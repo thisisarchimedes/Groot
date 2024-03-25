@@ -1,8 +1,8 @@
-import { ethers, Contract } from 'ethers';
-import { ILogger } from '../../service/logger/interfaces/ILogger';
-import { injectable } from 'inversify';
-import { BlockchainNodeProxyInfo } from './BlockchainNodeProxyInfo';
-import { IBlockchainNode } from './interfaces/IBlockchainNode';
+import {ethers, Contract} from 'ethers';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {injectable} from 'inversify';
+import {BlockchainNodeProxyInfo} from './BlockchainNodeProxyInfo';
+import {IBlockchainNode} from './interfaces/IBlockchainNode';
 
 
 export class BlockchainNodeError extends Error {
@@ -42,10 +42,10 @@ export abstract class BlockchainNode implements IBlockchainNode {
   }
 
   public async callViewFunction(
-    contractAddress: string,
-    abi: ethers.Interface,
-    functionName: string,
-    params: unknown[] = [],
+      contractAddress: string,
+      abi: ethers.Interface,
+      functionName: string,
+      params: unknown[] = [],
   ): Promise<unknown> {
     const contract = new Contract(contractAddress, abi, this.provider);
 

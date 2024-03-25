@@ -6,9 +6,10 @@ import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
 import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import { AbiRepo } from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import { TYPES } from '../../src/inversify.types';
-import { createTestContainer } from '../testContainer';
+import { createTestContainer } from './UnitTestContainer';
 import { Container } from 'inversify';
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
+import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 
 describe('Rule Factory Testings', function () {
   let container: Container;

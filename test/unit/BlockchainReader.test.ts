@@ -6,7 +6,7 @@ import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { TYPES } from '../../src/inversify.types';
 import { ethers } from 'ethers';
 import { IBlockchainReader } from '../../src/blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { createTestContainer } from '../testContainer';
+import { createTestContainer } from './UnitTestContainer';
 
 const { expect } = chai;
 
@@ -14,7 +14,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
   let container: Container;
 
   beforeEach(function () {
-    const container = createTestContainer();
+    container = createTestContainer();
 
     // Starting nodes
     const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
@@ -65,7 +65,6 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
   });
 
   it('Should call getBlockNumber and handle 1/2 node failed, use another node', async function () {
-
     const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
     const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
     const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);

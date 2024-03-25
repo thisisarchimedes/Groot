@@ -2,17 +2,17 @@ import { IBlockchainNode } from '../../blockchain/blockchain_nodes/interfaces/IB
 import { IBlockchainNodeLocal } from '../../blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import { injectable, inject } from 'inversify';
 import { ILoggerAll } from '../logger/interfaces/ILoggerAll';
+import { IBlockchainNodeHealthMonitor } from './interfaces/BlockchainNodeHealthMonitor';
 
 @injectable()
 export class BlockchainNodeHealthMonitor implements IBlockchainNodeHealthMonitor {
-
   private readonly nodes: IBlockchainNodeLocal[] = [];
   private readonly logger: ILoggerAll;
 
   constructor(
-    @inject("ILoggerAll") _logger: ILoggerAll,
-    @inject("BlockchainNodeLocalMain") _mainLocalNode: IBlockchainNodeLocal,
-    @inject("BlockchainNodeLocalAlt") _altLocalNode: IBlockchainNodeLocal) {
+    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
+    @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal) {
     this.logger = _logger;
     this.nodes = [_mainLocalNode, _altLocalNode];
   }

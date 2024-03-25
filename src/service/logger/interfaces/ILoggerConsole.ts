@@ -1,3 +1,3 @@
-import { ILogger } from "./ILogger";
+import {ILogger} from './ILogger';
 
 export interface ILoggerConsole extends ILogger { }

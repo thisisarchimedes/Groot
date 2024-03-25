@@ -28,75 +28,80 @@ import { FactoryRule } from './rule_engine/FactoryRule';
 import { IRuleEngine } from './rule_engine/interfaces/IRuleEngine';
 import { RuleEngine } from './rule_engine/RuleEngine';
 import { IGroot } from './interfaces/IGroot';
+import { IBlockchainNodeHealthMonitor } from './service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
+import { IHealthMonitor } from './service/health_monitor/signal/interfaces/IHealthMonitor';
+import { IAbiRepo } from './rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 
 export class InversifyConfig {
-    private container: Container;
+  private container: Container;
 
-    constructor(configServiceAWS: IConfigServiceAWS) {
-        this.container = new Container();
+  constructor(configServiceAWS: IConfigServiceAWS) {
+    this.container = new Container();
 
-        this.container.bind<string>(TYPES.MainLocalNodeURI)
-            .toConstantValue(`http://localhost:${process.env.MAIN_LOCAL_NODE_PORT || 8545}`);
+    this.container.bind<string>(TYPES.MainLocalNodeURI)
+      .toConstantValue(`http://localhost:${process.env.MAIN_LOCAL_NODE_PORT || 8545}`);
 
-        this.container.bind<string>(TYPES.AltLocalNodeURI)
-            .toConstantValue(`http://localhost:${process.env.ALT_LOCAL_NODE_PORT || 18545}`);
+    this.container.bind<string>(TYPES.AltLocalNodeURI)
+      .toConstantValue(`http://localhost:${process.env.ALT_LOCAL_NODE_PORT || 18545}`);
 
-        this.container.bind<string>(TYPES.ServiceName).toConstantValue("Groot");
+    this.container.bind<string>(TYPES.ServiceName).toConstantValue('Groot');
 
-        this.container.bind<string>(TYPES.MetricNamespaceHeartBeat).toConstantValue("Heartbeat");
-        this.container.bind<string>(TYPES.MetricNamespaceCriticalFailure).toConstantValue("CriticalFailure");
+    this.container.bind<string>(TYPES.MetricNamespaceHeartBeat).toConstantValue('Heartbeat');
+    this.container.bind<string>(TYPES.MetricNamespaceCriticalFailure).toConstantValue('CriticalFailure');
 
-        this.container.bind<string>(TYPES.AlchemyNodeLabel).toConstantValue("alchemy-node");
+    this.container.bind<string>(TYPES.AlchemyNodeLabel).toConstantValue('alchemy-node');
 
-        this.container.bind<string>(TYPES.InfuraNodeLabel).toConstantValue("infura-node");
+    this.container.bind<string>(TYPES.InfuraNodeLabel).toConstantValue('infura-node');
 
-        this.container.bind<IConfigServiceAWS>(TYPES.IConfigServiceAWS).toConstantValue(configServiceAWS);
+    this.container.bind<IConfigServiceAWS>(TYPES.IConfigServiceAWS).toConstantValue(configServiceAWS);
 
-        this.container.bind<ILoggerAll>(TYPES.ILoggerAll).to(LoggerAll).inSingletonScope();
+    this.container.bind<ILoggerAll>(TYPES.ILoggerAll).to(LoggerAll).inSingletonScope();
 
-        this.container.bind<IBlockchainNodeLocal>(TYPES.BlockchainNodeLocalMain)
-            .toDynamicValue((context: interfaces.Context) => {
-                const logger = context.container.get<ILoggerAll>(TYPES.ILoggerAll);
-                const mainRpcUrl = context.container.get<string>(TYPES.MainLocalNodeURI);
-                const alchemyNodeLabel = context.container.get<string>(TYPES.AlchemyNodeLabel);
+    this.container.bind<IBlockchainNodeLocal>(TYPES.BlockchainNodeLocalMain)
+      .toDynamicValue((context: interfaces.Context) => {
+        const logger = context.container.get<ILoggerAll>(TYPES.ILoggerAll);
+        const mainRpcUrl = context.container.get<string>(TYPES.MainLocalNodeURI);
+        const alchemyNodeLabel = context.container.get<string>(TYPES.AlchemyNodeLabel);
 
-                return new BlockchainNodeLocal(logger, mainRpcUrl, alchemyNodeLabel);
-            }).inSingletonScope();
+        return new BlockchainNodeLocal(logger, mainRpcUrl, alchemyNodeLabel);
+      }).inSingletonScope();
 
-        this.container.bind<IBlockchainNodeLocal>(TYPES.BlockchainNodeLocalAlt)
-            .toDynamicValue((context: interfaces.Context) => {
-                const logger = context.container.get<ILoggerAll>(TYPES.ILoggerAll);
-                const altRpcUrl = context.container.get<string>(TYPES.AltLocalNodeURI);
-                return new BlockchainNodeLocal(logger, altRpcUrl, "infura-node");
-            }).inSingletonScope();
+    this.container.bind<IBlockchainNodeLocal>(TYPES.BlockchainNodeLocalAlt)
+      .toDynamicValue((context: interfaces.Context) => {
+        const logger = context.container.get<ILoggerAll>(TYPES.ILoggerAll);
+        const altRpcUrl = context.container.get<string>(TYPES.AltLocalNodeURI);
+        return new BlockchainNodeLocal(logger, altRpcUrl, 'infura-node');
+      }).inSingletonScope();
 
 
-        this.container.bind<IBlockchainReader>(TYPES.IBlockchainReader).to(BlockchainReader).inSingletonScope();
+    this.container.bind<IBlockchainReader>(TYPES.IBlockchainReader).to(BlockchainReader).inSingletonScope();
 
-        this.container.bind<IBlockchainNodeHealthMonitor>(TYPES.IBlockchainNodeHealthMonitor).to(BlockchainNodeHealthMonitor).inRequestScope();
+    this.container.bind<IBlockchainNodeHealthMonitor>(TYPES.IBlockchainNodeHealthMonitor)
+      .to(BlockchainNodeHealthMonitor).inRequestScope();
 
-        this.container.bind<IHostNameProvider>(TYPES.IHostNameProvider).to(HostNameProvider).inRequestScope();
+    this.container.bind<IHostNameProvider>(TYPES.IHostNameProvider).to(HostNameProvider).inRequestScope();
 
-        this.container.bind<ISignalHeartbeat>(TYPES.ISignalHeartbeat).to(SignalAWSHeartbeat).inRequestScope();
+    this.container.bind<ISignalHeartbeat>(TYPES.ISignalHeartbeat).to(SignalAWSHeartbeat).inRequestScope();
 
-        this.container.bind<ISignalCriticalFailure>(TYPES.ISignalCriticalFailure).to(SignalAWSCriticalFailure).inRequestScope();
+    this.container.bind<ISignalCriticalFailure>(TYPES.ISignalCriticalFailure)
+      .to(SignalAWSCriticalFailure).inRequestScope();
 
-        this.container.bind<IHealthMonitor>(TYPES.IHealthMonitor).to(HealthMonitor).inRequestScope();
+    this.container.bind<IHealthMonitor>(TYPES.IHealthMonitor).to(HealthMonitor).inRequestScope();
 
-        this.container.bind<IAbiStorage>(TYPES.IAbiStorageDynamoDB).to(AbiStorageDynamoDB).inRequestScope();
+    this.container.bind<IAbiStorage>(TYPES.IAbiStorageDynamoDB).to(AbiStorageDynamoDB).inRequestScope();
 
-        this.container.bind<IAbiFetcher>(TYPES.IAbiFetcherEtherScan).to(AbiFetcherEtherscan).inRequestScope();
+    this.container.bind<IAbiFetcher>(TYPES.IAbiFetcherEtherScan).to(AbiFetcherEtherscan).inRequestScope();
 
-        this.container.bind<IAbiRepo>(TYPES.IAbiRepo).to(AbiRepo).inRequestScope();
+    this.container.bind<IAbiRepo>(TYPES.IAbiRepo).to(AbiRepo).inRequestScope();
 
-        this.container.bind<IFactoryRule>(TYPES.IFactoryRule).to(FactoryRule).inRequestScope();
+    this.container.bind<IFactoryRule>(TYPES.IFactoryRule).to(FactoryRule).inRequestScope();
 
-        this.container.bind<IRuleEngine>(TYPES.IRuleEngine).to(RuleEngine).inRequestScope();
+    this.container.bind<IRuleEngine>(TYPES.IRuleEngine).to(RuleEngine).inRequestScope();
 
-        this.container.bind<IGroot>(TYPES.Groot).to(Groot).inSingletonScope();
-    }
+    this.container.bind<IGroot>(TYPES.Groot).to(Groot).inSingletonScope();
+  }
 
-    public getContainer(): Container {
-        return this.container;
-    }
+  public getContainer(): Container {
+    return this.container;
+  }
 }

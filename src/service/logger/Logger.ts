@@ -1,7 +1,7 @@
-import { injectable } from 'inversify';
-import { ILogger } from './interfaces/ILogger';
-import { LogLevel } from './LogLevel';
-import { LogMessageCycleTime } from './TypeLogItem';
+import {injectable} from 'inversify';
+import {ILogger} from './interfaces/ILogger';
+import {LogLevel} from './LogLevel';
+import {LogMessageCycleTime} from './TypeLogItem';
 
 @injectable()
 export abstract class Logger implements ILogger {
@@ -37,4 +37,4 @@ export abstract class Logger implements ILogger {
   }
 }
 
-export { LogLevel };
+export {LogLevel};

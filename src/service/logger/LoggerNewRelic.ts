@@ -1,11 +1,10 @@
 import axios from 'axios';
-import { injectable, inject } from 'inversify';
+import {injectable} from 'inversify';
 
-import { Logger } from './Logger';
-import { ConfigService } from '../config/ConfigService';
-import { LogLevel } from './LogLevel';
-import { IConfigServiceAWS } from '../config/interfaces/IConfigServiceAWS';
-import { ILoggerNewRelic } from './interfaces/ILoggerNewRelic';
+import {Logger} from './Logger';
+import {LogLevel} from './LogLevel';
+import {IConfigServiceAWS} from '../config/interfaces/IConfigServiceAWS';
+import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
 
 
 interface LogRecord {
@@ -44,11 +43,11 @@ export class LoggerNewRelic extends Logger implements ILoggerNewRelic {
   private pendingPromises: Promise<void>[] = [];
 
   constructor(
-    configService: IConfigServiceAWS,
-    serviceName: string,
-    formatter: LogFormatter = new CustomJsonFormatter(),
-    maxRetries = 3,
-    backoffFactor = 2,
+      configService: IConfigServiceAWS,
+      serviceName: string,
+      formatter: LogFormatter = new CustomJsonFormatter(),
+      maxRetries = 3,
+      backoffFactor = 2,
   ) {
     super();
     this.config = {
@@ -113,13 +112,13 @@ export class LoggerNewRelic extends Logger implements ILoggerNewRelic {
   private async sendLogToNewRelic(payload: Record<string, unknown>, headers: Record<string, string>): Promise<void> {
     for (let attempt = 1; attempt <= this.config.maxRetries; attempt++) {
       try {
-        await axios.post(this.config.endpointUrl, payload, { headers });
+        await axios.post(this.config.endpointUrl, payload, {headers});
         return;
       } catch (error) {
         if (attempt === this.config.maxRetries) {
           console.error(
-            `Failed to send log to New Relic after ${this.config.maxRetries} retries:`,
-            error,
+              `Failed to send log to New Relic after ${this.config.maxRetries} retries:`,
+              error,
           );
         } else {
           await new Promise((resolve) =>

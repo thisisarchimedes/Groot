@@ -1,3 +1,3 @@
-interface ISignalAWS {
+export interface ISignalAWS {
 
 }

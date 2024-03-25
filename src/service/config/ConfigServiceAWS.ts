@@ -1,8 +1,8 @@
-import { injectable } from 'inversify';
+import {injectable} from 'inversify';
 
-import { AppConfigClient } from './AppConfigClient';
-import { ConfigService } from './ConfigService';
-import { IConfigServiceAWS } from './interfaces/IConfigServiceAWS';
+import {AppConfigClient} from './AppConfigClient';
+import {ConfigService} from './ConfigService';
+import {IConfigServiceAWS} from './interfaces/IConfigServiceAWS';
 
 @injectable()
 export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS {
@@ -43,7 +43,7 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
 
   private async refreshRules(): Promise<void> {
     const rules = await this.appConfigClient.fetchConfigRawString('GrootRules');
-    this.appConfigClient.fetchConfigRawString
+    this.appConfigClient.fetchConfigRawString;
     this.rules = JSON.parse(rules);
   }
 

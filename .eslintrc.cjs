@@ -39,4 +39,5 @@ module.exports = {
       'require-jsdoc': 'off',
           'valid-jsdoc': 'off',
     },
+   'ignorePatterns': ['test/**/*'],
   };

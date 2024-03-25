@@ -10,9 +10,10 @@ import {
 } from '../../src/service/health_monitor/BlockchainNodeHealthMonitor';
 import { HealthMonitor } from '../../src/service/health_monitor/HealthMonitor';
 import { SignalAdapter } from './adapters/SignalAdapter';
-import { createTestContainer } from '../testContainer';
+import { createTestContainer } from './UnitTestContainer';
 import { Container } from 'inversify';
 import { TYPES } from '../../src/inversify.types';
+import { IBlockchainNodeHealthMonitor } from '../../src/service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
 
 const { expect } = chai;
 
@@ -30,7 +31,6 @@ describe('Health Monitor tests', function () {
   let blockchainNodeHealth: IBlockchainNodeHealthMonitor;
 
   beforeEach(async function () {
-
     container = createTestContainer();
     // Starting nodes
     localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
@@ -68,7 +68,8 @@ describe('Health Monitor tests', function () {
       await blockchainNodeHealth.checkBlockchainNodesHealth();
       should.fail('Expected method to reject');
     } catch (error) {
-      error.should.be.an.instanceOf(ErrorBlockchainNodeHealthMonitor);
+      const errorInstance = error as ErrorBlockchainNodeHealthMonitor;
+      errorInstance.should.be.an.instanceOf(ErrorBlockchainNodeHealthMonitor);
     }
   });
 

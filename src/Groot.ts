@@ -10,6 +10,7 @@ import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
 import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import { IRuleEngine } from './rule_engine/interfaces/IRuleEngine';
 import { IGroot } from './interfaces/IGroot';
+import { IHealthMonitor } from './service/health_monitor/signal/interfaces/IHealthMonitor';
 
 dotenv.config();
 
@@ -18,19 +19,19 @@ export class Groot implements IGroot {
   private txQueuer!: TransactionQueuer;
 
   public readonly logger: ILoggerAll;
-  private readonly configService: IConfigServiceAWS
+  private readonly configService: IConfigServiceAWS;
   private readonly mainNode: IBlockchainNodeLocal;
   private readonly altNode: IBlockchainNodeLocal;
   private readonly healthMonitor: IHealthMonitor;
   private ruleEngine!: IRuleEngine;
 
   constructor(
-    @inject("IConfigServiceAWS") _configService: IConfigServiceAWS,
-    @inject("ILoggerAll") _logger: ILoggerAll,
-    @inject("BlockchainNodeLocalMain") _mainLocalNode: IBlockchainNodeLocal,
-    @inject("BlockchainNodeLocalAlt") _altLocalNode: IBlockchainNodeLocal,
-    @inject("IHealthMonitor") _healthMonitor: IHealthMonitor,
-    @inject("IRuleEngine") _ruleEngine: IRuleEngine,
+    @inject('IConfigServiceAWS') _configService: IConfigServiceAWS,
+    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
+    @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal,
+    @inject('IHealthMonitor') _healthMonitor: IHealthMonitor,
+    @inject('IRuleEngine') _ruleEngine: IRuleEngine,
   ) {
     this.logger = _logger;
     this.configService = _configService;
@@ -95,11 +96,9 @@ export class Groot implements IGroot {
       await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
       const txs = this.ruleEngine.getOutboundTransactions();
       await this.txQueuer.queueTransactions(txs);
-    }
-    catch (ex) {
-
-    }
-    finally {
+    } catch (ex) {
+      console.log('error '); // FIX
+    } finally {
       this.logger.info('Groot cycle ran successfully.');
       await this.logger.flush();
     }

@@ -5,13 +5,12 @@ import { AbiFetcherAdapter } from './adapters/AbiFetcherAdapter';
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { TYPES } from '../../src/inversify.types';
 import { IBlockchainReader } from '../../src/blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { createTestContainer } from '../testContainer';
+import { createTestContainer } from './UnitTestContainer';
 import { Container } from 'inversify';
 const container = createTestContainer();
 
 
 describe('ABI Repo', function () {
-
   let container: Container;
 
   let abiStorage: AbiStorageAdapter;
@@ -19,7 +18,6 @@ describe('ABI Repo', function () {
   let abiRepo: AbiRepo;
 
   beforeEach(async function () {
-
     container = createTestContainer();
 
     abiStorage = container.resolve(AbiStorageAdapter);

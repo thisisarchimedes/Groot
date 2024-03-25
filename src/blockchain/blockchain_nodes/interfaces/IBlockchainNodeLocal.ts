@@ -1,4 +1,4 @@
-import { IBlockchainNode } from "./IBlockchainNode";
+import {IBlockchainNode} from './IBlockchainNode';
 
 export interface IBlockchainNodeLocal extends IBlockchainNode {
     startNode(): Promise<void>;

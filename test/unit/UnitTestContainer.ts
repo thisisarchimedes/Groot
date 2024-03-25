@@ -1,24 +1,25 @@
 
 import 'reflect-metadata';
 import { Container } from 'inversify';
-import { TYPES } from '../src/inversify.types';
-import { IBlockchainReader } from '../src/blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { BlockchainReader } from '../src/blockchain/blockchain_reader/BlockchainReader';
-import { LoggerAdapter } from './unit/adapters/LoggerAdapter';
-import { BlockchainNodeAdapter } from './unit/adapters/BlockchainNodeAdapter';
-import { AbiStorageAdapter } from './unit/adapters/AbiStorageAdapter';
-import { AbiFetcherAdapter } from './unit/adapters/AbiFetcherAdapter';
-import { BlockchainNodeHealthMonitor } from '../src/service/health_monitor/BlockchainNodeHealthMonitor';
-import { ConfigServiceAdapter } from './unit/adapters/ConfigServiceAdapter';
-import { IAbiStorage } from '../src/rule_engine/tool/abi_repository/interfaces/IAbiStorage';
-import { AbiStorageDynamoDB } from '../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
-import { AbiRepoAdapter } from './unit/adapters/AbiRepoAdapter';
-import { TxQueueAdapter } from './unit/adapters/TxQueueAdapter';
+import { TYPES } from '../../src/inversify.types';
+import { IBlockchainReader } from '../../src/blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import { LoggerAdapter } from './adapters/LoggerAdapter';
+import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
+import { AbiStorageAdapter } from './adapters/AbiStorageAdapter';
+import { AbiFetcherAdapter } from './adapters/AbiFetcherAdapter';
+import { BlockchainNodeHealthMonitor } from '../../src/service/health_monitor/BlockchainNodeHealthMonitor';
+import { ConfigServiceAdapter } from './adapters/ConfigServiceAdapter';
+import { IAbiStorage } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiStorage';
+import { AbiStorageDynamoDB } from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
+import { AbiRepoAdapter } from './adapters/AbiRepoAdapter';
+import { TxQueueAdapter } from './adapters/TxQueueAdapter';
+import { IBlockchainNodeHealthMonitor } from '../../src/service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
+import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 // Import other dependencies and adapters...
 
 // Function to setup and return a new test container
 export const createTestContainer = (): Container => {
-
     const container = new Container();
 
 
@@ -36,7 +37,8 @@ export const createTestContainer = (): Container => {
         return new BlockchainNodeAdapter(logger, 'localNodeInfura');
     }).inSingletonScope();
 
-    container.bind<IBlockchainNodeHealthMonitor>(TYPES.IBlockchainNodeHealthMonitor).to(BlockchainNodeHealthMonitor).inSingletonScope();
+    container.bind<IBlockchainNodeHealthMonitor>(TYPES.IBlockchainNodeHealthMonitor)
+        .to(BlockchainNodeHealthMonitor).inSingletonScope();
 
     // Binding the BlockchainReader
     container.bind<IBlockchainReader>(TYPES.IBlockchainReader).to(BlockchainReader).inSingletonScope();
@@ -50,7 +52,6 @@ export const createTestContainer = (): Container => {
     container.bind<IAbiStorage>(TYPES.IAbiStorageDynamoDB).to(AbiStorageDynamoDB).inRequestScope();
 
     container.bind<ConfigServiceAdapter>(ConfigServiceAdapter).toSelf().inSingletonScope();
-
 
     return container;
 };
