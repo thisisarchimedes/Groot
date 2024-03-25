@@ -9,11 +9,19 @@ import { BlockchainNodeAdapter } from './unit/adapters/BlockchainNodeAdapter';
 import { AbiStorageAdapter } from './unit/adapters/AbiStorageAdapter';
 import { AbiFetcherAdapter } from './unit/adapters/AbiFetcherAdapter';
 import { BlockchainNodeHealthMonitor } from '../src/service/health_monitor/BlockchainNodeHealthMonitor';
+import { ConfigServiceAdapter } from './unit/adapters/ConfigServiceAdapter';
+import { AbiRepo } from '../src/rule_engine/tool/abi_repository/AbiRepo';
+import { IAbiStorage } from '../src/rule_engine/tool/abi_repository/interfaces/IAbiStorage';
+import { AbiStorageDynamoDB } from '../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
+import { IConfigServiceAWS } from '../src/service/config/interfaces/IConfigServiceAWS';
+import { AbiRepoAdapter } from './unit/adapters/AbiRepoAdapter';
 // Import other dependencies and adapters...
 
 // Function to setup and return a new test container
 export const createTestContainer = (): Container => {
+
     const container = new Container();
+
 
     // Binding logger
     container.bind<LoggerAdapter>(TYPES.ILoggerAll).to(LoggerAdapter).inSingletonScope();
@@ -31,11 +39,17 @@ export const createTestContainer = (): Container => {
 
     container.bind<IBlockchainNodeHealthMonitor>(TYPES.IBlockchainNodeHealthMonitor).to(BlockchainNodeHealthMonitor).inSingletonScope();
 
-
     // Binding the BlockchainReader
     container.bind<IBlockchainReader>(TYPES.IBlockchainReader).to(BlockchainReader).inSingletonScope();
     container.bind<AbiStorageAdapter>(AbiStorageAdapter).toSelf().inSingletonScope();
+
     container.bind<AbiFetcherAdapter>(AbiFetcherAdapter).toSelf().inSingletonScope();
+    container.bind<IAbiRepo>(TYPES.IAbiRepo).to(AbiRepoAdapter).inRequestScope();
+
+    container.bind<IAbiStorage>(TYPES.IAbiStorageDynamoDB).to(AbiStorageDynamoDB).inRequestScope();
+
+    container.bind<ConfigServiceAdapter>(ConfigServiceAdapter).toSelf().inSingletonScope();
+
 
     return container;
 };

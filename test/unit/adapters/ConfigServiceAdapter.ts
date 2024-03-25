@@ -1,6 +1,6 @@
 
 import fs from 'fs';
-import {ConfigService} from '../../../src/service/config/ConfigService';
+import { ConfigService } from '../../../src/service/config/ConfigService';
 
 export class ConfigServiceAdapter extends ConfigService {
   private ruleFilePath: string = '';
