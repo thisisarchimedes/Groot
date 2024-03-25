@@ -3,7 +3,7 @@ import {ethers} from 'ethers';
 import {expect} from 'chai';
 import {NewRelicInterceptor} from './interceptors/NewRelicInterceptor';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {grootStartHere} from '../../src/main';
+import {startGroot} from '../../src/main';
 import {AppConfigInterceptor} from './interceptors/AppConfigInterceptor';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 import {EthNodeInterceptor} from './interceptors/EthNodeInterceptor';
@@ -62,13 +62,6 @@ describe('Startup and Config', function() {
   it('should load dummy rule and emit a log item', async function() {
     const expectedBlockNumber = 10001;
 
-
-    ethNodeMainInterceptor = new EthNodeInterceptor('http://localhost:8545');
-    ethNodeMainInterceptor.interceptCalls();
-
-    ethNodeAltInterceptor = new EthNodeInterceptor('http://localhost:18545');
-    ethNodeAltInterceptor.interceptCalls();
-
     const mockRules: RuleJSONConfigItem[] = [
       {
         ruleType: TypeRule.Dummy,
@@ -100,7 +93,7 @@ describe('Startup and Config', function() {
 
     const expectedMessage = 'Queuing transaction: this is a dummy context';
     newRelicInterceptor.setWaitedOnMessage(expectedMessage);
-    await grootStartHere(false);
+    await startGroot(false);
     await waitForMessageProcessing();
 
     const isMessageObserved = newRelicInterceptor.isWaitedOnMessageObserved();
@@ -136,7 +129,7 @@ describe('Startup and Config', function() {
     const expectedMessage = 'Rule Engine loaded 1 rules';
     newRelicInterceptor.setWaitedOnMessage(expectedMessage);
 
-    await grootStartHere(false);
+    await startGroot(false);
     console.log('Waiting for message: ', expectedMessage);
     await waitForMessageProcessing();
 

@@ -1,4 +1,3 @@
 #!/bin/bash
 
-set -o allexport && source .env && set +o allexport
-yarn tsx src/main.ts
+yarn tsx src/EntryK8s.ts

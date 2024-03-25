@@ -104,4 +104,10 @@ export class Groot implements IGroot {
       await this.logger.flush();
     }
   }
+
+  public async sleepBetweenCycles(): Promise<void> {
+    const sleepTime = this.configService.getSleepMillisecondsBetweenCycles();
+    this.logger.debug(`Sleeping for ${sleepTime} seconds...`);
+    await new Promise((resolve) => setTimeout(resolve, sleepTime));
+  }
 }

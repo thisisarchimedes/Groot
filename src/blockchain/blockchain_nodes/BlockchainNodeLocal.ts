@@ -17,10 +17,12 @@ export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNo
   ) {
     super(_logger, nodeName);
     this.localRpcUrl = localRpcUrl;
+    this.logger.debug(`Initializing ${this.nodeName} with local RPC URL: ${localRpcUrl}`);
     this.provider = new JsonRpcProvider(localRpcUrl);
   }
 
   public async startNode(): Promise<void> {
+    this.logger.debug(`Starting local node...${this.localRpcUrl}`);
     await this.waitForNodeToBeReady();
   }
 

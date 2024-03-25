@@ -34,10 +34,12 @@ describe('Check that we work with local Hardhat node correctly', function() {
 
 
   it('Should be able to reset node and point it to valid RPC', async function() {
-    const alchemyRpcUrl: string = 'https://eth-mainnet.g.alchemy.com/v2/' + process.env.API_KEY_ALCHEMY;
+    console.log('Starting reset test - MAKE SURE THERE IS LOCAL NODE RUNNING AND ACCESSABLE');
+
+    const alchemyRpcUrl: string = 'https://eth-mainnet.g.alchemy.com/v2/' + process.env.ALCHEMY_API_KEY;
     await resetAndVerify(alchemyRpcUrl);
 
-    const infuraRpcUrl: string = 'https://mainnet.infura.io/v3/' + process.env.API_KEY_INFURA;
+    const infuraRpcUrl: string = 'https://mainnet.infura.io/v3/' + process.env.INFURA_API_KEY;
     await resetAndVerify(infuraRpcUrl);
   });
 
