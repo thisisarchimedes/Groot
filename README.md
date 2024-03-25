@@ -4,6 +4,7 @@
 
 - **Local**: See [doc/LocalEnvironment.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/LocalEnvironment.md)
 - **CICD**: See [doc/CICDPipeline.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/CICDPipeline.md)
+  - **Observability**: [Pixie on Groot-Stable-App](https://github.com/thisisarchimedes/Groot/blob/main/doc/K8sObservability.md)
 - **NewRelic**: [Raw logs](https://onenr.io/0Bj3XDql2QX)
 ## Supported Rules
 
