@@ -81,8 +81,7 @@ jobs:
           aws eks update-kubeconfig --name groot-demo-app --region ${{ env.EKS_REGION }}
                     
           # Create the groot namespace if it doesn't exist
-          # kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
-          kubectl apply -f namespace.yaml --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f scripts/k8s/namespace.yaml --dry-run=client -o yaml | kubectl apply -f -
           
           # Create secrets
           kubectl apply -f - <<EOF
@@ -146,8 +145,7 @@ jobs:
           aws eks update-kubeconfig --name groot-stable-app --region ${{ env.EKS_REGION }}
                     
           # Create the groot namespace if it doesn't exist
-          # kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
-          kubectl apply -f namespace.yaml --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f scripts/k8s/namespace.yaml --dry-run=client -o yaml | kubectl apply -f -
           
           # Create secrets
           kubectl apply -f - <<EOF
