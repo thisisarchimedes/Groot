@@ -1,8 +1,10 @@
-import {injectable} from 'inversify';
+import 'reflect-metadata';
 
-import {AppConfigClient} from './AppConfigClient';
-import {ConfigService} from './ConfigService';
-import {IConfigServiceAWS} from './interfaces/IConfigServiceAWS';
+import { injectable } from 'inversify';
+
+import { AppConfigClient } from './AppConfigClient';
+import { ConfigService } from './ConfigService';
+import { IConfigServiceAWS } from './interfaces/IConfigServiceAWS';
 
 @injectable()
 export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS {

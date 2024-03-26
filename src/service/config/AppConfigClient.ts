@@ -1,7 +1,9 @@
-import {injectable} from 'inversify';
+import 'reflect-metadata';
 
-import {AppConfig, GetConfigurationCommandOutput} from '@aws-sdk/client-appconfig';
-import {IAppConfigClient} from './interfaces/IAppConfigClient';
+import { injectable } from 'inversify';
+
+import { AppConfig, GetConfigurationCommandOutput } from '@aws-sdk/client-appconfig';
+import { IAppConfigClient } from './interfaces/IAppConfigClient';
 
 @injectable()
 export class AppConfigClient implements IAppConfigClient {
@@ -12,7 +14,7 @@ export class AppConfigClient implements IAppConfigClient {
   private readonly clientId: string = 'Groot';
 
   constructor(environment: string, region: string) {
-    this.appConfigClient = new AppConfig({region: region});
+    this.appConfigClient = new AppConfig({ region: region });
     this.environment = environment;
   }
 

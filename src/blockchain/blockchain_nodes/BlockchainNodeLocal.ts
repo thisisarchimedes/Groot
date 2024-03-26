@@ -1,10 +1,10 @@
 import axios from 'axios';
-import {injectable, inject} from 'inversify';
+import { injectable, inject } from 'inversify';
 
-import {JsonRpcProvider} from 'ethers';
-import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
-import {IBlockchainNodeLocal} from './interfaces/IBlockchainNodeLocal';
-import {ILoggerAll} from '../../service/logger/interfaces/ILoggerAll';
+import { JsonRpcProvider } from 'ethers';
+import { BlockchainNode, BlockchainNodeError } from './BlockchainNode';
+import { IBlockchainNodeLocal } from './interfaces/IBlockchainNodeLocal';
+import { ILoggerAll } from '../../service/logger/interfaces/ILoggerAll';
 
 @injectable()
 export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNodeLocal {
@@ -59,6 +59,8 @@ export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNo
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const blockNumber = await this.getBlockNumber();
+        console.log('*** blockNumber', blockNumber);
+
         this.logger.debug(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,10 +78,10 @@ export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNo
       const response = await axios.post(this.localRpcUrl, {
         jsonrpc: '2.0',
         method: 'hardhat_reset',
-        params: [{forking: {jsonRpcUrl: externalProviderRpcUrl}}],
+        params: [{ forking: { jsonRpcUrl: externalProviderRpcUrl } }],
         id: 1,
       }, {
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
       });
 
       return response.data;
