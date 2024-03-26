@@ -16,9 +16,7 @@ import { AbiRepoAdapter } from './adapters/AbiRepoAdapter';
 import { TxQueueAdapter } from './adapters/TxQueueAdapter';
 import { IBlockchainNodeHealthMonitor } from '../../src/service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
 import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
-// Import other dependencies and adapters...
 
-// Function to setup and return a new test container
 export const createTestContainer = (): Container => {
     const container = new Container();
 

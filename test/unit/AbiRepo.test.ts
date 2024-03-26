@@ -5,7 +5,7 @@ import { AbiFetcherAdapter } from './adapters/AbiFetcherAdapter';
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { TYPES } from '../../src/inversify.types';
 import { IBlockchainReader } from '../../src/blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { createTestContainer } from './UnitTestContainer';
+import { createTestContainer } from './inversify.config.unit_test';
 import { Container } from 'inversify';
 const container = createTestContainer();
 

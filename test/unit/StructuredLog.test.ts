@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { LoggerAdapter } from './adapters/LoggerAdapter';
 import { LogMessageCycleTime, RuleEvalResult } from '../../src/service/logger/TypeLogItem';
 import { TYPES } from '../../src/inversify.types';
-import { createTestContainer } from './UnitTestContainer';
+import { createTestContainer } from './inversify.config.unit_test';
 import { Container } from 'inversify';
 
 describe('Check that we build the structured log messages correctly', function () {

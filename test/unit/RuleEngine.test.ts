@@ -12,7 +12,7 @@ import { BlockchainReader } from '../../src/blockchain/blockchain_reader/Blockch
 import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
 import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
 import { TYPES } from '../../src/inversify.types';
-import { createTestContainer } from './UnitTestContainer';
+import { createTestContainer } from './inversify.config.unit_test';
 import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 
 describe('Rule Engine Testings', function () {

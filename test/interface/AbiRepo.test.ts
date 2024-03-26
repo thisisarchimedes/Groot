@@ -1,21 +1,23 @@
-import {expect} from 'chai';
-import {AbiFetcherEtherscan} from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
-import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
-import {IConfigServiceAWS} from '../../src/service/config/interfaces/IConfigServiceAWS';
+import 'reflect-metadata';
 
-describe('ABI Repo external services', function() {
+import { expect } from 'chai';
+import { AbiFetcherEtherscan } from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
+import { AbiStorageDynamoDB } from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
+import { IConfigServiceAWS } from '../../src/service/config/interfaces/IConfigServiceAWS';
+
+describe('ABI Repo external services', function () {
   // eslint-disable-next-line no-invalid-this
   this.timeout(12000);
 
   let configService: IConfigServiceAWS;
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
     await configService.refreshConfig();
   });
 
-  it('should load ABI from Etherscan', async function() {
+  it('should load ABI from Etherscan', async function () {
     const abiFetcher = new AbiFetcherEtherscan(configService);
     const USDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi: string = await abiFetcher.getAbiByAddress(USDC);
@@ -24,14 +26,14 @@ describe('ABI Repo external services', function() {
     expect(abi.length).to.be.greaterThan(100);
   });
 
-  it('should be able to write ABI to DynamoDB', async function() {
+  it('should be able to write ABI to DynamoDB', async function () {
     const address = '0x123';
     const abi = 'mockAbi2';
     const abiStorage = new AbiStorageDynamoDB(configService);
     await abiStorage.storeAbiForAddress(address, abi);
   });
 
-  it('should be able to read ABI from DynamoDB', async function() {
+  it('should be able to read ABI from DynamoDB', async function () {
     const address = '0x123';
     const abiStorage = new AbiStorageDynamoDB(configService);
     const abi = await abiStorage.getAbiForAddress(address);

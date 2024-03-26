@@ -6,7 +6,7 @@ import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { TYPES } from '../../src/inversify.types';
 import { ethers } from 'ethers';
 import { IBlockchainReader } from '../../src/blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { createTestContainer } from './UnitTestContainer';
+import { createTestContainer } from './inversify.config.unit_test';
 
 const { expect } = chai;
 
