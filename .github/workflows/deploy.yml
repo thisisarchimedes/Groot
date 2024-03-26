@@ -81,7 +81,7 @@ jobs:
           aws eks update-kubeconfig --name groot-demo-app --region ${{ env.EKS_REGION }}
                     
           # Create the groot namespace if it doesn't exist
-          kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f scripts/k8s/namespace.yaml --dry-run=client -o yaml | kubectl apply -f -
           
           # Create secrets
           kubectl apply -f - <<EOF
@@ -129,7 +129,71 @@ jobs:
           EOF
           
           # Deploy or update Kubernetes manifests
-          kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
+          kubectl apply -f scripts/k8s/configmap-demoapp.yaml --namespace groot
+          kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
+          kubectl apply -f scripts/k8s/service.yaml --namespace groot
+
+          # Trigger a rolling restart of the deployment
+          # kubectl rollout restart deployment/groot-deployment --namespace groot
+                    
+          # Verify deployment
+          kubectl get pods --namespace groot
+      
+      - name: Deploy to EKS (StableApp)
+        run: |
+          # Update kubeconfig
+          aws eks update-kubeconfig --name groot-stable-app --region ${{ env.EKS_REGION }}
+                    
+          # Create the groot namespace if it doesn't exist
+          kubectl apply -f scripts/k8s/namespace.yaml --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Create secrets
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: aws-access-key-id
+            namespace: groot
+          type: Opaque
+          stringData:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          EOF
+      
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: aws-secret-access-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          EOF
+
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: alchemy-api-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          EOF
+
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: newrelic-api-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
+          EOF
+          
+          # Deploy or update Kubernetes manifests
+          kubectl apply -f scripts/k8s/configmap-stableapp.yaml --namespace groot
           kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
           kubectl apply -f scripts/k8s/service.yaml --namespace groot
 

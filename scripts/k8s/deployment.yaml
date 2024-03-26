@@ -9,30 +9,26 @@ spec:
       app: groot-eth-nodes
   template:
     metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "true"
       labels:
         app: groot-eth-nodes
-        eks.amazonaws.com/fargate-profile: groot-fargate-profile
     spec:
-      schedulerName: fargate-scheduler
-      tolerations:
-      - key: "eks.amazonaws.com/compute-type"
-        operator: "Equal"
-        value: "fargate"
-        effect: "NoSchedule"
+      hostNetwork: true
       containers:
       - name: eth-node-1
-        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
+        image: 240910251918.dkr.ecr.us-west-2.amazonaws.com/groot:arch-production-node
         imagePullPolicy: Always
         resources:
           requests:
-            cpu: "2"
+            cpu: "1"
             memory: "16Gi"
           limits:
-            cpu: "4"
-            memory: "64Gi"
+            cpu: "2"
+            memory: "24Gi"
         envFrom:
         - configMapRef:
-            name: demoapp-config
+            name: groot-appconfig
         env:
         - name: ALCHEMY_API_KEY
           valueFrom:
@@ -42,7 +38,7 @@ spec:
         - name: HARDHAT_PORT
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: MAIN_LOCAL_NODE_PORT
         - name: NEW_RELIC_API_KEY
           valueFrom:
@@ -66,18 +62,18 @@ spec:
           failureThreshold: 30
         
       - name: eth-node-2
-        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:arch-production-node
+        image: 240910251918.dkr.ecr.us-west-2.amazonaws.com/groot:arch-production-node
         imagePullPolicy: Always
         resources:
           requests:
-            cpu: "2"
+            cpu: "1"
             memory: "16Gi"
           limits:
-            cpu: "4"
-            memory: "64Gi"
+            cpu: "2"
+            memory: "24Gi"
         envFrom:
         - configMapRef:
-            name: demoapp-config
+            name: groot-appconfig
         env:
         - name: ALCHEMY_API_KEY
           valueFrom:
@@ -87,7 +83,7 @@ spec:
         - name: HARDHAT_PORT
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: ALT_LOCAL_NODE_PORT
         - name: NEW_RELIC_API_KEY
           valueFrom:
@@ -111,18 +107,18 @@ spec:
           failureThreshold: 30
 
       - name: groot-container
-        image: 240910251918.dkr.ecr.us-west-1.amazonaws.com/groot:groot-container
+        image: 240910251918.dkr.ecr.us-west-2.amazonaws.com/groot:groot-container
         imagePullPolicy: Always
         resources:
           requests:
-            cpu: "2"
-            memory: "16Gi"
+            cpu: "1"
+            memory: "8Gi"
           limits:
-            cpu: "4"
-            memory: "64Gi"
+            cpu: "2"
+            memory: "24Gi"
         envFrom:
         - configMapRef:
-            name: demoapp-config
+            name: groot-appconfig
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
@@ -139,24 +135,24 @@ spec:
         - name: MAIN_LOCAL_NODE_PORT
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: MAIN_LOCAL_NODE_PORT
         - name: ALT_LOCAL_NODE_URL
           value: "http://localhost"
         - name: ALT_LOCAL_NODE_PORT
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: ALT_LOCAL_NODE_PORT
         - name: ENVIRONMENT
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: ENVIRONMENT
         - name: AWS_REGION
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: AWS_REGION
         - name: NEW_RELIC_API_KEY
           valueFrom:
