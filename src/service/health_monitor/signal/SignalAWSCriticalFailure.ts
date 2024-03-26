@@ -1,5 +1,4 @@
 import {injectable, inject} from 'inversify';
-``;
 import {IConfigServiceAWS} from '../../config/interfaces/IConfigServiceAWS';
 import {ILoggerAll} from '../../logger/interfaces/ILoggerAll';
 import {IHostNameProvider} from '../IHostNameProvider';
