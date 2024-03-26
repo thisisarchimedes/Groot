@@ -11,7 +11,7 @@ import {
 import {ILogger} from '../../logger/interfaces/ILogger';
 import {IConfigService} from '../../config/interfaces/IConfigService';
 import {IHostNameProvider} from '../IHostNameProvider';
-import { ISignalAWS } from './interfaces/ISignalAWS';
+import {ISignalAWS} from './interfaces/ISignalAWS';
 
 @injectable()
 export abstract class SignalAWS implements ISignalAWS {

@@ -1,16 +1,16 @@
 import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
-import { injectable, inject } from 'inversify';
+import {injectable, inject} from 'inversify';
 
-import { TxQueueAdapter } from '../test/unit/adapters/TxQueueAdapter';
-import { TransactionQueuer } from './tx_queue/TransactionQueuer';
-import { IConfigServiceAWS } from './service/config/interfaces/IConfigServiceAWS';
-import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
-import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
-import { IRuleEngine } from './rule_engine/interfaces/IRuleEngine';
-import { IGroot } from './interfaces/IGroot';
-import { IHealthMonitor } from './service/health_monitor/signal/interfaces/IHealthMonitor';
+import {TxQueueAdapter} from '../test/unit/adapters/TxQueueAdapter';
+import {TransactionQueuer} from './tx_queue/TransactionQueuer';
+import {IConfigServiceAWS} from './service/config/interfaces/IConfigServiceAWS';
+import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
+import {IBlockchainNodeLocal} from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
+import {IRuleEngine} from './rule_engine/interfaces/IRuleEngine';
+import {IGroot} from './interfaces/IGroot';
+import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealthMonitor';
 
 dotenv.config();
 

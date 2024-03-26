@@ -6,8 +6,8 @@ import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
 import { TxQueueAdapter } from './adapters/TxQueueAdapter';
 import { TransactionQueuer } from '../../src/tx_queue/TransactionQueuer';
 import { TYPES } from '../../src/inversify.types';
-import { createTestContainer } from './inversify.config.unit_test';
 import { Container } from 'inversify';
+import { createTestContainer } from './inversify.config.unit_test';
 
 describe('Transaction Queuer', function () {
   let container: Container;

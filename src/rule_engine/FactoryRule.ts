@@ -1,15 +1,15 @@
-import { injectable, inject } from 'inversify';
+import {injectable, inject} from 'inversify';
 
-import { IBlockchainReader } from '../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { ILogger } from '../service/logger/interfaces/ILogger';
-import { Rule, RuleParams } from './rule/Rule';
-import { RuleDummy } from './rule/RuleDummy';
-import { RuleExpirePositions } from './rule/RuleExpirePositions';
-import { RuleUniswapPSPRebalance } from './rule/RuleUniswapPSPRebalance';
-import { RuleJSONConfigItem, TypeRule } from './TypesRule';
-import { ILoggerAll } from '../service/logger/interfaces/ILoggerAll';
-import { IFactoryRule } from './interfaces/IFactoryRule';
-import { IAbiRepo } from './tool/abi_repository/interfaces/IAbiRepo';
+import {IBlockchainReader} from '../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {ILogger} from '../service/logger/interfaces/ILogger';
+import {Rule, RuleParams} from './rule/Rule';
+import {RuleDummy} from './rule/RuleDummy';
+import {RuleExpirePositions} from './rule/RuleExpirePositions';
+import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
+import {RuleJSONConfigItem, TypeRule} from './TypesRule';
+import {ILoggerAll} from '../service/logger/interfaces/ILoggerAll';
+import {IFactoryRule} from './interfaces/IFactoryRule';
+import {IAbiRepo} from './tool/abi_repository/interfaces/IAbiRepo';
 
 export class ErrorRuleFactory extends Error {
   constructor(message: string) {

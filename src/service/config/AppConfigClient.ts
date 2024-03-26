@@ -1,7 +1,7 @@
 import {injectable} from 'inversify';
 
 import {AppConfig, GetConfigurationCommandOutput} from '@aws-sdk/client-appconfig';
-import { IAppConfigClient } from './interfaces/IAppConfigClient';
+import {IAppConfigClient} from './interfaces/IAppConfigClient';
 
 @injectable()
 export class AppConfigClient implements IAppConfigClient {

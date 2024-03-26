@@ -4,9 +4,9 @@ import { ToolStrategyUniswap } from '../../src/rule_engine/tool/ToolStrategyUnis
 import { LoggerAdapter } from './adapters/LoggerAdapter';
 import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import { TYPES } from '../../src/inversify.types';
-import { createTestContainer } from './inversify.config.unit_test';
 import { Container } from 'inversify';
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
+import { createTestContainer } from './inversify.config.unit_test';
 
 describe('Check we create the PSP strategy tool correctly', function () {
   let container: Container;

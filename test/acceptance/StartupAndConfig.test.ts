@@ -11,9 +11,7 @@ import { AppConfigInterceptor } from './interceptors/AppConfigInterceptor';
 import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
 import { EthNodeInterceptor } from './interceptors/EthNodeInterceptor';
 import { Container } from 'inversify';
-import { TYPES } from '../../src/inversify.types';
 import { IConfigServiceAWS } from '../../src/service/config/interfaces/IConfigServiceAWS';
-import { IBlockchainNodeLocal } from '../../src/blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import { InversifyConfig } from '../../src/inversify.config';
 
 describe('Startup and Config', function () {

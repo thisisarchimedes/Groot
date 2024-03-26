@@ -10,10 +10,10 @@ import {
 } from '../../src/service/health_monitor/BlockchainNodeHealthMonitor';
 import { HealthMonitor } from '../../src/service/health_monitor/HealthMonitor';
 import { SignalAdapter } from './adapters/SignalAdapter';
-import { createTestContainer } from './inversify.config.unit_test';
 import { Container } from 'inversify';
 import { TYPES } from '../../src/inversify.types';
 import { IBlockchainNodeHealthMonitor } from '../../src/service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
+import { createTestContainer } from './inversify.config.unit_test';
 
 const { expect } = chai;
 

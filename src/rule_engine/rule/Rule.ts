@@ -2,7 +2,7 @@ import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {UrgencyLevel} from '../TypesRule';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
+import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
