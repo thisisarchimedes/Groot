@@ -129,8 +129,8 @@ jobs:
           EOF
           
           # Deploy or update Kubernetes manifests
-          kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
-          kubectl apply -f scripts/k8s/demoapp-deployment.yaml --namespace groot
+          kubectl apply -f scripts/k8s/configmap-demoapp.yaml --namespace groot
+          kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
           kubectl apply -f scripts/k8s/service.yaml --namespace groot
 
           # Trigger a rolling restart of the deployment
@@ -193,8 +193,8 @@ jobs:
           EOF
           
           # Deploy or update Kubernetes manifests
-          kubectl apply -f scripts/k8s/stableapp-configmap.yaml --namespace groot
-          kubectl apply -f scripts/k8s/stableapp-deployment.yaml --namespace groot
+          kubectl apply -f scripts/k8s/configmap-stableapp.yaml --namespace groot
+          kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
           kubectl apply -f scripts/k8s/service.yaml --namespace groot
 
           # Trigger a rolling restart of the deployment
