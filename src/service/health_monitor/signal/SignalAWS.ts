@@ -1,3 +1,5 @@
+import {injectable} from 'inversify';
+
 import {
   CloudWatchClient,
   PutMetricDataCommand,
@@ -6,21 +8,23 @@ import {
   MetricDatum,
 } from '@aws-sdk/client-cloudwatch';
 
-import {Logger} from '../../logger/Logger';
-import {ConfigService} from '../../config/ConfigService';
-import {HostNameProvider} from '../HostNameProvider';
+import {ILogger} from '../../logger/interfaces/ILogger';
+import {IConfigService} from '../../config/interfaces/IConfigService';
+import {IHostNameProvider} from '../IHostNameProvider';
+import {ISignalAWS} from './interfaces/ISignalAWS';
 
-export abstract class SignalAWS {
+@injectable()
+export abstract class SignalAWS implements ISignalAWS {
   protected readonly cloudWatchClient: CloudWatchClient;
-  protected readonly logger: Logger;
-  protected readonly configService: ConfigService;
-  protected readonly hostNameProvider: HostNameProvider;
+  protected readonly logger: ILogger;
+  protected readonly configService: IConfigService;
+  protected readonly hostNameProvider: IHostNameProvider;
   protected readonly metricNamespace: string;
 
   constructor(
-      logger: Logger,
-      configService: ConfigService,
-      hostNameProvider: HostNameProvider,
+      logger: ILogger,
+      configService: IConfigService,
+      hostNameProvider: IHostNameProvider,
       metricNamespace: string,
   ) {
     this.cloudWatchClient = new CloudWatchClient({});

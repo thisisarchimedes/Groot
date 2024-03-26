@@ -1,11 +1,15 @@
-import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
-import {Logger} from '../service/logger/Logger';
+import {injectable, inject} from 'inversify';
+
+import {IBlockchainReader} from '../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {ILogger} from '../service/logger/interfaces/ILogger';
 import {Rule, RuleParams} from './rule/Rule';
 import {RuleDummy} from './rule/RuleDummy';
 import {RuleExpirePositions} from './rule/RuleExpirePositions';
 import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
-import {AbiRepo} from './tool/abi_repository/AbiRepo';
 import {RuleJSONConfigItem, TypeRule} from './TypesRule';
+import {ILoggerAll} from '../service/logger/interfaces/ILoggerAll';
+import {IFactoryRule} from './interfaces/IFactoryRule';
+import {IAbiRepo} from './tool/abi_repository/interfaces/IAbiRepo';
 
 export class ErrorRuleFactory extends Error {
   constructor(message: string) {
@@ -14,15 +18,19 @@ export class ErrorRuleFactory extends Error {
   }
 }
 
-export class FactoryRule {
-  private readonly logger: Logger;
-  private readonly blockchainReader: BlockchainReader;
-  private readonly abiRepo: AbiRepo;
+@injectable()
+export class FactoryRule implements IFactoryRule {
+  private readonly logger: ILogger;
+  private readonly blockchainReader: IBlockchainReader;
+  private readonly abiRepo: IAbiRepo;
 
-  constructor(logger: Logger, blockchainReader: BlockchainReader, abiRepo: AbiRepo) {
-    this.logger = logger;
-    this.blockchainReader = blockchainReader;
-    this.abiRepo = abiRepo;
+  constructor(
+    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('IBlockchainReader') _blockchainReader: IBlockchainReader,
+    @inject('IAbiRepo') _abiRepo: IAbiRepo) {
+    this.logger = _logger;
+    this.blockchainReader = _blockchainReader;
+    this.abiRepo = _abiRepo;
   }
 
   public createRule(config: RuleJSONConfigItem): Rule | null {

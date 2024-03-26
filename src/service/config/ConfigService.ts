@@ -1,7 +1,7 @@
-import { RuleJSONConfigItem } from '../../rule_engine/TypesRule';
-import EthereumAddress from '../../types/EthereumAddress';
-import LeverageContract from '../../types/LeverageContract';
+import {injectable} from 'inversify';
+import {RuleJSONConfigItem} from '../../rule_engine/TypesRule';
 
+@injectable()
 export abstract class ConfigService {
   protected environment: string = '';
   protected mainRPCURL: string = '';
@@ -14,8 +14,6 @@ export abstract class ConfigService {
   protected sleepTimeMS: number = 0;
   protected etherscanAPIKey: string = '';
   protected AbiRepoDynamoDBTable: string = '';
-
-  protected leverageContractAddresses: LeverageContract[] = [];
 
   abstract refreshConfig(): Promise<void>;
 
@@ -53,15 +51,5 @@ export abstract class ConfigService {
 
   public getDynamoDBAbiRepoTable(): string {
     return this.AbiRepoDynamoDBTable;
-  }
-
-  public getLeverageContractAddresses(): LeverageContract[] {
-    return this.leverageContractAddresses;
-  }
-
-  public getLeverageContract(contractName: string): LeverageContract | undefined {
-    if (this.leverageContractAddresses.length > 0) {
-      return this.leverageContractAddresses.find(a => a.name == contractName);
-    }
   }
 }

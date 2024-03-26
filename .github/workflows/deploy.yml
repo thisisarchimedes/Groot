@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - '.github/workflows/deploy.yml'
 
 env:
   ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
@@ -43,11 +47,11 @@ jobs:
         run: yarn install
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.EKS_REGION }}    
+          aws-region: ${{ env.EKS_REGION }}
 
       - name: Build and Push main Groot container
         run: |
@@ -61,9 +65,9 @@ jobs:
         run: |
           ./scripts/container_reader_node/build_read_node_container.sh
           
-          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
-          docker tag arch-production-node:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:arch-production-node
-          docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:arch-production-node
+          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+          docker tag arch-production-node:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:arch-production-node
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:arch-production-node
 
       - name: Install kubectl
         run: |
@@ -77,7 +81,7 @@ jobs:
           aws eks update-kubeconfig --name groot-demo-app --region ${{ env.EKS_REGION }}
                     
           # Create the groot namespace if it doesn't exist
-          kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -f scripts/k8s/namespace.yaml --dry-run=client -o yaml | kubectl apply -f -
           
           # Create secrets
           kubectl apply -f - <<EOF
@@ -112,12 +116,89 @@ jobs:
           stringData:
             ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
           EOF
+
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: newrelic-api-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
+          EOF
           
           # Deploy or update Kubernetes manifests
-          kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
+          kubectl apply -f scripts/k8s/configmap-demoapp.yaml --namespace groot
           kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
           kubectl apply -f scripts/k8s/service.yaml --namespace groot
-          kubectl apply -f scripts/k8s/cronjob.yaml --namespace groot
+
+          # Trigger a rolling restart of the deployment
+          kubectl rollout restart deployment/groot-deployment --namespace groot
+                    
+          # Verify deployment
+          kubectl get pods --namespace groot
+      
+      - name: Deploy to EKS (StableApp)
+        run: |
+          # Update kubeconfig
+          aws eks update-kubeconfig --name groot-stable-app --region ${{ env.EKS_REGION }}
+                    
+          # Create the groot namespace if it doesn't exist
+          kubectl apply -f scripts/k8s/namespace.yaml --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Create secrets
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: aws-access-key-id
+            namespace: groot
+          type: Opaque
+          stringData:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          EOF
+      
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: aws-secret-access-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          EOF
+
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: alchemy-api-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          EOF
+
+          kubectl apply -f - <<EOF
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: newrelic-api-key
+            namespace: groot
+          type: Opaque
+          stringData:
+            NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
+          EOF
+          
+          # Deploy or update Kubernetes manifests
+          kubectl apply -f scripts/k8s/configmap-stableapp.yaml --namespace groot
+          kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
+          kubectl apply -f scripts/k8s/service.yaml --namespace groot
+
+          # Trigger a rolling restart of the deployment
+          kubectl rollout restart deployment/groot-deployment --namespace groot
                     
           # Verify deployment
           kubectl get pods --namespace groot
@@ -127,13 +208,12 @@ jobs:
         shell: bash
         run: |
           ./devops/github_actions_templates/get_commit_shas.sh ${{ github.event.before }} ${{ github.event.after }} > commit_shas.txt
-          COMMIT_SHAS_JSON=$(cat commit_shas.txt)
-          echo "::set-output name=commit_shas::$COMMIT_SHAS_JSON"
+          echo "commit_shas=$(cat commit_shas.txt)" >> $GITHUB_ENV
 
       - name: Report DevOps Event
         run: |
           yarn add axios dotenv
-          node devops/metrics/src/cicd_script/report_devops_event.js ${{ github.repository }} deploy '{"commit_ids": ${{ steps.format_commits.outputs.commit_shas }} }'
+          node devops/metrics/src/cicd_script/report_devops_event.js ${{ github.repository }} deploy '{"commit_ids": ${{ env.commit_shas }} }'
 
       - name: Slack Notification
         if: always()

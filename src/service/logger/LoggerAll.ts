@@ -1,15 +1,19 @@
-import { ConfigService } from '../config/ConfigService';
-import { Logger } from './Logger';
-import { LoggerConsole } from './LoggerConsole';
-import { LoggerNewRelic } from './LoggerNewRelic';
+import {injectable, inject} from 'inversify';
+import {Logger} from './Logger';
+import {LoggerConsole} from './LoggerConsole';
+import {LoggerNewRelic} from './LoggerNewRelic';
+import {IConfigServiceAWS} from '../config/interfaces/IConfigServiceAWS';
+import {ILoggerAll} from './interfaces/ILoggerAll';
+import {TYPES} from '../../inversify.types';
 
-export class LoggerAll extends Logger {
+@injectable()
+export class LoggerAll extends Logger implements ILoggerAll {
   private loggerConsole: LoggerConsole;
   private loggerNewRelic: LoggerNewRelic;
 
   constructor(
-    configService: ConfigService,
-    serviceName: string,
+    @inject(TYPES.IConfigServiceAWS) configService: IConfigServiceAWS,
+    @inject(TYPES.ServiceName) serviceName: string,
   ) {
     super();
     this.loggerConsole = new LoggerConsole();
@@ -38,14 +42,8 @@ export class LoggerAll extends Logger {
     this.loggerNewRelic.warn(message);
   }
 
-  public error(error: unknown): void {
-    if (error instanceof Error) {
-      this.loggerConsole.error((error as Error).message);
-      this.loggerConsole.error((error as Error).stack ?? '');
-
-      this.loggerNewRelic.error((error as Error).message);
-      this.loggerNewRelic.error((error as Error).stack ?? '');
-    }
+  public error(message: string): void {
+    this.loggerConsole.error(message);
+    this.loggerNewRelic.error(message);
   }
 }
-

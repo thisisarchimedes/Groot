@@ -1,102 +1,50 @@
-import * as dotenv from 'dotenv';
+import 'reflect-metadata';
 
-import { TxQueueAdapter } from '../test/unit/adapters/TxQueueAdapter';
-import { FactoryRule } from './rule_engine/FactoryRule';
-import { RuleEngine } from './rule_engine/RuleEngine';
-import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
-import { LoggerAll } from './service/logger/LoggerAll';
-import { TransactionQueuer } from './tx_queue/TransactionQueuer';
-import { BlockchainReader } from './blockchain/blockchain_reader/BlockchainReader';
-import { BlockchainNodeLocal } from './blockchain/blockchain_nodes/BlockchainNodeLocal';
-import { HealthMonitor } from './service/health_monitor/HealthMonitor';
-import { BlockchainNodeHealthMonitor } from './service/health_monitor/BlockchainNodeHealthMonitor';
-import { SignalAWSCriticalFailure } from './service/health_monitor/signal/SignalAWSCriticalFailure';
-import { SignalAWSHeartbeat } from './service/health_monitor/signal/SignalAWSHeartbeat';
-import { HostNameProvider } from './service/health_monitor/HostNameProvider';
-import { AbiRepo } from './rule_engine/tool/abi_repository/AbiRepo';
-import { AbiStorageDynamoDB } from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
-import { AbiFetcherEtherscan } from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
-import { LocalConfigService } from './service/config/LocalConfigService';
+import * as dotenv from 'dotenv';
+import {injectable, inject} from 'inversify';
+
+import {TxQueueAdapter} from '../test/unit/adapters/TxQueueAdapter';
+import {TransactionQueuer} from './tx_queue/TransactionQueuer';
+import {IConfigServiceAWS} from './service/config/interfaces/IConfigServiceAWS';
+import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
+import {IBlockchainNodeLocal} from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
+import {IRuleEngine} from './rule_engine/interfaces/IRuleEngine';
+import {IGroot} from './interfaces/IGroot';
+import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealthMonitor';
 
 dotenv.config();
 
-export class Groot {
-  private readonly logServiceName: string = 'Groot';
-  private readonly configService: ConfigServiceAWS;
-
-  private logger!: LoggerAll;
-  private ruleEngine!: RuleEngine;
+@injectable()
+export class Groot implements IGroot {
   private txQueuer!: TransactionQueuer;
-  private healthMonitor!: HealthMonitor;
 
-  private mainNode!: BlockchainNodeLocal;
-  private altNode!: BlockchainNodeLocal;
-  private blockchainReader!: BlockchainReader;
+  public readonly logger: ILoggerAll;
+  private readonly configService: IConfigServiceAWS;
+  private readonly mainNode: IBlockchainNodeLocal;
+  private readonly altNode: IBlockchainNodeLocal;
+  private readonly healthMonitor: IHealthMonitor;
+  private ruleEngine!: IRuleEngine;
 
-  private abiRepo!: AbiRepo;
-
-  private readonly mainLocalNodePort: number;
-  private readonly altLocalNodePort: number;
-
-  constructor(environment: string, region: string, mainLocalNodePort: number = 8545, altLocalNodePort: number = 18545) {
-    this.configService = new ConfigServiceAWS(environment, region);
-    this.mainLocalNodePort = mainLocalNodePort;
-    this.altLocalNodePort = altLocalNodePort;
+  constructor(
+    @inject('IConfigServiceAWS') _configService: IConfigServiceAWS,
+    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
+    @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal,
+    @inject('IHealthMonitor') _healthMonitor: IHealthMonitor,
+    @inject('IRuleEngine') _ruleEngine: IRuleEngine,
+  ) {
+    this.logger = _logger;
+    this.configService = _configService;
+    this.mainNode = _mainLocalNode;
+    this.altNode = _altLocalNode;
+    this.healthMonitor = _healthMonitor;
+    this.ruleEngine = _ruleEngine;
   }
 
   public async initalizeGroot() {
-    await this.configService.refreshConfig();
-    this.logger = new LoggerAll(this.configService, this.logServiceName);
-
     this.logger.info('Initializing Groot...');
-
-    await this.initalizeReadOnlyLocalNodes();
-
-    this.initalizeHealthMonitor();
-
-    this.initalizeAbiRepo();
-
+    await this.configService.refreshConfig();
     this.logger.info('Groot initialized successfully.');
-  }
-
-  private async initalizeReadOnlyLocalNodes() {
-    this.mainNode = new BlockchainNodeLocal(this.logger, `http://localhost:${this.mainLocalNodePort}`, 'alchemy-node');
-    this.altNode = new BlockchainNodeLocal(this.logger, `http://localhost:${this.altLocalNodePort}`, 'infura-node');
-
-    await Promise.all([
-      this.mainNode.startNode(),
-      this.altNode.startNode(),
-    ]);
-
-    this.blockchainReader = new BlockchainReader(this.logger, [this.mainNode, this.altNode]);
-  }
-
-  private initalizeHealthMonitor() {
-    if (!this.mainNode || !this.altNode) {
-      throw new Error('Cannot initalize health monitor without nodes');
-    }
-
-    const blockchainHealthMonitor = new BlockchainNodeHealthMonitor(this.logger, [this.mainNode, this.altNode]);
-    const hostNameProvider = new HostNameProvider(this.logger);
-    const signalHeartbeat = new SignalAWSHeartbeat(this.logger, this.configService, hostNameProvider);
-    const signalCriticalFailure = new SignalAWSCriticalFailure(this.logger, this.configService, hostNameProvider);
-    this.healthMonitor = new HealthMonitor(
-      this.logger,
-      blockchainHealthMonitor,
-      signalHeartbeat,
-      signalCriticalFailure);
-  }
-
-  private initalizeAbiRepo() {
-    if (!this.blockchainReader) {
-      throw new Error('Cannot initalize abi repo without blockchain reader');
-    }
-
-    const abiStorage = new AbiStorageDynamoDB(
-      this.configService.getDynamoDBAbiRepoTable(),
-      this.configService.getAWSRegion());
-    const abiFetcher = new AbiFetcherEtherscan(this.configService.getEtherscanAPIKey());
-    this.abiRepo = new AbiRepo(this.blockchainReader, abiStorage, abiFetcher);
   }
 
   public async shutdownGroot() {
@@ -115,16 +63,15 @@ export class Groot {
   }
 
   public async prepareForAnotherCycle() {
-    this.logger.info('Preparing Groot for another cycle...');
+    this.logger.info('Preparing Groot for cycle...');
     await this.healthMonitor.startOfCycleSequence();
 
     await this.configService.refreshConfig();
     await this.setLocalNodesToNewestBlock();
-    this.resetRulesEngine();
     this.resetTransactionQueuer();
 
     this.healthMonitor.endOfCycleSequence();
-    this.logger.info('Groot is ready for another cycle.');
+    this.logger.info('Groot is ready for cycle.');
   }
 
   private async setLocalNodesToNewestBlock() {
@@ -132,11 +79,6 @@ export class Groot {
       this.mainNode.resetNode(this.configService.getMainRPCURL()),
       this.altNode.resetNode(this.configService.getAlternativeRPCURL()),
     ]);
-  }
-
-  private resetRulesEngine() {
-    const ruleFactory = new FactoryRule(this.logger, this.blockchainReader, this.abiRepo);
-    this.ruleEngine = new RuleEngine(this.logger, ruleFactory);
   }
 
   private resetTransactionQueuer() {
@@ -148,22 +90,23 @@ export class Groot {
   public async runOneGrootCycle(): Promise<void> {
     this.logger.info('Running Groot cycle...');
 
-    const awsRules = this.configService.getRules();
+    try {
+      this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
 
-    //local config service -- TEMPORARY for local dev
-    const localConfig = new LocalConfigService();
-    localConfig.refreshConfig();
+      await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
+      const txs = this.ruleEngine.getOutboundTransactions();
+      await this.txQueuer.queueTransactions(txs);
+    } catch (ex) {
+      console.log('error '); // FIX
+    } finally {
+      this.logger.info('Groot cycle ran successfully.');
+      await this.logger.flush();
+    }
+  }
 
-    const localRules = localConfig.getRules();
-
-    const rules = [...awsRules, ...localRules];
-
-    this.ruleEngine.loadRulesFromJSONConfig(rules);
-
-    await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
-    const txs = this.ruleEngine.getOutboundTransactions();
-    await this.txQueuer.queueTransactions(txs);
-
-    this.logger.info('Groot cycle ran successfully.');
+  public async sleepBetweenCycles(): Promise<void> {
+    const sleepTime = this.configService.getSleepMillisecondsBetweenCycles();
+    this.logger.debug(`Sleeping for ${sleepTime} seconds...`);
+    await new Promise((resolve) => setTimeout(resolve, sleepTime));
   }
 }

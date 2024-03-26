@@ -4,7 +4,7 @@ metadata:
   name: groot-service
 spec:
   selector:
-    app: groot
+    app: groot-eth-nodes
   ports:
   - name: eth-node-1
     port: 8545

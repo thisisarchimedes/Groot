@@ -12,10 +12,11 @@ spec:
       labels:
         app: groot-eth-nodes
     spec:
+      hostNetwork: true
       containers:
       - name: eth-node-1
-        image: arch-production-node
-        imagePullPolicy: Always
+        image: docker.io/library/arch-production-node:latest
+        imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: demoapp-config
@@ -30,11 +31,29 @@ spec:
             configMapKeyRef:
               name: demoapp-config
               key: MAIN_LOCAL_NODE_PORT
+        - name: NEW_RELIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: newrelic-api-key
+              key: NEW_RELIC_API_KEY
         ports:
         - containerPort: 8545
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - >
+              curl -X POST
+              -H "Content-Type: application/json"
+              --data '{"method":"eth_blockNumber","params":[],"id":1,"jsonrpc":"2.0"}'
+              http://localhost:8545
+          initialDelaySeconds: 10
+          periodSeconds: 2
+          failureThreshold: 30
       - name: eth-node-2
-        image: arch-production-node
-        imagePullPolicy: Always
+        image: docker.io/library/arch-production-node:latest
+        imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: demoapp-config
@@ -49,6 +68,70 @@ spec:
             configMapKeyRef:
               name: demoapp-config
               key: ALT_LOCAL_NODE_PORT
+        - name: NEW_RELIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: newrelic-api-key
+              key: NEW_RELIC_API_KEY
         ports:
         - containerPort: 18545
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - >
+              curl -X POST
+              -H "Content-Type: application/json"
+              --data '{"method":"eth_blockNumber","params":[],"id":1,"jsonrpc":"2.0"}'
+              http://localhost:18545
+          initialDelaySeconds: 10
+          periodSeconds: 2
+          failureThreshold: 30
+      - name: groot-container
+        image: docker.io/library/groot-container:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: demoapp-config
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-access-key-id
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: aws-secret-access-key
+              key: AWS_SECRET_ACCESS_KEY
+        - name: MAIN_LOCAL_NODE_URL
+          value: "http://localhost"
+        - name: MAIN_LOCAL_NODE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: demoapp-config
+              key: MAIN_LOCAL_NODE_PORT
+        - name: ALT_LOCAL_NODE_URL
+          value: "http://localhost"
+        - name: ALT_LOCAL_NODE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: demoapp-config
+              key: ALT_LOCAL_NODE_PORT
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: demoapp-config
+              key: ENVIRONMENT
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              name: demoapp-config
+              key: AWS_REGION
+        - name: NEW_RELIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: newrelic-api-key
+              key: NEW_RELIC_API_KEY
       restartPolicy: Always
