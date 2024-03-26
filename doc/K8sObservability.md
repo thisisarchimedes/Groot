@@ -1,13 +1,13 @@
 # Pixie
 
-## UI
+## Access UI
 
 https://work.withpixie.ai:443
 
 ## Install Pixe in Cluster 
 
 ### Before You Start
-- Do this once when creating a cluster (not every deploy)
+- Do this once when creating a cluster (NOT every time we  deploy)
 - Make sure kubectl is pointing to the correct EKS
 
 ### Install
