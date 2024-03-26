@@ -34,7 +34,7 @@
   "dependencies": {
     "@aws-sdk/client-appconfig": "^3.525.0",
     "@aws-sdk/client-cloudwatch": "^3.529.1",
-    "@dotenvx/dotenvx": "^0.24.0",
+    "@dotenvx/dotenvx": "^0.27.0",
     "@ethersproject/abstract-provider": "^5.7.0",
     "aws-sdk": "^2.1571.0",
     "awssdk": "^1.0.1",
