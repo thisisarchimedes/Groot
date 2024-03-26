@@ -7,7 +7,6 @@ import {RuleDummy} from './rule/RuleDummy';
 import {RuleExpirePositions} from './rule/RuleExpirePositions';
 import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
 import {RuleJSONConfigItem, TypeRule} from './TypesRule';
-import {ILoggerAll} from '../service/logger/interfaces/ILoggerAll';
 import {IFactoryRule} from './interfaces/IFactoryRule';
 import {IAbiRepo} from './tool/abi_repository/interfaces/IAbiRepo';
 
@@ -25,7 +24,7 @@ export class FactoryRule implements IFactoryRule {
   private readonly abiRepo: IAbiRepo;
 
   constructor(
-    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('ILoggerAll') _logger: ILogger,
     @inject('IBlockchainReader') _blockchainReader: IBlockchainReader,
     @inject('IAbiRepo') _abiRepo: IAbiRepo) {
     this.logger = _logger;

@@ -35,7 +35,7 @@ export class BlockchainReader implements IBlockchainReader {
   private initialized: boolean;
 
   constructor(
-    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('ILoggerAll') _logger: ILogger,
     @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
     @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal) {
     this.nodes = [_mainLocalNode, _altLocalNode];

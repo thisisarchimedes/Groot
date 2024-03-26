@@ -1,4 +1,4 @@
-import {RuleJSONConfigItem} from '../../../rule_engine/TypesRule';
+import { RuleJSONConfigItem } from '../../../rule_engine/TypesRule';
 
 export interface IConfigService {
     refreshConfig(): Promise<void>;
@@ -11,4 +11,5 @@ export interface IConfigService {
     getSleepMillisecondsBetweenCycles(): number;
     getEtherscanAPIKey(): string;
     getDynamoDBAbiRepoTable(): string;
+    getTransactionsDBURL(): string;
 }

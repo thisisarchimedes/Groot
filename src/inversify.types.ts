@@ -24,6 +24,9 @@ const TYPES = {
   IAbiRepo: 'IAbiRepo',
   IFactoryRule: 'IFactoryRule',
   IRuleEngine: 'IRuleEngine',
+  PGClient: 'PGClient',
+  PostgreTxQueue: 'PostgreTxQueue',
+  ITransactionQueuer: 'ITransactionQueuer'
 };
 
-export {TYPES};
+export { TYPES };

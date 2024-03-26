@@ -17,7 +17,7 @@ export class RuleEngine implements IRuleEngine {
   private readonly ruleFactory: IFactoryRule;
 
   constructor(
-    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('ILoggerAll') _logger: ILogger,
     @inject('IFactoryRule') _factoryRule: IFactoryRule,
   ) {
     this.logger = _logger;

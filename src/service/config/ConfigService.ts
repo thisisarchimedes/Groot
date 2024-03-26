@@ -1,11 +1,12 @@
-import {injectable} from 'inversify';
-import {RuleJSONConfigItem} from '../../rule_engine/TypesRule';
+import { injectable } from 'inversify';
+import { RuleJSONConfigItem } from '../../rule_engine/TypesRule';
 
 @injectable()
 export abstract class ConfigService {
   protected environment: string = '';
   protected mainRPCURL: string = '';
   protected altRPCURL: string = '';
+  protected transactionsDatabaseURL: string = '';
 
   protected rules: RuleJSONConfigItem[] = [];
   protected newRelicURL: string = '';
@@ -43,6 +44,10 @@ export abstract class ConfigService {
 
   public getSleepMillisecondsBetweenCycles(): number {
     return this.sleepTimeMS;
+  }
+
+  public getTransactionsDBURL(): string {
+    return this.transactionsDatabaseURL;
   }
 
   public getEtherscanAPIKey(): string {

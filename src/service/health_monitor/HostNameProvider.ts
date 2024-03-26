@@ -8,7 +8,7 @@ import {injectable, inject} from 'inversify';
 export class HostNameProvider implements IHostNameProvider {
   private readonly logger: ILogger;
 
-  constructor(@inject('ILoggerAll') _logger: ILoggerAll) {
+  constructor(@inject('ILoggerAll') _logger: ILogger) {
     this.logger = _logger;
   }
 

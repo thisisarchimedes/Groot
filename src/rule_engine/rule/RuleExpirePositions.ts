@@ -4,11 +4,6 @@ import { OutboundTransaction, RawTransactionData } from '../../blockchain/Outbou
 import LeverageDataSource from '../tool/data_source/LeverageDataSource';
 import { RuleConstructorInput } from '../../types/RuleConstructorInput';
 import LeveragePosition from '../../types/LeveragePosition';
-import EthereumAddress from '../../types/EthereumAddress';
-import ethers from 'ethers';
-// import Uniswap from '../tool/uniswap/Uniswap';
-import PositionLedger from '../tool/contracts/PositionLedger';
-import MultiPoolStrategy from '../tool/contracts/MultiPoolStrategy';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -93,12 +88,13 @@ export class RuleExpirePositions extends Rule {
     return {
       urgencyLevel: UrgencyLevel.NORMAL,
       context: `Position expired transaction`,
-      postEvalUniqueKey: this.generateUniqueKey(position),
-      lowLevelUnsignedTransaction: {} as RawTransactionData,
+      postEvalUniqueKey: this.generateUniqueKey(),
+      lowLevelUnsignedTransaction: { to: '', value: BigInt(0), data: '' } as RawTransactionData,
     };
   }
 
-  protected generateUniqueKey(position: LeveragePosition): string {
-    return `${position.nftId}-${position.strategy}`;
+  protected generateUniqueKey(): string {
+    // return `${position.nftId}-${position.strategy}`;
+    return '';
   }
 }
