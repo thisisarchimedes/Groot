@@ -1,6 +1,9 @@
-import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {Logger} from '../service/logger/Logger';
-import {ITxQueue} from './ITxQueue';
+import { injectable } from 'inversify';
+import { OutboundTransaction } from '../blockchain/OutboundTransaction';
+import { ILogger } from '../service/logger/interfaces/ILogger';
+import { ITxQueue } from './ITxQueue';
+
+@injectable()
 
 export class TransactionQueuer {
   private readonly logger: Logger;

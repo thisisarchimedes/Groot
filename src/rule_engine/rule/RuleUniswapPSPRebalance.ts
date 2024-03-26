@@ -1,5 +1,5 @@
-import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
-import {Rule, RuleConstructorInput, RuleParams} from './Rule';
+import { ToolStrategyUniswap } from '../tool/ToolStrategyUniswap';
+import { Rule, RuleConstructorInput, RuleParams } from './Rule';
 
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
@@ -16,8 +16,8 @@ export class RuleUniswapPSPRebalance extends Rule {
   constructor(constractorInput: RuleConstructorInput) {
     super(constractorInput);
     this.uniswapStrategy = new ToolStrategyUniswap(
-        (this.params as RuleParamsUniswapPSPRebalance).strategyAddress,
-        this.blockchainReader);
+      (this.params as RuleParamsUniswapPSPRebalance).strategyAddress,
+      this.blockchainReader);
   }
   public async evaluate(): Promise<void> {
     // fetch the pool address from strategy
