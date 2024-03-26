@@ -59,8 +59,6 @@ export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNo
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const blockNumber = await this.getBlockNumber();
-        console.log('*** blockNumber', blockNumber);
-
         this.logger.debug(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
