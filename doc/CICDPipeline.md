@@ -43,7 +43,8 @@ eksctl create nodegroup --config-file=scripts/k8s/cluster_creation/node-creation
 ```
 
 ### Current K8s clusters
-- Cluster: groot-demo-app (us-west-2)
+- Cluster (production): groot-stable-app (us-west-2)
+- Cluster (demo): groot-demo-app (us-west-2)
 - ECR Repo: groot (us-west-2)
 
 ## Getting Basic Cluster Information
@@ -53,7 +54,12 @@ From local environment, make sure aws cli is installed and configured with the r
 Then, authenicate and make sure you can get the cluster information.
 
 ```bash
+# DemoApp
 aws eks update-kubeconfig --name groot-demo-app --region us-west-2
+```
+```bash
+# OR StableApp
+aws eks update-kubeconfig --name groot-stable-app --region us-west-2
 ```
 
 Get all pods
