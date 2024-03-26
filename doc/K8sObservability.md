@@ -2,7 +2,7 @@
 
 ## UI
 
-https://work.withpixie.ai/live/clusters/SAMDeployUser%40groot-stable-app.us-west-2.eksctl.io
+https://work.withpixie.ai:443
 
 ## Install Pixe in Cluster 
 
