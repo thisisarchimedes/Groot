@@ -28,7 +28,7 @@ spec:
             memory: "24Gi"
         envFrom:
         - configMapRef:
-            name: demoapp-config
+            name: groot-appconfig
         env:
         - name: ALCHEMY_API_KEY
           valueFrom:
@@ -38,7 +38,7 @@ spec:
         - name: HARDHAT_PORT
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: MAIN_LOCAL_NODE_PORT
         - name: NEW_RELIC_API_KEY
           valueFrom:
@@ -73,7 +73,7 @@ spec:
             memory: "24Gi"
         envFrom:
         - configMapRef:
-            name: demoapp-config
+            name: groot-appconfig
         env:
         - name: ALCHEMY_API_KEY
           valueFrom:
@@ -83,7 +83,7 @@ spec:
         - name: HARDHAT_PORT
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: ALT_LOCAL_NODE_PORT
         - name: NEW_RELIC_API_KEY
           valueFrom:
@@ -118,7 +118,7 @@ spec:
             memory: "24Gi"
         envFrom:
         - configMapRef:
-            name: demoapp-config
+            name: groot-appconfig
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
@@ -135,24 +135,24 @@ spec:
         - name: MAIN_LOCAL_NODE_PORT
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: MAIN_LOCAL_NODE_PORT
         - name: ALT_LOCAL_NODE_URL
           value: "http://localhost"
         - name: ALT_LOCAL_NODE_PORT
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: ALT_LOCAL_NODE_PORT
         - name: ENVIRONMENT
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: ENVIRONMENT
         - name: AWS_REGION
           valueFrom:
             configMapKeyRef:
-              name: demoapp-config
+              name: groot-appconfig
               key: AWS_REGION
         - name: NEW_RELIC_API_KEY
           valueFrom:

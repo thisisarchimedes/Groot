@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: stableapp-config
+  name: groot-appconfig
 data:
   MAIN_LOCAL_NODE_PORT: "8545"
   ALT_LOCAL_NODE_PORT: "18545"
