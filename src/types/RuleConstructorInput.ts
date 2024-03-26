@@ -1,12 +1,12 @@
-import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
+import {IBlockchainReader} from '../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {RuleParams} from '../rule_engine/rule/Rule';
-import {AbiRepo} from '../rule_engine/tool/abi_repository/AbiRepo';
-import {Logger} from '../service/logger/Logger';
+import {IAbiRepo} from '../rule_engine/tool/abi_repository/interfaces/IAbiRepo';
+import {ILogger} from '../service/logger/interfaces/ILogger';
 
 export interface RuleConstructorInput {
-    logger: Logger;
-    blockchainReader: BlockchainReader;
-    abiRepo: AbiRepo
+    logger: ILogger;
+    blockchainReader: IBlockchainReader;
+    abiRepo: IAbiRepo
     ruleLabel: string;
     params: RuleParams;
 }

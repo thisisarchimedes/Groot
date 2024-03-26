@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {IAbiStorage} from '../../../src/rule_engine/tool/abi_repository/IAbiStorage';
+import 'reflect-metadata';
 
+import {injectable} from 'inversify';
+import {IAbiStorage} from '../../../src/rule_engine/tool/abi_repository/interfaces/IAbiStorage';
+
+@injectable()
 export class AbiStorageAdapter implements IAbiStorage {
   private returnAbi: string | null = null;
 

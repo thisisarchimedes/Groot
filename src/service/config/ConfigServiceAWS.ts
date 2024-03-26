@@ -1,7 +1,13 @@
+import 'reflect-metadata';
+
+import {injectable} from 'inversify';
+
 import {AppConfigClient} from './AppConfigClient';
 import {ConfigService} from './ConfigService';
+import {IConfigServiceAWS} from './interfaces/IConfigServiceAWS';
 
-export class ConfigServiceAWS extends ConfigService {
+@injectable()
+export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS {
   private readonly appConfigClient: AppConfigClient;
   private readonly awsRegion: string;
 

@@ -1,13 +1,21 @@
 import axios from 'axios';
+import {injectable, inject} from 'inversify';
+
 import {JsonRpcProvider} from 'ethers';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
-import {Logger} from '../../service/logger/Logger';
+import {IBlockchainNodeLocal} from './interfaces/IBlockchainNodeLocal';
+import {ILoggerAll} from '../../service/logger/interfaces/ILoggerAll';
 
-export class BlockchainNodeLocal extends BlockchainNode {
+@injectable()
+export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNodeLocal {
   private readonly localRpcUrl: string;
 
-  constructor(logger: Logger, localRpcUrl: string, nodeName: string) {
-    super(logger, nodeName);
+  constructor(
+    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('MainLocalNodeURI') localRpcUrl: string,
+    @inject('AlchemyNodeLabel') nodeName: string,
+  ) {
+    super(_logger, nodeName);
     this.localRpcUrl = localRpcUrl;
     this.logger.debug(`Initializing ${this.nodeName} with local RPC URL: ${localRpcUrl}`);
     this.provider = new JsonRpcProvider(localRpcUrl);
@@ -51,6 +59,8 @@ export class BlockchainNodeLocal extends BlockchainNode {
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         const blockNumber = await this.getBlockNumber();
+        console.log('*** blockNumber', blockNumber);
+
         this.logger.debug(`Blockchain is ready. Current block number is ${blockNumber}.`);
         return;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

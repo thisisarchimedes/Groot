@@ -1,15 +1,29 @@
+import 'reflect-metadata';
+
 import * as dotenv from 'dotenv';
 
-import {Groot, GrootParams} from './Groot';
-import {LoggerAll} from './service/logger/LoggerAll';
+import {GrootParams} from './GrootParams';
+import {IGroot} from './interfaces/IGroot';
 import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
+import {InversifyConfig} from './inversify.config';
+import {Container} from 'inversify';
+import {TYPES} from './inversify.types';
+import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
 
 dotenv.config();
+
+let container: Container = new Container();
 
 export async function startGroot(runInfinite: boolean = true): Promise<void> {
   const grootParams = getGrootParamsFromEnv();
   reportGrootStartup(grootParams);
-  const groot = new Groot(grootParams);
+
+  const configServiceAWS = new ConfigServiceAWS(grootParams.environment, grootParams.region);
+  await configServiceAWS.refreshConfig();
+
+  const inversifyConfig = new InversifyConfig(configServiceAWS);
+  container = inversifyConfig.getContainer();
+  const groot = container.get<IGroot>(TYPES.Groot);
 
   setShutdownOnSigTerm();
 
@@ -19,11 +33,14 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
     do {
       await groot.prepareForAnotherCycle();
       await groot.runOneGrootCycle();
+      await groot.logger.flush();
       await groot.sleepBetweenCycles();
     } while (runInfinite);
   } catch (error) {
     reportCriticalError(grootParams.environment, grootParams.region, error);
     process.exit(1);
+  } finally {
+    await groot.logger.flush();
   }
 
   await groot.shutdownGroot();
@@ -51,8 +68,7 @@ function reportGrootStartup(grootParams: GrootParams): void {
 
 function reportCriticalError(environment: string, region: string, error: unknown): void {
   const errorMessage = `Unexpected CRITICAL ERROR in main loop: ${error}`;
-  const configService: ConfigServiceAWS = new ConfigServiceAWS(environment, region);
-  const logger: LoggerAll = new LoggerAll(configService, 'Groot');
+  const logger = container.get<ILoggerAll>(TYPES.ILoggerAll);
   logger.error(errorMessage);
 }
 

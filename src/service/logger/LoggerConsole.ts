@@ -1,6 +1,11 @@
-import {LogLevel, Logger} from './Logger';
+import {injectable} from 'inversify';
 
-export class LoggerConsole extends Logger {
+import {LogLevel} from './LogLevel';
+import {Logger} from './Logger';
+import {ILoggerConsole} from './interfaces/ILoggerConsole';
+
+@injectable()
+export class LoggerConsole extends Logger implements ILoggerConsole {
   public async flush(): Promise<void> {
     // No-op
   }

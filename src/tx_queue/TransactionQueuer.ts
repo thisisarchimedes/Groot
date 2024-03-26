@@ -1,12 +1,12 @@
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {Logger} from '../service/logger/Logger';
+import {ILogger} from '../service/logger/interfaces/ILogger';
 import {ITxQueue} from './ITxQueue';
 
 export class TransactionQueuer {
-  private readonly logger: Logger;
+  private readonly logger: ILogger;
   private readonly queue: ITxQueue;
 
-  constructor(logger: Logger, queue: ITxQueue) {
+  constructor(logger: ILogger, queue: ITxQueue) {
     this.logger = logger;
     this.queue = queue;
   }

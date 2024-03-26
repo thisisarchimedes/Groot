@@ -1,7 +1,11 @@
-import {BlockchainNode, BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNode';
-import {Logger} from '../../service/logger/Logger';
+import {injectable, inject} from 'inversify';
 import {Interface} from 'ethers';
-
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {ILoggerAll} from '../../service/logger/interfaces/ILoggerAll';
+import {IBlockchainNode} from '../blockchain_nodes/interfaces/IBlockchainNode';
+import {IBlockchainNodeLocal} from '../blockchain_nodes/interfaces/IBlockchainNodeLocal';
+import {BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNodeProxyInfo';
+import {IBlockchainReader} from './interfaces/IBlockchainReader';
 
 export class BlockchainReaderError extends Error {
   constructor(message: string) {
@@ -23,16 +27,33 @@ interface ValidNodeResponse {
   blockNumber: number;
 }
 
-export class BlockchainReader {
-  private readonly nodes: BlockchainNode[];
-  private readonly logger: Logger;
+@injectable()
+export class BlockchainReader implements IBlockchainReader {
+  private readonly nodes: IBlockchainNode[];
+  private readonly logger: ILogger;
 
-  constructor(logger: Logger, nodes: BlockchainNode[]) {
-    this.nodes = nodes;
-    this.logger = logger;
+  private initialized: boolean;
+
+  constructor(
+    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
+    @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal) {
+    this.nodes = [_mainLocalNode, _altLocalNode];
+    this.logger = _logger;
+    this.initialized = false;
+  }
+
+  private async init() {
+    if (!this.initialized) {
+      await Promise.all([
+        this.nodes[0].startNode(),
+        this.nodes[0].startNode(),
+      ]);
+    }
   }
 
   public async getBlockNumber(): Promise<number> {
+    await this.init();
     const blockNumbers = await this.fetchBlockNumbersFromNodes();
     const validBlockNumbers = this.extractValidBlockNumbers(blockNumbers);
     this.ensureValidBlockNumbers(validBlockNumbers);
@@ -45,6 +66,7 @@ export class BlockchainReader {
       functionName: string,
       params: unknown[] = [],
   ): Promise<unknown> {
+    await this.init();
     const nodeResponses = await this.fetchNodeResponses(contractAddress, abi, functionName, params);
     const validNodeResponses = this.extractValidNodeResponses(nodeResponses);
     this.ensureValidNodeResponses(validNodeResponses);
@@ -52,9 +74,11 @@ export class BlockchainReader {
   }
 
   public async getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo> {
+    await this.init();
     const proxyInfoResults = await this.fetchProxyInfoFromNodes(proxyAddress);
+
     for (const proxyInfo of proxyInfoResults) {
-      if (proxyInfo !== null) {
+      if (proxyInfo) {
         return proxyInfo;
       }
     }
