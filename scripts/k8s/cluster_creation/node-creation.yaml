@@ -1,0 +1,16 @@
+# ksctl create nodegroup --config-file=scripts/k8s/cluster_creation/node-creation.yaml
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: groot-demo-app
+  region: us-west-2
+
+managedNodeGroups:
+  - name: groot-demo-node-group-1
+    instanceType: r5.2xlarge
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 4
+    volumeSize: 80
+    privateNetworking: true
