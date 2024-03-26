@@ -9,6 +9,8 @@ spec:
       app: groot-eth-nodes
   template:
     metadata:
+      annotations:
+        instrumentation.opentelemetry.io/inject-java: "true"
       labels:
         app: groot-eth-nodes
     spec:
