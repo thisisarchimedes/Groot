@@ -7,10 +7,10 @@ metadata:
   region: us-west-2
 
 managedNodeGroups:
-  - name: demo-node-group-1-groot
-    instanceType: r5.xlarge
-    desiredCapacity: 3
-    minSize: 3
-    maxSize: 6
+  - name: groot-demo-node-group-1
+    instanceType: r5.2xlarge
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 4
     volumeSize: 80
     privateNetworking: true
