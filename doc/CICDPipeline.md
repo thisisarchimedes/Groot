@@ -83,3 +83,11 @@ Get pod info & logs and check for errors
 kubectl describe pod <pod-name> --namespace groot
 kubectl logs <pod-name> --namespace groot
 ```
+
+### How to see container logs?
+
+```bash
+kubectl logs <pod-name> -n groot -c groot-container
+kubectl logs <pod-name> -n groot -c eth-node-1
+kubectl logs <pod-name> -n groot -c eth-node-2
+```
