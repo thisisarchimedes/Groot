@@ -20,10 +20,10 @@ spec:
         resources:
           requests:
             cpu: "2"
-            memory: "16Gi"
+            memory: "8Gi"
           limits:
             cpu: "4"
-            memory: "32Gi"
+            memory: "24Gi"
         envFrom:
         - configMapRef:
             name: demoapp-config
@@ -68,7 +68,7 @@ spec:
             memory: "16Gi"
           limits:
             cpu: "4"
-            memory: "32Gi"
+            memory: "24Gi"
         envFrom:
         - configMapRef:
             name: demoapp-config
@@ -113,7 +113,7 @@ spec:
             memory: "16Gi"
           limits:
             cpu: "4"
-            memory: "64Gi"
+            memory: "24Gi"
         envFrom:
         - configMapRef:
             name: demoapp-config

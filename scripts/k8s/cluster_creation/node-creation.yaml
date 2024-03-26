@@ -7,17 +7,10 @@ metadata:
   region: us-west-2
 
 managedNodeGroups:
-  - name: ng-1-workers
-    labels: { role: workers }
+  - name: groot-ng-1
     instanceType: m5.xlarge
-    desiredCapacity: 2
-    minSize: 2
-    maxSize: 4
+    desiredCapacity: 3
+    minSize: 3
+    maxSize: 8
     volumeSize: 80
-    privateNetworking: true
-  - name: ng-2-builders
-    labels: { role: builders }
-    instanceType: m5.2xlarge
-    desiredCapacity: 2
-    volumeSize: 100
     privateNetworking: true
