@@ -10,9 +10,13 @@
     "sourceMap": true,
     "rootDir": ".",
     "outDir": "./dist",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "test/**/*"
+
   ],
   "exclude": [
     "node_modules",

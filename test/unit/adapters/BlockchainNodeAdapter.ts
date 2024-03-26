@@ -2,8 +2,8 @@ import {ethers} from 'ethers';
 import {
   BlockchainNode,
   BlockchainNodeError,
-  BlockchainNodeProxyInfo,
 } from '../../../src/blockchain/blockchain_nodes/BlockchainNode';
+import {BlockchainNodeProxyInfo} from '../../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
 
 
 /* eslint-disable @typescript-eslint/no-unused-vars */

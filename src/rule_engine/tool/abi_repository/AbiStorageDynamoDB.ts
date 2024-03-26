@@ -1,12 +1,21 @@
+import {injectable, inject} from 'inversify';
 import DynamoDB from 'aws-sdk/clients/dynamodb';
-import {IAbiStorage} from './IAbiStorage';
+import {IAbiStorage} from './interfaces/IAbiStorage';
+import {IConfigServiceAWS} from '../../../service/config/interfaces/IConfigServiceAWS';
 
+@injectable()
 export class AbiStorageDynamoDB implements IAbiStorage {
   private readonly tableName: string;
   private dynamoDB: DynamoDB.DocumentClient;
+  private readonly configService: IConfigServiceAWS;
 
-  constructor(tableName: string, region: string) {
-    this.tableName = tableName;
+
+  constructor(
+    @inject('IConfigServiceAWS') _configService: IConfigServiceAWS,
+  ) {
+    this.configService = _configService;
+    this.tableName = this.configService.getDynamoDBAbiRepoTable();
+    const region = this.configService.getAWSRegion();
     this.dynamoDB = new DynamoDB.DocumentClient({region});
   }
 

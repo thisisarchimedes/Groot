@@ -1,15 +1,49 @@
 import axios from 'axios';
+import {injectable} from 'inversify';
 
-import {LogLevel, Logger} from './Logger';
-import {ConfigService} from '../config/ConfigService';
+import {Logger} from './Logger';
+import {LogLevel} from './LogLevel';
+import {IConfigServiceAWS} from '../config/interfaces/IConfigServiceAWS';
+import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
 
-export class LoggerNewRelic extends Logger {
+
+interface LogRecord {
+  message: string;
+  level: string;
+  timestamp: number;
+  service: string;
+}
+
+interface LogFormatter {
+  format(record: LogRecord): string;
+}
+
+class CustomJsonFormatter implements LogFormatter {
+  format(record: LogRecord): string {
+    return JSON.stringify({
+      ...record,
+      timestamp: new Date().getTime(),
+    });
+  }
+}
+
+interface NewRelicConfig {
+  apiKey: string;
+  environment: string;
+  endpointUrl: string;
+  serviceName: string;
+  maxRetries: number;
+  backoffFactor: number;
+}
+
+@injectable()
+export class LoggerNewRelic extends Logger implements ILoggerNewRelic {
   private readonly config: NewRelicConfig;
   private readonly formatter: LogFormatter;
   private pendingPromises: Promise<void>[] = [];
 
   constructor(
-      configService: ConfigService,
+      configService: IConfigServiceAWS,
       serviceName: string,
       formatter: LogFormatter = new CustomJsonFormatter(),
       maxRetries = 3,
@@ -96,31 +130,3 @@ export class LoggerNewRelic extends Logger {
   }
 }
 
-interface LogRecord {
-    message: string;
-    level: string;
-    timestamp: number;
-    service: string;
-  }
-
-interface LogFormatter {
-    format(record: LogRecord): string;
-  }
-
-class CustomJsonFormatter implements LogFormatter {
-  format(record: LogRecord): string {
-    return JSON.stringify({
-      ...record,
-      timestamp: new Date().getTime(),
-    });
-  }
-}
-
-interface NewRelicConfig {
-    apiKey: string;
-    environment: string;
-    endpointUrl: string;
-    serviceName: string;
-    maxRetries: number;
-    backoffFactor: number;
-  }
