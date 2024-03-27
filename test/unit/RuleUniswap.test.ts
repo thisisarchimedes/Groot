@@ -31,7 +31,7 @@ describe('Rule Factory Testings: Uniswap', function () {
   });
 
   it('should create Uniswap PSP rebalance Rule object from a rule config', function () {
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = new FactoryRule(this.container, logger);
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.UniswapPSPRebalance,
       label: 'Uniswap PSP rebalance - test',
@@ -48,7 +48,7 @@ describe('Rule Factory Testings: Uniswap', function () {
   });
 
   it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', function () {
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = new FactoryRule(this.container, logger);
     const uniswapRule: RuleJSONConfigItem = {
       ruleType: TypeRule.UniswapPSPRebalance,
       label: 'Uniswap PSP rebalance - test',

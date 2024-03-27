@@ -28,7 +28,7 @@ describe('Rule Factory Testings', function () {
   });
 
   it('should create Rule object from a dummy rule config', async function () {
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = new FactoryRule(this.container, logger);
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
@@ -48,7 +48,7 @@ describe('Rule Factory Testings', function () {
       label: 'dummyRule',
       params: { message: 'I AM GROOT', NumberOfDummyTxs: 3, evalSuccess: true },
     };
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = new FactoryRule(this.container, logger);
     const rule = ruleFactory.createRule(dummyRule);
     if (rule) {
       await rule.evaluate();
@@ -66,7 +66,7 @@ describe('Rule Factory Testings', function () {
   });
 
   it('should create identifier when the Rule evaluates itself', async function () {
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = new FactoryRule(this.container, logger);
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',

@@ -68,7 +68,7 @@ describe('Rule Engine Testings', function () {
   function createRuleEngine(rules: RuleJSONConfigItem[]): RuleEngine {
     const abiRepo = container.get<IAbiRepo>(TYPES.IAbiRepo);
 
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = new FactoryRule(container, logger);
     const ruleEngine = new RuleEngine(logger, ruleFactory);
     ruleEngine.loadRulesFromJSONConfig(rules);
     return ruleEngine;

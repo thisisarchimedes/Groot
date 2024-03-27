@@ -31,7 +31,7 @@ describe('Rule Factory Testings: Expire Positions', function () {
   });
 
   it('should create Expire positions Rule object from a rule config', function () {
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = new FactoryRule(this.container, logger);
     const expirePositionRule: RuleJSONConfigItem = {
       ruleType: TypeRule.ExpirePositions,
       label: 'Expire positions - test',

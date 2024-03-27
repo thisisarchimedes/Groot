@@ -1,7 +1,7 @@
-import { injectable, inject } from 'inversify';
+import {injectable, inject} from 'inversify';
 import DynamoDB from 'aws-sdk/clients/dynamodb';
-import { IAbiStorage } from './interfaces/IAbiStorage';
-import { IConfigServiceAWS } from '../../../service/config/interfaces/IConfigServiceAWS';
+import {IAbiStorage} from './interfaces/IAbiStorage';
+import {IConfigServiceAWS} from '../../../service/config/interfaces/IConfigServiceAWS';
 
 @injectable()
 export class AbiStorageDynamoDB implements IAbiStorage {
@@ -16,7 +16,7 @@ export class AbiStorageDynamoDB implements IAbiStorage {
     this.configService = _configService;
     this.tableName = this.configService.getDynamoDBAbiRepoTable();
     const region = this.configService.getAWSRegion();
-    this.dynamoDB = new DynamoDB.DocumentClient({ region });
+    this.dynamoDB = new DynamoDB.DocumentClient({region});
   }
 
   public async storeAbiForAddress(contractAddress: string, abi: string): Promise<void> {
