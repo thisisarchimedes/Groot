@@ -2,7 +2,8 @@ export enum TypeRule {
     Invalid = 'invalid',
     Dummy = 'dummy',
     UniswapPSPRebalance = 'uniswapPSPRebalance',
-    ExpirePositions = 'expirePosition'
+    ExpirePositions = 'expirePosition',
+    RuleBalanceCurvePoolWithVault = 'balanceCurvePoolWithVault'
 }
 
 export enum UrgencyLevel {

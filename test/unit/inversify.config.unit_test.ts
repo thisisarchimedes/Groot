@@ -16,10 +16,13 @@ import { AbiRepoAdapter } from './adapters/AbiRepoAdapter';
 import { TxQueueAdapter } from './adapters/TxQueueAdapter';
 import { IBlockchainNodeHealthMonitor } from '../../src/service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
 import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
+import { RuleEngine } from '../../src/rule_engine/RuleEngine';
+import { IRuleEngine } from '../../src/rule_engine/interfaces/IRuleEngine';
+import { FactoryRule } from '../../src/rule_engine/FactoryRule';
+import { IFactoryRule } from '../../src/rule_engine/interfaces/IFactoryRule';
 
 export const createTestContainer = (): Container => {
     const container = new Container();
-
 
     // Binding logger
     container.bind<LoggerAdapter>(TYPES.ILoggerAll).to(LoggerAdapter).inSingletonScope();
@@ -44,12 +47,19 @@ export const createTestContainer = (): Container => {
     container.bind<TxQueueAdapter>(TxQueueAdapter).toSelf().inSingletonScope();
 
 
+    container.bind<IFactoryRule>(TYPES.IFactoryRule).to(FactoryRule).inRequestScope();
+
+    container.bind<IRuleEngine>(TYPES.IRuleEngine).to(RuleEngine).inRequestScope();
+
     container.bind<AbiFetcherAdapter>(AbiFetcherAdapter).toSelf().inSingletonScope();
     container.bind<IAbiRepo>(TYPES.IAbiRepo).to(AbiRepoAdapter).inRequestScope();
 
     container.bind<IAbiStorage>(TYPES.IAbiStorageDynamoDB).to(AbiStorageDynamoDB).inRequestScope();
 
     container.bind<ConfigServiceAdapter>(ConfigServiceAdapter).toSelf().inSingletonScope();
+
+    container.bind<Container>(Container).toConstantValue(container);
+
 
     return container;
 };
