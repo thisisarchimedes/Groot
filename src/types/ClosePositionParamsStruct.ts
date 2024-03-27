@@ -1,4 +1,4 @@
-import EthereumAddress from "./EthereumAddress";
+import EthereumAddress from './EthereumAddress';
 
 export type ClosePositionParamsStruct = {
     nftId: number;

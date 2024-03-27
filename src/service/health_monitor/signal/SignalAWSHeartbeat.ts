@@ -1,10 +1,10 @@
-import { injectable, inject } from 'inversify';
+import {injectable, inject} from 'inversify';
 
-import { IHostNameProvider } from '../IHostNameProvider';
-import { ISignalHeartbeat } from './interfaces/ISignalHeartbeat';
-import { SignalAWS } from './SignalAWS';
-import { IConfigService } from '../../config/interfaces/IConfigService';
-import { ILogger } from '../../logger/interfaces/ILogger';
+import {IHostNameProvider} from '../IHostNameProvider';
+import {ISignalHeartbeat} from './interfaces/ISignalHeartbeat';
+import {SignalAWS} from './SignalAWS';
+import {IConfigService} from '../../config/interfaces/IConfigService';
+import {ILogger} from '../../logger/interfaces/ILogger';
 
 @injectable()
 export class SignalAWSHeartbeat extends SignalAWS implements ISignalHeartbeat {

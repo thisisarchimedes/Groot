@@ -1,7 +1,6 @@
 import os from 'os';
 import {IHostNameProvider} from './IHostNameProvider';
 import {ILogger} from '../logger/interfaces/ILogger';
-import {ILoggerAll} from '../logger/interfaces/ILoggerAll';
 import {injectable, inject} from 'inversify';
 
 @injectable()

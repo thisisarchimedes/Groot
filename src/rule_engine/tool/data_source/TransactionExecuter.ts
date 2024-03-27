@@ -25,21 +25,21 @@ interface Transaction {
 }
 
 class TransactionExecuter extends PostgreDataSourceBase {
-    async insertTransaction(transaction: Transaction) {
-        const {
-            to,
-            executor,
-            txHash,
-            identifier,
-            value,
-            data,
-            urgency = TransactionUrgency.LOW,
-            gasLimit,
-            nonce,
-        } = transaction;
+  async insertTransaction(transaction: Transaction) {
+    const {
+      to,
+      executor,
+      txHash,
+      identifier,
+      value,
+      data,
+      urgency = TransactionUrgency.LOW,
+      gasLimit,
+      nonce,
+    } = transaction;
 
-        const query = {
-            text: `
+    const query = {
+      text: `
         INSERT INTO "Transaction" (
           "to",
           "executor",
@@ -53,26 +53,26 @@ class TransactionExecuter extends PostgreDataSourceBase {
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       `,
-            values: [
-                to,
-                executor,
-                txHash,
-                identifier,
-                value,
-                data,
-                urgency,
-                gasLimit,
-                nonce,
-            ],
-        };
+      values: [
+        to,
+        executor,
+        txHash,
+        identifier,
+        value,
+        data,
+        urgency,
+        gasLimit,
+        nonce,
+      ],
+    };
 
-        try {
-            await this.executeQuery(query);
-        } catch (error) {
-            this.logger.error(`Failed to insert transaction: ${(error as Error).message}`);
-            throw error;
-        }
+    try {
+      await this.executeQuery(query);
+    } catch (error) {
+      this.logger.error(`Failed to insert transaction: ${(error as Error).message}`);
+      throw error;
     }
+  }
 }
 
-export { TransactionExecuter, Transaction, TransactionStatus, TransactionUrgency };
+export {TransactionExecuter, Transaction, TransactionStatus, TransactionUrgency};

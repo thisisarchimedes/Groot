@@ -1,7 +1,6 @@
-import { LoggerAll } from '../../../service/logger/LoggerAll';
+import {LoggerAll} from '../../../service/logger/LoggerAll';
 import pg from 'pg'; // Import Client instead of Pool
-import { ConfigServiceAWS } from '../../../service/config/ConfigServiceAWS';
-
+import {ConfigServiceAWS} from '../../../service/config/ConfigServiceAWS';
 
 
 export default class PostgreDataSourceBase {

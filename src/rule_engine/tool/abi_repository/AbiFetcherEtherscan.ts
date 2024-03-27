@@ -1,9 +1,8 @@
-import { injectable, inject } from 'inversify';
+import {injectable, inject} from 'inversify';
 
 import axios from 'axios';
-import { IAbiFetcher } from './interfaces/IAbiFetcher';
-import { IConfigServiceAWS } from '../../../service/config/interfaces/IConfigServiceAWS';
-import { IConfigService } from '../../../service/config/interfaces/IConfigService';
+import {IAbiFetcher} from './interfaces/IAbiFetcher';
+import {IConfigService} from '../../../service/config/interfaces/IConfigService';
 
 interface EtherscanResponse {
   status: string;

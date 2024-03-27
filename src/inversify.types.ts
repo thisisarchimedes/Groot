@@ -26,7 +26,7 @@ const TYPES = {
   IRuleEngine: 'IRuleEngine',
   PGClient: 'PGClient',
   PostgreTxQueue: 'PostgreTxQueue',
-  ITransactionQueuer: 'ITransactionQueuer'
+  ITransactionQueuer: 'ITransactionQueuer',
 };
 
-export { TYPES };
+export {TYPES};

@@ -1,9 +1,6 @@
-import { Rule, RuleParams } from './Rule';
-import { UrgencyLevel } from '../TypesRule';
-import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
+import {Rule, RuleParams} from './Rule';
 import LeverageDataSource from '../tool/data_source/LeverageDataSource';
-import { RuleConstructorInput } from '../../types/RuleConstructorInput';
-import LeveragePosition from '../../types/LeveragePosition';
+import {RuleConstructorInput} from '../../types/RuleConstructorInput';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -12,8 +9,8 @@ export interface RuleParamsDummy extends RuleParams {
 }
 
 
-const WBTC_ADDRESS = '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599';
-const WBTC_DECIMALS = 8;
+// const WBTC_ADDRESS = '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599';
+// const WBTC_DECIMALS = 8;
 
 export class RuleExpirePositions extends Rule {
   private leverageDataSource: LeverageDataSource;
@@ -76,22 +73,20 @@ export class RuleExpirePositions extends Rule {
   //   };
   // }
 
-  private createExpireTransaction(position: LeveragePosition): OutboundTransaction {
+  // private createExpireTransaction(position: LeveragePosition): OutboundTransaction {
+  //   // //call uniswap and generate ClosePositionParamsStruct
+  //   // this.uniswap.buildPayload(0)
 
+  //   // //generate tx
+  //   // const tx = this.expirationContract.methods.expirePosition(position.nftId, null) as Transaction;
 
-    // //call uniswap and generate ClosePositionParamsStruct
-    // this.uniswap.buildPayload(0)
-
-    // //generate tx
-    // const tx = this.expirationContract.methods.expirePosition(position.nftId, null) as Transaction;
-
-    return {
-      urgencyLevel: UrgencyLevel.NORMAL,
-      context: `Position expired transaction`,
-      postEvalUniqueKey: this.generateUniqueKey(),
-      lowLevelUnsignedTransaction: { to: '', value: BigInt(0), data: '' } as RawTransactionData,
-    };
-  }
+  //   return {
+  //     urgencyLevel: UrgencyLevel.NORMAL,
+  //     context: `Position expired transaction`,
+  //     postEvalUniqueKey: this.generateUniqueKey(),
+  //     lowLevelUnsignedTransaction: { to: '', value: BigInt(0), data: '' } as RawTransactionData,
+  //   };
+  // }
 
   protected generateUniqueKey(): string {
     // return `${position.nftId}-${position.strategy}`;

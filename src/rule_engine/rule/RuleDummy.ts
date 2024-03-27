@@ -1,6 +1,6 @@
-import { Rule, RuleParams } from './Rule';
-import { UrgencyLevel } from '../TypesRule';
-import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
+import {Rule, RuleParams} from './Rule';
+import {UrgencyLevel} from '../TypesRule';
+import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;

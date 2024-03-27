@@ -4,7 +4,6 @@ import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Rule} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
-import {ILoggerAll} from '../service/logger/interfaces/ILoggerAll';
 import {IFactoryRule} from './interfaces/IFactoryRule';
 import {IRuleEngine} from './interfaces/IRuleEngine';
 
