@@ -1,5 +1,6 @@
 const TYPES = {
   ILoggerAll: 'ILoggerAll',
+  ILoggerConsole: 'ILoggerConsole',
   IConfigServiceAWS: 'IConfigServiceAWS',
   Environment: 'Environment',
   Region: 'Region',
@@ -30,4 +31,4 @@ const TYPES = {
   PostgreDataSource: 'PostgreDataSource',
 };
 
-export {TYPES};
+export { TYPES };
