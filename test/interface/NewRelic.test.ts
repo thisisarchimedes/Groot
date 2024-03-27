@@ -12,6 +12,7 @@ describe('Check that we work with NewRelic correctly', function () {
   this.timeout(120000);
 
   let configService: ConfigServiceAWS;
+  const loggerConsole: LoggerConsole = new LoggerConsole();
 
   beforeEach(async function () {
     const environment = process.env.ENVIRONMENT as string;
@@ -27,19 +28,19 @@ describe('Check that we work with NewRelic correctly', function () {
   });
 
   it('Should send a log line to New Relic and console', async function () {
-    const logger = new LoggerAll(configService, new LoggerConsole(), 'AcceptanceTest');
+    const logger = new LoggerAll(configService, loggerConsole, 'AcceptanceTest');
     logger.info('I AM GROOT - ALL');
     await logger.flush();
   });
 
   it('Should send cycle time to New Relic and console', async function () {
-    const logger = new LoggerAll(configService, new LoggerConsole(), 'AcceptanceTest');
+    const logger = new LoggerAll(configService, loggerConsole, 'AcceptanceTest');
     logger.reportCycleTime(1000);
     await logger.flush();
   });
 
   it('Should send rule eval results New Relic and console', async function () {
-    const logger = new LoggerAll(configService, new LoggerConsole(), 'AcceptanceTest');
+    const logger = new LoggerAll(configService, loggerConsole, 'AcceptanceTest');
     logger.reportRuleEvalResults(11, 3);
     await logger.flush();
   });
