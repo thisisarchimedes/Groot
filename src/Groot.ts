@@ -10,14 +10,12 @@ import { IGroot } from './interfaces/IGroot';
 import { IHealthMonitor } from './service/health_monitor/signal/interfaces/IHealthMonitor';
 import { IConfigService } from './service/config/interfaces/IConfigService';
 import { ILogger } from './service/logger/interfaces/ILogger';
-import { ITxQueue } from './tx_queue/interfaces/ITxQueue';
 import { ITransactionQueuer } from './tx_queue/interfaces/ITransactionQueuer';
 
 dotenv.config();
 
 @injectable()
 export class Groot implements IGroot {
-  private txQueuer!: TransactionQueuer;
 
   public readonly logger: ILogger;
   private readonly configService: IConfigService;
@@ -97,7 +95,7 @@ export class Groot implements IGroot {
 
       await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
       const txs = this.ruleEngine.getOutboundTransactions();
-      await this.txQueuer.queueTransactions(txs);
+      await this.transactionsQueuer.queueTransactions(txs);
     } catch (ex) {
       if (ex instanceof Error) {
         this.logger.error(ex.message);
