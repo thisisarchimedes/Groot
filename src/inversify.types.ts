@@ -31,4 +31,4 @@ const TYPES = {
   PostgreDataSource: 'PostgreDataSource',
 };
 
-export { TYPES };
+export {TYPES};

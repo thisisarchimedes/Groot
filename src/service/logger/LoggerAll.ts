@@ -1,11 +1,11 @@
-import { injectable, inject } from 'inversify';
-import { Logger } from './Logger';
-import { LoggerNewRelic } from './LoggerNewRelic';
-import { IConfigServiceAWS } from '../config/interfaces/IConfigServiceAWS';
-import { ILoggerAll } from './interfaces/ILoggerAll';
-import { TYPES } from '../../inversify.types';
-import { ILoggerConsole } from './interfaces/ILoggerConsole';
-import { ILoggerNewRelic } from './interfaces/ILoggerNewRelic';
+import {injectable, inject} from 'inversify';
+import {Logger} from './Logger';
+import {LoggerNewRelic} from './LoggerNewRelic';
+import {IConfigServiceAWS} from '../config/interfaces/IConfigServiceAWS';
+import {ILoggerAll} from './interfaces/ILoggerAll';
+import {TYPES} from '../../inversify.types';
+import {ILoggerConsole} from './interfaces/ILoggerConsole';
+import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
 
 @injectable()
 export class LoggerAll extends Logger implements ILoggerAll {
