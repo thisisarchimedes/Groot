@@ -1,6 +1,6 @@
-import {Rule, RuleParams} from './Rule';
-import LeverageDataSource from '../tool/data_source/LeverageDataSource';
-import {RuleConstructorInput} from '../../types/RuleConstructorInput';
+import { Rule, RuleParams } from './Rule';
+import { RuleConstructorInput } from '../../types/RuleConstructorInput';
+import { ILeverageDataSource } from '../tool/data_source/interfaces/ILeverageDataSource';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -13,7 +13,7 @@ export interface RuleParamsDummy extends RuleParams {
 // const WBTC_DECIMALS = 8;
 
 export class RuleExpirePositions extends Rule {
-  private leverageDataSource: LeverageDataSource;
+  private leverageDataSource: ILeverageDataSource;
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 

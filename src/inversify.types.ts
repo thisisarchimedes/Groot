@@ -27,6 +27,7 @@ const TYPES = {
   PGClient: 'PGClient',
   PostgreTxQueue: 'PostgreTxQueue',
   ITransactionQueuer: 'ITransactionQueuer',
+  PostgreDataSource: 'PostgreDataSource'
 };
 
-export {TYPES};
+export { TYPES };
