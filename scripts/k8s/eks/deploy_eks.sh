@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# EXAMPLE: deploy_eks.sh scripts/k8s/eks/configmap-demoapp.yaml
+# EXAMPLE: deploy_eks.sh configmap-demoapp.yaml
 
 if [ -z "$1" ]; then
   echo "Error: No configmap argument supplied. Exiting."

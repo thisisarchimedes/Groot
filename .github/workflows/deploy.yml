@@ -77,11 +77,11 @@ jobs:
 
       - name: Deploy to EKS (DemoApp)
         run: |
-          ./deploy_eks.sh configmap-demoapp.yaml
+          ./scripts/k8s/eks/deploy_eks.sh configmap-demoapp.yaml
       
       - name: Deploy to EKS (StableApp)
         run: |
-          ./deploy_eks.sh configmap-stableapp.yaml
+          ./scripts/k8s/eks/deploy_eks.sh configmap-stableapp.yaml
           
       - name: List all commit SHAs involved in the push
         id: format_commits
