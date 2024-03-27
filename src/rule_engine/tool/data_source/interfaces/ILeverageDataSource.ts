@@ -1,4 +1,4 @@
-import LeveragePosition from "../../../../types/LeveragePosition";
+import LeveragePosition from '../../../../types/LeveragePosition';
 
 export interface ILeverageDataSource {
     getPositionsByNftIds(nftIds: number[]): Promise<LeveragePosition[]>;

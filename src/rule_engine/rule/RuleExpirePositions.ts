@@ -1,6 +1,6 @@
-import { Rule, RuleParams } from './Rule';
-import { RuleConstructorInput } from '../../types/RuleConstructorInput';
-import { ILeverageDataSource } from '../tool/data_source/interfaces/ILeverageDataSource';
+import {Rule, RuleParams} from './Rule';
+import {RuleConstructorInput} from '../../types/RuleConstructorInput';
+import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
