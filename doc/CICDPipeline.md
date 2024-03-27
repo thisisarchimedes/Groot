@@ -65,13 +65,11 @@ aws eks update-kubeconfig --name groot-stable-app --region us-west-2
 Get all pods
 ```bash
 kubectl get pods -n groot
-kubectl get pods -n prometheus
 ```
 
 Delete  all pods from Groot
 ```bash
 kubectl delete all --all --namespace groot
-kubectl delete all --all --namespace prometheus
 ```
 
 ## Troubleshooting
