@@ -1,9 +1,9 @@
-# eksctl create cluster  -f scripts/k8s/cluster_creation/cluster-creation.yaml
+# eksctl create cluster  -f scripts/k8s/eks/cluster_creation/cluster-creation.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: groot-demo-app
+  name: groot-stable-app
   region: us-west-2
   version: '1.29'
 
