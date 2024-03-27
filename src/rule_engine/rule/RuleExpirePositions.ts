@@ -1,6 +1,9 @@
-import {Rule, RuleParams} from './Rule';
-import {RuleConstructorInput} from '../../types/RuleConstructorInput';
-import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
+import { Rule, RuleParams } from './Rule';
+import { ILeverageDataSource } from '../tool/data_source/interfaces/ILeverageDataSource';
+import { inject, injectable } from 'inversify';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
+import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -12,14 +15,19 @@ export interface RuleParamsDummy extends RuleParams {
 // const WBTC_ADDRESS = '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599';
 // const WBTC_DECIMALS = 8;
 
+@injectable()
 export class RuleExpirePositions extends Rule {
   private leverageDataSource: ILeverageDataSource;
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 
-  constructor(constractorInput: RuleConstructorInput) {
-    super(constractorInput);
-    this.leverageDataSource = new LeverageDataSource();
+  constructor(
+    @inject('ILoggerAll') logger: ILogger,
+    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
+    @inject('IAbiRepo') abiRepo: IAbiRepo,
+    @inject('ILeverageDataSource') leverageDataSource: ILeverageDataSource) {
+    super(logger, blockchainReader, abiRepo);
+    this.leverageDataSource = leverageDataSource
     // this.uniswap = new Uniswap('');
   }
 

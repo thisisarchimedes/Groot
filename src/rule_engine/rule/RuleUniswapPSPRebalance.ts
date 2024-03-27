@@ -1,5 +1,9 @@
-import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
-import {Rule, RuleConstructorInput, RuleParams} from './Rule';
+import { inject, injectable } from 'inversify';
+import { ToolStrategyUniswap } from '../tool/ToolStrategyUniswap';
+import { Rule, RuleConstructorInput, RuleParams } from './Rule';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
+import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
 
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
@@ -11,13 +15,18 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
 }
 /* eslint-enable max-len */
 
+
+@injectable()
 export class RuleUniswapPSPRebalance extends Rule {
   private uniswapStrategy: ToolStrategyUniswap;
-  constructor(constractorInput: RuleConstructorInput) {
-    super(constractorInput);
+  constructor(
+    @inject('ILoggerAll') logger: ILogger,
+    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
+    @inject('IAbiRepo') abiRepo: IAbiRepo) {
+    super(logger, blockchainReader, abiRepo);
     this.uniswapStrategy = new ToolStrategyUniswap(
-        (this.params as RuleParamsUniswapPSPRebalance).strategyAddress,
-        this.blockchainReader);
+      (this.params as RuleParamsUniswapPSPRebalance).strategyAddress,
+      this.blockchainReader);
   }
   public async evaluate(): Promise<void> {
     // fetch the pool address from strategy

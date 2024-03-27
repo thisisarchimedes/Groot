@@ -29,9 +29,9 @@ export abstract class Rule {
   protected pendingTxQueue: OutboundTransaction[] = [];
 
   constructor(
-    @inject('ILoggerAll') logger: ILogger,
-    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
-    @inject('IAbiRepo') abiRepo: IAbiRepo
+    logger: ILogger,
+    blockchainReader: IBlockchainReader,
+    abiRepo: IAbiRepo
   ) {
     this.logger = logger;
     this.blockchainReader = blockchainReader;
