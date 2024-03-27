@@ -1,9 +1,9 @@
-import {Rule, RuleParams} from './Rule';
-import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
-import {inject, injectable} from 'inversify';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import { Rule, RuleParams } from './Rule';
+import { ILeverageDataSource } from '../tool/data_source/interfaces/ILeverageDataSource';
+import { inject, injectable } from 'inversify';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
+import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -25,7 +25,7 @@ export class RuleExpirePositions extends Rule {
     @inject('ILoggerAll') logger: ILogger,
     @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
     @inject('IAbiRepo') abiRepo: IAbiRepo,
-    @inject('ILeverageDataSource') leverageDataSource: ILeverageDataSource) {
+    @inject('PostgreDataSource') leverageDataSource: ILeverageDataSource) {
     super(logger, blockchainReader, abiRepo);
     this.leverageDataSource = leverageDataSource;
     // this.uniswap = new Uniswap('');
