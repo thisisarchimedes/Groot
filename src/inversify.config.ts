@@ -49,7 +49,7 @@ export class InversifyConfig {
     this.container.bind<Client>(TYPES.PGClient).toDynamicValue((context: interfaces.Context) => {
       const connectionString = configServiceAWS.getTransactionsDBURL();
       return new Client({ connectionString: connectionString });
-    });
+    }).inSingletonScope();
 
     this.container.bind<string>(TYPES.MainLocalNodeURI)
       .toConstantValue(`http://localhost:${process.env.MAIN_LOCAL_NODE_PORT || 8545}`);

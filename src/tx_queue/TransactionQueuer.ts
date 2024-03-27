@@ -5,7 +5,6 @@ import { OutboundTransaction } from '../blockchain/OutboundTransaction';
 import { ILogger } from '../service/logger/interfaces/ILogger';
 import { ITxQueue } from './interfaces/ITxQueue';
 import { ITransactionQueuer } from './interfaces/ITransactionQueuer';
-import { resolve } from 'path';
 
 @injectable()
 export class TransactionQueuer implements ITransactionQueuer {
@@ -18,7 +17,7 @@ export class TransactionQueuer implements ITransactionQueuer {
     this.queue = _queue;
   }
   public async refresh(): Promise<void> {
-
+    await this.queue.refresh();
   }
 
   public async queueTransactions(txs: OutboundTransaction[]): Promise<void> {

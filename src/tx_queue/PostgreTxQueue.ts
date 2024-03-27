@@ -5,6 +5,7 @@ import { TYPES } from '../inversify.types';
 import { inject, injectable } from 'inversify';
 import { ITxQueue } from './interfaces/ITxQueue';
 import { OutboundTransaction } from '../blockchain/OutboundTransaction';
+import { UrgencyLevel } from '../rule_engine/TypesRule';
 
 @injectable()
 class PostgreTxQueue implements ITxQueue {
@@ -17,11 +18,21 @@ class PostgreTxQueue implements ITxQueue {
         this.client.connect().catch(console.error);
     }
     public async refresh(): Promise<void> {
-        //flush records
+        this.client.connect().catch(console.error);
     }
 
     public async addTransactionToQueue(tx: OutboundTransaction): Promise<void> {
-        throw new Error('Method not implemented.');
+        const createdAt = new Date();
+        const updatedAt = new Date();
+        const status = 'PENDING';
+        const to = tx.lowLevelUnsignedTransaction.to;
+        const executor = ''; // You need to provide the executor
+        const identifier = tx.postEvalUniqueKey;
+        const value = tx.lowLevelUnsignedTransaction.value.toString();
+        const data = tx.lowLevelUnsignedTransaction.data;
+        const urgency = tx.urgencyLevel;
+
+        await this.insertTransaction(createdAt, updatedAt, status, to, executor, identifier, value, data, urgency);
     }
 
     async insertTransaction(
@@ -30,19 +41,16 @@ class PostgreTxQueue implements ITxQueue {
         status: string,
         to: string,
         executor: string,
-        txHash: string | null,
         identifier: string,
         value: string,
         data: string,
-        urgency: string,
-        gasLimit: string,
-        nonce: number | null,
+        urgency: UrgencyLevel,
     ): Promise<void> {
         try {
             await this.client.query('BEGIN');
-            const queryText = `CALL insert_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`;
-            const queryValues: (string | number | Date | null)[] = [createdAt, updatedAt, status, to, executor, txHash, identifier, value, data, urgency, gasLimit, nonce];
-            // await this.client.query(queryText, queryValues);
+            const queryText = `CALL insert_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
+            const queryValues: unknown[] = [createdAt, updatedAt, status, to, executor, identifier, value, data, urgency];
+            await this.client.query(queryText, queryValues);
             await this.client.query('COMMIT');
         } catch (err) {
             await this.client.query('ROLLBACK');
