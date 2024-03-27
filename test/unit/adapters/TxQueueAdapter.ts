@@ -4,9 +4,12 @@ import { injectable } from 'inversify';
 
 @injectable()
 export class TxQueueAdapter implements ITxQueue {
+  refresh(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
   private transactions: OutboundTransaction[] = [];
 
-  public addTransactionToQueue(tx: OutboundTransaction): void {
+  public async addTransactionToQueue(tx: OutboundTransaction): Promise<void> {
     this.transactions.push(tx);
   }
 

@@ -29,8 +29,8 @@ export class RuleExpirePositions extends Rule {
 
     for (const position of livePositions) {
       if (position.positionExpireBlock < blockNumber) {
-        const tx = this.createExpireTransaction(position);
-        this.pushTransactionToRuleLocalQueue(tx);
+        // const tx = this.createExpireTransaction(position);
+        // this.pushTransactionToRuleLocalQueue(tx);
       }
     }
 
