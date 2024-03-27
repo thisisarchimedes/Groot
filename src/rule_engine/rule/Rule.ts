@@ -1,8 +1,9 @@
-import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {UrgencyLevel} from '../TypesRule';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import { OutboundTransaction } from '../../blockchain/OutboundTransaction';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
+import { UrgencyLevel } from '../TypesRule';
+import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
+import { inject, injectable } from 'inversify';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
@@ -17,21 +18,32 @@ export interface RuleConstructorInput {
 
 }
 
+@injectable()
 export abstract class Rule {
-  protected logger: ILogger;
-  protected blockchainReader: IBlockchainReader;
-  protected abiRepo: IAbiRepo;
+  protected readonly logger: ILogger;
+  protected readonly blockchainReader: IBlockchainReader;
+  protected readonly abiRepo: IAbiRepo;
 
-  protected params: RuleParams;
-  protected readonly ruleLabel: string;
+  protected ruleLabel: string;
+  protected params: RuleParams | unknown;
   protected pendingTxQueue: OutboundTransaction[] = [];
 
-  constructor(constructorInput: RuleConstructorInput) {
-    this.logger = constructorInput.logger;
-    this.params = constructorInput.params;
-    this.abiRepo = constructorInput.abiRepo;
-    this.ruleLabel = constructorInput.ruleLabel;
-    this.blockchainReader = constructorInput.blockchainReader;
+  constructor(
+    @inject('ILoggerAll') logger: ILogger,
+    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
+    @inject('IAbiRepo') abiRepo: IAbiRepo
+  ) {
+    this.logger = logger;
+    this.blockchainReader = blockchainReader;
+    this.abiRepo = abiRepo;
+    this.ruleLabel = ""; // Default initialization
+    this.params = { urgencyLevel: UrgencyLevel.NORMAL }; // Default initialization
+  }
+
+
+  public initialize(ruleLabel: string, params: RuleParams | unknown): void {
+    this.ruleLabel = ruleLabel;
+    this.params = params;
   }
 
   public abstract evaluate(): Promise<void>;

@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import {inject, injectable} from 'inversify';
-import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {ILogger} from '../service/logger/interfaces/ILogger';
-import {ITxQueue} from './interfaces/ITxQueue';
-import {ITransactionQueuer} from './interfaces/ITransactionQueuer';
+import { inject, injectable } from 'inversify';
+import { OutboundTransaction } from '../blockchain/OutboundTransaction';
+import { ILogger } from '../service/logger/interfaces/ILogger';
+import { ITxQueue } from './interfaces/ITxQueue';
+import { ITransactionQueuer } from './interfaces/ITransactionQueuer';
 
 @injectable()
 export class TransactionQueuer implements ITransactionQueuer {
