@@ -132,6 +132,8 @@ export class InversifyConfig {
     this.container.bind<Rule>(TypeRule.UniswapPSPRebalance).to(RuleUniswapPSPRebalance).inRequestScope();
 
     this.container.bind<IGroot>(TYPES.Groot).to(Groot).inSingletonScope();
+    this.container.bind<Container>(Container).toConstantValue(this.container);
+
   }
 
   public getContainer(): Container {

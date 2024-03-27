@@ -2,13 +2,13 @@ import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
 
-import {GrootParams} from './GrootParams';
-import {IGroot} from './interfaces/IGroot';
-import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
-import {InversifyConfig} from './inversify.config';
-import {Container} from 'inversify';
-import {TYPES} from './inversify.types';
-import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
+import { GrootParams } from './GrootParams';
+import { IGroot } from './interfaces/IGroot';
+import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
+import { InversifyConfig } from './inversify.config';
+import { Container } from 'inversify';
+import { TYPES } from './inversify.types';
+import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
 
 dotenv.config();
 
@@ -58,7 +58,7 @@ function getGrootParamsFromEnv(): GrootParams {
     reportCriticalError(environment, region, 'Cannot boot. Missing environment variables');
   }
 
-  return {environment, region, mainLocalNodeUrl, altLocalNodeUrl};
+  return { environment, region, mainLocalNodeUrl, altLocalNodeUrl };
 }
 
 function reportGrootStartup(grootParams: GrootParams): void {
@@ -78,3 +78,7 @@ function setShutdownOnSigTerm(): void {
     process.exit(0);
   });
 }
+
+startGroot(false).then(a => {
+  console.log(a);
+});
