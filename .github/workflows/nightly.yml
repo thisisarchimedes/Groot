@@ -79,7 +79,7 @@ jobs:
             - name: Calculating test coverage
               continue-on-error: true
               run: |
-                AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:all > tmp_report
+                AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:all > tmp_coverage.txt
                 cat tmp_coverage.txt
                 echo "COVERAGE_FUNC=`grep "All files" tmp_coverage.txt | awk '{print $(NF-3)}'`" >> $GITHUB_ENV
 
