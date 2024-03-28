@@ -18,11 +18,9 @@ env:
     DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
 
 jobs:
-    eval-commit-stage:
+    nightly-check:
         runs-on: ubuntu-latest
         steps:
-       
-    
             - name: Checkout code
               uses: actions/checkout@v4
               with:
@@ -80,5 +78,7 @@ jobs:
 
             - name: Report test run time
               run: |
-                echo "Time taken to run the tests: ${{ env.DURATION }} seconds"        
-                yarn tsx devops/metrics/src/cicd_script/report_devops_event.ts ${{ github.repository }} "test_run" --metadata '{"pass": "${{ env.TEST_PASS }}", "time": "${{ env.DURATION }}" ,"coverage": {"functions": "${{ env.COVERAGE_FUNC }}"}, "linter_issues": {"tests": "${{ env. LINT_PROBLEMS }}"}}'
+                echo "Time taken to run the tests: ${{ env.DURATION }} seconds"
+                yarn add axios dotenv
+                node devops/metrics/src/cicd_script/report_devops_event.js ${{ github.repository }} test_run '{"pass": "${{ env.TEST_PASS }}", "time": "${{ env.DURATION }}" ,"coverage": {"functions": "${{ env.COVERAGE_FUNC }}"}, "functions_stryker": "${{ env.COVERAGE_STRYKER_FUNC }}", "linter_issues": {"tests": "${{ env. LINT_PROBLEMS }}"}}'
+    
