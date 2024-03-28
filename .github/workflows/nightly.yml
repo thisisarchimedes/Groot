@@ -55,9 +55,25 @@ jobs:
 
             - name: Run Tests
               run: |
-                AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:all
-                
+                start=$(date +%s)
 
+                AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:all
+
+                end=$(date +%s)
+                duration=$((end-start))
+
+                echo "DURATION=$duration" >> $GITHUB_ENV
+                echo "Time taken to run the tests: $duration seconds"
+
+                echo "::set-output name=passed::$?"
+                
+            - name: Set Test Result Env Variable
+              run: |
+                  if [ ${{ steps.test_suite.outputs.passed }} -eq 0 ]; then
+                    echo "TEST_PASS=true" >> $GITHUB_ENV
+                  else
+                    echo "TEST_PASS=false" >> $GITHUB_ENV
+            
             - name: Calculating test coverage
               continue-on-error: true
               run: |
