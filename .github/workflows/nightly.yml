@@ -80,8 +80,8 @@ jobs:
               continue-on-error: true
               run: |
                 AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:all > tmp_report
-                cat tmp_report
-                echo "COVERAGE_FUNC=`grep "Total" tmp_report | awk '{print $(NF-2)}'`" >> $GITHUB_ENV
+                cat tmp_coverage.txt
+                echo "COVERAGE_FUNC=`grep "All files" tmp_coverage.txt | awk '{print $(NF-3)}'`" >> $GITHUB_ENV
 
             - name: Run lint on tests
               continue-on-error: true
