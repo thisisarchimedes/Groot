@@ -63,12 +63,4 @@ kubectl apply -f scripts/k8s/local/demoapp-configmap.yaml --namespace groot
 kubectl apply -f scripts/k8s/local/deployment.yaml --namespace groot
 kubectl apply -f scripts/k8s/local/service.yaml --namespace groot
 
-kubectl create namespace prometheus
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
-helm install prometheus prometheus-community/prometheus --namespace prometheus
-
-kubectl apply -f scripts/k8s/local/prometheus-config.yaml --namespace prometheus
-
-kubectl get pods --namespace prometheus
 kubectl get pods --namespace groot
