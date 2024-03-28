@@ -73,6 +73,7 @@ jobs:
                     echo "TEST_PASS=true" >> $GITHUB_ENV
                   else
                     echo "TEST_PASS=false" >> $GITHUB_ENV
+                  fi
             
             - name: Calculating test coverage
               continue-on-error: true
