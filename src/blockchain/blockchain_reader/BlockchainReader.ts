@@ -45,10 +45,11 @@ export class BlockchainReader implements IBlockchainReader {
 
   private async init() {
     if (!this.initialized) {
-      await Promise.all([
-        this.nodes[0].startNode(),
-        this.nodes[0].startNode(),
-      ]);
+      const initPromises = this.nodes.map((node) =>
+        node.startNode(),
+      );
+      await Promise.all(initPromises);
+      this.initialized = true;
     }
   }
 
