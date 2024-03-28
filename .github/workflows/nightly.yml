@@ -54,6 +54,7 @@ jobs:
                 ./scripts/container_reader_node/run_nodes_containers_locally.sh
 
             - name: Run Tests
+              id: test_suite
               run: |
                 start=$(date +%s)
 
