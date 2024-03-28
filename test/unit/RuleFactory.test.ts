@@ -37,7 +37,6 @@ describe('Rule Factory Testings', function () {
     };
     const rule = ruleFactory.createRule(dummyRule);
     expect(rule).not.to.be.undefined;
-    console.log('ruilee', rule);
     if (rule) {
       await rule.evaluate();
     }

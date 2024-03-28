@@ -78,7 +78,3 @@ function setShutdownOnSigTerm(): void {
     process.exit(0);
   });
 }
-
-startGroot(false).then((a) => {
-  console.log(a);
-});

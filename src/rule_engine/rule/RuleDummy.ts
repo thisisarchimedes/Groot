@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 
-import { Rule, RuleParams } from './Rule';
-import { UrgencyLevel } from '../TypesRule';
-import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
-import { inject, injectable } from 'inversify';
-import { ILogger } from '../../service/logger/interfaces/ILogger';
-import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
-import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {Rule, RuleParams} from './Rule';
+import {UrgencyLevel} from '../TypesRule';
+import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
+import {inject, injectable} from 'inversify';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -16,7 +16,6 @@ export interface RuleParamsDummy extends RuleParams {
 
 @injectable()
 export class RuleDummy extends Rule {
-
   constructor(
     @inject('ILoggerAll') logger: ILogger,
     @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
@@ -29,7 +28,6 @@ export class RuleDummy extends Rule {
     const params = this.params as RuleParamsDummy;
     const blockNumber = await this.blockchainReader.getBlockNumber();
 
-    console.log('aaa');
     this.logger.info('RuleDummy.evaluate() called: ' + params.message);
 
     if (params.evalSuccess === false) {

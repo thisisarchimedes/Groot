@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import { Container, inject, injectable } from 'inversify';
-import { IFactoryRule } from './interfaces/IFactoryRule';
-import { RuleJSONConfigItem } from './TypesRule';
-import { ILogger } from '../service/logger/interfaces/ILogger';
-import { Rule } from './rule/Rule';
+import {Container, inject, injectable} from 'inversify';
+import {IFactoryRule} from './interfaces/IFactoryRule';
+import {RuleJSONConfigItem} from './TypesRule';
+import {ILogger} from '../service/logger/interfaces/ILogger';
+import {Rule} from './rule/Rule';
 
 
 @injectable()
@@ -16,7 +16,6 @@ export class FactoryRule implements IFactoryRule {
 
   public createRule(config: RuleJSONConfigItem): Rule | null {
     try {
-
       const ruleInstance = this.container.get<Rule>(config.ruleType);
       ruleInstance.initialize(config.label, config.params);
       return ruleInstance;

@@ -69,7 +69,6 @@ export class InversifyConfig {
   private bindDBConfiguration(configServiceAWS: IConfigServiceAWS) {
     this.container.bind<Client>(TYPES.PGClient).toDynamicValue(() => {
       const connectionString = configServiceAWS.getTransactionsDBURL();
-      console.log('*** connection string', connectionString);
       return new Client({connectionString: connectionString});
     }).inRequestScope();
 
