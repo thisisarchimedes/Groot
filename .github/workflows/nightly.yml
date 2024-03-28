@@ -1,0 +1,84 @@
+name: Nightly Check
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+env:
+    ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
+    DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
+    
+    AWS_REGION: ${{ vars.AWS_REGION }}
+    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    
+    PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+    API_DEVOPS_EVENT_CATCHER: ${{ vars.API_DEVOPS_EVENT_CATCHER }}
+    DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
+
+jobs:
+    eval-commit-stage:
+        runs-on: ubuntu-latest
+        steps:
+       
+    
+            - name: Checkout code
+              uses: actions/checkout@v4
+              with:
+                submodules: 'recursive'
+                fetch-depth: 0
+
+            - name: Use Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: 20
+
+            - name: Install dotenvx
+              run: | 
+                curl -fsS https://dotenvx.sh/ | sh
+
+            - name: Install dependencies
+              run: yarn install
+
+            - name: Lint Code
+              run: yarn eslint src/**/*.ts --ext .js,.jsx,.ts,.tsx --ignore-pattern /devops/
+
+            - name: Build
+              run: yarn tsc
+
+            - name: Build Node Container
+              run: |
+                ./scripts/container_reader_node/build_read_node_container.sh
+      
+            - name: Run Node Container
+              run: |
+                ./scripts/container_reader_node/run_nodes_containers_locally.sh
+
+            - name: Run Tests
+              run: |
+                AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:unit
+                
+
+            - name: Calculating test coverage
+              continue-on-error: true
+              run: |
+                AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test > tmp_report
+                cat tmp_report
+                echo "COVERAGE_FUNC=`grep "Total" tmp_report | awk '{print $(NF-2)}'`" >> $GITHUB_ENV
+
+            - name: Run lint on tests
+              continue-on-error: true
+              run: |
+                LINT_OUTPUT=`yarn eslint -c .eslintrc.cjs test/**/*.ts | grep "problem" | awk '{print $2}'`
+                        
+                if [ -z "$LINT_OUTPUT" ]; then
+                    LINT_OUTPUT=0
+                fi
+                        
+                echo "LINT_PROBLEMS=$LINT_OUTPUT" >> $GITHUB_ENV
+
+            - name: Report test run time
+              run: |
+                echo "Time taken to run the tests: ${{ env.DURATION }} seconds"        
+                yarn tsx devops/metrics/src/cicd_script/report_devops_event.ts ${{ github.repository }} "test_run" --metadata '{"pass": "${{ env.TEST_PASS }}", "time": "${{ env.DURATION }}" ,"coverage": {"functions": "${{ env.COVERAGE_FUNC }}"}, "linter_issues": {"tests": "${{ env. LINT_PROBLEMS }}"}}'
