@@ -8,7 +8,7 @@ import { IConfigServiceAWS } from '../../src/service/config/interfaces/IConfigSe
 
 describe('ABI Repo external services', function () {
   // eslint-disable-next-line no-invalid-this
-  this.timeout(12000);
+  this.timeout(25000);
 
   let configService: IConfigServiceAWS;
 
