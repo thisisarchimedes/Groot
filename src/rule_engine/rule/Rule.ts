@@ -3,6 +3,7 @@ import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {UrgencyLevel} from '../TypesRule';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import {IConfigServiceAWS} from '../../service/config/interfaces/IConfigServiceAWS';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
@@ -10,15 +11,16 @@ export interface RuleParams {
 
 export interface RuleConstructorInput {
   logger: ILogger;
+  config: IConfigServiceAWS;
   blockchainReader: IBlockchainReader;
   abiRepo: IAbiRepo
   ruleLabel: string;
   params: RuleParams;
-
 }
 
 export abstract class Rule {
   protected logger: ILogger;
+  protected config: IConfigServiceAWS;
   protected blockchainReader: IBlockchainReader;
   protected abiRepo: IAbiRepo;
 
@@ -28,6 +30,7 @@ export abstract class Rule {
 
   constructor(constructorInput: RuleConstructorInput) {
     this.logger = constructorInput.logger;
+    this.config = constructorInput.config;
     this.params = constructorInput.params;
     this.abiRepo = constructorInput.abiRepo;
     this.ruleLabel = constructorInput.ruleLabel;

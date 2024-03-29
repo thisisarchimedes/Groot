@@ -5,6 +5,7 @@ import {injectable} from 'inversify';
 import {AppConfigClient} from './AppConfigClient';
 import {ConfigService} from './ConfigService';
 import {IConfigServiceAWS} from './interfaces/IConfigServiceAWS';
+import {EthereumAddress} from '@thisisarchimedes/backend-sdk';
 
 @injectable()
 export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS {
@@ -26,6 +27,7 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
       this.refreshSleepTime(),
       this.refreshEtherscanAPIKey(),
       this.refreshAbiStorageConfig(),
+      this.refreshLeverageContractInfo(),
     ]);
   }
 
@@ -67,5 +69,26 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
 
   private async refreshAbiStorageConfig(): Promise<void> {
     this.AbiRepoDynamoDBTable = await this.appConfigClient.fetchConfigRawString('AbiRepoDynamoDBTable');
+  }
+
+  private async refreshLeverageContractInfo(): Promise<void> {
+    const json = JSON.parse(await this.appConfigClient.fetchConfigRawString('LeverageContractInfo'));
+
+    json.forEach((contract: {name: string, address: string}) => {
+      switch (contract.name) {
+        case 'PositionOpener':
+          this.leverageContractAddresses.positionOpener = new EthereumAddress(contract.address);
+          break;
+        case 'PositionLiquidator':
+          this.leverageContractAddresses.positionLiquidator = new EthereumAddress(contract.address);
+          break;
+        case 'PositionCloser':
+          this.leverageContractAddresses.positionCloser = new EthereumAddress(contract.address);
+          break;
+        case 'PositionExpirator':
+          this.leverageContractAddresses.positionExpirator = new EthereumAddress(contract.address);
+          break;
+      }
+    });
   }
 }

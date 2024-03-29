@@ -1,4 +1,5 @@
 import {RuleJSONConfigItem} from '../../../rule_engine/TypesRule';
+import {LeverageContractAddresses} from '../../../types/LeverageContractAddresses';
 
 export interface IConfigService {
     refreshConfig(): Promise<void>;
@@ -11,4 +12,5 @@ export interface IConfigService {
     getSleepMillisecondsBetweenCycles(): number;
     getEtherscanAPIKey(): string;
     getDynamoDBAbiRepoTable(): string;
+    getLeverageContractInfo(): LeverageContractAddresses;
 }

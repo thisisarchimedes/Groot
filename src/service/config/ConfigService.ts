@@ -1,5 +1,7 @@
 import {injectable} from 'inversify';
 import {RuleJSONConfigItem} from '../../rule_engine/TypesRule';
+import {LeverageContractAddresses} from '../../types/LeverageContractAddresses';
+import {EthereumAddress} from '@thisisarchimedes/backend-sdk';
 
 @injectable()
 export abstract class ConfigService {
@@ -14,6 +16,13 @@ export abstract class ConfigService {
   protected sleepTimeMS: number = 0;
   protected etherscanAPIKey: string = '';
   protected AbiRepoDynamoDBTable: string = '';
+
+  protected leverageContractAddresses: LeverageContractAddresses = {
+    positionOpener: new EthereumAddress(''),
+    positionLiquidator: new EthereumAddress(''),
+    positionCloser: new EthereumAddress(''),
+    positionExpirator: new EthereumAddress(''),
+  };
 
   abstract refreshConfig(): Promise<void>;
 
@@ -51,5 +60,9 @@ export abstract class ConfigService {
 
   public getDynamoDBAbiRepoTable(): string {
     return this.AbiRepoDynamoDBTable;
+  }
+
+  public getLeverageContractInfo(): LeverageContractAddresses {
+    return this.leverageContractAddresses;
   }
 }

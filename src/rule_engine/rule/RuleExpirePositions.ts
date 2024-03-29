@@ -1,8 +1,7 @@
-import {Rule, RuleParams} from './Rule';
+import {Rule, RuleConstructorInput, RuleParams} from './Rule';
 import {UrgencyLevel} from '../TypesRule';
 import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
 import LeverageDataSource from '../tool/data_source/LeverageDataSource';
-import {RuleConstructorInput} from '../../types/RuleConstructorInput';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
