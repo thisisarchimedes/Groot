@@ -13,14 +13,20 @@ env:
   ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
   DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
   AWS_REGION: ${{ vars.AWS_REGION }}
+
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
   API_DEVOPS_EVENT_CATCHER: ${{ vars.API_DEVOPS_EVENT_CATCHER }}
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
   EKS_REGION: ${{ vars.EKS_REGION }}
+
   ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
   ECR_REPO: ${{ vars.ECR_REPO }}
+  ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+
+  NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
 
 jobs:
   build:
@@ -78,7 +84,17 @@ jobs:
       - name: Deploy to EKS (DemoApp)
         run: |
           ./scripts/k8s/eks/deploy_eks.sh configmap-demoapp.yaml
-      
+
+      - name: Wait for DemoApp deployment to complete
+        run: |
+          kubectl rollout status deployment/groot-deployment -n groot
+
+      - name: Check container status (fail if Demo didn't deploy correctly)
+        run: |
+          ./scripts/k8s/eks/check_container_status.sh groot-container groot-deployment
+          ./scripts/k8s/eks/check_container_status.sh eth-node-1 groot-deployment
+          ./scripts/k8s/eks/check_container_status.sh eth-node-2 groot-deployment
+    
       - name: Deploy to EKS (StableApp)
         run: |
           ./scripts/k8s/eks/deploy_eks.sh configmap-stableapp.yaml
