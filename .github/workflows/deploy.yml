@@ -26,6 +26,8 @@ env:
   ECR_REPO: ${{ vars.ECR_REPO }}
   ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
 
+  NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
+
 jobs:
   build:
     name: Build and Push Images
