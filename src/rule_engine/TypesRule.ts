@@ -4,6 +4,7 @@ export enum TypeRule {
     UniswapPSPRebalance = 'uniswapPSPRebalance',
     ExpirePositions = 'expirePosition',
     LiquidatePositions = 'liquidatePosition',
+    RuleBalanceCurvePoolWithVault = 'balanceCurvePoolWithVault'
 }
 
 export enum UrgencyLevel {

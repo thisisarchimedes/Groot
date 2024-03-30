@@ -3,7 +3,6 @@ import {injectable, inject} from 'inversify';
 import {ILogger} from '../logger/interfaces/ILogger';
 import {ISignalCriticalFailure} from './signal/interfaces/ISignalCriticalFailure';
 import {ISignalHeartbeat} from './signal/interfaces/ISignalHeartbeat';
-import {ILoggerAll} from '../logger/interfaces/ILoggerAll';
 import {IHealthMonitor} from './signal/interfaces/IHealthMonitor';
 import {IBlockchainNodeHealthMonitor} from './interfaces/BlockchainNodeHealthMonitor';
 
@@ -17,7 +16,7 @@ export class HealthMonitor implements IHealthMonitor {
   private readonly signalCriticalFailure: ISignalCriticalFailure;
 
   constructor(
-    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('ILoggerAll') _logger: ILogger,
     @inject('IBlockchainNodeHealthMonitor') blockchainHealthMonitor: IBlockchainNodeHealthMonitor,
     @inject('ISignalHeartbeat') signalHeartbeat: ISignalHeartbeat,
     @inject('ISignalCriticalFailure') signalCriticalFailure: ISignalCriticalFailure) {

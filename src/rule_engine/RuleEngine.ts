@@ -4,7 +4,6 @@ import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Rule} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
-import {ILoggerAll} from '../service/logger/interfaces/ILoggerAll';
 import {IFactoryRule} from './interfaces/IFactoryRule';
 import {IRuleEngine} from './interfaces/IRuleEngine';
 
@@ -17,7 +16,7 @@ export class RuleEngine implements IRuleEngine {
   private readonly ruleFactory: IFactoryRule;
 
   constructor(
-    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('ILoggerAll') _logger: ILogger,
     @inject('IFactoryRule') _factoryRule: IFactoryRule,
   ) {
     this.logger = _logger;

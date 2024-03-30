@@ -3,17 +3,15 @@ import 'reflect-metadata';
 
 import { expect } from 'chai';
 import { Container } from 'inversify';
-import { FactoryRule } from '../../src/rule_engine/FactoryRule';
 import { LoggerAdapter } from './adapters/LoggerAdapter';
 import { ConfigServiceAdapter } from './adapters/ConfigServiceAdapter';
-import { RuleEngine } from '../../src/rule_engine/RuleEngine';
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
 import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
 import { TYPES } from '../../src/inversify.types';
-import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 import { createTestContainer } from './inversify.config.unit_test';
+import { IRuleEngine } from '../../src/rule_engine/interfaces/IRuleEngine';
 
 describe('Rule Engine Testings', function () {
   let container: Container;
@@ -59,17 +57,14 @@ describe('Rule Engine Testings', function () {
     assertTransactionsValid(transactions, 3);
   });
 
-  async function createRuleEngineWithConfiguredRules(rulesFilePath: string): Promise<RuleEngine> {
+  async function createRuleEngineWithConfiguredRules(rulesFilePath: string): Promise<IRuleEngine> {
     configService.setRulesFromFile(rulesFilePath);
     await configService.refreshConfig();
     return createRuleEngine(configService.getRules());
   }
 
-  function createRuleEngine(rules: RuleJSONConfigItem[]): RuleEngine {
-    const abiRepo = container.get<IAbiRepo>(TYPES.IAbiRepo);
-
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
-    const ruleEngine = new RuleEngine(logger, ruleFactory);
+  function createRuleEngine(rules: RuleJSONConfigItem[]): IRuleEngine {
+    const ruleEngine: IRuleEngine = container.get<IRuleEngine>(TYPES.IRuleEngine);
     ruleEngine.loadRulesFromJSONConfig(rules);
     return ruleEngine;
   }

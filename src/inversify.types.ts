@@ -1,5 +1,6 @@
 const TYPES = {
   ILoggerAll: 'ILoggerAll',
+  ILoggerConsole: 'ILoggerConsole',
   IConfigServiceAWS: 'IConfigServiceAWS',
   Environment: 'Environment',
   Region: 'Region',
@@ -24,6 +25,10 @@ const TYPES = {
   IAbiRepo: 'IAbiRepo',
   IFactoryRule: 'IFactoryRule',
   IRuleEngine: 'IRuleEngine',
+  PGClient: 'PGClient',
+  PostgreTxQueue: 'PostgreTxQueue',
+  ITransactionQueuer: 'ITransactionQueuer',
+  PostgreDataSource: 'PostgreDataSource',
 };
 
 export {TYPES};

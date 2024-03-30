@@ -16,3 +16,7 @@ bash -c "$(curl -fsSL https://work.withpixie.ai/install.sh)"
 px auth login
 px deploy
 ```
+
+## New Relic integration
+
+Pixie is integrated with NewRelic - see https://onenr.io/0MRNxYydAQn

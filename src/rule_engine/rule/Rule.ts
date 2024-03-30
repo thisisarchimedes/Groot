@@ -3,7 +3,7 @@ import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {UrgencyLevel} from '../TypesRule';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
-import {IConfigServiceAWS} from '../../service/config/interfaces/IConfigServiceAWS';
+import {injectable} from 'inversify';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
@@ -11,30 +11,39 @@ export interface RuleParams {
 
 export interface RuleConstructorInput {
   logger: ILogger;
-  config: IConfigServiceAWS;
   blockchainReader: IBlockchainReader;
   abiRepo: IAbiRepo
   ruleLabel: string;
   params: RuleParams;
+
 }
 
+@injectable()
 export abstract class Rule {
-  protected logger: ILogger;
-  protected config: IConfigServiceAWS;
-  protected blockchainReader: IBlockchainReader;
-  protected abiRepo: IAbiRepo;
+  protected readonly logger: ILogger;
+  protected readonly blockchainReader: IBlockchainReader;
+  protected readonly abiRepo: IAbiRepo;
 
-  protected params: RuleParams;
-  protected readonly ruleLabel: string;
+  protected ruleLabel: string;
+  protected params: RuleParams | unknown;
   protected pendingTxQueue: OutboundTransaction[] = [];
 
-  constructor(constructorInput: RuleConstructorInput) {
-    this.logger = constructorInput.logger;
-    this.config = constructorInput.config;
-    this.params = constructorInput.params;
-    this.abiRepo = constructorInput.abiRepo;
-    this.ruleLabel = constructorInput.ruleLabel;
-    this.blockchainReader = constructorInput.blockchainReader;
+  constructor(
+      logger: ILogger,
+      blockchainReader: IBlockchainReader,
+      abiRepo: IAbiRepo,
+  ) {
+    this.logger = logger;
+    this.blockchainReader = blockchainReader;
+    this.abiRepo = abiRepo;
+    this.ruleLabel = ''; // Default initialization
+    this.params = {urgencyLevel: UrgencyLevel.NORMAL}; // Default initialization
+  }
+
+
+  public initialize(ruleLabel: string, params: RuleParams | unknown): void {
+    this.ruleLabel = ruleLabel;
+    this.params = params;
   }
 
   public abstract evaluate(): Promise<void>;

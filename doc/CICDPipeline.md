@@ -38,7 +38,7 @@ We run on AWS EKS . Pod has the following containers
 We've `eksctl` to create the clusters. 
 
 ```bash
-eksctl create cluster  -f scripts/k8s/eks/cluster_creation/config.yaml
+eksctl create cluster  -f scripts/k8s/eks/cluster_creation/cluster-creation.yaml
 eksctl create nodegroup --config-file=scripts/k8s/eks/cluster_creation/node-creation.yaml
 ```
 

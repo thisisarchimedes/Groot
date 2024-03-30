@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import {injectable} from 'inversify';
+import { injectable } from 'inversify';
 
-import {AppConfigClient} from './AppConfigClient';
-import {ConfigService} from './ConfigService';
-import {IConfigServiceAWS} from './interfaces/IConfigServiceAWS';
+import { AppConfigClient } from './AppConfigClient';
+import { ConfigService } from './ConfigService';
+import { IConfigServiceAWS } from './interfaces/IConfigServiceAWS';
 
 @injectable()
 export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS {
@@ -28,6 +28,7 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
       this.refreshAbiStorageConfig(),
       this.refreshLeverageContractInfo(),
       this.refreshLeverageDBURL(),
+      this.refreshTransactionsDatabaseURL(),
     ]);
   }
 
@@ -74,7 +75,7 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
   private async refreshLeverageContractInfo(): Promise<void> {
     const data = JSON.parse(await this.appConfigClient.fetchConfigRawString('LeverageContractInfo'));
 
-    data.forEach((contract: {name: string, address: string}) => {
+    data.forEach((contract: { name: string, address: string }) => {
       switch (contract.name) {
         case 'PositionOpener':
           this.leverageContractAddresses.positionOpener = contract.address;
@@ -94,5 +95,9 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
 
   private async refreshLeverageDBURL(): Promise<void> {
     this.leverageDbUrl = await this.appConfigClient.fetchConfigRawString('LeveragePositionDatabaseURL');
+  }
+
+  private async refreshTransactionsDatabaseURL(): Promise<void> {
+    this.transactionsDatabaseURL = await this.appConfigClient.fetchConfigRawString('TransactionsDatabaseURL');
   }
 }

@@ -3,35 +3,34 @@ import 'reflect-metadata';
 import * as dotenv from 'dotenv';
 import {injectable, inject} from 'inversify';
 
-import {TxQueueAdapter} from '../test/unit/adapters/TxQueueAdapter';
-import {TransactionQueuer} from './tx_queue/TransactionQueuer';
-import {IConfigServiceAWS} from './service/config/interfaces/IConfigServiceAWS';
-import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
 import {IBlockchainNodeLocal} from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import {IRuleEngine} from './rule_engine/interfaces/IRuleEngine';
 import {IGroot} from './interfaces/IGroot';
 import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealthMonitor';
+import {IConfigService} from './service/config/interfaces/IConfigService';
+import {ILogger} from './service/logger/interfaces/ILogger';
+import {ITransactionQueuer} from './tx_queue/interfaces/ITransactionQueuer';
 
 dotenv.config();
 
 @injectable()
 export class Groot implements IGroot {
-  private txQueuer!: TransactionQueuer;
-
-  public readonly logger: ILoggerAll;
-  private readonly configService: IConfigServiceAWS;
+  public readonly logger: ILogger;
+  private readonly configService: IConfigService;
   private readonly mainNode: IBlockchainNodeLocal;
   private readonly altNode: IBlockchainNodeLocal;
   private readonly healthMonitor: IHealthMonitor;
   private ruleEngine!: IRuleEngine;
+  private transactionsQueuer: ITransactionQueuer;
 
   constructor(
-    @inject('IConfigServiceAWS') _configService: IConfigServiceAWS,
-    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('IConfigServiceAWS') _configService: IConfigService,
+    @inject('ILoggerAll') _logger: ILogger,
     @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
     @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal,
     @inject('IHealthMonitor') _healthMonitor: IHealthMonitor,
     @inject('IRuleEngine') _ruleEngine: IRuleEngine,
+    @inject('ITransactionQueuer') _transactionsQueuer: ITransactionQueuer,
   ) {
     this.logger = _logger;
     this.configService = _configService;
@@ -39,6 +38,7 @@ export class Groot implements IGroot {
     this.altNode = _altLocalNode;
     this.healthMonitor = _healthMonitor;
     this.ruleEngine = _ruleEngine;
+    this.transactionsQueuer = _transactionsQueuer;
   }
 
   public async initalizeGroot() {
@@ -68,7 +68,7 @@ export class Groot implements IGroot {
 
     await this.configService.refreshConfig();
     await this.setLocalNodesToNewestBlock();
-    this.resetTransactionQueuer();
+    await this.resetTransactionQueuer();
 
     this.healthMonitor.endOfCycleSequence();
     this.logger.info('Groot is ready for cycle.');
@@ -81,10 +81,8 @@ export class Groot implements IGroot {
     ]);
   }
 
-  private resetTransactionQueuer() {
-    // TODO: Replace with actual queue implementaion
-    const queue = new TxQueueAdapter();
-    this.txQueuer = new TransactionQueuer(this.logger, queue);
+  private async resetTransactionQueuer() {
+    await this.transactionsQueuer.refresh();
   }
 
   public async runOneGrootCycle(): Promise<void> {
@@ -95,9 +93,11 @@ export class Groot implements IGroot {
 
       await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
       const txs = this.ruleEngine.getOutboundTransactions();
-      await this.txQueuer.queueTransactions(txs);
+      await this.transactionsQueuer.queueTransactions(txs);
     } catch (ex) {
-      console.log('error '); // FIX
+      if (ex instanceof Error) {
+        this.logger.error(ex.message);
+      }
     } finally {
       this.logger.info('Groot cycle ran successfully.');
       await this.logger.flush();

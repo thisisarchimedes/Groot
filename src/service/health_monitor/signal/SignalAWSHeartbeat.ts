@@ -1,18 +1,18 @@
 import {injectable, inject} from 'inversify';
 
-import {IConfigServiceAWS} from '../../config/interfaces/IConfigServiceAWS';
-import {ILoggerAll} from '../../logger/interfaces/ILoggerAll';
 import {IHostNameProvider} from '../IHostNameProvider';
 import {ISignalHeartbeat} from './interfaces/ISignalHeartbeat';
 import {SignalAWS} from './SignalAWS';
+import {IConfigService} from '../../config/interfaces/IConfigService';
+import {ILogger} from '../../logger/interfaces/ILogger';
 
 @injectable()
 export class SignalAWSHeartbeat extends SignalAWS implements ISignalHeartbeat {
   private readonly namespace: string;
 
   constructor(
-    @inject('IConfigServiceAWS') _configService: IConfigServiceAWS,
-    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('IConfigServiceAWS') _configService: IConfigService,
+    @inject('ILoggerAll') _logger: ILogger,
     @inject('IHostNameProvider') _hostNameProvider: IHostNameProvider,
     @inject('MetricNamespaceHeartBeat') namespace: string,
   ) {

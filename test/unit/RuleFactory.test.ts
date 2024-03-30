@@ -9,6 +9,7 @@ import { Container } from 'inversify';
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 import { createTestContainer } from './inversify.config.unit_test';
+import { IFactoryRule } from '../../src/rule_engine/interfaces/IFactoryRule';
 
 describe('Rule Factory Testings', function () {
   let container: Container;
@@ -18,7 +19,7 @@ describe('Rule Factory Testings', function () {
 
   beforeEach(async function () {
     container = createTestContainer();
-    logger = container.get<LoggerAdapter>(TYPES.ILoggerAll);
+    logger = container.resolve(LoggerAdapter);
     blockchainReader = container.get<BlockchainReader>(TYPES.IBlockchainReader);
     abiRepo = container.get<IAbiRepo>(TYPES.IAbiRepo);
 
@@ -28,7 +29,7 @@ describe('Rule Factory Testings', function () {
   });
 
   it('should create Rule object from a dummy rule config', async function () {
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
@@ -48,7 +49,7 @@ describe('Rule Factory Testings', function () {
       label: 'dummyRule',
       params: { message: 'I AM GROOT', NumberOfDummyTxs: 3, evalSuccess: true },
     };
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
     const rule = ruleFactory.createRule(dummyRule);
     if (rule) {
       await rule.evaluate();
@@ -66,7 +67,7 @@ describe('Rule Factory Testings', function () {
   });
 
   it('should create identifier when the Rule evaluates itself', async function () {
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
