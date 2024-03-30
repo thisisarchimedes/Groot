@@ -60,7 +60,7 @@ describe('Check that we work with local Hardhat node correctly', function () {
     // eslint-disable-next-line max-len
     const abi = [{ 'inputs': [], 'name': 'decimals', 'outputs': [{ 'internalType': 'uint8', 'name': '', 'type': 'uint8' }], 'stateMutability': 'view', 'type': 'function' }];
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
-    const res = Number(await localNode.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals'));
+    const res = Number(await localNode.callViewFunction(usdcContractAddress, JSON.stringify(abi), 'decimals'));
     expect(res).to.be.equal(6);
   });
 

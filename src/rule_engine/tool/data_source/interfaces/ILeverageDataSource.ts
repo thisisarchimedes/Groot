@@ -4,4 +4,5 @@ export interface ILeverageDataSource {
     getPositionsByNftIds(nftIds: number[]): Promise<LeveragePosition[]>;
     getLivePositions(): Promise<LeveragePosition[]>;
     getLivePositionsNftIds(): Promise<number[]>;
+    getLivePositionsForLiquidaton(): Promise<LeveragePosition[]>;
 }

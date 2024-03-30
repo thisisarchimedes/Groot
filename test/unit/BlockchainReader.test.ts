@@ -59,7 +59,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
     const res = Number(await blockchainReader.callViewFunction(usdcContractAddress,
-      new ethers.Interface(abi), 'decimals'));
+      JSON.stringify(abi), 'decimals'));
 
     expect(res).to.be.eq(2);
   });
@@ -123,7 +123,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
     const res = Number(await blockchainReader.callViewFunction(usdcContractAddress,
-      new ethers.Interface(abi), 'decimals'));
+      JSON.stringify(abi), 'decimals'));
 
     expect(res).to.be.eq(1);
   });
@@ -150,7 +150,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
       const abi = getStubAbi();
 
-      await blockchainReader.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals');
+      await blockchainReader.callViewFunction(usdcContractAddress, JSON.stringify(abi), 'decimals');
       expect.fail('Expected callViewFunction to throw an error');
     } catch (error) {
       expect(error).to.be.instanceOf(BlockchainReaderError);
@@ -180,7 +180,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
       const abi = getStubAbi();
 
-      await blockchainReader.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals');
+      await blockchainReader.callViewFunction(usdcContractAddress, JSON.stringify(abi), 'decimals');
       expect.fail('Expected callViewFunction to throw an error');
     } catch (error) {
       expect(error).to.be.instanceOf(BlockchainReaderError);
@@ -210,7 +210,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
       const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
       const abi = getStubAbi();
 
-      await blockchainReader.callViewFunction(usdcContractAddress, new ethers.Interface(abi), 'decimals');
+      await blockchainReader.callViewFunction(usdcContractAddress, JSON.stringify(abi), 'decimals');
       expect.fail('Expected callViewFunction to throw an error');
     } catch (error) {
       expect(error).to.be.instanceOf(BlockchainReaderError);

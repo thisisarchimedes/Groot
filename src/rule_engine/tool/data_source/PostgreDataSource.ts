@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import pg, {Client} from 'pg'; // Import Client instead of Pool
-import {ILeverageDataSource} from './interfaces/ILeverageDataSource';
+import pg, { Client } from 'pg'; // Import Client instead of Pool
+import { ILeverageDataSource } from './interfaces/ILeverageDataSource';
 import LeveragePosition from '../../../types/LeveragePosition';
-import {ILogger} from '../../../service/logger/interfaces/ILogger';
-import {inject, injectable} from 'inversify';
+import { ILogger } from '../../../service/logger/interfaces/ILogger';
+import { inject, injectable } from 'inversify';
 
 
 @injectable()
@@ -33,6 +33,17 @@ export default class PostgreDataSource implements ILeverageDataSource {
   async getLivePositionsNftIds(): Promise<number[]> {
     const resp = await this.executeQuery('SELECT "nftId" FROM "LeveragePosition" WHERE "positionState" = \'LIVE\'');
     return resp ? resp.rows.map((row) => row.nftId) : [];
+  }
+
+  public async getLivePositionsForLiquidaton(): Promise<LeveragePosition[]> {
+    const query = `SELECT *, (debtAmount + collateralAmount) AS positionSize
+      FROM "LeveragePosition"
+      WHERE "positionState" = 'LIVE'
+      ORDER BY positionSize DESC
+      LIMIT 1000
+    `;
+    const resp = await this.executeQuery(query);
+    return resp ? (resp.rows as LeveragePosition[]) : [];
   }
 
   private async connect() {
