@@ -40,6 +40,7 @@ export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNo
 
   public async resetNode(externalProviderRpcUrl: string): Promise<void> {
     try {
+      this.logger.debug(`Resetting node to external RPC URL: ${externalProviderRpcUrl}`);
       const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
       this.handleResetResponse(responseData);
     } catch (error) {
