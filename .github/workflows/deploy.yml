@@ -84,7 +84,17 @@ jobs:
       - name: Deploy to EKS (DemoApp)
         run: |
           ./scripts/k8s/eks/deploy_eks.sh configmap-demoapp.yaml
-      
+
+      - name: Wait for DemoApp deployment to complete
+        run: |
+          kubectl rollout status deployment/groot-deployment
+
+      - name: Check container status (fail if Demo didn't deploy correctly)
+        run: |
+          ./scripts/k8s/eks/check_container_status.sh groot-container groot-deployment
+          ./scripts/k8s/eks/check_container_status.sh eth-node-1 groot-deployment
+          ./scripts/k8s/eks/check_container_status.sh eth-node-2 groot-deployment
+    
       - name: Deploy to EKS (StableApp)
         run: |
           ./scripts/k8s/eks/deploy_eks.sh configmap-stableapp.yaml
