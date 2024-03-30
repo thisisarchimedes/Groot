@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import pg, { Client } from 'pg'; // Import Client instead of Pool
-import { ILeverageDataSource } from './interfaces/ILeverageDataSource';
+import pg, {Client} from 'pg'; // Import Client instead of Pool
+import {ILeverageDataSource} from './interfaces/ILeverageDataSource';
 import LeveragePosition from '../../../types/LeveragePosition';
-import { ILogger } from '../../../service/logger/interfaces/ILogger';
-import { inject, injectable } from 'inversify';
+import {ILogger} from '../../../service/logger/interfaces/ILogger';
+import {inject, injectable} from 'inversify';
 
 
 @injectable()

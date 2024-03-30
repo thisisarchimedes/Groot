@@ -1,4 +1,4 @@
-import {Block, ethers} from 'ethers';
+import {Block} from 'ethers';
 import {BlockchainNodeProxyInfo} from '../BlockchainNodeProxyInfo';
 
 export interface IBlockchainNode {

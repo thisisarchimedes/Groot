@@ -47,6 +47,8 @@ import {RuleExpirePositions} from './rule_engine/rule/RuleExpirePositions';
 import {RuleUniswapPSPRebalance} from './rule_engine/rule/RuleUniswapPSPRebalance';
 import {LoggerConsole} from './service/logger/LoggerConsole';
 import {RuleBalanceCurvePoolWithVault} from './rule_engine/rule/RuleBalanceCurvePoolWithVault';
+import {IUniSwapPayloadBuilder} from './rule_engine/tool/uni_swap/interfaces/IUniSwapPayloadBuilder';
+import UniSwapPayloadBuilder from './rule_engine/tool/uni_swap/UniSwapPayloadBuilder';
 
 export class InversifyConfig {
   private container: Container;
@@ -63,7 +65,13 @@ export class InversifyConfig {
     this.bindRuleEngine();
     this.bindTransactionQueue();
     this.bindRules();
+    this.bindTooling();
     this.bindGroot();
+  }
+
+  private bindTooling() {
+    this.container.bind<IUniSwapPayloadBuilder>(TYPES.IUniSwapPayloadBuilder)
+        .to(UniSwapPayloadBuilder).inTransientScope();
   }
 
   private bindDBConfiguration(configServiceAWS: IConfigServiceAWS) {

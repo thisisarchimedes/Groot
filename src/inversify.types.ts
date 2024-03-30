@@ -29,6 +29,7 @@ const TYPES = {
   PostgreTxQueue: 'PostgreTxQueue',
   ITransactionQueuer: 'ITransactionQueuer',
   PostgreDataSource: 'PostgreDataSource',
+  IUniSwapPayloadBuilder: 'IUniSwapPayloadBuilder',
 };
 
 export {TYPES};

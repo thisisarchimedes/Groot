@@ -4,34 +4,44 @@ import {IBlockchainReader} from '../../../blockchain/blockchain_reader/interface
 import {Address} from '../../../types/LeverageContractAddresses';
 import {IAbiRepo} from '../abi_repository/interfaces/IAbiRepo';
 import {WBTC, WBTC_DECIMALS} from '../../../constants/addresses';
+import {inject, injectable} from 'inversify';
+import {IUniSwapPayloadBuilder} from './interfaces/IUniSwapPayloadBuilder';
 
-export default class UniSwapPayloadBuilder {
+@injectable()
+export default class UniSwapPayloadBuilder implements IUniSwapPayloadBuilder {
+  protected readonly blockchainReader: IBlockchainReader;
+  protected readonly abiRepo: IAbiRepo;
+
+  constructor(@inject('IBlockchainReader') blockchainReader: IBlockchainReader,
+        @inject('IAbiRepo') abiRepo: IAbiRepo) {
+    this.blockchainReader = blockchainReader;
+    this.abiRepo = abiRepo;
+  }
+
   /**
-  * Returns the swap payload to open a position
-  * @param blockchainReader blockchain reader class
-  * @param abiRepo ABI repository class
-  * @param amount open position amount
-  * @param strategy strategy address
-  * @param currentTimestamp timestamp of the latest block
-  * @returns string - swap payload to open the position
-  */
-  public static readonly getOpenPositionSwapPayload = async (
-      blockchainReader: IBlockchainReader,
-      abiRepo: IAbiRepo,
+    * Returns the swap payload to open a position
+    * @param blockchainReader blockchain reader class
+    * @param abiRepo ABI repository class
+    * @param amount open position amount
+    * @param strategy strategy address
+    * @param currentTimestamp timestamp of the latest block
+    * @returns string - swap payload to open the position
+    */
+  public readonly getOpenPositionSwapPayload = async (
       amount: bigint,
       strategy: Address,
       currentTimestamp: number,
   ): Promise<string> => {
     // console.log('Building payload for:', nftId); // Debug
-    const strategyAsset = await blockchainReader.callViewFunction( // Optimization: can get from DB
+    const strategyAsset = await this.blockchainReader.callViewFunction( // Optimization: can get from DB
         strategy,
-        await abiRepo.getAbiByAddress(strategy),
+        await this.abiRepo.getAbiByAddress(strategy),
         'asset',
         [],
     ) as Address;
-    const assetDecimals = await blockchainReader.callViewFunction( // Optimization: can get from DB
+    const assetDecimals = await this.blockchainReader.callViewFunction( // Optimization: can get from DB
         strategyAsset,
-        await abiRepo.getAbiByAddress(strategyAsset),
+        await this.abiRepo.getAbiByAddress(strategyAsset),
         'decimals',
         [],
     ) as bigint;
@@ -50,31 +60,29 @@ export default class UniSwapPayloadBuilder {
   };
 
   /**
-  * Returns the swap payload to close the position
-  * @param blockchainReader blockchain reader class
-  * @param abiRepo ABI repository class
-  * @param strategy strategy address
-  * @param strategyShares shares amount
-  * @param currentTimestamp timestamp of the latest block
-  * @returns string - swap payload to close the position
-  */
-  public static readonly getClosePositionSwapPayload = async (
-      blockchainReader: IBlockchainReader,
-      abiRepo: IAbiRepo,
+    * Returns the swap payload to close the position
+    * @param blockchainReader blockchain reader class
+    * @param abiRepo ABI repository class
+    * @param strategy strategy address
+    * @param strategyShares shares amount
+    * @param currentTimestamp timestamp of the latest block
+    * @returns string - swap payload to close the position
+    */
+  public getClosePositionSwapPayload = async (
       strategy: Address,
       strategyShares: number,
       currentTimestamp: number,
   ): Promise<string> => {
     // console.log('Building payload for:', nftId); // Debug
-    const strategyAsset = await blockchainReader.callViewFunction( // Optimization: can get from DB
+    const strategyAsset = await this.blockchainReader.callViewFunction( // Optimization: can get from DB
         strategy,
-        await abiRepo.getAbiByAddress(strategy),
+        await this.abiRepo.getAbiByAddress(strategy),
         'asset',
         [],
     ) as Address;
-    const assetDecimals = await blockchainReader.callViewFunction( // Optimization: can get from DB
+    const assetDecimals = await this.blockchainReader.callViewFunction( // Optimization: can get from DB
         strategyAsset,
-        await abiRepo.getAbiByAddress(strategyAsset),
+        await this.abiRepo.getAbiByAddress(strategyAsset),
         'decimals',
         [],
     ) as bigint;
@@ -82,9 +90,9 @@ export default class UniSwapPayloadBuilder {
         strategyShares.toFixed(Number(assetDecimals)),
         assetDecimals,
     ); // Converting float to bigint
-    const minimumExpectedAssets = await blockchainReader.callViewFunction( // Must query live
+    const minimumExpectedAssets = await this.blockchainReader.callViewFunction( // Must query live
         strategy,
-        await abiRepo.getAbiByAddress(strategy),
+        await this.abiRepo.getAbiByAddress(strategy),
         'convertToAssets',
         [strategySharesN],
     ) as bigint;
