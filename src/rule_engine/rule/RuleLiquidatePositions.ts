@@ -1,11 +1,12 @@
 import pLimit from 'p-limit';
-import {Contracts, EthereumAddress, PositionLiquidator} from '@thisisarchimedes/backend-sdk';
 import {Rule, RuleConstructorInput, RuleParams} from './Rule';
 import {UrgencyLevel} from '../TypesRule';
-import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
+import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
 import LeverageDataSource from '../tool/data_source/LeverageDataSource';
 import LeveragePosition from '../../types/LeveragePosition';
 import UniSwapPayloadBuilder from '../tool/uni_swap/UniSwapPayloadBuilder';
+import {Contract} from 'ethers';
+import {Address} from '../../types/LeverageContractAddresses';
 
 const MAX_CONCURRENCY = 20;
 
@@ -13,33 +14,34 @@ const limit = pLimit(MAX_CONCURRENCY);
 
 export interface RuleParamsLiquidatePositions extends RuleParams {
   message: string;
-  NumberOfLiquidatePositionsTxs: number;
+  numberOfLiquidatePositionsTxs: number;
   evalSuccess: boolean;
 }
 
 export class RuleLiquidatePositions extends Rule {
   private leverageDataSource: LeverageDataSource;
-  private positionLiquidator!: PositionLiquidator;
+  private positionLiquidator!: Contract;
 
   constructor(constractorInput: RuleConstructorInput) {
     super(constractorInput);
-    this.leverageDataSource = new LeverageDataSource();
-    this.positionLiquidator = Contracts.leverage.positionLiquidator(
-        this.config.getLeverageContractInfo().positionLiquidator,
-        this.blockchainReader,
-    );
+    this.leverageDataSource = new LeverageDataSource(this.logger, this.config);
   }
 
   public async evaluate(): Promise<void> {
     const params = this.params as RuleParamsLiquidatePositions;
-    const blockNumber = await this.blockchainReader.getBlockNumber();
-
     this.logger.info('RuleLiquidatePositions.evaluate() called: ' + params.message);
+
+    // Initialize
+    const blockNumber = await this.blockchainReader.getBlockNumber();
+    const currentTimestamp = await this.blockchainReader.getBlockTimestamp(blockNumber);
+
+    this.positionLiquidator = new Contract(
+        this.config.getLeverageContractInfo().positionLiquidator,
+        await this.abiRepo.getAbiByAddress(this.config.getLeverageContractInfo().positionLiquidator),
+    );
 
     // Query to get all live positions data
     const res = await this.leverageDataSource.getLivePositionsForLiquidaton();
-
-    let liquidatedCount = 0;
 
     // Looping through the positions and preparing the semaphore with the liquidation process
     const promises = [];
@@ -47,9 +49,7 @@ export class RuleLiquidatePositions extends Rule {
       try {
         const {nftId, strategy, strategyShares} = this.validatePositionData(position); // Throws
 
-        const promise = this.pushToSemaphore(nftId, strategy, strategyShares, currentTimestamp, () => {
-          liquidatedCount++;
-        });
+        const promise = this.pushToSemaphore(nftId, strategy, strategyShares, currentTimestamp);
         promises.push(promise);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
@@ -58,17 +58,16 @@ export class RuleLiquidatePositions extends Rule {
       }
     }
 
-    // Await for all the processes to finish
-    const answers = await Promise.allSettled(promises);
+    // Await for all the processes to finish and filter out the failed ones
+    const txs = (await Promise.allSettled(promises))
+        .filter((result) => result.status === 'fulfilled')
+        .map((result) => (result as PromiseFulfilledResult<RawTransactionData>).value);
 
-    this.logRunResult(liquidatedCount, res.length);
+    params.evalSuccess = true;
+    params.numberOfLiquidatePositionsTxs = txs.length;
 
-    if (params.evalSuccess === false) {
-      throw new Error('RuleLiquidatePositions.evaluate() failed');
-    }
-
-    for (let i = 0; i < params.NumberOfLiquidatePositionsTxs; i++) {
-      const liquidatePositionTx = this.createLiquidatePositionsTransaction(i, blockNumber);
+    for (let i = 0; i < params.numberOfLiquidatePositionsTxs; i++) {
+      const liquidatePositionTx = this.createLiquidatePositionsTransaction(i, blockNumber, txs[i]);
       this.pushTransactionToRuleLocalQueue(liquidatePositionTx);
     }
   }
@@ -76,7 +75,6 @@ export class RuleLiquidatePositions extends Rule {
   private validatePositionData = (position: LeveragePosition) => {
     const nftId: number = Number(position.nftId);
     const strategyShares: number = Number(position.strategyShares);
-    const strategy = new EthereumAddress(position.strategy); // Throws
     if (isNaN(nftId)) {
       throw new Error(`Position nftId is not a number`);
     }
@@ -87,62 +85,45 @@ export class RuleLiquidatePositions extends Rule {
 
     return {
       nftId,
-      strategy,
+      strategy: position.strategy,
       strategyShares,
     };
   };
 
   private pushToSemaphore = (
       nftId: number,
-      strategy: EthereumAddress,
+      strategy: Address,
       strategyShares: number,
       currentTimestamp: number,
-      cb: () => void,
   ) => {
-    const promise = limit(() => this.tryLiquidate(nftId, strategy, strategyShares, currentTimestamp).then(cb));
+    const promise = limit(() => this.createLiquidateTransaction(nftId, strategy, strategyShares, currentTimestamp));
     return promise;
   };
 
-  private tryLiquidate = async (
+  private createLiquidateTransaction = async (
       nftId: number,
-      strategy: EthereumAddress,
+      strategy: Address,
       strategyShares: number,
       currentTimestamp: number,
   ) => {
     try {
       const payload = await UniSwapPayloadBuilder.getClosePositionSwapPayload(
-          this.signer,
+          this.blockchainReader,
+          this.abiRepo,
           strategy,
           strategyShares,
           currentTimestamp,
       );
-      const tx = this.prepareTransaction(nftId, gasPrice, payload);
-      await this.txSimulator.simulateAndRunTransaction(tx);
+      return this.prepareTransaction(nftId, payload);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      this.errorLogger(nftId, error);
+      this.logger.error(`Position ${nftId} liquidation errored with [1]:`);
+      this.logger.error(error);
       return Promise.reject(error);
     }
   };
 
-  private errorLogger = (nftId: number, error: any) => {
-    if (error.data === '0x5e6797f9') { // NotEligibleForLiquidation selector
-      this.logger.info(`Position ${nftId} is not eligible for liquidation`);
-    } else {
-      this.logger.error(`Position ${nftId} liquidation errored with [1]:`);
-      this.logger.error(error);
-    }
-  };
-
-  private logRunResult = (liquidatedCount: number, total: number) => {
-    if (liquidatedCount === 0) {
-      this.logger.info(`No positions liquidated`);
-    } else {
-      this.logger.warn(`${liquidatedCount} out of ${total} positions liquidated`);
-    }
-  };
-
-  private prepareTransaction = (nftId: number, gasPrice: bigint | null, payload: string): TransactionRequest => {
+  private prepareTransaction = (nftId: number, payload: string): RawTransactionData => {
     const data = this.positionLiquidator.interface.encodeFunctionData('liquidatePosition', [{
       nftId,
       minWBTC: 0,
@@ -153,24 +134,28 @@ export class RuleLiquidatePositions extends Rule {
 
     // Create a transaction object
     const tx = {
-      to: this.config.positionLiquidator.toString(),
+      to: this.config.getLeverageContractInfo().positionLiquidator,
+      value: 0n,
       data,
-      gasPrice,
     };
 
     return tx;
   };
 
-  private createLiquidatePositionsTransaction(txNumber: number, currentBlockNumber: number): OutboundTransaction {
+  private createLiquidatePositionsTransaction(
+      txNumber: number,
+      currentBlockNumber: number,
+      tx: RawTransactionData,
+  ): OutboundTransaction {
     return {
-      urgencyLevel: UrgencyLevel.NORMAL,
+      urgencyLevel: UrgencyLevel.URGENT,
       context: `this is a liquidatePosition context - number: ${txNumber} - block: ${currentBlockNumber}`,
       postEvalUniqueKey: this.generateUniqueKey(),
-      lowLevelUnsignedTransaction: {},
+      lowLevelUnsignedTransaction: tx,
     };
   }
 
   protected generateUniqueKey(): string {
-    return 'liquidatePositionKey';
+    return 'liquidatePositionKey'; // !TODO: Implement a unique key generator
   }
 }

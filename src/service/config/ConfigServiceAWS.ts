@@ -5,7 +5,6 @@ import {injectable} from 'inversify';
 import {AppConfigClient} from './AppConfigClient';
 import {ConfigService} from './ConfigService';
 import {IConfigServiceAWS} from './interfaces/IConfigServiceAWS';
-import {EthereumAddress} from '@thisisarchimedes/backend-sdk';
 
 @injectable()
 export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS {
@@ -28,6 +27,7 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
       this.refreshEtherscanAPIKey(),
       this.refreshAbiStorageConfig(),
       this.refreshLeverageContractInfo(),
+      this.refreshLeverageDBURL(),
     ]);
   }
 
@@ -72,23 +72,27 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
   }
 
   private async refreshLeverageContractInfo(): Promise<void> {
-    const json = JSON.parse(await this.appConfigClient.fetchConfigRawString('LeverageContractInfo'));
+    const data = JSON.parse(await this.appConfigClient.fetchConfigRawString('LeverageContractInfo'));
 
-    json.forEach((contract: {name: string, address: string}) => {
+    data.forEach((contract: {name: string, address: string}) => {
       switch (contract.name) {
         case 'PositionOpener':
-          this.leverageContractAddresses.positionOpener = new EthereumAddress(contract.address);
+          this.leverageContractAddresses.positionOpener = contract.address;
           break;
         case 'PositionLiquidator':
-          this.leverageContractAddresses.positionLiquidator = new EthereumAddress(contract.address);
+          this.leverageContractAddresses.positionLiquidator = contract.address;
           break;
         case 'PositionCloser':
-          this.leverageContractAddresses.positionCloser = new EthereumAddress(contract.address);
+          this.leverageContractAddresses.positionCloser = contract.address;
           break;
         case 'PositionExpirator':
-          this.leverageContractAddresses.positionExpirator = new EthereumAddress(contract.address);
+          this.leverageContractAddresses.positionExpirator = contract.address;
           break;
       }
     });
+  }
+
+  private async refreshLeverageDBURL(): Promise<void> {
+    this.leverageDbUrl = await this.appConfigClient.fetchConfigRawString('LeveragePositionDatabaseURL');
   }
 }

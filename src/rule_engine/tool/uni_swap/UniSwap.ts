@@ -3,7 +3,7 @@ import {Protocol} from '@uniswap/router-sdk';
 import {AlphaRouter, SwapRoute} from '@uniswap/smart-order-router';
 import {Pool} from '@uniswap/v3-sdk';
 import {ethers} from 'ethers';
-import {EthereumAddress} from '@thisisarchimedes/backend-sdk';
+import {Address} from '../../../types/LeverageContractAddresses';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let uniSwapEthers: any;
@@ -28,9 +28,9 @@ export default class Uniswap {
 
   public async buildPayload(
       amount: string,
-      inputToken: EthereumAddress,
+      inputToken: Address,
       inputTokenDecimals: number,
-      outputToken: EthereumAddress,
+      outputToken: Address,
       outputTokenDecimals: number,
       currentTimestamp: number,
   ): Promise<{ payload: string; swapOutputAmount: string }> {

@@ -1,11 +1,11 @@
-import {Interface} from 'ethers';
 import {BlockchainNodeProxyInfo} from '../../blockchain_nodes/BlockchainNodeProxyInfo';
 
 export interface IBlockchainReader {
     getBlockNumber(): Promise<number>;
+    getBlockTimestamp(blockNumber: number): Promise<number>;
     callViewFunction(
         contractAddress: string,
-        abi: Interface,
+        abi: string,
         functionName: string,
         params?: unknown[]
     ): Promise<unknown>;

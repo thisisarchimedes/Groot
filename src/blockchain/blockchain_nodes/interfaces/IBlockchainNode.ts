@@ -1,11 +1,12 @@
-import {ethers} from 'ethers';
+import {Block, ethers} from 'ethers';
 import {BlockchainNodeProxyInfo} from '../BlockchainNodeProxyInfo';
 
 export interface IBlockchainNode {
+    getBlock(blockNumber: number): Promise<Block>;
     getBlockNumber(): Promise<number>;
     callViewFunction(
         contractAddress: string,
-        abi: ethers.Interface,
+        abi: string,
         functionName: string,
         params?: unknown[]
     ): Promise<unknown>;
