@@ -87,7 +87,7 @@ jobs:
 
       - name: Wait for DemoApp deployment to complete
         run: |
-          kubectl rollout status deployment/groot-deployment
+          kubectl rollout status deployment/groot-deployment -n groot
 
       - name: Check container status (fail if Demo didn't deploy correctly)
         run: |
