@@ -9,7 +9,7 @@ fi
 
 CONFIG_FILE_NAME=$1 
 
-echo "Deploying configmap $CONFIG_FILE_NAME [$EKS_REGION ; $AWS_ACCESS_KEY_ID ; $AWS_SECRET_ACCESS_KEY ; $ALCHEMY_API_KEY ; $NEW_RELIC_API_KEY]"
+echo "Deploying with configmap $CONFIG_FILE_NAME [$EKS_REGION ; $AWS_ACCESS_KEY_ID ; $AWS_SECRET_ACCESS_KEY ; $ALCHEMY_API_KEY ; $NEW_RELIC_API_KEY]"
 
 # Update kubeconfig
 aws eks update-kubeconfig --name groot-demo-app --region $EKS_REGION
