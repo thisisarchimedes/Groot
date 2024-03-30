@@ -29,12 +29,9 @@ describe('Transaction Queuer', function () {
         context: 'test 1',
         postEvalUniqueKey: '0x1234',
         lowLevelUnsignedTransaction: {
-          nonce: '0x0',
-          gasPrice: '0x0',
           to: '0x0',
-          value: '0x0',
+          value: BigInt(0),
           data: '0x0',
-          chainId: 0,
         },
       },
       {
@@ -42,12 +39,9 @@ describe('Transaction Queuer', function () {
         context: 'test 2',
         postEvalUniqueKey: '',
         lowLevelUnsignedTransaction: {
-          nonce: '0x0',
-          gasPrice: '0x0',
           to: '0x0',
-          value: '0x0',
+          value: BigInt(0),
           data: '0x0',
-          chainId: 0,
         },
       },
       {
@@ -55,12 +49,9 @@ describe('Transaction Queuer', function () {
         context: 'test 3',
         postEvalUniqueKey: '0x345',
         lowLevelUnsignedTransaction: {
-          nonce: '0x0',
-          gasPrice: '0x0',
           to: '0x0',
-          value: '0x0',
+          value: BigInt(0),
           data: '0x0',
-          chainId: 0,
         },
       },
     ];

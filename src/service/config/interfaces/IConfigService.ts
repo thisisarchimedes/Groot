@@ -11,4 +11,5 @@ export interface IConfigService {
     getSleepMillisecondsBetweenCycles(): number;
     getEtherscanAPIKey(): string;
     getDynamoDBAbiRepoTable(): string;
+    getTransactionsDBURL(): string;
 }

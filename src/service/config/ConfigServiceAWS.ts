@@ -26,6 +26,7 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
       this.refreshSleepTime(),
       this.refreshEtherscanAPIKey(),
       this.refreshAbiStorageConfig(),
+      this.refreshTransactionsDatabaseURL(),
     ]);
   }
 
@@ -67,5 +68,9 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
 
   private async refreshAbiStorageConfig(): Promise<void> {
     this.AbiRepoDynamoDBTable = await this.appConfigClient.fetchConfigRawString('AbiRepoDynamoDBTable');
+  }
+
+  private async refreshTransactionsDatabaseURL(): Promise<void> {
+    this.transactionsDatabaseURL = await this.appConfigClient.fetchConfigRawString('TransactionsDatabaseURL');
   }
 }

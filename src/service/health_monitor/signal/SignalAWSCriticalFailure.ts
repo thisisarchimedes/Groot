@@ -1,9 +1,9 @@
 import {injectable, inject} from 'inversify';
-import {IConfigServiceAWS} from '../../config/interfaces/IConfigServiceAWS';
-import {ILoggerAll} from '../../logger/interfaces/ILoggerAll';
 import {IHostNameProvider} from '../IHostNameProvider';
 import {ISignalCriticalFailure} from './interfaces/ISignalCriticalFailure';
 import {SignalAWS} from './SignalAWS';
+import {IConfigService} from '../../config/interfaces/IConfigService';
+import {ILogger} from '../../logger/interfaces/ILogger';
 
 @injectable()
 export class SignalAWSCriticalFailure extends SignalAWS implements ISignalCriticalFailure {
@@ -11,8 +11,8 @@ export class SignalAWSCriticalFailure extends SignalAWS implements ISignalCritic
 
 
   constructor(
-    @inject('IConfigServiceAWS') _configService: IConfigServiceAWS,
-    @inject('ILoggerAll') _logger: ILoggerAll,
+    @inject('IConfigServiceAWS') _configService: IConfigService,
+    @inject('ILoggerAll') _logger: ILogger,
     @inject('IHostNameProvider') _hostNameProvider: IHostNameProvider,
     @inject('MetricNamespaceCriticalFailure') namespace: string) {
     super(_logger, _configService, _hostNameProvider, namespace);

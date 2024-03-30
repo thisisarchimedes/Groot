@@ -10,6 +10,7 @@ import { Container } from 'inversify';
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 import { createTestContainer } from './inversify.config.unit_test';
+import { IFactoryRule } from '../../src/rule_engine/interfaces/IFactoryRule';
 
 dotenv.config();
 
@@ -31,7 +32,8 @@ describe('Rule Factory Testings: Expire Positions', function () {
   });
 
   it('should create Expire positions Rule object from a rule config', function () {
-    const ruleFactory = new FactoryRule(logger, blockchainReader, abiRepo);
+    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
+
     const expirePositionRule: RuleJSONConfigItem = {
       ruleType: TypeRule.ExpirePositions,
       label: 'Expire positions - test',
