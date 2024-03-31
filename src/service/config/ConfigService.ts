@@ -1,5 +1,6 @@
-import {injectable} from 'inversify';
-import {RuleJSONConfigItem} from '../../rule_engine/TypesRule';
+import { injectable } from 'inversify';
+import { RuleJSONConfigItem } from '../../rule_engine/TypesRule';
+import { LeverageContractAddresses } from '../../types/LeverageContractAddresses';
 
 @injectable()
 export abstract class ConfigService {
@@ -17,6 +18,24 @@ export abstract class ConfigService {
   protected AbiRepoDynamoDBTable: string = '';
 
   abstract refreshConfig(): Promise<void>;
+
+  protected leverageContractAddresses: LeverageContractAddresses = {
+    positionOpener: '',
+    positionLiquidator: '',
+    positionCloser: '',
+    positionExpirator: '',
+  };
+
+  protected leverageDbUrl: string = '';
+
+
+  public getLeverageContractInfo(): LeverageContractAddresses {
+    return this.leverageContractAddresses;
+  }
+
+  public getLeverageDBURL(): string {
+    return this.leverageDbUrl;
+  }
 
   public getEnvironment(): string {
     return this.environment;

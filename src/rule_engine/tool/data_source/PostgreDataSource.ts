@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import pg, {Client} from 'pg'; // Import Client instead of Pool
-import {ILeverageDataSource} from './interfaces/ILeverageDataSource';
+import pg, { Client } from 'pg'; // Import Client instead of Pool
 import LeveragePosition from '../../../types/LeveragePosition';
-import {ILogger} from '../../../service/logger/interfaces/ILogger';
-import {inject, injectable} from 'inversify';
+import { ILogger } from '../../../service/logger/interfaces/ILogger';
+import { inject, injectable } from 'inversify';
+import { ILeverageDataSource } from './interfaces/ILeverageDataSource';
 
 
 @injectable()
@@ -13,7 +13,7 @@ export default class PostgreDataSource implements ILeverageDataSource {
   protected logger: ILogger;
 
   constructor(@inject('ILoggerAll') _logger: ILogger,
-    @inject('PGClient') _client: Client) {
+    @inject('LeverageDBClient') _client: Client) {
     this.logger = _logger;
     this.client = _client;
   }

@@ -3,7 +3,6 @@ import { Container } from 'inversify';
 import * as chai from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { QueryResult } from 'pg';
-
 import { createTestContainer } from './inversify.config.unit_test';
 import { PGClientAdapter } from './adapters/PGClientAdapter';
 import PostgreDataSource from '../../src/rule_engine/tool/data_source/PostgreDataSource';
