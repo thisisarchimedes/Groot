@@ -26,7 +26,7 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
   const groot = container.get<IGroot>(TYPES.Groot);
 
   setShutdownOnSigTerm();
-
+5
   try {
     await groot.initalizeGroot();
 

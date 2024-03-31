@@ -40,9 +40,11 @@ export class RuleExpirePositions extends Rule {
   }
 
   public async evaluate(): Promise<void> {
+    console.log('position evaluated1 ');
+
     const position = await this.positionLedgerContract.getPosition(0);
     await Promise.resolve();
-    console.log('position');
+    console.log('position evaluated 2');
   }
 
   public override async initialize(ruleLabel: string, params: RuleParams | unknown): Promise<void> {
