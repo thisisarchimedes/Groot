@@ -30,7 +30,6 @@ export class RuleLiquidatePositions extends Rule {
   private config: IConfigService;
   private uniSwapPayloadBuilder: IUniSwapPayloadBuilder;
 
-
   constructor(
     @inject('ILoggerAll') logger: ILogger,
     @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
@@ -80,13 +79,13 @@ export class RuleLiquidatePositions extends Rule {
     // Await for all the processes to finish and filter out the failed ones
     const txs = (await Promise.allSettled(promises))
         .filter((result) => result.status === 'fulfilled')
-        .map((result) => (result as PromiseFulfilledResult<RawTransactionData>).value);
+        .map((result) => (result as PromiseFulfilledResult<{tx: RawTransactionData, nftId: number}>).value);
 
     params.evalSuccess = true;
     params.numberOfLiquidatePositionsTxs = txs.length;
 
     for (let i = 0; i < params.numberOfLiquidatePositionsTxs; i++) {
-      const liquidatePositionTx = this.createLiquidatePositionsTransaction(i, blockNumber, txs[i]);
+      const liquidatePositionTx = this.createLiquidatePositionsTransaction(i, blockNumber, txs[i].nftId, txs[i].tx);
       this.pushTransactionToRuleLocalQueue(liquidatePositionTx);
     }
   }
@@ -140,7 +139,7 @@ export class RuleLiquidatePositions extends Rule {
     }
   };
 
-  private prepareTransaction = (nftId: number, payload: string): RawTransactionData => {
+  private prepareTransaction = (nftId: number, payload: string): {tx: RawTransactionData, nftId: number} => {
     const data = this.positionLiquidator.interface.encodeFunctionData('liquidatePosition', [{
       nftId,
       minWBTC: 0,
@@ -156,23 +155,29 @@ export class RuleLiquidatePositions extends Rule {
       data,
     };
 
-    return tx;
+    return {tx, nftId};
   };
 
   private createLiquidatePositionsTransaction(
       txNumber: number,
       currentBlockNumber: number,
+      nftId: number,
       tx: RawTransactionData,
   ): OutboundTransaction {
     return {
       urgencyLevel: UrgencyLevel.URGENT,
-      context: `this is a liquidatePosition context - number: ${txNumber} - block: ${currentBlockNumber}`,
-      postEvalUniqueKey: this.generateUniqueKey(),
+      context: `this is a liquidatePosition context
+        - number: ${txNumber}
+        - block: ${currentBlockNumber}
+        - nftId: ${nftId}
+      `,
+      postEvalUniqueKey: this.generateUniqueKey(nftId),
       lowLevelUnsignedTransaction: tx,
     };
   }
 
-  protected generateUniqueKey(): string {
-    return 'liquidatePositionKey'; // !TODO: Implement a unique key generator
+  protected generateUniqueKey<T extends unknown[]>(...args: T): string {
+    const nftId = args[0];
+    return `liquidate-${nftId}`;
   }
 }

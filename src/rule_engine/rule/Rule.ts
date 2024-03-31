@@ -48,7 +48,7 @@ export abstract class Rule {
 
   public abstract evaluate(): Promise<void>;
 
-  protected abstract generateUniqueKey(): string;
+  protected abstract generateUniqueKey<T extends unknown[]>(...args: T): string;
 
   public getRuleLabel(): string {
     return this.ruleLabel;
