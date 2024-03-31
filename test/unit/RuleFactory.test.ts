@@ -35,7 +35,7 @@ describe('Rule Factory Testings', function () {
       label: 'dummyRule',
       params: { message: 'I AM GROOT', NumberOfDummyTxs: 1, evalSuccess: true },
     };
-    const rule = ruleFactory.createRule(dummyRule);
+    const rule = await ruleFactory.createRule(dummyRule);
     expect(rule).not.to.be.undefined;
     if (rule) {
       await rule.evaluate();
@@ -50,7 +50,7 @@ describe('Rule Factory Testings', function () {
       params: { message: 'I AM GROOT', NumberOfDummyTxs: 3, evalSuccess: true },
     };
     const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
-    const rule = ruleFactory.createRule(dummyRule);
+    const rule = await ruleFactory.createRule(dummyRule);
     if (rule) {
       await rule.evaluate();
     } else {
@@ -73,7 +73,7 @@ describe('Rule Factory Testings', function () {
       label: 'dummyRule',
       params: { message: 'I AM GROOT', NumberOfDummyTxs: 1, evalSuccess: true },
     };
-    const rule = ruleFactory.createRule(dummyRule);
+    const rule = await ruleFactory.createRule(dummyRule);
     expect(rule).not.to.be.undefined;
     if (rule) {
       await rule.evaluate();

@@ -48,7 +48,7 @@ describe('Rule Factory Testings: Uniswap', function () {
     expect(rule).not.to.be.null;
   });
 
-  it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', function () {
+  it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', async function () {
     const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
     const uniswapRule: RuleJSONConfigItem = {
       ruleType: TypeRule.UniswapPSPRebalance,
@@ -61,7 +61,7 @@ describe('Rule Factory Testings: Uniswap', function () {
         strategyAddress: '0x1234',
       },
     };
-    const rule = ruleFactory.createRule(uniswapRule);
+    const rule = await ruleFactory.createRule(uniswapRule);
     expect(rule).not.to.be.null;
     rule?.evaluate();
     expect(rule?.getPendingTransactionCount()).to.be.eq(0);

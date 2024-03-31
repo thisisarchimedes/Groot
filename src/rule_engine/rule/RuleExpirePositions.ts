@@ -1,10 +1,13 @@
-import {Rule, RuleParams} from './Rule';
-import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
-import {inject, injectable} from 'inversify';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import { Rule, RuleParams } from './Rule';
+import { ILeverageDataSource } from '../tool/data_source/interfaces/ILeverageDataSource';
+import { inject, injectable } from 'inversify';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
+import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
 import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
+import { IConfigService } from '../../service/config/interfaces/IConfigService';
+import fs from 'fs';
+import { error } from 'console';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -18,7 +21,8 @@ export interface RuleParamsDummy extends RuleParams {
 @injectable()
 export class RuleExpirePositions extends Rule {
   private leverageDataSource: ILeverageDataSource;
-  private positionLedgerContract: PositionLedgerContract;
+  private configService: IConfigService;
+  private positionLedgerContract!: PositionLedgerContract;
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 
@@ -27,18 +31,35 @@ export class RuleExpirePositions extends Rule {
     @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
     @inject('IAbiRepo') abiRepo: IAbiRepo,
     @inject('ILeverageDataSource') leverageDataSource: ILeverageDataSource,
-    @inject('PositionLedgerContract') positionLedgerContract: PositionLedgerContract,
+    @inject('IConfigServiceAWS') configService: IConfigService,
   ) {
     super(logger, blockchainReader, abiRepo);
     this.leverageDataSource = leverageDataSource;
-    this.positionLedgerContract = positionLedgerContract;
+    this.configService = configService;
     // this.uniswap = new Uniswap('');
   }
 
   public async evaluate(): Promise<void> {
-    // const position = await this.positionLedgerContract.getPosition(0);
-
+    const position = await this.positionLedgerContract.getPosition(0);
+    await Promise.resolve();
     console.log('position');
+  }
+
+  public override async initialize(ruleLabel: string, params: RuleParams | unknown): Promise<void> {
+    this.ruleLabel = ruleLabel;
+    this.params = params;
+
+
+    const positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;
+    let positionLedgerABI = '';
+    try {
+      //positionLedgerABI = await this.abiRepo.getAbiByAddress(positionLedgerAddress);
+      throw new Error("failed to fetch");
+    }
+    catch {
+      positionLedgerABI = fs.readFileSync('./src/constants/abis/POSITION_LEDGER_ABI.json', 'utf-8')
+    }
+    this.positionLedgerContract = new PositionLedgerContract(positionLedgerAddress, positionLedgerABI);
   }
 
   /**

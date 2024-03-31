@@ -41,9 +41,10 @@ export abstract class Rule {
   }
 
 
-  public initialize(ruleLabel: string, params: RuleParams | unknown): void {
+  public async initialize(ruleLabel: string, params: RuleParams | unknown): Promise<void> {
     this.ruleLabel = ruleLabel;
     this.params = params;
+    return await Promise.resolve();
   }
 
   public abstract evaluate(): Promise<void>;
