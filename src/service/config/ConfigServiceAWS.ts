@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import { injectable } from 'inversify';
+import {injectable} from 'inversify';
 
-import { AppConfigClient } from './AppConfigClient';
-import { ConfigService } from './ConfigService';
-import { IConfigServiceAWS } from './interfaces/IConfigServiceAWS';
+import {AppConfigClient} from './AppConfigClient';
+import {ConfigService} from './ConfigService';
+import {IConfigServiceAWS} from './interfaces/IConfigServiceAWS';
 
 @injectable()
 export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS {
@@ -28,6 +28,7 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
       this.refreshAbiStorageConfig(),
       this.refreshTransactionsDatabaseURL(),
       this.refreshLeverageDBURL(),
+      this.refreshLeverageContractInfo(),
     ]);
   }
 
@@ -52,6 +53,8 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
         case 'PositionExpirator':
           this.leverageContractAddresses.positionExpirator = contract.address;
           break;
+        case 'PositionLedger':
+          this.leverageContractAddresses.positionLedger = contract.address;
       }
     });
   }
@@ -87,7 +90,6 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
     const sleepTime = await this.appConfigClient.fetchConfigRawString('GrootSleepMillisecondsBetweenCycles');
     this.sleepTimeMS = parseInt(sleepTime, 10);
   }
-
 
 
   private async refreshEtherscanAPIKey(): Promise<void> {

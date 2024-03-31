@@ -1,9 +1,9 @@
-import { inject, injectable } from 'inversify';
-import { ToolStrategyUniswap } from '../tool/ToolStrategyUniswap';
-import { Rule, RuleParams } from './Rule';
-import { ILogger } from '../../service/logger/interfaces/ILogger';
-import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
+import {inject, injectable} from 'inversify';
+import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
+import {Rule, RuleParams} from './Rule';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
 
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
@@ -25,8 +25,8 @@ export class RuleUniswapPSPRebalance extends Rule {
     @inject('IAbiRepo') abiRepo: IAbiRepo) {
     super(logger, blockchainReader, abiRepo);
     this.uniswapStrategy = new ToolStrategyUniswap(
-      (this.params as RuleParamsUniswapPSPRebalance).strategyAddress,
-      this.blockchainReader);
+        (this.params as RuleParamsUniswapPSPRebalance).strategyAddress,
+        this.blockchainReader);
   }
   public async evaluate(): Promise<void> {
     // fetch the pool address from strategy

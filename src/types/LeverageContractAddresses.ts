@@ -5,4 +5,5 @@ export interface LeverageContractAddresses {
     positionLiquidator: Address;
     positionCloser: Address;
     positionExpirator: Address;
+    positionLedger: Address;
 }

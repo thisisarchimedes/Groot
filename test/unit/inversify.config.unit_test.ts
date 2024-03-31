@@ -83,14 +83,14 @@ export const createTestContainer = (): Container => {
 
     container.bind<ConfigServiceAdapter>(ConfigServiceAdapter).toSelf().inSingletonScope();
 
-    container.bind<Client>(TYPES.PGClient).toDynamicValue(() => {
+    container.bind<Client>(TYPES.LeverageDBClient).toDynamicValue(() => {
         const configService = container.resolve(ConfigServiceAdapter);
 
-        const connectionString = configService.getTransactionsDBURL();
+        const connectionString = configService.getLeverageDBURL();
         return new Client({ connectionString: connectionString });
     }).inRequestScope();
 
-    container.bind<ILeverageDataSource>(TYPES.PostgreDataSource).to(PostgreDataSource).inRequestScope();
+    container.bind<ILeverageDataSource>(TYPES.ILeverageDataSource).to(PostgreDataSource).inRequestScope();
 
 
     container.bind<Container>(Container).toConstantValue(container);

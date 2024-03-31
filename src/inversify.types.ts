@@ -30,7 +30,8 @@ const TYPES = {
   ITransactionQueuer: 'ITransactionQueuer',
   TransactionsDataSource: 'TransactionsDataSource',
   LeverageDBClient: 'LeverageDBClient',
-  ILeverageDataSource: 'ILeverageDataSource'
+  ILeverageDataSource: 'ILeverageDataSource',
+  PositionLedgerContract: 'PositionLedgerContract',
 };
 
-export { TYPES };
+export {TYPES};

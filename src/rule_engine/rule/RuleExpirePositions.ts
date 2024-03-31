@@ -1,9 +1,10 @@
-import { Rule, RuleParams } from './Rule';
-import { ILeverageDataSource } from '../tool/data_source/interfaces/ILeverageDataSource';
-import { inject, injectable } from 'inversify';
-import { ILogger } from '../../service/logger/interfaces/ILogger';
-import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
+import {Rule, RuleParams} from './Rule';
+import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
+import {inject, injectable} from 'inversify';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -17,6 +18,7 @@ export interface RuleParamsDummy extends RuleParams {
 @injectable()
 export class RuleExpirePositions extends Rule {
   private leverageDataSource: ILeverageDataSource;
+  private positionLedgerContract: PositionLedgerContract;
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 
@@ -24,26 +26,19 @@ export class RuleExpirePositions extends Rule {
     @inject('ILoggerAll') logger: ILogger,
     @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
     @inject('IAbiRepo') abiRepo: IAbiRepo,
-    @inject('PostgreDataSource') leverageDataSource: ILeverageDataSource) {
+    @inject('ILeverageDataSource') leverageDataSource: ILeverageDataSource,
+    @inject('PositionLedgerContract') positionLedgerContract: PositionLedgerContract,
+  ) {
     super(logger, blockchainReader, abiRepo);
     this.leverageDataSource = leverageDataSource;
+    this.positionLedgerContract = positionLedgerContract;
     // this.uniswap = new Uniswap('');
   }
 
   public async evaluate(): Promise<void> {
-    const blockNumber = await this.blockchainReader.getBlockNumber();
-    const livePositions = await this.leverageDataSource.getLivePositions();
+    // const position = await this.positionLedgerContract.getPosition(0);
 
-    for (const position of livePositions) {
-      if (position.positionExpireBlock < blockNumber) {
-        // const tx = this.createExpireTransaction(position);
-        // this.pushTransactionToRuleLocalQueue(tx);
-      }
-    }
-
-    // if (params.evalSuccess === false) {
-    //   throw new Error('RuleExpirePositions.evaluate() failed');
-    // }
+    console.log('position');
   }
 
   /**

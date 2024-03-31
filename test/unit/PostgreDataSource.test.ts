@@ -8,13 +8,14 @@ import { PGClientAdapter } from './adapters/PGClientAdapter';
 import PostgreDataSource from '../../src/rule_engine/tool/data_source/PostgreDataSource';
 import { LoggerAdapter } from './adapters/LoggerAdapter';
 import { TYPES } from '../../src/inversify.types';
+import { ILeverageDataSource } from '../../src/rule_engine/tool/data_source/interfaces/ILeverageDataSource';
 
 const { expect } = chai;
 
 describe('PostgreDataSource Tests', function () {
     let container: Container;
     let pgClientAdapter: PGClientAdapter;
-    let dataSource: PostgreDataSource;
+    let dataSource: ILeverageDataSource;
     let loggerAdapter: LoggerAdapter;
 
     beforeEach(function () {
@@ -26,10 +27,10 @@ describe('PostgreDataSource Tests', function () {
 
         // Setup PGClientAdapter
         pgClientAdapter = new PGClientAdapter();
-        container.rebind(TYPES.PGClient).toConstantValue(pgClientAdapter);
+        container.rebind(TYPES.LeverageDBClient).toConstantValue(pgClientAdapter);
 
         // Resolve the dataSource to be tested
-        dataSource = container.get<PostgreDataSource>(TYPES.PostgreDataSource);
+        dataSource = container.get<ILeverageDataSource>(TYPES.ILeverageDataSource);
     });
 
     it('getPositionsByNftIds should return correct positions', async function () {
