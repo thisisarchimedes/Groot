@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 
-import {Client} from 'pg';
-import {TYPES} from '../inversify.types';
-import {inject, injectable} from 'inversify';
-import {ITxQueue} from './interfaces/ITxQueue';
-import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {UrgencyLevel} from '../rule_engine/TypesRule';
+import { Client } from 'pg';
+import { TYPES } from '../inversify.types';
+import { inject, injectable } from 'inversify';
+import { ITxQueue } from './interfaces/ITxQueue';
+import { OutboundTransaction } from '../blockchain/OutboundTransaction';
+import { UrgencyLevel } from '../rule_engine/TypesRule';
 
 @injectable()
 class PostgreTxQueue implements ITxQueue {
@@ -33,15 +33,15 @@ class PostgreTxQueue implements ITxQueue {
   }
 
   async insertTransaction(
-      createdAt: Date,
-      updatedAt: Date,
-      status: string,
-      to: string,
-      executor: string,
-      identifier: string,
-      value: string,
-      data: string,
-      urgency: UrgencyLevel,
+    createdAt: Date,
+    updatedAt: Date,
+    status: string,
+    to: string,
+    executor: string,
+    identifier: string,
+    value: string,
+    data: string,
+    urgency: UrgencyLevel,
   ): Promise<void> {
     try {
       await this.client.query('BEGIN');
