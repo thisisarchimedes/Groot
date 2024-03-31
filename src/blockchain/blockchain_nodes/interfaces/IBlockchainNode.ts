@@ -1,5 +1,5 @@
-import {ethers} from 'ethers';
-import {BlockchainNodeProxyInfo} from '../BlockchainNodeProxyInfo';
+import { ethers } from 'ethers';
+import { BlockchainNodeProxyInfo } from '../BlockchainNodeProxyInfo';
 
 export interface IBlockchainNode {
     getBlockNumber(): Promise<number>;
@@ -16,4 +16,5 @@ export interface IBlockchainNode {
     isHealthy(): boolean;
     getNodeName(): string;
     getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo>;
+    getProvider(): ethers.Provider;
 }

@@ -1,10 +1,10 @@
 import axios from 'axios';
-import {injectable, inject} from 'inversify';
+import { injectable, inject } from 'inversify';
 
-import {JsonRpcProvider} from 'ethers';
-import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
-import {IBlockchainNodeLocal} from './interfaces/IBlockchainNodeLocal';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
+import { JsonRpcProvider, ethers } from 'ethers';
+import { BlockchainNode, BlockchainNodeError } from './BlockchainNode';
+import { IBlockchainNodeLocal } from './interfaces/IBlockchainNodeLocal';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
 
 @injectable()
 export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNodeLocal {
@@ -24,6 +24,10 @@ export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNo
   public async startNode(): Promise<void> {
     this.logger.debug(`Starting local node...${this.localRpcUrl}`);
     await this.waitForNodeToBeReady();
+  }
+
+  public getProvider(): ethers.Provider {
+    return this.provider;
   }
 
   public async stopNode(): Promise<void> {
@@ -77,10 +81,10 @@ export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNo
       const response = await axios.post(this.localRpcUrl, {
         jsonrpc: '2.0',
         method: 'hardhat_reset',
-        params: [{forking: {jsonRpcUrl: externalProviderRpcUrl}}],
+        params: [{ forking: { jsonRpcUrl: externalProviderRpcUrl } }],
         id: 1,
       }, {
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
       });
 
       return response.data;

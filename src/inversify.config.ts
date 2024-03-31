@@ -72,7 +72,7 @@ export class InversifyConfig {
     this.container.bind<Client>(TYPES.TransactionsDBClient).toDynamicValue(() => {
       const connectionString = configServiceAWS.getTransactionsDBURL();
       return new Client({ connectionString: connectionString });
-    }).inSingletonScope();
+    }).inTransientScope();
 
     this.container.bind<Client>(TYPES.LeverageDBClient).toDynamicValue(() => {
       const connectionString = configServiceAWS.getLeverageDBURL();

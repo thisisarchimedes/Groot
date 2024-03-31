@@ -3,6 +3,8 @@ import { ILogger } from '../../service/logger/interfaces/ILogger';
 import { injectable } from 'inversify';
 import { BlockchainNodeProxyInfo } from './BlockchainNodeProxyInfo';
 import { IBlockchainNode } from './interfaces/IBlockchainNode';
+import { Provider } from '@ethersproject/abstract-provider';
+import { resolveHttpAuthRuntimeConfig } from '@aws-sdk/client-cloudwatch/dist-types/auth/httpAuthExtensionConfiguration';
 
 
 export class BlockchainNodeError extends Error {
@@ -25,6 +27,10 @@ export abstract class BlockchainNode implements IBlockchainNode {
   constructor(logger: ILogger, nodeName: string) {
     this.logger = logger;
     this.nodeName = nodeName;
+  }
+
+  public getProvider(): ethers.Provider {
+    return this.provider;
   }
 
   public async getBlockNumber(): Promise<number> {

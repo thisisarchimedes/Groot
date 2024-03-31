@@ -1,5 +1,5 @@
-import {Interface} from 'ethers';
-import {BlockchainNodeProxyInfo} from '../../blockchain_nodes/BlockchainNodeProxyInfo';
+import { Interface } from 'ethers';
+import { BlockchainNodeProxyInfo } from '../../blockchain_nodes/BlockchainNodeProxyInfo';
 
 export interface IBlockchainReader {
     getBlockNumber(): Promise<number>;

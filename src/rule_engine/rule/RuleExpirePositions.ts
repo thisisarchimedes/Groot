@@ -8,6 +8,10 @@ import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
 import { IConfigService } from '../../service/config/interfaces/IConfigService';
 import fs from 'fs';
 import { error } from 'console';
+import { Address } from '../../types/LeverageContractAddresses';
+import { ethers } from 'ethers';
+import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
+import { UrgencyLevel } from '../TypesRule';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -23,6 +27,8 @@ export class RuleExpirePositions extends Rule {
   private leverageDataSource: ILeverageDataSource;
   private configService: IConfigService;
   private positionLedgerContract!: PositionLedgerContract;
+  private positionLedgerAddress!: Address;
+  private positionLedgerABI!: string;
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 
@@ -42,9 +48,27 @@ export class RuleExpirePositions extends Rule {
   public async evaluate(): Promise<void> {
     console.log('position evaluated1 ');
 
-    const position = await this.positionLedgerContract.getPosition(0);
-    await Promise.resolve();
-    console.log('position evaluated 2');
+    // const rse = await this.blockchainReader.callViewFunction(this.positionLedgerAddress,
+    //   new ethers.Interface(this.positionLedgerABI), "getPosition", [0]);
+
+
+    const encodedData = this.positionLedgerContract
+      .contract.interface.encodeFunctionData('setPositionState', [0, 1]);
+
+    const tx = {
+      to: this.positionLedgerAddress,
+      value: 0n,
+      data: encodedData,
+    } as RawTransactionData;
+
+    const outboundTx = {
+      urgencyLevel: UrgencyLevel.URGENT,
+      context: `this is a expire test context`,
+      postEvalUniqueKey: this.generateUniqueKey(0),
+      lowLevelUnsignedTransaction: tx,
+    } as OutboundTransaction;
+
+    this.pushTransactionToRuleLocalQueue(outboundTx);
   }
 
   public override async initialize(ruleLabel: string, params: RuleParams | unknown): Promise<void> {
@@ -52,16 +76,17 @@ export class RuleExpirePositions extends Rule {
     this.params = params;
 
 
-    const positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;
-    let positionLedgerABI = '';
+    this.positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;
     try {
-      //positionLedgerABI = await this.abiRepo.getAbiByAddress(positionLedgerAddress);
+      //this.positionLedgerABI = await this.abiRepo.getAbiByAddress(positionLedgerAddress);
       throw new Error("failed to fetch");
     }
     catch {
-      positionLedgerABI = fs.readFileSync('./src/constants/abis/POSITION_LEDGER_ABI.json', 'utf-8')
+      this.positionLedgerABI = fs.readFileSync('./src/constants/abis/POSITION_LEDGER_ABI.json', 'utf-8')
     }
-    this.positionLedgerContract = new PositionLedgerContract(positionLedgerAddress, positionLedgerABI);
+    this.positionLedgerContract = new PositionLedgerContract(this.positionLedgerAddress, this.positionLedgerABI);
+
+
   }
 
   /**
@@ -113,8 +138,7 @@ export class RuleExpirePositions extends Rule {
   //   };
   // }
 
-  protected generateUniqueKey(): string {
-    // return `${position.nftId}-${position.strategy}`;
-    return '';
+  protected generateUniqueKey(nftId?: number): string {
+    return 'expire--' + nftId;
   }
 }
