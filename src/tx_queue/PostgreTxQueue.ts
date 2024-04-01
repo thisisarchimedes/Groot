@@ -37,14 +37,14 @@ class PostgreTxQueue implements ITxQueue {
   async insertTransaction(
     createdAt: Date,
     updatedAt: Date,
-    status: string, // Assuming this is the correct representation for TransactionStatus
+    status: string,
     to: string,
     executor: Executor,
     txHash: string,
     identifier: string,
     value: string,
     data: string,
-    urgency: UrgencyLevel, // Assuming this translates correctly to TransactionUrgency
+    urgency: UrgencyLevel,
     ttlSeconds: number
   ): Promise<void> {
     try {
