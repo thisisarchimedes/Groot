@@ -30,8 +30,8 @@ class PostgreTxQueue implements ITxQueue {
     const value = tx.lowLevelUnsignedTransaction.value.toString();
     const data = tx.lowLevelUnsignedTransaction.data;
     const urgency = tx.urgencyLevel;
-    const ttl = tx.ttlSeconds;
-    await this.insertTransaction(createdAt, updatedAt, status, to, executor, '', identifier, value, data, urgency, ttl);
+    const ttlSeconds = tx.ttlSeconds;
+    await this.insertTransaction(createdAt, updatedAt, status, to, executor, '', identifier, value, data, urgency, ttlSeconds);
   }
 
   async insertTransaction(
