@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 
-import {Client, QueryConfig} from 'pg';
-import {TYPES} from '../inversify.types';
-import {inject, injectable} from 'inversify';
-import {ITxQueue} from './interfaces/ITxQueue';
-import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {UrgencyLevel} from '../rule_engine/TypesRule';
+import { Client, QueryConfig } from 'pg';
+import { TYPES } from '../inversify.types';
+import { inject, injectable } from 'inversify';
+import { ITxQueue } from './interfaces/ITxQueue';
+import { OutboundTransaction } from '../blockchain/OutboundTransaction';
+import { UrgencyLevel } from '../rule_engine/TypesRule';
 
 @injectable()
 class PostgreTxQueue implements ITxQueue {
@@ -34,20 +34,19 @@ class PostgreTxQueue implements ITxQueue {
   }
 
   async insertTransaction(
-      createdAt: Date,
-      updatedAt: Date,
-      status: string, // Assuming this is the correct representation for TransactionStatus
-      to: string,
-      executor: string,
-      txHash: string,
-      identifier: string,
-      value: string,
-      data: string,
-      urgency: UrgencyLevel, // Assuming this translates correctly to TransactionUrgency
+    createdAt: Date,
+    updatedAt: Date,
+    status: string, // Assuming this is the correct representation for TransactionStatus
+    to: string,
+    executor: string,
+    txHash: string,
+    identifier: string,
+    value: string,
+    data: string,
+    urgency: UrgencyLevel, // Assuming this translates correctly to TransactionUrgency
   ): Promise<void> {
     try {
       await this.client.query('BEGIN');
-      // Specify your SQL command and the parameters array
       const queryConfig: QueryConfig = {
         text: 'CALL "Transactions".insert_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
         values: [createdAt, updatedAt, status, to, executor, txHash, identifier, value, data, urgency],
