@@ -11,7 +11,7 @@ import { Executor, UrgencyLevel } from '../rule_engine/TypesRule';
 class PostgreTxQueue implements ITxQueue {
   private client: Client;
 
-  constructor(@inject(TYPES.LeverageDBClient) client: Client) {
+  constructor(@inject(TYPES.TransactionsDBClient) client: Client) {
     this.client = client;
   }
   public async refresh(): Promise<void> {
