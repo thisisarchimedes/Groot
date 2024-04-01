@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import { Client } from 'pg';
+import { Client, QueryConfig } from 'pg';
 import { TYPES } from '../inversify.types';
 import { inject, injectable } from 'inversify';
 import { ITxQueue } from './interfaces/ITxQueue';
@@ -28,37 +28,40 @@ class PostgreTxQueue implements ITxQueue {
     const value = tx.lowLevelUnsignedTransaction.value.toString();
     const data = tx.lowLevelUnsignedTransaction.data;
     const urgency = tx.urgencyLevel;
-
-    await this.insertTransaction(createdAt, updatedAt, status, to, executor, identifier, value, data, urgency);
+    try {
+      await this.insertTransaction(createdAt, updatedAt, status, to, executor, '', identifier, value, data, urgency);
+    }
+    catch (ex) {
+      console.log(ex);
+    }
   }
 
   async insertTransaction(
     createdAt: Date,
     updatedAt: Date,
-    status: string,
+    status: string, // Assuming this is the correct representation for TransactionStatus
     to: string,
     executor: string,
+    txHash: string,
     identifier: string,
     value: string,
     data: string,
-    urgency: UrgencyLevel,
+    urgency: UrgencyLevel, // Assuming this translates correctly to TransactionUrgency
   ): Promise<void> {
     try {
-      await this.client.connect().catch(console.error)
       await this.client.query('BEGIN');
-      const queryText = `CALL insert_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9)`;
-      const queryValues: unknown[] = [createdAt, updatedAt, status, to, executor, identifier, value, data, urgency];
-      await this.client.query(queryText, queryValues);
+      // Specify your SQL command and the parameters array
+      const queryConfig: QueryConfig = {
+        text: 'CALL "Transactions".insert_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
+        values: [createdAt, updatedAt, status, to, executor, txHash, identifier, value, data, urgency],
+      };
+
+      await this.client.query(queryConfig);
       await this.client.query('COMMIT');
     } catch (err) {
       await this.client.query('ROLLBACK');
       throw err;
     }
-  }
-
-  // Method to close the database connection
-  async closeConnection(): Promise<void> {
-    await this.client.end();
   }
 }
 

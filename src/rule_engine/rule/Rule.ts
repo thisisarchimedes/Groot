@@ -1,9 +1,9 @@
-import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {UrgencyLevel} from '../TypesRule';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
-import {injectable} from 'inversify';
+import { OutboundTransaction } from '../../blockchain/OutboundTransaction';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
+import { UrgencyLevel } from '../TypesRule';
+import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
+import { injectable } from 'inversify';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
@@ -29,15 +29,15 @@ export abstract class Rule {
   protected pendingTxQueue: OutboundTransaction[] = [];
 
   constructor(
-      logger: ILogger,
-      blockchainReader: IBlockchainReader,
-      abiRepo: IAbiRepo,
+    logger: ILogger,
+    blockchainReader: IBlockchainReader,
+    abiRepo: IAbiRepo,
   ) {
     this.logger = logger;
     this.blockchainReader = blockchainReader;
     this.abiRepo = abiRepo;
     this.ruleLabel = ''; // Default initialization
-    this.params = {urgencyLevel: UrgencyLevel.NORMAL}; // Default initialization
+    this.params = { urgencyLevel: UrgencyLevel.LOW }; // Default initialization
   }
 
 

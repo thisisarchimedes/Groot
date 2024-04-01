@@ -25,7 +25,7 @@ describe('Transaction Queuer', function () {
   it('should filter out and report on all tx that dont have a hash', async function () {
     const txs: OutboundTransaction[] = [
       {
-        urgencyLevel: UrgencyLevel.URGENT,
+        urgencyLevel: UrgencyLevel.HIGH,
         context: 'test 1',
         postEvalUniqueKey: '0x1234',
         lowLevelUnsignedTransaction: {
@@ -35,7 +35,7 @@ describe('Transaction Queuer', function () {
         },
       },
       {
-        urgencyLevel: UrgencyLevel.URGENT,
+        urgencyLevel: UrgencyLevel.HIGH,
         context: 'test 2',
         postEvalUniqueKey: '',
         lowLevelUnsignedTransaction: {
@@ -45,7 +45,7 @@ describe('Transaction Queuer', function () {
         },
       },
       {
-        urgencyLevel: UrgencyLevel.NORMAL,
+        urgencyLevel: UrgencyLevel.LOW,
         context: 'test 3',
         postEvalUniqueKey: '0x345',
         lowLevelUnsignedTransaction: {

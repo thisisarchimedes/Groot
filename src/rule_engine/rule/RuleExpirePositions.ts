@@ -62,7 +62,7 @@ export class RuleExpirePositions extends Rule {
     } as RawTransactionData;
 
     const outboundTx = {
-      urgencyLevel: UrgencyLevel.URGENT,
+      urgencyLevel: UrgencyLevel.LOW,
       context: `this is a expire test context`,
       postEvalUniqueKey: this.generateUniqueKey(0),
       lowLevelUnsignedTransaction: tx,

@@ -71,12 +71,22 @@ export class InversifyConfig {
   private bindDBConfiguration(configServiceAWS: IConfigServiceAWS) {
     this.container.bind<Client>(TYPES.TransactionsDBClient).toDynamicValue(() => {
       const connectionString = configServiceAWS.getTransactionsDBURL();
-      return new Client({ connectionString: connectionString });
+      return new Client({
+        connectionString: connectionString,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      });
     }).inTransientScope();
 
     this.container.bind<Client>(TYPES.LeverageDBClient).toDynamicValue(() => {
       const connectionString = configServiceAWS.getLeverageDBURL();
-      return new Client({ connectionString: connectionString });
+      return new Client({
+        connectionString: connectionString,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      });
     }).inSingletonScope();
 
     this.container.bind<ILeverageDataSource>(TYPES.ILeverageDataSource).to(PostgreDataSource).inTransientScope();
