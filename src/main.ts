@@ -2,13 +2,13 @@ import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
 
-import { GrootParams } from './GrootParams';
-import { IGroot } from './interfaces/IGroot';
-import { ConfigServiceAWS } from './service/config/ConfigServiceAWS';
-import { InversifyConfig } from './inversify.config';
-import { Container } from 'inversify';
-import { TYPES } from './inversify.types';
-import { ILoggerAll } from './service/logger/interfaces/ILoggerAll';
+import {GrootParams} from './GrootParams';
+import {IGroot} from './interfaces/IGroot';
+import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
+import {InversifyConfig} from './inversify.config';
+import {Container} from 'inversify';
+import {TYPES} from './inversify.types';
+import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
 
 dotenv.config();
 
@@ -29,6 +29,7 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
     // Application specific logging, throwing an error, or other logic here
   });
+
   setShutdownOnSigTerm();
   try {
     await groot.initalizeGroot();
@@ -61,7 +62,7 @@ function getGrootParamsFromEnv(): GrootParams {
     reportCriticalError(environment, region, 'Cannot boot. Missing environment variables');
   }
 
-  return { environment, region, mainLocalNodeUrl, altLocalNodeUrl };
+  return {environment, region, mainLocalNodeUrl, altLocalNodeUrl};
 }
 
 function reportGrootStartup(grootParams: GrootParams): void {

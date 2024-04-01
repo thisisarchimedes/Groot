@@ -7,8 +7,8 @@ export enum TypeRule {
 }
 
 export enum UrgencyLevel {
-    LOW,
-    HIGH
+    LOW = 'LOW',
+    HIGH = 'HIGH'
 }
 
 export interface RuleJSONConfigItem {

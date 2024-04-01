@@ -1,15 +1,15 @@
 import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
-import { injectable, inject } from 'inversify';
+import {injectable, inject} from 'inversify';
 
-import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
-import { IRuleEngine } from './rule_engine/interfaces/IRuleEngine';
-import { IGroot } from './interfaces/IGroot';
-import { IHealthMonitor } from './service/health_monitor/signal/interfaces/IHealthMonitor';
-import { IConfigService } from './service/config/interfaces/IConfigService';
-import { ILogger } from './service/logger/interfaces/ILogger';
-import { ITransactionQueuer } from './tx_queue/interfaces/ITransactionQueuer';
+import {IBlockchainNodeLocal} from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
+import {IRuleEngine} from './rule_engine/interfaces/IRuleEngine';
+import {IGroot} from './interfaces/IGroot';
+import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealthMonitor';
+import {IConfigService} from './service/config/interfaces/IConfigService';
+import {ILogger} from './service/logger/interfaces/ILogger';
+import {ITransactionQueuer} from './tx_queue/interfaces/ITransactionQueuer';
 
 dotenv.config();
 
@@ -92,8 +92,7 @@ export class Groot implements IGroot {
       await this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
       try {
         await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
-      }
-      catch (err) {
+      } catch (err) {
         if (err instanceof Error) {
           console.log(err.message);
         }

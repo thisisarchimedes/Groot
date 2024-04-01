@@ -1,17 +1,15 @@
-import { Rule, RuleParams } from './Rule';
-import { ILeverageDataSource } from '../tool/data_source/interfaces/ILeverageDataSource';
-import { inject, injectable } from 'inversify';
-import { ILogger } from '../../service/logger/interfaces/ILogger';
-import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
+import {Rule, RuleParams} from './Rule';
+import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
+import {inject, injectable} from 'inversify';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
 import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
-import { IConfigService } from '../../service/config/interfaces/IConfigService';
+import {IConfigService} from '../../service/config/interfaces/IConfigService';
 import fs from 'fs';
-import { error } from 'console';
-import { Address } from '../../types/LeverageContractAddresses';
-import { ethers } from 'ethers';
-import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
-import { UrgencyLevel } from '../TypesRule';
+import {Address} from '../../types/LeverageContractAddresses';
+import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
+import {UrgencyLevel} from '../TypesRule';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -46,14 +44,10 @@ export class RuleExpirePositions extends Rule {
   }
 
   public async evaluate(): Promise<void> {
-    console.log('position evaluated1 ');
-
-    // const rse = await this.blockchainReader.callViewFunction(this.positionLedgerAddress,
-    //   new ethers.Interface(this.positionLedgerABI), "getPosition", [0]);
-
+    await Promise.resolve();
 
     const encodedData = this.positionLedgerContract
-      .contract.interface.encodeFunctionData('setPositionState', [0, 1]);
+        .contract.interface.encodeFunctionData('setPositionState', [0, 1]);
 
     const tx = {
       to: this.positionLedgerAddress,
@@ -78,15 +72,13 @@ export class RuleExpirePositions extends Rule {
 
     this.positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;
     try {
-      //this.positionLedgerABI = await this.abiRepo.getAbiByAddress(positionLedgerAddress);
-      throw new Error("failed to fetch");
-    }
-    catch {
-      this.positionLedgerABI = fs.readFileSync('./src/constants/abis/POSITION_LEDGER_ABI.json', 'utf-8')
+      // this.positionLedgerABI = await this.abiRepo.getAbiByAddress(positionLedgerAddress);
+      throw new Error('failed to fetch');
+    } catch {
+      this.positionLedgerABI = fs.readFileSync('./src/constants/abis/POSITION_LEDGER_ABI.json', 'utf-8');
     }
     this.positionLedgerContract = new PositionLedgerContract(this.positionLedgerAddress, this.positionLedgerABI);
-
-
+    await Promise.resolve();
   }
 
   /**

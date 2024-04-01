@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 
-import { Rule, RuleParams } from './Rule';
-import { UrgencyLevel } from '../TypesRule';
-import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
-import { inject, injectable } from 'inversify';
-import { ILogger } from '../../service/logger/interfaces/ILogger';
-import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
-import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {Rule, RuleParams} from './Rule';
+import {UrgencyLevel} from '../TypesRule';
+import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
+import {inject, injectable} from 'inversify';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;

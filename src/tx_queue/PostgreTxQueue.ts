@@ -1,17 +1,17 @@
 import 'reflect-metadata';
 
-import { Client, QueryConfig } from 'pg';
-import { TYPES } from '../inversify.types';
-import { inject, injectable } from 'inversify';
-import { ITxQueue } from './interfaces/ITxQueue';
-import { OutboundTransaction } from '../blockchain/OutboundTransaction';
-import { UrgencyLevel } from '../rule_engine/TypesRule';
+import {Client, QueryConfig} from 'pg';
+import {TYPES} from '../inversify.types';
+import {inject, injectable} from 'inversify';
+import {ITxQueue} from './interfaces/ITxQueue';
+import {OutboundTransaction} from '../blockchain/OutboundTransaction';
+import {UrgencyLevel} from '../rule_engine/TypesRule';
 
 @injectable()
 class PostgreTxQueue implements ITxQueue {
   private client: Client;
 
-  constructor(@inject(TYPES.TransactionsDBClient) client: Client) {
+  constructor(@inject(TYPES.LeverageDBClient) client: Client) {
     this.client = client;
   }
   public async refresh(): Promise<void> {
@@ -19,6 +19,8 @@ class PostgreTxQueue implements ITxQueue {
   }
 
   public async addTransactionToQueue(tx: OutboundTransaction): Promise<void> {
+    await this.client.connect().catch(console.error);
+
     const createdAt = new Date();
     const updatedAt = new Date();
     const status = 'PENDING';
@@ -28,25 +30,20 @@ class PostgreTxQueue implements ITxQueue {
     const value = tx.lowLevelUnsignedTransaction.value.toString();
     const data = tx.lowLevelUnsignedTransaction.data;
     const urgency = tx.urgencyLevel;
-    try {
-      await this.insertTransaction(createdAt, updatedAt, status, to, executor, '', identifier, value, data, urgency);
-    }
-    catch (ex) {
-      console.log(ex);
-    }
+    await this.insertTransaction(createdAt, updatedAt, status, to, executor, '', identifier, value, data, urgency);
   }
 
   async insertTransaction(
-    createdAt: Date,
-    updatedAt: Date,
-    status: string, // Assuming this is the correct representation for TransactionStatus
-    to: string,
-    executor: string,
-    txHash: string,
-    identifier: string,
-    value: string,
-    data: string,
-    urgency: UrgencyLevel, // Assuming this translates correctly to TransactionUrgency
+      createdAt: Date,
+      updatedAt: Date,
+      status: string, // Assuming this is the correct representation for TransactionStatus
+      to: string,
+      executor: string,
+      txHash: string,
+      identifier: string,
+      value: string,
+      data: string,
+      urgency: UrgencyLevel, // Assuming this translates correctly to TransactionUrgency
   ): Promise<void> {
     try {
       await this.client.query('BEGIN');

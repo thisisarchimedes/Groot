@@ -1,10 +1,10 @@
-import { injectable, inject } from 'inversify';
-import { Interface } from 'ethers';
-import { ILogger } from '../../service/logger/interfaces/ILogger';
-import { IBlockchainNode } from '../blockchain_nodes/interfaces/IBlockchainNode';
-import { IBlockchainNodeLocal } from '../blockchain_nodes/interfaces/IBlockchainNodeLocal';
-import { BlockchainNodeProxyInfo } from '../blockchain_nodes/BlockchainNodeProxyInfo';
-import { IBlockchainReader } from './interfaces/IBlockchainReader';
+import {injectable, inject} from 'inversify';
+import {Interface} from 'ethers';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {IBlockchainNode} from '../blockchain_nodes/interfaces/IBlockchainNode';
+import {IBlockchainNodeLocal} from '../blockchain_nodes/interfaces/IBlockchainNodeLocal';
+import {BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNodeProxyInfo';
+import {IBlockchainReader} from './interfaces/IBlockchainReader';
 
 export class BlockchainReaderError extends Error {
   constructor(message: string) {
@@ -60,10 +60,10 @@ export class BlockchainReader implements IBlockchainReader {
   }
 
   public async callViewFunction(
-    contractAddress: string,
-    abi: Interface,
-    functionName: string,
-    params: unknown[] = [],
+      contractAddress: string,
+      abi: Interface,
+      functionName: string,
+      params: unknown[] = [],
   ): Promise<unknown> {
     await this.init();
     const nodeResponses = await this.fetchNodeResponses(contractAddress, abi, functionName, params);
@@ -108,10 +108,10 @@ export class BlockchainReader implements IBlockchainReader {
   }
 
   private async fetchNodeResponses(
-    contractAddress: string,
-    abi: Interface,
-    functionName: string,
-    params: unknown[],
+      contractAddress: string,
+      abi: Interface,
+      functionName: string,
+      params: unknown[],
   ): Promise<NodeResponse[]> {
     const functionCalls = this.nodes.map((node) =>
       node.callViewFunction(contractAddress, abi, functionName, params).catch(() => null),
@@ -137,8 +137,8 @@ export class BlockchainReader implements IBlockchainReader {
 
   private extractValidNodeResponses(nodeResponses: NodeResponse[]): ValidNodeResponse[] {
     return nodeResponses.filter(
-      (nodeResponse): nodeResponse is ValidNodeResponse =>
-        nodeResponse.response !== null && nodeResponse.blockNumber !== null,
+        (nodeResponse): nodeResponse is ValidNodeResponse =>
+          nodeResponse.response !== null && nodeResponse.blockNumber !== null,
     );
   }
 
@@ -151,9 +151,9 @@ export class BlockchainReader implements IBlockchainReader {
 
   private findResponseFromNodeWithHighestBlockNumber(validNodeResponses: ValidNodeResponse[]): unknown {
     const highestBlockNumberIndex = validNodeResponses.reduce(
-      (highestIndex, currentNode, currentIndex) =>
+        (highestIndex, currentNode, currentIndex) =>
         currentNode.blockNumber > validNodeResponses[highestIndex].blockNumber ? currentIndex : highestIndex,
-      0,
+        0,
     );
     return validNodeResponses[highestBlockNumberIndex].response;
   }

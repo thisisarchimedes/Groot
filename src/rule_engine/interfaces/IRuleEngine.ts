@@ -1,5 +1,5 @@
-import { OutboundTransaction } from '../../blockchain/OutboundTransaction';
-import { RuleJSONConfigItem } from '../TypesRule';
+import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
+import {RuleJSONConfigItem} from '../TypesRule';
 
 export interface IRuleEngine {
     loadRulesFromJSONConfig(ruleConfig: RuleJSONConfigItem[]): Promise<void>;
