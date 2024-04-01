@@ -5,7 +5,7 @@ import { TYPES } from '../inversify.types';
 import { inject, injectable } from 'inversify';
 import { ITxQueue } from './interfaces/ITxQueue';
 import { OutboundTransaction } from '../blockchain/OutboundTransaction';
-import { UrgencyLevel } from '../rule_engine/TypesRule';
+import { Executor, UrgencyLevel } from '../rule_engine/TypesRule';
 
 @injectable()
 class PostgreTxQueue implements ITxQueue {
@@ -25,7 +25,7 @@ class PostgreTxQueue implements ITxQueue {
     const updatedAt = new Date();
     const status = 'PENDING';
     const to = tx.lowLevelUnsignedTransaction.to;
-    const executor = ''; // You need to provide the executor
+    const executor = tx.executor;
     const identifier = tx.postEvalUniqueKey;
     const value = tx.lowLevelUnsignedTransaction.value.toString();
     const data = tx.lowLevelUnsignedTransaction.data;
@@ -38,7 +38,7 @@ class PostgreTxQueue implements ITxQueue {
     updatedAt: Date,
     status: string, // Assuming this is the correct representation for TransactionStatus
     to: string,
-    executor: string,
+    executor: Executor,
     txHash: string,
     identifier: string,
     value: string,

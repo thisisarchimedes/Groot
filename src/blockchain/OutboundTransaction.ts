@@ -1,4 +1,4 @@
-import {UrgencyLevel} from '../rule_engine/TypesRule';
+import { Executor, UrgencyLevel } from '../rule_engine/TypesRule';
 
 export interface RawTransactionData {
   to: string;
@@ -9,6 +9,7 @@ export interface RawTransactionData {
 export interface OutboundTransaction {
   urgencyLevel: UrgencyLevel;
   context: string;
+  executor: Executor;
   postEvalUniqueKey: string;
   lowLevelUnsignedTransaction: RawTransactionData;
 }

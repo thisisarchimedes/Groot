@@ -6,6 +6,12 @@ export enum TypeRule {
     RuleBalanceCurvePoolWithVault = 'balanceCurvePoolWithVault'
 }
 
+
+export enum Executor {
+    PSP = 'PSP',
+    LEVERAGE = 'LEVERAGE'
+}
+
 export enum UrgencyLevel {
     LOW = 'LOW',
     HIGH = 'HIGH'
