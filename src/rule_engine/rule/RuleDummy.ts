@@ -47,6 +47,7 @@ export class RuleDummy extends Rule {
       context: `this is a dummy context - number: ${txNumber} - block: ${currentBlockNumber}`,
       postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction: {} as RawTransactionData,
+      ttlSeconds: 300
     };
   }
 

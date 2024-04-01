@@ -12,4 +12,5 @@ export interface OutboundTransaction {
   executor: Executor;
   postEvalUniqueKey: string;
   lowLevelUnsignedTransaction: RawTransactionData;
+  ttlSeconds: number;
 }

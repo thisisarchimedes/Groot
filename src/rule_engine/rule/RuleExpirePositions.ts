@@ -61,6 +61,7 @@ export class RuleExpirePositions extends Rule {
       context: `this is a expire test context`,
       postEvalUniqueKey: this.generateUniqueKey(0),
       lowLevelUnsignedTransaction: tx,
+      ttlSeconds: 300
     } as OutboundTransaction;
 
     this.pushTransactionToRuleLocalQueue(outboundTx);

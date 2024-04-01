@@ -26,6 +26,7 @@ describe('Transaction Queuer', function () {
     const txs: OutboundTransaction[] = [
       {
         urgencyLevel: UrgencyLevel.HIGH,
+        ttlSeconds: 300,
         executor: Executor.LEVERAGE,
         context: 'test 1',
         postEvalUniqueKey: '0x1234',
@@ -37,6 +38,7 @@ describe('Transaction Queuer', function () {
       },
       {
         urgencyLevel: UrgencyLevel.HIGH,
+        ttlSeconds: 300,
         executor: Executor.LEVERAGE,
         context: 'test 2',
         postEvalUniqueKey: '',
@@ -48,6 +50,7 @@ describe('Transaction Queuer', function () {
       },
       {
         urgencyLevel: UrgencyLevel.LOW,
+        ttlSeconds: 300,
         executor: Executor.LEVERAGE,
         context: 'test 3',
         postEvalUniqueKey: '0x345',
