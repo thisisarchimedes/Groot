@@ -12,6 +12,7 @@ import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
 import { TYPES } from '../../src/inversify.types';
 import { createTestContainer } from './inversify.config.unit_test';
 import { IRuleEngine } from '../../src/rule_engine/interfaces/IRuleEngine';
+import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 
 describe('Rule Engine Testings', function () {
   let container: Container;
@@ -73,7 +74,7 @@ describe('Rule Engine Testings', function () {
     return {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
-      params: { message, NumberOfDummyTxs: numberOfDummyTxs, evalSuccess },
+      params: { message, NumberOfDummyTxs: numberOfDummyTxs, evalSuccess } as RuleParamsDummy,
     };
   }
 
@@ -81,7 +82,7 @@ describe('Rule Engine Testings', function () {
     return {
       ruleType: TypeRule.Invalid,
       label: 'invalideRule',
-      params: { message, NumberOfDummyTxs: numberOfDummyTxs },
+      params: { message, NumberOfDummyTxs: numberOfDummyTxs } as RuleParamsDummy,
     };
   }
 

@@ -13,6 +13,7 @@ import { EthNodeInterceptor } from './interceptors/EthNodeInterceptor';
 import { Container } from 'inversify';
 import { IConfigServiceAWS } from '../../src/service/config/interfaces/IConfigServiceAWS';
 import { InversifyConfig } from '../../src/inversify.config';
+import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 
 describe('Startup and Config', function () {
   // eslint-disable-next-line no-invalid-this
@@ -76,7 +77,7 @@ describe('Startup and Config', function () {
         params: {
           message: 'I AM GROOT 1',
           NumberOfDummyTxs: 1,
-        },
+        } as RuleParamsDummy,
       },
       {
         ruleType: TypeRule.Dummy,
@@ -85,7 +86,7 @@ describe('Startup and Config', function () {
           message: 'I AM GROOT 2',
           NumberOfDummyTxs: 2,
           evalSuccess: true,
-        },
+        } as RuleParamsDummy,
       },
     ];
     appConfigInterceptor = createAppConfigInterceptor(mockRules);
@@ -120,7 +121,7 @@ describe('Startup and Config', function () {
         label: 'invalidRule',
         params: {
           message: 'I AM GROOT 1',
-        },
+        } as RuleParamsDummy,
       },
       {
         ruleType: TypeRule.Dummy,
@@ -129,7 +130,7 @@ describe('Startup and Config', function () {
           message: 'I AM GROOT 2',
           NumberOfDummyTxs: 1,
           evalSuccess: true,
-        },
+        } as RuleParamsDummy,
       },
     ];
     appConfigInterceptor = createAppConfigInterceptor(mockRules);

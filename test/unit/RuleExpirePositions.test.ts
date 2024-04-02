@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as dotenv from 'dotenv';
 import { FactoryRule } from '../../src/rule_engine/FactoryRule';
 import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
+import { Executor, RuleJSONConfigItem, TypeRule, UrgencyLevel } from '../../src/rule_engine/TypesRule';
 import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import { TYPES } from '../../src/inversify.types';
 import { Container } from 'inversify';
@@ -37,7 +37,7 @@ describe('Rule Factory Testings: Expire Positions', function () {
     const expirePositionRule: RuleJSONConfigItem = {
       ruleType: TypeRule.ExpirePositions,
       label: 'Expire positions - test',
-      params: {},
+      params: { ttlSeconds: 300, urgencyLevel: UrgencyLevel.LOW, executor: Executor.LEVERAGE },
     };
     const rule = ruleFactory.createRule(expirePositionRule);
     expect(rule).not.to.be.null;

@@ -27,6 +27,7 @@ export class RuleExpirePositions extends Rule {
   private positionLedgerContract!: PositionLedgerContract;
   private positionLedgerAddress!: Address;
   private positionLedgerABI!: string;
+
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 
@@ -56,21 +57,20 @@ export class RuleExpirePositions extends Rule {
     } as RawTransactionData;
 
     const outboundTx = {
-      urgencyLevel: UrgencyLevel.LOW,
-      executor: Executor.LEVERAGE,
+      urgencyLevel: this.params.urgencyLevel,
+      executor: this.params.executor,
       context: `this is a expire test context`,
       postEvalUniqueKey: this.generateUniqueKey(0),
       lowLevelUnsignedTransaction: tx,
-      ttlSeconds: 300
+      ttlSeconds: this.params.ttlSeconds
     } as OutboundTransaction;
 
     this.pushTransactionToRuleLocalQueue(outboundTx);
   }
 
-  public override async initialize(ruleLabel: string, params: RuleParams | unknown): Promise<void> {
+  public override async initialize(ruleLabel: string, params: RuleParams): Promise<void> {
     this.ruleLabel = ruleLabel;
     this.params = params;
-
 
     this.positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;
     try {

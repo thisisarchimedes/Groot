@@ -1,3 +1,5 @@
+import { RuleParams } from "./rule/Rule";
+
 export enum TypeRule {
     Invalid = 'invalid',
     Dummy = 'dummy',
@@ -20,5 +22,5 @@ export enum UrgencyLevel {
 export interface RuleJSONConfigItem {
     ruleType: TypeRule;
     label: string;
-    params: unknown;
+    params: RuleParams;
 }

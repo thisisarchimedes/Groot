@@ -42,12 +42,12 @@ export class RuleDummy extends Rule {
 
   private createDummyTransaction(txNumber: number, currentBlockNumber: number): OutboundTransaction {
     return {
-      urgencyLevel: UrgencyLevel.LOW,
-      executor: Executor.LEVERAGE,
+      urgencyLevel: this.params.urgencyLevel,
+      executor: this.params.executor,
       context: `this is a dummy context - number: ${txNumber} - block: ${currentBlockNumber}`,
       postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction: {} as RawTransactionData,
-      ttlSeconds: 300
+      ttlSeconds: this.params.ttlSeconds
     };
   }
 
