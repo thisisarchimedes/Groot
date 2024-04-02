@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 import { expect } from 'chai';
 import * as dotenv from 'dotenv';
-import { FactoryRule } from '../../src/rule_engine/FactoryRule';
 import { LoggerAdapter } from './adapters/LoggerAdapter';
 import { Executor, RuleJSONConfigItem, TypeRule, UrgencyLevel } from '../../src/rule_engine/TypesRule';
 import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
