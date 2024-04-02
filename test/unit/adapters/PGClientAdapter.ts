@@ -13,7 +13,6 @@ export class PGClientAdapter extends Client {
     }
 
     public async query(queryConfig: string | QueryConfig): Promise<QueryResult> {
-        console.log('**** QUERY ****');
         this.lastExecutedQuery = queryConfig;
         if (this.queryResponse) {
             return this.queryResponse;
