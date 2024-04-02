@@ -13,6 +13,7 @@ import { Container } from 'inversify';
 import { TYPES } from '../../src/inversify.types';
 import { IBlockchainNodeHealthMonitor } from '../../src/service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
 import { createTestContainer } from './inversify.config.unit_test';
+import { ILogger } from '../../src/service/logger/interfaces/ILogger';
 
 const { expect } = chai;
 
@@ -22,16 +23,13 @@ const should = chai.should();
 describe('Health Monitor tests', function () {
   let localNodeAlchemy: BlockchainNodeAdapter;
   let localNodeInfura: BlockchainNodeAdapter;
-  const logger: LoggerAdapter = new LoggerAdapter();
-
   let container: Container;
-
-
   let blockchainNodeHealth: IBlockchainNodeHealthMonitor;
-
+  let logger: LoggerAdapter;
   beforeEach(async function () {
     container = createTestContainer();
     // Starting nodes
+    logger = container.get<LoggerAdapter>(LoggerAdapter);
     localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
     localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
     Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
@@ -45,19 +43,18 @@ describe('Health Monitor tests', function () {
   });
 
   // TODO:fix test
-  // it('Should be able to recover node that is currently unhealthy', async function () {
-  //   localNodeAlchemy.setNodeHealthy(true);
-  //   localNodeInfura.setNodeHealthy(false);
-  //   localNodeInfura.setExpectRecoverToSucceed(true);
+  it('Should be able to recover node that is currently unhealthy', async function () {
+    localNodeAlchemy.setNodeHealthy(true);
+    localNodeInfura.setNodeHealthy(false);
+    localNodeInfura.setExpectRecoverToSucceed(true);
 
-  //   await blockchainNodeHealth.checkBlockchainNodesHealth();
-  //   const loggLastLine = logger.getLatestInfoLogLine();
-  //   console.log('**** loggLastLine', loggLastLine);
-  //   expect(loggLastLine.includes(`Node ${localNodeInfura.getNodeName()} has been recovered`))
-  //     .to.be.true;
-  //   expect(localNodeInfura.isHealthy()).to.be.true;
-  //   expect(localNodeAlchemy.isHealthy()).to.be.true;
-  // });
+    await blockchainNodeHealth.checkBlockchainNodesHealth();
+    const loggLastLine = logger.getLatestInfoLogLine();
+    expect(loggLastLine.includes(`Node ${localNodeInfura.getNodeName()} has been recovered`))
+      .to.be.true;
+    expect(localNodeInfura.isHealthy()).to.be.true;
+    expect(localNodeAlchemy.isHealthy()).to.be.true;
+  });
 
   it('Should throw if all nodes failed and cannot recover', async function () {
     localNodeAlchemy.setNodeHealthy(false);
