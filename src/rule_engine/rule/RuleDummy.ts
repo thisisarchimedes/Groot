@@ -1,12 +1,11 @@
 import 'reflect-metadata';
 
-import { Rule, RuleParams } from './Rule';
-import { Executor, UrgencyLevel } from '../TypesRule';
-import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
-import { inject, injectable } from 'inversify';
-import { ILogger } from '../../service/logger/interfaces/ILogger';
-import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
-import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {Rule, RuleParams} from './Rule';
+import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
+import {inject, injectable} from 'inversify';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -47,7 +46,7 @@ export class RuleDummy extends Rule {
       context: `this is a dummy context - number: ${txNumber} - block: ${currentBlockNumber}`,
       postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction: {} as RawTransactionData,
-      ttlSeconds: this.params.ttlSeconds
+      ttlSeconds: this.params.ttlSeconds,
     };
   }
 

@@ -1,4 +1,4 @@
-import { Executor, UrgencyLevel } from '../rule_engine/TypesRule';
+import {Executor, UrgencyLevel} from '../rule_engine/TypesRule';
 
 export interface RawTransactionData {
   to: string;

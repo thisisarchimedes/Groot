@@ -1,4 +1,4 @@
-import { RuleParams } from "./rule/Rule";
+import {RuleParams} from './rule/Rule';
 
 export enum TypeRule {
     Invalid = 'invalid',

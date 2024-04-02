@@ -1,11 +1,11 @@
 import 'reflect-metadata';
 
-import { Client, QueryConfig } from 'pg';
-import { TYPES } from '../inversify.types';
-import { inject, injectable } from 'inversify';
-import { ITxQueue } from './interfaces/ITxQueue';
-import { OutboundTransaction } from '../blockchain/OutboundTransaction';
-import { Executor, UrgencyLevel } from '../rule_engine/TypesRule';
+import {Client, QueryConfig} from 'pg';
+import {TYPES} from '../inversify.types';
+import {inject, injectable} from 'inversify';
+import {ITxQueue} from './interfaces/ITxQueue';
+import {OutboundTransaction} from '../blockchain/OutboundTransaction';
+import {Executor, UrgencyLevel} from '../rule_engine/TypesRule';
 
 @injectable()
 class PostgreTxQueue implements ITxQueue {
@@ -31,21 +31,22 @@ class PostgreTxQueue implements ITxQueue {
     const data = tx.lowLevelUnsignedTransaction.data;
     const urgency = tx.urgencyLevel;
     const ttlSeconds = tx.ttlSeconds;
-    await this.insertTransaction(createdAt, updatedAt, status, to, executor, '', identifier, value, data, urgency, ttlSeconds);
+    await this.insertTransaction(createdAt, updatedAt, status, to, executor,
+        '', identifier, value, data, urgency, ttlSeconds);
   }
 
   async insertTransaction(
-    createdAt: Date,
-    updatedAt: Date,
-    status: string,
-    to: string,
-    executor: Executor,
-    txHash: string,
-    identifier: string,
-    value: string,
-    data: string,
-    urgency: UrgencyLevel,
-    ttlSeconds: number
+      createdAt: Date,
+      updatedAt: Date,
+      status: string,
+      to: string,
+      executor: Executor,
+      txHash: string,
+      identifier: string,
+      value: string,
+      data: string,
+      urgency: UrgencyLevel,
+      ttlSeconds: number,
   ): Promise<void> {
     try {
       await this.client.query('BEGIN');
