@@ -5,7 +5,6 @@ import { describe, it, beforeEach } from 'mocha';
 import { QueryResult } from 'pg';
 import { createTestContainer } from './inversify.config.unit_test';
 import { PGClientAdapter } from './adapters/PGClientAdapter';
-import PostgreDataSource from '../../src/rule_engine/tool/data_source/PostgreDataSource';
 import { LoggerAdapter } from './adapters/LoggerAdapter';
 import { TYPES } from '../../src/inversify.types';
 import { ILeverageDataSource } from '../../src/rule_engine/tool/data_source/interfaces/ILeverageDataSource';
@@ -47,7 +46,7 @@ describe('PostgreDataSource Tests', function () {
             fields: [],
         };
 
-        // Use this mockResponse in your test
+        pgClientAdapter.setThrowErrorOnConnect(false);
         pgClientAdapter.setQueryResponse(mockResponse);
 
         const nftIds = [100, 101];
@@ -64,6 +63,7 @@ describe('PostgreDataSource Tests', function () {
         // Setup mock to throw error on connect
         pgClientAdapter.setThrowErrorOnConnect(true);
         pgClientAdapter.setErrorMessage("Database connection failed");
+        pgClientAdapter.setQueryResponse({} as QueryResult);
 
         const nftIds = [100, 101];
         let errorCaught = false;
@@ -71,6 +71,7 @@ describe('PostgreDataSource Tests', function () {
             await dataSource.getPositionsByNftIds(nftIds);
         } catch (error) {
             if (error instanceof Error) {
+                errorCaught = true;
                 console.error(error.message); // TODO
             }
         }

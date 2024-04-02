@@ -10,10 +10,10 @@ export class PGClientAdapter extends Client {
         if (this.throwErrorOnConnect) {
             throw new Error(this.errorMessage);
         }
-        await super.connect();
     }
 
     public async query(queryConfig: string | QueryConfig): Promise<QueryResult> {
+        console.log('**** QUERY ****');
         this.lastExecutedQuery = queryConfig;
         if (this.queryResponse) {
             return this.queryResponse;
@@ -30,7 +30,7 @@ export class PGClientAdapter extends Client {
     }
 
     public setQueryResponse(response: QueryResult): void {
-        this.queryResponse =  response;
+        this.queryResponse = response;
     }
 
     public getLastExecutedQuery(): string | QueryConfig | null {

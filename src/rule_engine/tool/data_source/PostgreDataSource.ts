@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import pg, {Client} from 'pg'; // Import Client instead of Pool
+import pg, { Client } from 'pg'; // Import Client instead of Pool
 import LeveragePosition from '../../../types/LeveragePosition';
-import {ILogger} from '../../../service/logger/interfaces/ILogger';
-import {inject, injectable} from 'inversify';
-import {ILeverageDataSource} from './interfaces/ILeverageDataSource';
+import { ILogger } from '../../../service/logger/interfaces/ILogger';
+import { inject, injectable } from 'inversify';
+import { ILeverageDataSource } from './interfaces/ILeverageDataSource';
 
 
 @injectable()
@@ -18,10 +18,12 @@ export default class PostgreDataSource implements ILeverageDataSource {
     this.client = _client;
   }
   async getPositionsByNftIds(nftIds: number[]): Promise<LeveragePosition[]> {
+    console.log('1')
     const query = {
       text: 'SELECT * FROM "LeveragePosition" WHERE "nftId" = ANY($1::int[])',
       values: [nftIds],
     };
+    console.log('2')
     const resp = await this.executeQuery(query);
     return resp ? (resp.rows as LeveragePosition[]) : [];
   }
@@ -36,13 +38,17 @@ export default class PostgreDataSource implements ILeverageDataSource {
   }
 
   private async connect() {
-    await this.client.connect().catch((err) => {
-      this.logger.error(`Could not connect to the database: ${(err as Error).message}`);
+    console.log('4')
+    await this.client.connect().catch(e => {
+      console.log('5')
+      this.logger.error("Database connection failed");
+      throw e;
     });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected async executeQuery(query: string | { text: string, values: any[] }): Promise<pg.QueryResult | null> {
+    console.log('3')
     await this.connect();
     try {
       if (this.client) {
