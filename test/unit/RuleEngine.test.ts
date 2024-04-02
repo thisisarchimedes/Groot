@@ -13,36 +13,48 @@ import { IRuleEngine } from '../../src/rule_engine/interfaces/IRuleEngine';
 import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
 import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
+import { IConfigService } from '../../src/service/config/interfaces/IConfigService';
 
 describe('Rule Engine Testings', function () {
   let container: Container;
   let logger: LoggerAdapter;
   let configService: ConfigServiceAdapter;
-  let blockchainReader: BlockchainReader;
 
   beforeEach(async function () {
     container = createTestContainer();
     logger = container.get<LoggerAdapter>(TYPES.ILoggerAll);
-    configService = container.get<ConfigServiceAdapter>(ConfigServiceAdapter);
-    blockchainReader = container.get<BlockchainReader>(TYPES.IBlockchainReader);
-
+    configService = container.get<ConfigServiceAdapter>(TYPES.IConfigServiceAWS);
+    configService.setLeverageContractInfo({
+      positionOpener: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
+      positionLiquidator: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
+      positionCloser: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
+      positionExpirator: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
+      positionLedger: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
+    })
     const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
     const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
     await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
   });
 
-  //TODO:FIX TEST
-  // it('should load rules from rule JSON and iterate on them, invoke each one', async function () {
-  //   const expectedLogMessage = 'I AM GROOT';
-  //   logger.lookForInfoLogLineContaining(expectedLogMessage);
-  //   const ruleEngine = await createRuleEngineWithConfiguredRules('./test/unit/data/dummy_rules.json');
+  it('should load rules from rule JSON and iterate on them, invoke each one', async function () {
+    const expectedLogMessage = 'I AM GROOT';
 
-  //   await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
-  //   const transactions = ruleEngine.getOutboundTransactions();
+    configService.setLeverageContractInfo({
+      positionOpener: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
+      positionLiquidator: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
+      positionCloser: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
+      positionExpirator: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
+      positionLedger: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
+    })
 
-  //   assertTransactionsValid(transactions, 3);
-  //   expect(logger.isExpectedLogLineInfoFound()).to.be.true;
-  // });
+    logger.lookForInfoLogLineContaining(expectedLogMessage);
+    const ruleEngine = await createRuleEngineWithConfiguredRules('./test/unit/data/dummy_rules.json');
+
+    await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
+    const transactions = ruleEngine.getOutboundTransactions();
+    assertTransactionsValid(transactions, 3);
+    expect(logger.isExpectedLogLineInfoFound()).to.be.true;
+  });
 
   //TODO: FIX TEST
   // it('Should report on 1 successful rule and 1 failed rule', async function () {
@@ -63,13 +75,20 @@ describe('Rule Engine Testings', function () {
   async function createRuleEngineWithConfiguredRules(rulesFilePath: string): Promise<IRuleEngine> {
     configService.setRulesFromFile(rulesFilePath);
     await configService.refreshConfig();
-    return createRuleEngine();
+    return await createRuleEngine();
   }
 
-  function createRuleEngine(): IRuleEngine {
+  async function createRuleEngine(): Promise<IRuleEngine> {
     const ruleEngine: IRuleEngine = container.get<IRuleEngine>(TYPES.IRuleEngine);
-    ruleEngine.loadRulesFromJSONConfig(configService.getRules());
+    await ruleEngine.loadRulesFromJSONConfig(configService.getRules());
     return ruleEngine;
+  }
+
+  function assertTransactionsValid(transactions: OutboundTransaction[], expectedLength?: number): void {
+    expect(transactions).not.to.be.undefined;
+    if (expectedLength !== undefined) {
+      expect(transactions.length).to.be.eq(expectedLength);
+    }
   }
 
   function createDummyRule(message: string, numberOfDummyTxs: number, evalSuccess: boolean): RuleJSONConfigItem {
@@ -86,13 +105,6 @@ describe('Rule Engine Testings', function () {
       label: 'invalideRule',
       params: { message, NumberOfDummyTxs: numberOfDummyTxs } as RuleParamsDummy,
     };
-  }
-
-  function assertTransactionsValid(transactions: OutboundTransaction[], expectedLength?: number): void {
-    expect(transactions).not.to.be.undefined;
-    if (expectedLength !== undefined) {
-      expect(transactions.length).to.be.eq(expectedLength);
-    }
   }
 
   function assertRuleEvaluationResult(successfulRuleEval: number, failedRuleEval: number): void {

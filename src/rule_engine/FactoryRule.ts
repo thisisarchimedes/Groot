@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import {Container, inject, injectable} from 'inversify';
-import {IFactoryRule} from './interfaces/IFactoryRule';
-import {RuleJSONConfigItem} from './TypesRule';
-import {ILogger} from '../service/logger/interfaces/ILogger';
-import {Rule} from './rule/Rule';
+import { Container, inject, injectable } from 'inversify';
+import { IFactoryRule } from './interfaces/IFactoryRule';
+import { RuleJSONConfigItem } from './TypesRule';
+import { ILogger } from '../service/logger/interfaces/ILogger';
+import { Rule } from './rule/Rule';
 
 
 @injectable()

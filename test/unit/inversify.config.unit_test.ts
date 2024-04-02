@@ -30,6 +30,7 @@ import { Client } from 'pg';
 import { ILeverageDataSource } from '../../src/rule_engine/tool/data_source/interfaces/ILeverageDataSource';
 import PostgreDataSource from '../../src/rule_engine/tool/data_source/PostgreDataSource';
 import { ILoggerAll } from '../../src/service/logger/interfaces/ILoggerAll';
+import { IConfigService } from '../../src/service/config/interfaces/IConfigService';
 
 export const createTestContainer = (): Container => {
     const container = new Container();
@@ -66,9 +67,9 @@ export const createTestContainer = (): Container => {
     container.bind<TxQueueAdapter>(TxQueueAdapter).toSelf().inSingletonScope();
 
 
-    container.bind<IFactoryRule>(TYPES.IFactoryRule).to(FactoryRule).inRequestScope();
+    container.bind<IFactoryRule>(TYPES.IFactoryRule).to(FactoryRule).inSingletonScope();
 
-    container.bind<IRuleEngine>(TYPES.IRuleEngine).to(RuleEngine).inRequestScope();
+    container.bind<IRuleEngine>(TYPES.IRuleEngine).to(RuleEngine).inSingletonScope();
 
     container.bind<AbiFetcherAdapter>(AbiFetcherAdapter).toSelf().inSingletonScope();
     container.bind<IAbiRepo>(TYPES.IAbiRepo).to(AbiRepoAdapter).inRequestScope();
@@ -82,6 +83,9 @@ export const createTestContainer = (): Container => {
         .to(RuleBalanceCurvePoolWithVault).inRequestScope();
 
     container.bind<ConfigServiceAdapter>(ConfigServiceAdapter).toSelf().inSingletonScope();
+
+    container.bind<IConfigService>(TYPES.IConfigServiceAWS).to(ConfigServiceAdapter).inSingletonScope();
+
 
     container.bind<Client>(TYPES.LeverageDBClient).toDynamicValue(() => {
         const configService = container.resolve(ConfigServiceAdapter);

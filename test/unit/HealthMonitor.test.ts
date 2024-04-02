@@ -42,7 +42,6 @@ describe('Health Monitor tests', function () {
     await localNodeInfura.stopNode();
   });
 
-  // TODO:fix test
   it('Should be able to recover node that is currently unhealthy', async function () {
     localNodeAlchemy.setNodeHealthy(true);
     localNodeInfura.setNodeHealthy(false);

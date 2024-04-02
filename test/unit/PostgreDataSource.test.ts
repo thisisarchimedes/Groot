@@ -72,7 +72,6 @@ describe('PostgreDataSource Tests', function () {
         } catch (error) {
             if (error instanceof Error) {
                 errorCaught = true;
-                console.error(error.message); // TODO
             }
         }
 
