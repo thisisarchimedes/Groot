@@ -1,5 +1,3 @@
-require('wtfnode').init();
-
 import 'reflect-metadata';
 
 
