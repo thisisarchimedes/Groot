@@ -11,14 +11,6 @@ import { Address } from '../../types/LeverageContractAddresses';
 import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
 import { Executor, UrgencyLevel } from '../TypesRule';
 
-export interface RuleParamsDummy extends RuleParams {
-  message: string;
-  NumberOfDummyTxs: number;
-  evalSuccess: boolean;
-}
-
-// const WBTC_ADDRESS = '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599';
-// const WBTC_DECIMALS = 8;
 
 @injectable()
 export class RuleExpirePositions extends Rule {
