@@ -1,3 +1,5 @@
+require('wtfnode').init();
+
 import 'reflect-metadata';
 
 
@@ -15,6 +17,9 @@ import { IConfigServiceAWS } from '../../src/service/config/interfaces/IConfigSe
 import { InversifyConfig } from '../../src/inversify.config';
 import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 
+let timeoutId: NodeJS.Timeout | null = null;
+
+
 describe('Startup and Config', function () {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
@@ -24,6 +29,8 @@ describe('Startup and Config', function () {
   let appConfigInterceptor: AppConfigInterceptor | undefined;
   let ethNodeMainInterceptor: EthNodeInterceptor | undefined;
   let ethNodeAltInterceptor: EthNodeInterceptor | undefined;
+
+
 
   beforeEach(async function () {
     const configService = createConfigService();
@@ -41,7 +48,16 @@ describe('Startup and Config', function () {
 
   afterEach(function () {
     cleanupTestDoubles();
+    clearMessageProcessingTimeout();
   });
+
+  function clearMessageProcessingTimeout(): void {
+    if (timeoutId) {
+      console.log('**** clearing', timeoutId)
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+  }
 
   it('Should return block number from mock node', async function () {
     const expectedBlockNumber = 10001;
@@ -183,7 +199,11 @@ describe('Startup and Config', function () {
     }
   }
 
-  function waitForMessageProcessing(): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, 1000));
+  function waitForMessageProcessing(): NodeJS.Timeout {
+    timeoutId = setTimeout(() => {
+      // Your code here
+    }, 1000);
+    return timeoutId;
   }
+
 });
