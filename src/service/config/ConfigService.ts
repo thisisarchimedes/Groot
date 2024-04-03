@@ -1,7 +1,7 @@
-import { injectable } from 'inversify';
-import { RuleJSONConfigItem } from '../../rule_engine/TypesRule';
-import { LeverageContractAddresses } from '../../types/LeverageContractAddresses';
-import { IConfigService } from './interfaces/IConfigService';
+import {injectable} from 'inversify';
+import {RuleJSONConfigItem} from '../../rule_engine/TypesRule';
+import {LeverageContractAddresses} from '../../types/LeverageContractAddresses';
+import {IConfigService} from './interfaces/IConfigService';
 
 @injectable()
 export abstract class ConfigService implements IConfigService {
