@@ -27,11 +27,40 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
       this.refreshEtherscanAPIKey(),
       this.refreshAbiStorageConfig(),
       this.refreshTransactionsDatabaseURL(),
+      this.refreshLeverageDBURL(),
+      this.refreshLeverageContractInfo(),
     ]);
   }
 
   public getAWSRegion(): string {
     return this.awsRegion;
+  }
+
+  private async refreshLeverageContractInfo(): Promise<void> {
+    const data = JSON.parse(await this.appConfigClient.fetchConfigRawString('LeverageContractInfo'));
+
+    data.forEach((contract: { name: string, address: string }) => {
+      switch (contract.name) {
+        case 'PositionOpener':
+          this.leverageContractAddresses.positionOpener = contract.address;
+          break;
+        case 'PositionLiquidator':
+          this.leverageContractAddresses.positionLiquidator = contract.address;
+          break;
+        case 'PositionCloser':
+          this.leverageContractAddresses.positionCloser = contract.address;
+          break;
+        case 'PositionExpirator':
+          this.leverageContractAddresses.positionExpirator = contract.address;
+          break;
+        case 'PositionLedger':
+          this.leverageContractAddresses.positionLedger = contract.address;
+      }
+    });
+  }
+
+  private async refreshLeverageDBURL(): Promise<void> {
+    this.leverageDbUrl = await this.appConfigClient.fetchConfigRawString('LeveragePositionDatabaseURL');
   }
 
   private async refreshRPCURL(): Promise<void> {
@@ -61,6 +90,7 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
     const sleepTime = await this.appConfigClient.fetchConfigRawString('GrootSleepMillisecondsBetweenCycles');
     this.sleepTimeMS = parseInt(sleepTime, 10);
   }
+
 
   private async refreshEtherscanAPIKey(): Promise<void> {
     this.etherscanAPIKey = await this.appConfigClient.fetchConfigRawString('EtherscanApiKey');

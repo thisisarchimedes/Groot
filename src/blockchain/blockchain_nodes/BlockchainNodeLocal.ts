@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {injectable, inject} from 'inversify';
 
-import {JsonRpcProvider} from 'ethers';
+import {JsonRpcProvider, ethers} from 'ethers';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
 import {IBlockchainNodeLocal} from './interfaces/IBlockchainNodeLocal';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
@@ -24,6 +24,10 @@ export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNo
   public async startNode(): Promise<void> {
     this.logger.debug(`Starting local node...${this.localRpcUrl}`);
     await this.waitForNodeToBeReady();
+  }
+
+  public getProvider(): ethers.Provider {
+    return this.provider;
   }
 
   public async stopNode(): Promise<void> {

@@ -6,10 +6,18 @@
 - **CICD**: See [doc/CICDPipeline.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/CICDPipeline.md)
   - **Observability**: [Pixie](https://github.com/thisisarchimedes/Groot/blob/main/doc/K8sObservability.md)
 - **NewRelic**: [Raw logs](https://onenr.io/0Bj3XDql2QX)
+
+
+## Dependency injection design pattern (inversify.js)
+
+[doc/DependencyInjection.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/DependencyInjection.md)
+
 ## Supported Rules
 
 [doc/RulesLogic.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/RulesLogic.md)
 
+
 ## Tx broadcasting logic
 
 [doc/TxLogic.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/TxLogic.md)
+

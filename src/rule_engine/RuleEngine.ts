@@ -23,8 +23,8 @@ export class RuleEngine implements IRuleEngine {
     this.ruleFactory = _factoryRule;
   }
 
-  public loadRulesFromJSONConfig(ruleConfig: RuleJSONConfigItem[]): void {
-    this.rules = this.createRules(ruleConfig);
+  public async loadRulesFromJSONConfig(ruleConfig: RuleJSONConfigItem[]): Promise<void> {
+    this.rules = await this.createRules(ruleConfig);
     this.logRuleCount();
   }
 
@@ -37,10 +37,16 @@ export class RuleEngine implements IRuleEngine {
     return this.outboundTransactions;
   }
 
-  private createRules(ruleConfig: RuleJSONConfigItem[]): Rule[] {
-    return ruleConfig
-        .map((config) => this.ruleFactory.createRule(config))
-        .filter((rule): rule is Rule => rule !== null);
+  private async createRules(ruleConfig: RuleJSONConfigItem[]): Promise<Rule[]> {
+    const rules: Rule[] = [];
+
+    for (const config of ruleConfig) {
+      const rule = await this.ruleFactory.createRule(config);
+      if (rule !== null) {
+        rules.push(rule);
+      }
+    }
+    return rules;
   }
 
   private logRuleCount(): void {

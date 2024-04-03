@@ -27,6 +27,10 @@ export abstract class BlockchainNode implements IBlockchainNode {
     this.nodeName = nodeName;
   }
 
+  public getProvider(): ethers.Provider {
+    return this.provider;
+  }
+
   public async getBlockNumber(): Promise<number> {
     try {
       const blockNumber = await this.provider.getBlockNumber();

@@ -10,6 +10,7 @@ import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 import { createTestContainer } from './inversify.config.unit_test';
 import { IFactoryRule } from '../../src/rule_engine/interfaces/IFactoryRule';
+import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 
 describe('Rule Factory Testings', function () {
   let container: Container;
@@ -33,9 +34,9 @@ describe('Rule Factory Testings', function () {
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
-      params: { message: 'I AM GROOT', NumberOfDummyTxs: 1, evalSuccess: true },
+      params: { message: 'I AM GROOT', NumberOfDummyTxs: 1, evalSuccess: true } as RuleParamsDummy,
     };
-    const rule = ruleFactory.createRule(dummyRule);
+    const rule = await ruleFactory.createRule(dummyRule);
     expect(rule).not.to.be.undefined;
     if (rule) {
       await rule.evaluate();
@@ -47,10 +48,10 @@ describe('Rule Factory Testings', function () {
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
-      params: { message: 'I AM GROOT', NumberOfDummyTxs: 3, evalSuccess: true },
+      params: { message: 'I AM GROOT', NumberOfDummyTxs: 3, evalSuccess: true } as RuleParamsDummy,
     };
     const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
-    const rule = ruleFactory.createRule(dummyRule);
+    const rule = await ruleFactory.createRule(dummyRule);
     if (rule) {
       await rule.evaluate();
     } else {
@@ -71,9 +72,9 @@ describe('Rule Factory Testings', function () {
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
-      params: { message: 'I AM GROOT', NumberOfDummyTxs: 1, evalSuccess: true },
+      params: { message: 'I AM GROOT', NumberOfDummyTxs: 1, evalSuccess: true } as RuleParamsDummy,
     };
-    const rule = ruleFactory.createRule(dummyRule);
+    const rule = await ruleFactory.createRule(dummyRule);
     expect(rule).not.to.be.undefined;
     if (rule) {
       await rule.evaluate();

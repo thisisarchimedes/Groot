@@ -16,4 +16,5 @@ export interface IBlockchainNode {
     isHealthy(): boolean;
     getNodeName(): string;
     getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo>;
+    getProvider(): ethers.Provider;
 }
