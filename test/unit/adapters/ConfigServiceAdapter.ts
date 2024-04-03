@@ -1,7 +1,6 @@
 
 import fs from 'fs';
 import { ConfigService } from '../../../src/service/config/ConfigService';
-import { IConfigService } from '../../../src/service/config/interfaces/IConfigService';
 import { LeverageContractAddresses } from '../../../src/types/LeverageContractAddresses';
 
 export class ConfigServiceAdapter extends ConfigService {

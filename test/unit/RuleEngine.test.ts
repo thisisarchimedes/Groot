@@ -56,31 +56,30 @@ describe('Rule Engine Testings', function () {
     expect(logger.isExpectedLogLineInfoFound()).to.be.true;
   });
 
-  //TODO: FIX TEST
-  // it('Should report on 1 successful rule and 1 failed rule', async function () {
-  //   const testRules: RuleJSONConfigItem[] = [
-  //     createDummyRule('I AM GROOT', 3, true),
-  //     createInvalidRule('I AM GROOT', 3),
-  //     createDummyRule('I AM GROOT', 1, false),
-  //   ];
-  //   const ruleEngine = createRuleEngine(testRules);
+  it('Should report on 1 successful rule and 1 failed rule', async function () {
+    const testRules: RuleJSONConfigItem[] = [
+      createDummyRule('I AM GROOT', 3, true),
+      createInvalidRule('I AM GROOT', 3),
+      createDummyRule('I AM GROOT', 1, false),
+    ];
+    const ruleEngine = createRuleEngine(testRules);
 
-  //   await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
-  //   const transactions = ruleEngine.getOutboundTransactions();
+    await (await ruleEngine).evaluateRulesAndCreateOutboundTransactions();
+    const transactions = (await ruleEngine).getOutboundTransactions();
 
-  //   assertRuleEvaluationResult(1, 1);
-  //   assertTransactionsValid(transactions, 3);
-  // });
+    assertRuleEvaluationResult(1, 1);
+    assertTransactionsValid(transactions, 3);
+  });
 
   async function createRuleEngineWithConfiguredRules(rulesFilePath: string): Promise<IRuleEngine> {
     configService.setRulesFromFile(rulesFilePath);
     await configService.refreshConfig();
-    return await createRuleEngine();
+    return await createRuleEngine(configService.getRules());
   }
 
-  async function createRuleEngine(): Promise<IRuleEngine> {
+  async function createRuleEngine(rules: RuleJSONConfigItem[]): Promise<IRuleEngine> {
     const ruleEngine: IRuleEngine = container.get<IRuleEngine>(TYPES.IRuleEngine);
-    await ruleEngine.loadRulesFromJSONConfig(configService.getRules());
+    await ruleEngine.loadRulesFromJSONConfig(rules);
     return ruleEngine;
   }
 
