@@ -34,9 +34,10 @@ export class RuleDummy extends Rule {
     if (params.evalSuccess === false) {
       throw new Error('RuleDummy.evaluate() failed');
     }
-
-    const dummyTx = this.createDummyTransaction(blockNumber);
-    this.pushTransactionToRuleLocalQueue(dummyTx);
+    for (let i = 0; i < params.NumberOfDummyTxs; i++) {
+      const dummyTx = this.createDummyTransaction(blockNumber);
+      this.pushTransactionToRuleLocalQueue(dummyTx);
+    }
   }
 
   private createDummyTransaction(currentBlockNumber: number): OutboundTransaction {

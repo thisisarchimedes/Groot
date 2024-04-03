@@ -5,7 +5,8 @@
         "params":{
            "urgencyLevel":"LOW",
             "executor":"LEVERAGE",
-            "ttlSeconds":300
+            "ttlSeconds":300,
+            "NumberOfDummyTxs":1
         }
     },
         {
