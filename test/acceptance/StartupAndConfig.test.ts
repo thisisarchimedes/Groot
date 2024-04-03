@@ -51,7 +51,6 @@ describe('Startup and Config', function () {
 
   function clearMessageProcessingTimeout(): void {
     if (timeoutId) {
-      console.log('**** clearing', timeoutId)
       clearTimeout(timeoutId);
       timeoutId = null;
     }
