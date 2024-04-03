@@ -1,25 +1,34 @@
 import 'reflect-metadata';
 
-import {Client, QueryConfig} from 'pg';
-import {TYPES} from '../inversify.types';
-import {inject, injectable} from 'inversify';
-import {ITxQueue} from './interfaces/ITxQueue';
-import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {Executor, UrgencyLevel} from '../rule_engine/TypesRule';
+import { Client, QueryConfig } from 'pg';
+import { TYPES } from '../inversify.types';
+import { inject, injectable } from 'inversify';
+import { ITxQueue } from './interfaces/ITxQueue';
+import { OutboundTransaction } from '../blockchain/OutboundTransaction';
+import { Executor, UrgencyLevel } from '../rule_engine/TypesRule';
+import { ILogger } from '../service/logger/interfaces/ILogger';
 
 @injectable()
 class PostgreTxQueue implements ITxQueue {
   private client: Client;
+  private logger: ILogger;
 
-  constructor(@inject(TYPES.TransactionsDBClient) client: Client) {
+  constructor(@inject('ILoggerAll') logger: ILogger,
+    @inject(TYPES.TransactionsDBClient) client: Client) {
     this.client = client;
+    this.logger = logger;
   }
   public async refresh(): Promise<void> {
-    // await this.client.connect().catch(console.error);
+    await this.client.connect().catch((e) => {
+      if (e instanceof Error) {
+        this.logger.error(e.message);
+      } else {
+        console.error(e);
+      }
+    });
   }
 
   public async addTransactionToQueue(tx: OutboundTransaction): Promise<void> {
-    await this.client.connect().catch(console.error);
 
     const createdAt = new Date();
     const updatedAt = new Date();
@@ -32,21 +41,21 @@ class PostgreTxQueue implements ITxQueue {
     const urgency = tx.urgencyLevel;
     const ttlSeconds = tx.ttlSeconds;
     await this.insertTransaction(createdAt, updatedAt, status, to, executor,
-        '', identifier, value, data, urgency, ttlSeconds);
+      '', identifier, value, data, urgency, ttlSeconds);
   }
 
   async insertTransaction(
-      createdAt: Date,
-      updatedAt: Date,
-      status: string,
-      to: string,
-      executor: Executor,
-      txHash: string,
-      identifier: string,
-      value: string,
-      data: string,
-      urgency: UrgencyLevel,
-      ttlSeconds: number,
+    createdAt: Date,
+    updatedAt: Date,
+    status: string,
+    to: string,
+    executor: Executor,
+    txHash: string,
+    identifier: string,
+    value: string,
+    data: string,
+    urgency: UrgencyLevel,
+    ttlSeconds: number,
   ): Promise<void> {
     try {
       await this.client.query('BEGIN');

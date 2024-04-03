@@ -1,17 +1,17 @@
 import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
-import {injectable, inject, Container} from 'inversify';
+import { injectable, inject, Container } from 'inversify';
 
-import {IBlockchainNodeLocal} from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
-import {IRuleEngine} from './rule_engine/interfaces/IRuleEngine';
-import {IGroot} from './interfaces/IGroot';
-import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealthMonitor';
-import {IConfigService} from './service/config/interfaces/IConfigService';
-import {ILogger} from './service/logger/interfaces/ILogger';
-import {ITransactionQueuer} from './tx_queue/interfaces/ITransactionQueuer';
-import {Client} from 'pg';
-import {TYPES} from './inversify.types';
+import { IBlockchainNodeLocal } from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
+import { IRuleEngine } from './rule_engine/interfaces/IRuleEngine';
+import { IGroot } from './interfaces/IGroot';
+import { IHealthMonitor } from './service/health_monitor/signal/interfaces/IHealthMonitor';
+import { IConfigService } from './service/config/interfaces/IConfigService';
+import { ILogger } from './service/logger/interfaces/ILogger';
+import { ITransactionQueuer } from './tx_queue/interfaces/ITransactionQueuer';
+import { Client } from 'pg';
+import { TYPES } from './inversify.types';
 
 dotenv.config();
 
@@ -50,6 +50,7 @@ export class Groot implements IGroot {
   public async initalizeGroot() {
     this.logger.info('Initializing Groot...');
     await this.configService.refreshConfig();
+    await this.transactionsQueuer.refresh();
     this.logger.info('Groot initialized successfully.');
   }
 
