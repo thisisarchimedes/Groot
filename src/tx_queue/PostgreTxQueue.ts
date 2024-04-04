@@ -6,21 +6,29 @@ import {inject, injectable} from 'inversify';
 import {ITxQueue} from './interfaces/ITxQueue';
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Executor, UrgencyLevel} from '../rule_engine/TypesRule';
+import {ILogger} from '../service/logger/interfaces/ILogger';
 
 @injectable()
 class PostgreTxQueue implements ITxQueue {
   private client: Client;
+  private logger: ILogger;
 
-  constructor(@inject(TYPES.TransactionsDBClient) client: Client) {
+  constructor(@inject('ILoggerAll') logger: ILogger,
+    @inject(TYPES.TransactionsDBClient) client: Client) {
     this.client = client;
+    this.logger = logger;
   }
   public async refresh(): Promise<void> {
-    // await this.client.connect().catch(console.error);
+    await this.client.connect().catch((e) => {
+      if (e instanceof Error) {
+        this.logger.error(e.message);
+      } else {
+        console.error(e);
+      }
+    });
   }
 
   public async addTransactionToQueue(tx: OutboundTransaction): Promise<void> {
-    await this.client.connect().catch(console.error);
-
     const createdAt = new Date();
     const updatedAt = new Date();
     const status = 'PENDING';

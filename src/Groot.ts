@@ -50,6 +50,7 @@ export class Groot implements IGroot {
   public async initalizeGroot() {
     this.logger.info('Initializing Groot...');
     await this.configService.refreshConfig();
+    await this.transactionsQueuer.refresh();
     this.logger.info('Groot initialized successfully.');
   }
 
