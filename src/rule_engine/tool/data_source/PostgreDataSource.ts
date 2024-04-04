@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import pg, {Client} from 'pg'; // Import Client instead of Pool
+import pg, { Client } from 'pg'; // Import Client instead of Pool
 import LeveragePosition from '../../../types/LeveragePosition';
-import {ILogger} from '../../../service/logger/interfaces/ILogger';
-import {inject, injectable} from 'inversify';
-import {ILeverageDataSource} from './interfaces/ILeverageDataSource';
+import { ILogger } from '../../../service/logger/interfaces/ILogger';
+import { inject, injectable } from 'inversify';
+import { ILeverageDataSource } from './interfaces/ILeverageDataSource';
 
 
 @injectable()
@@ -44,7 +44,7 @@ export default class PostgreDataSource implements ILeverageDataSource {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected async executeQuery(query: string | { text: string, values: any[] }): Promise<pg.QueryResult | null> {
-    // await this.connect();
+    await this.connect();
     try {
       if (this.client) {
         return await this.client.query(query);
