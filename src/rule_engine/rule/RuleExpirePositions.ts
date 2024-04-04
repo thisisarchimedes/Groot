@@ -1,14 +1,14 @@
-import { Rule, RuleParams } from './Rule';
-import { ILeverageDataSource } from '../tool/data_source/interfaces/ILeverageDataSource';
-import { inject, injectable } from 'inversify';
-import { ILogger } from '../../service/logger/interfaces/ILogger';
-import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
+import {Rule, RuleParams} from './Rule';
+import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
+import {inject, injectable} from 'inversify';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
 import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
-import { IConfigService } from '../../service/config/interfaces/IConfigService';
+import {IConfigService} from '../../service/config/interfaces/IConfigService';
 import fs from 'fs';
-import { Address } from '../../types/LeverageContractAddresses';
-import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
+import {Address} from '../../types/LeverageContractAddresses';
+import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
 
 
 @injectable()
@@ -38,7 +38,7 @@ export class RuleExpirePositions extends Rule {
   public async evaluate(): Promise<void> {
     await Promise.resolve();
     const encodedData = this.positionLedgerContract
-      .contract.interface.encodeFunctionData('setPositionState', [0, 1]);
+        .contract.interface.encodeFunctionData('setPositionState', [0, 1]);
 
     const tx = {
       to: this.positionLedgerAddress,
@@ -50,7 +50,7 @@ export class RuleExpirePositions extends Rule {
       urgencyLevel: this.params.urgencyLevel,
       executor: this.params.executor,
       context: `this is a expire test context`,
-      postEvalUniqueKey: this.generateUniqueKey(0),
+      postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction: tx,
       ttlSeconds: this.params.ttlSeconds,
     } as OutboundTransaction;

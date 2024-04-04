@@ -1,6 +1,6 @@
 import pLimit from 'p-limit';
 import {Rule, RuleParams} from './Rule';
-import {UrgencyLevel} from '../TypesRule';
+import {Executor, UrgencyLevel} from '../TypesRule';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
 import LeveragePosition from '../../types/LeveragePosition';
 import {Contract} from 'ethers';
@@ -79,7 +79,7 @@ export class RuleLiquidatePositions extends Rule {
     // Await for all the processes to finish and filter out the failed ones
     const txs = (await Promise.allSettled(promises))
         .filter((result) => result.status === 'fulfilled')
-        .map((result) => (result as PromiseFulfilledResult<{tx: RawTransactionData, nftId: number}>).value);
+        .map((result) => (result as PromiseFulfilledResult<{ tx: RawTransactionData, nftId: number }>).value);
 
     params.evalSuccess = true;
     params.numberOfLiquidatePositionsTxs = txs.length;
@@ -139,7 +139,7 @@ export class RuleLiquidatePositions extends Rule {
     }
   };
 
-  private prepareTransaction = (nftId: number, payload: string): {tx: RawTransactionData, nftId: number} => {
+  private prepareTransaction = (nftId: number, payload: string): { tx: RawTransactionData, nftId: number } => {
     const data = this.positionLiquidator.interface.encodeFunctionData('liquidatePosition', [{
       nftId,
       minWBTC: 0,
@@ -165,12 +165,14 @@ export class RuleLiquidatePositions extends Rule {
       tx: RawTransactionData,
   ): OutboundTransaction {
     return {
-      urgencyLevel: UrgencyLevel.URGENT,
+      urgencyLevel: UrgencyLevel.HIGH,
       context: `this is a liquidatePosition context
         - number: ${txNumber}
         - block: ${currentBlockNumber}
         - nftId: ${nftId}
       `,
+      executor: Executor.LEVERAGE,
+      ttlSeconds: 300,
       postEvalUniqueKey: this.generateUniqueKey(nftId),
       lowLevelUnsignedTransaction: tx,
     };

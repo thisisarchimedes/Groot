@@ -1,7 +1,7 @@
-import { injectable } from 'inversify';
-import { RuleJSONConfigItem } from '../../rule_engine/TypesRule';
-import { LeverageContractAddresses } from '../../types/LeverageContractAddresses';
-import { IConfigService } from './interfaces/IConfigService';
+import {injectable} from 'inversify';
+import {RuleJSONConfigItem} from '../../rule_engine/TypesRule';
+import {LeverageContractAddresses} from '../../types/LeverageContractAddresses';
+import {IConfigService} from './interfaces/IConfigService';
 
 @injectable()
 export abstract class ConfigService implements IConfigService {
@@ -11,7 +11,6 @@ export abstract class ConfigService implements IConfigService {
   protected transactionsDatabaseURL: string = '';
 
   protected rules: RuleJSONConfigItem[] = [];
-  protected leverageContractAddresses: LeverageContractAddresses;
   protected newRelicURL: string = '';
   protected newRelicAPIKey: string = '';
 
@@ -20,6 +19,15 @@ export abstract class ConfigService implements IConfigService {
   protected AbiRepoDynamoDBTable: string = '';
 
   protected leverageDbUrl: string = '';
+
+
+  protected leverageContractAddresses: LeverageContractAddresses = {
+    positionOpener: '',
+    positionLiquidator: '',
+    positionCloser: '',
+    positionExpirator: '',
+    positionLedger: '',
+  };
 
   abstract refreshConfig(): Promise<void>;
 
