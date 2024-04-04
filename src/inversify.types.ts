@@ -25,11 +25,15 @@ const TYPES = {
   IAbiRepo: 'IAbiRepo',
   IFactoryRule: 'IFactoryRule',
   IRuleEngine: 'IRuleEngine',
-  PGClient: 'PGClient',
+  TransactionsDBClient: 'TransactionsDBClient',
   PostgreTxQueue: 'PostgreTxQueue',
   ITransactionQueuer: 'ITransactionQueuer',
   PostgreDataSource: 'PostgreDataSource',
   IUniSwapPayloadBuilder: 'IUniSwapPayloadBuilder',
+  TransactionsDataSource: 'TransactionsDataSource',
+  LeverageDBClient: 'LeverageDBClient',
+  ILeverageDataSource: 'ILeverageDataSource',
+  PositionLedgerContract: 'PositionLedgerContract',
 };
 
-export {TYPES};
+export { TYPES };

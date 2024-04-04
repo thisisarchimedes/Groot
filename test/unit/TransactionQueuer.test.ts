@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { expect } from 'chai';
 import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { UrgencyLevel } from '../../src/rule_engine/TypesRule';
+import { Executor, UrgencyLevel } from '../../src/rule_engine/TypesRule';
 import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
 import { TxQueueAdapter } from './adapters/TxQueueAdapter';
 import { TransactionQueuer } from '../../src/tx_queue/TransactionQueuer';
@@ -25,7 +25,9 @@ describe('Transaction Queuer', function () {
   it('should filter out and report on all tx that dont have a hash', async function () {
     const txs: OutboundTransaction[] = [
       {
-        urgencyLevel: UrgencyLevel.URGENT,
+        urgencyLevel: UrgencyLevel.HIGH,
+        ttlSeconds: 300,
+        executor: Executor.LEVERAGE,
         context: 'test 1',
         postEvalUniqueKey: '0x1234',
         lowLevelUnsignedTransaction: {
@@ -35,7 +37,9 @@ describe('Transaction Queuer', function () {
         },
       },
       {
-        urgencyLevel: UrgencyLevel.URGENT,
+        urgencyLevel: UrgencyLevel.HIGH,
+        ttlSeconds: 300,
+        executor: Executor.LEVERAGE,
         context: 'test 2',
         postEvalUniqueKey: '',
         lowLevelUnsignedTransaction: {
@@ -45,7 +49,9 @@ describe('Transaction Queuer', function () {
         },
       },
       {
-        urgencyLevel: UrgencyLevel.NORMAL,
+        urgencyLevel: UrgencyLevel.LOW,
+        ttlSeconds: 300,
+        executor: Executor.LEVERAGE,
         context: 'test 3',
         postEvalUniqueKey: '0x345',
         lowLevelUnsignedTransaction: {

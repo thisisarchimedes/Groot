@@ -1,7 +1,6 @@
 import 'reflect-metadata';
 
 import {Rule, RuleParams} from './Rule';
-import {UrgencyLevel} from '../TypesRule';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
 import {inject, injectable} from 'inversify';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
@@ -28,24 +27,27 @@ export class RuleDummy extends Rule {
     const params = this.params as RuleParamsDummy;
     const blockNumber = await this.blockchainReader.getBlockNumber();
 
+    this.logger.info('I AM GROOT');
+
     this.logger.info('RuleDummy.evaluate() called: ' + params.message);
 
     if (params.evalSuccess === false) {
       throw new Error('RuleDummy.evaluate() failed');
     }
-
     for (let i = 0; i < params.NumberOfDummyTxs; i++) {
-      const dummyTx = this.createDummyTransaction(i, blockNumber);
+      const dummyTx = this.createDummyTransaction(blockNumber);
       this.pushTransactionToRuleLocalQueue(dummyTx);
     }
   }
 
-  private createDummyTransaction(txNumber: number, currentBlockNumber: number): OutboundTransaction {
+  private createDummyTransaction(currentBlockNumber: number): OutboundTransaction {
     return {
-      urgencyLevel: UrgencyLevel.NORMAL,
-      context: `this is a dummy context - number: ${txNumber} - block: ${currentBlockNumber}`,
+      urgencyLevel: this.params.urgencyLevel,
+      executor: this.params.executor,
+      context: `this is a dummy context - block: ${currentBlockNumber}`,
       postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction: {} as RawTransactionData,
+      ttlSeconds: this.params.ttlSeconds,
     };
   }
 

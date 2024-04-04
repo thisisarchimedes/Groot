@@ -187,8 +187,8 @@ export class BlockchainReader implements IBlockchainReader {
   }
 
   private async fetchProxyInfoFromNodes(proxyAddress: string): Promise<BlockchainNodeProxyInfo[]> {
-    const proxyInfoPromises = this.nodes.map((node) =>
-      node.getProxyInfoForAddress(proxyAddress).catch(() => null),
+    const proxyInfoPromises = this.nodes.map(async (node) =>
+      await node.getProxyInfoForAddress(proxyAddress).catch(() => null),
     );
     const res: BlockchainNodeProxyInfo[] = await Promise.all(proxyInfoPromises) as BlockchainNodeProxyInfo[];
     return res;

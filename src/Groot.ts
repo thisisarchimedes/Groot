@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
-import {injectable, inject} from 'inversify';
+import {injectable, inject, Container} from 'inversify';
 
 import {IBlockchainNodeLocal} from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import {IRuleEngine} from './rule_engine/interfaces/IRuleEngine';
@@ -10,6 +10,8 @@ import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealth
 import {IConfigService} from './service/config/interfaces/IConfigService';
 import {ILogger} from './service/logger/interfaces/ILogger';
 import {ITransactionQueuer} from './tx_queue/interfaces/ITransactionQueuer';
+import {Client} from 'pg';
+import {TYPES} from './inversify.types';
 
 dotenv.config();
 
@@ -22,6 +24,7 @@ export class Groot implements IGroot {
   private readonly healthMonitor: IHealthMonitor;
   private ruleEngine!: IRuleEngine;
   private transactionsQueuer: ITransactionQueuer;
+  private container: Container;
 
   constructor(
     @inject('IConfigServiceAWS') _configService: IConfigService,
@@ -31,6 +34,8 @@ export class Groot implements IGroot {
     @inject('IHealthMonitor') _healthMonitor: IHealthMonitor,
     @inject('IRuleEngine') _ruleEngine: IRuleEngine,
     @inject('ITransactionQueuer') _transactionsQueuer: ITransactionQueuer,
+    @inject(Container) container: Container,
+
   ) {
     this.logger = _logger;
     this.configService = _configService;
@@ -39,6 +44,7 @@ export class Groot implements IGroot {
     this.healthMonitor = _healthMonitor;
     this.ruleEngine = _ruleEngine;
     this.transactionsQueuer = _transactionsQueuer;
+    this.container = container;
   }
 
   public async initalizeGroot() {
@@ -51,8 +57,14 @@ export class Groot implements IGroot {
     this.logger.warn('Shutting down Groot...');
 
     await this.shutdownReadOnlyLocalNodes();
+    await this.shutdownDBClients();
 
     this.logger.warn('Groot shutdown successfully.');
+  }
+
+  public async shutdownDBClients() {
+    await this.container.get<Client>(TYPES.LeverageDBClient).end();
+    await this.container.get<Client>(TYPES.TransactionsDBClient).end();
   }
 
   private async shutdownReadOnlyLocalNodes() {
@@ -89,9 +101,14 @@ export class Groot implements IGroot {
     this.logger.info('Running Groot cycle...');
 
     try {
-      this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
-
-      await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
+      await this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
+      try {
+        await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
+      } catch (err) {
+        if (err instanceof Error) {
+          console.log(err.message);
+        }
+      }
       const txs = this.ruleEngine.getOutboundTransactions();
       await this.transactionsQueuer.queueTransactions(txs);
     } catch (ex) {

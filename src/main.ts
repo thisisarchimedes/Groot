@@ -25,8 +25,12 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
   container = inversifyConfig.getContainer();
   const groot = container.get<IGroot>(TYPES.Groot);
 
-  setShutdownOnSigTerm();
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // Application specific logging, throwing an error, or other logic here
+  });
 
+  setShutdownOnSigTerm();
   try {
     await groot.initalizeGroot();
 

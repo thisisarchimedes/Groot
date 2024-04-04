@@ -47,9 +47,9 @@ import { RuleExpirePositions } from './rule_engine/rule/RuleExpirePositions';
 import { RuleUniswapPSPRebalance } from './rule_engine/rule/RuleUniswapPSPRebalance';
 import { LoggerConsole } from './service/logger/LoggerConsole';
 import { RuleBalanceCurvePoolWithVault } from './rule_engine/rule/RuleBalanceCurvePoolWithVault';
+import PositionLedgerContract from './rule_engine/tool/contracts/PositionLedgerContract';
 import { IUniSwapPayloadBuilder } from './rule_engine/tool/uni_swap/interfaces/IUniSwapPayloadBuilder';
 import UniSwapPayloadBuilder from './rule_engine/tool/uni_swap/UniSwapPayloadBuilder';
-import { RuleLiquidatePositions } from './rule_engine/rule/RuleLiquidatePositions';
 
 export class InversifyConfig {
   private container: Container;
@@ -67,6 +67,7 @@ export class InversifyConfig {
     this.bindTransactionQueue();
     this.bindRules();
     this.bindTooling();
+    this.bindContracts();
     this.bindGroot();
   }
 
@@ -76,12 +77,27 @@ export class InversifyConfig {
   }
 
   private bindDBConfiguration(configServiceAWS: IConfigServiceAWS) {
-    this.container.bind<Client>(TYPES.PGClient).toDynamicValue(() => {
+    this.container.bind<Client>(TYPES.TransactionsDBClient).toDynamicValue(() => {
       const connectionString = configServiceAWS.getTransactionsDBURL();
-      return new Client({ connectionString: connectionString });
+      return new Client({
+        connectionString: connectionString,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      });
     }).inSingletonScope();
 
-    this.container.bind<ILeverageDataSource>(TYPES.PostgreDataSource).to(PostgreDataSource).inTransientScope();
+    this.container.bind<Client>(TYPES.LeverageDBClient).toDynamicValue(() => {
+      const connectionString = configServiceAWS.getLeverageDBURL();
+      return new Client({
+        connectionString: connectionString,
+        ssl: {
+          rejectUnauthorized: false,
+        },
+      });
+    }).inSingletonScope();
+
+    this.container.bind<ILeverageDataSource>(TYPES.ILeverageDataSource).to(PostgreDataSource).inTransientScope();
   }
 
   private bindConstants(configServiceAWS: IConfigServiceAWS) {
@@ -92,15 +108,16 @@ export class InversifyConfig {
       .toConstantValue(`http://localhost:${process.env.ALT_LOCAL_NODE_PORT || 18545}`);
 
     this.container.bind<string>(TYPES.ServiceName).toConstantValue('Groot');
-
     this.container.bind<string>(TYPES.MetricNamespaceHeartBeat).toConstantValue('Heartbeat');
     this.container.bind<string>(TYPES.MetricNamespaceCriticalFailure).toConstantValue('CriticalFailure');
-
     this.container.bind<string>(TYPES.AlchemyNodeLabel).toConstantValue('alchemy-node');
-
     this.container.bind<string>(TYPES.InfuraNodeLabel).toConstantValue('infura-node');
 
     this.container.bind<IConfigService>(TYPES.IConfigServiceAWS).toConstantValue(configServiceAWS);
+  }
+
+  private bindContracts() {
+    this.container.bind<PositionLedgerContract>(PositionLedgerContract).toSelf();
   }
 
   private bindLogging() {

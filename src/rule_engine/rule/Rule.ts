@@ -1,12 +1,14 @@
 import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {UrgencyLevel} from '../TypesRule';
+import {Executor, UrgencyLevel} from '../TypesRule';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
 import {injectable} from 'inversify';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
+  ttlSeconds: number;
+  executor: Executor;
 }
 
 export interface RuleConstructorInput {
@@ -25,7 +27,7 @@ export abstract class Rule {
   protected readonly abiRepo: IAbiRepo;
 
   protected ruleLabel: string;
-  protected params: RuleParams | unknown;
+  protected params: RuleParams;
   protected pendingTxQueue: OutboundTransaction[] = [];
 
   constructor(
@@ -37,13 +39,18 @@ export abstract class Rule {
     this.blockchainReader = blockchainReader;
     this.abiRepo = abiRepo;
     this.ruleLabel = ''; // Default initialization
-    this.params = {urgencyLevel: UrgencyLevel.NORMAL}; // Default initialization
+    this.params = {
+      urgencyLevel: UrgencyLevel.LOW,
+      executor: Executor.LEVERAGE,
+      ttlSeconds: 300,
+    }; // Default initialization
   }
 
 
-  public initialize(ruleLabel: string, params: RuleParams | unknown): void {
+  public async initialize(ruleLabel: string, params: RuleParams): Promise<void> {
     this.ruleLabel = ruleLabel;
     this.params = params;
+    return await Promise.resolve();
   }
 
   public abstract evaluate(): Promise<void>;

@@ -13,6 +13,10 @@ import { EthNodeInterceptor } from './interceptors/EthNodeInterceptor';
 import { Container } from 'inversify';
 import { IConfigServiceAWS } from '../../src/service/config/interfaces/IConfigServiceAWS';
 import { InversifyConfig } from '../../src/inversify.config';
+import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
+
+let timeoutId: NodeJS.Timeout | null = null;
+
 
 describe('Startup and Config', function () {
   // eslint-disable-next-line no-invalid-this
@@ -23,6 +27,8 @@ describe('Startup and Config', function () {
   let appConfigInterceptor: AppConfigInterceptor | undefined;
   let ethNodeMainInterceptor: EthNodeInterceptor | undefined;
   let ethNodeAltInterceptor: EthNodeInterceptor | undefined;
+
+
 
   beforeEach(async function () {
     const configService = createConfigService();
@@ -40,7 +46,15 @@ describe('Startup and Config', function () {
 
   afterEach(function () {
     cleanupTestDoubles();
+    clearMessageProcessingTimeout();
   });
+
+  function clearMessageProcessingTimeout(): void {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+  }
 
   it('Should return block number from mock node', async function () {
     const expectedBlockNumber = 10001;
@@ -76,7 +90,7 @@ describe('Startup and Config', function () {
         params: {
           message: 'I AM GROOT 1',
           NumberOfDummyTxs: 1,
-        },
+        } as RuleParamsDummy,
       },
       {
         ruleType: TypeRule.Dummy,
@@ -85,7 +99,7 @@ describe('Startup and Config', function () {
           message: 'I AM GROOT 2',
           NumberOfDummyTxs: 2,
           evalSuccess: true,
-        },
+        } as RuleParamsDummy,
       },
     ];
     appConfigInterceptor = createAppConfigInterceptor(mockRules);
@@ -120,7 +134,7 @@ describe('Startup and Config', function () {
         label: 'invalidRule',
         params: {
           message: 'I AM GROOT 1',
-        },
+        } as RuleParamsDummy,
       },
       {
         ruleType: TypeRule.Dummy,
@@ -129,7 +143,7 @@ describe('Startup and Config', function () {
           message: 'I AM GROOT 2',
           NumberOfDummyTxs: 1,
           evalSuccess: true,
-        },
+        } as RuleParamsDummy,
       },
     ];
     appConfigInterceptor = createAppConfigInterceptor(mockRules);
@@ -182,7 +196,11 @@ describe('Startup and Config', function () {
     }
   }
 
-  function waitForMessageProcessing(): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, 1000));
+  function waitForMessageProcessing(): NodeJS.Timeout {
+    timeoutId = setTimeout(() => {
+      // Your code here
+    }, 1000);
+    return timeoutId;
   }
+
 });

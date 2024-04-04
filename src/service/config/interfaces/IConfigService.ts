@@ -14,4 +14,5 @@ export interface IConfigService {
     getDynamoDBAbiRepoTable(): string;
     getLeverageContractInfo(): LeverageContractAddresses;
     getTransactionsDBURL(): string;
+    getLeverageContractInfo(): LeverageContractAddresses;
 }

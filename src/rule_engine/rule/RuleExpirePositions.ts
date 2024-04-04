@@ -1,23 +1,24 @@
-import {Rule, RuleParams} from './Rule';
-import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
-import {inject, injectable} from 'inversify';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import { Rule, RuleParams } from './Rule';
+import { ILeverageDataSource } from '../tool/data_source/interfaces/ILeverageDataSource';
+import { inject, injectable } from 'inversify';
+import { ILogger } from '../../service/logger/interfaces/ILogger';
+import { IBlockchainReader } from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import { IAbiRepo } from '../tool/abi_repository/interfaces/IAbiRepo';
+import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
+import { IConfigService } from '../../service/config/interfaces/IConfigService';
+import fs from 'fs';
+import { Address } from '../../types/LeverageContractAddresses';
+import { OutboundTransaction, RawTransactionData } from '../../blockchain/OutboundTransaction';
 
-export interface RuleParamsDummy extends RuleParams {
-  message: string;
-  NumberOfDummyTxs: number;
-  evalSuccess: boolean;
-}
-
-
-// const WBTC_ADDRESS = '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599';
-// const WBTC_DECIMALS = 8;
 
 @injectable()
 export class RuleExpirePositions extends Rule {
   private leverageDataSource: ILeverageDataSource;
+  private configService: IConfigService;
+  private positionLedgerContract!: PositionLedgerContract;
+  private positionLedgerAddress!: Address;
+  private positionLedgerABI!: string;
+
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 
@@ -25,26 +26,51 @@ export class RuleExpirePositions extends Rule {
     @inject('ILoggerAll') logger: ILogger,
     @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
     @inject('IAbiRepo') abiRepo: IAbiRepo,
-    @inject('PostgreDataSource') leverageDataSource: ILeverageDataSource) {
+    @inject('ILeverageDataSource') leverageDataSource: ILeverageDataSource,
+    @inject('IConfigServiceAWS') configService: IConfigService,
+  ) {
     super(logger, blockchainReader, abiRepo);
     this.leverageDataSource = leverageDataSource;
+    this.configService = configService;
     // this.uniswap = new Uniswap('');
   }
 
   public async evaluate(): Promise<void> {
-    const blockNumber = await this.blockchainReader.getBlockNumber();
-    const livePositions = await this.leverageDataSource.getLivePositions();
+    await Promise.resolve();
+    const encodedData = this.positionLedgerContract
+      .contract.interface.encodeFunctionData('setPositionState', [0, 1]);
 
-    for (const position of livePositions) {
-      if (position.positionExpireBlock < blockNumber) {
-        // const tx = this.createExpireTransaction(position);
-        // this.pushTransactionToRuleLocalQueue(tx);
-      }
+    const tx = {
+      to: this.positionLedgerAddress,
+      value: 0n,
+      data: encodedData,
+    } as RawTransactionData;
+
+    const outboundTx = {
+      urgencyLevel: this.params.urgencyLevel,
+      executor: this.params.executor,
+      context: `this is a expire test context`,
+      postEvalUniqueKey: this.generateUniqueKey(0),
+      lowLevelUnsignedTransaction: tx,
+      ttlSeconds: this.params.ttlSeconds,
+    } as OutboundTransaction;
+
+    this.pushTransactionToRuleLocalQueue(outboundTx);
+  }
+
+  public override async initialize(ruleLabel: string, params: RuleParams): Promise<void> {
+    this.ruleLabel = ruleLabel;
+    this.params = params;
+
+    this.positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;
+    try {
+      // this.positionLedgerABI = await this.abiRepo.getAbiByAddress(positionLedgerAddress);
+      throw new Error('failed to fetch');
+    } catch {
+      this.positionLedgerABI = fs.readFileSync('./src/constants/abis/POSITION_LEDGER_ABI.json', 'utf-8');
     }
-
-    // if (params.evalSuccess === false) {
-    //   throw new Error('RuleExpirePositions.evaluate() failed');
-    // }
+    this.positionLedgerContract = new PositionLedgerContract(this.positionLedgerAddress, this.positionLedgerABI);
+    await Promise.resolve();
   }
 
   /**
@@ -96,8 +122,7 @@ export class RuleExpirePositions extends Rule {
   //   };
   // }
 
-  protected generateUniqueKey(): string {
-    // return `${position.nftId}-${position.strategy}`;
-    return '';
+  protected generateUniqueKey(nftId?: number): string {
+    return 'expire--' + nftId;
   }
 }

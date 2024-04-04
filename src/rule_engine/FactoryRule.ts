@@ -14,10 +14,10 @@ export class FactoryRule implements IFactoryRule {
     @inject('ILoggerAll') private logger: ILogger,
   ) { }
 
-  public createRule(config: RuleJSONConfigItem): Rule | null {
+  public async createRule(config: RuleJSONConfigItem): Promise<Rule | null> {
     try {
       const ruleInstance = this.container.get<Rule>(config.ruleType);
-      ruleInstance.initialize(config.label, config.params);
+      await ruleInstance.initialize(config.label, config.params);
       return ruleInstance;
     } catch (error) {
       this.logger.warn(`Error creating rule instance for type ${config.ruleType}: ${error}`);
