@@ -122,7 +122,7 @@ export class RuleExpirePositions extends Rule {
   //   };
   // }
 
-  protected generateUniqueKey(nftId?: number): string {
-    return 'expire--' + nftId;
+  protected generateUniqueKey(): string {
+    return 'expire--';
   }
 }

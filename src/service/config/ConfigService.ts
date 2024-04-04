@@ -11,19 +11,13 @@ export abstract class ConfigService implements IConfigService {
   protected transactionsDatabaseURL: string = '';
 
   protected rules: RuleJSONConfigItem[] = [];
+  protected leverageContractAddresses: LeverageContractAddresses;
   protected newRelicURL: string = '';
   protected newRelicAPIKey: string = '';
 
   protected sleepTimeMS: number = 0;
   protected etherscanAPIKey: string = '';
   protected AbiRepoDynamoDBTable: string = '';
-
-  protected leverageContractAddresses: LeverageContractAddresses = {
-    positionOpener: '',
-    positionLiquidator: '',
-    positionCloser: '',
-    positionExpirator: '',
-  };
 
   protected leverageDbUrl: string = '';
 

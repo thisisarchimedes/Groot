@@ -1,5 +1,5 @@
-import {Block} from 'ethers';
-import {BlockchainNodeProxyInfo} from '../BlockchainNodeProxyInfo';
+import { Block, ethers } from 'ethers';
+import { BlockchainNodeProxyInfo } from '../BlockchainNodeProxyInfo';
 
 export interface IBlockchainNode {
     getBlock(blockNumber: number): Promise<Block>;

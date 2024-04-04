@@ -36,4 +36,4 @@ const TYPES = {
   PositionLedgerContract: 'PositionLedgerContract',
 };
 
-export { TYPES };
+export {TYPES};
