@@ -35,7 +35,7 @@ describe('Transaction Insertion Tests', function () {
         await new Promise(resolve => setTimeout(resolve, 1000)); // 5 seconds
     });
 
-    it('Inserting a New Transaction', async () => {
+    it('Should insert a new transaction', async () => {
         const testTransaction = {
             lowLevelUnsignedTransaction: {
                 to: '0xTEST',
@@ -45,7 +45,7 @@ describe('Transaction Insertion Tests', function () {
             executor: Executor.LEVERAGE,
             postEvalUniqueKey: 'test_uniqueIdentifier1',
             urgencyLevel: UrgencyLevel.LOW,
-            ttlSeconds: 300, // 5 minutes
+            ttlSeconds: 300,
             context: ''
         } as OutboundTransaction;
 
@@ -63,7 +63,7 @@ describe('Transaction Insertion Tests', function () {
         expect(result.rows[0].identifier).to.equal('test_uniqueIdentifier1');
     });
 
-    it('Attempting to Insert a Duplicate Transaction Within TTL', async () => {
+    it('Attempting to insert a duplicate transaction within TTL', async () => {
         // Insert a transaction that will be considered within TTL
         const duplicateTransaction = {
             lowLevelUnsignedTransaction: {
@@ -92,38 +92,41 @@ describe('Transaction Insertion Tests', function () {
         expect(errorMessage).to.equal('A transaction with the same identifier and a status other than COMPLETED exists within the TTL.');
     });
 
-    // it('Inserting a Transaction After Previous One Expires', async () => {
-    //     const expiredTransaction = {
-    //         lowLevelUnsignedTransaction: {
-    //             to: '0xTEST',
-    //             value: BigInt('0'), // converted to bigint
-    //             data: '0xTEST',
-    //         },
-    //         executor: Executor.LEVERAGE,
-    //         postEvalUniqueKey: 'test_uniqueIdentifier2',
-    //         urgencyLevel: UrgencyLevel.LOW,
-    //         ttlSeconds: 1, // 1 sec for quick expiration
-    //     } as OutboundTransaction;
+    it('Inserting a Transaction After Previous One Expires', async () => {
+        const expiredTransaction = {
+            lowLevelUnsignedTransaction: {
+                to: '0xTEST',
+                value: BigInt('0'), // converted to bigint
+                data: '0xTEST',
+            },
+            executor: Executor.LEVERAGE,
+            postEvalUniqueKey: 'test_expiredTransaction',
+            urgencyLevel: UrgencyLevel.LOW,
+            ttlSeconds: 1, // 1 sec for quick expiration
+        } as OutboundTransaction;
 
-    //     await txQueue.addTransactionToQueue(expiredTransaction);
+        await txQueue.addTransactionToQueue(expiredTransaction);
 
-    //     // Wait for the transaction to expire
-    //     await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds
+        // Wait for the transaction to expire
+        await new Promise(resolve => setTimeout(resolve, 2000)); // 2 seconds
 
-    //     // Insert a new transaction with the same identifier
-    //     const newTransaction = { ...expiredTransaction };
+        // Insert a new transaction with the same identifier
+        const newTransaction = { ...expiredTransaction };
 
-    //     let errorOccurred = false;
-    //     try {
-    //         await txQueue.addTransactionToQueue(newTransaction);
-    //     } catch (error) {
-    //         errorOccurred = true;
-    //     }
-    //     expect(errorOccurred).to.be.false;
+        let errorOccurred = false;
+        try {
+            await txQueue.addTransactionToQueue(newTransaction);
+        } catch (error) {
+            errorOccurred = true;
+        }
+        expect(errorOccurred).to.be.false;
 
-    //     const result = await dbClient.query('SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1', ['test_expiredTransaction']);
-    //     expect(result.rows.length).to.equal(1);
-    // });
+        const pendingResult = await dbClient.query('SELECT * FROM "Transactions"."Transaction" WHERE status = $1 AND identifier = $2', ['PENDING', 'test_expiredTransaction']);
+        const failedResult = await dbClient.query('SELECT * FROM "Transactions"."Transaction" WHERE status = $1 AND identifier = $2', ['FAILED', 'test_expiredTransaction']);
+
+        expect(pendingResult.rows.length).to.equal(1);
+        expect(failedResult.rows.length).to.equal(1);
+    }).timeout(1000000000);
 
     it('Concurrent Insertions with Different Identifiers', async () => {
         const transactions = [{
@@ -157,69 +160,5 @@ describe('Transaction Insertion Tests', function () {
             const result = await dbClient.query('SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1', [tx.postEvalUniqueKey]);
             expect(result.rows.length).to.equal(1);
         }
-    });
-
-    // it('Inserting Transactions with Various Urgency Levels', async () => {
-    //     const transactionUrgencies = [UrgencyLevel.LOW, UrgencyLevel.HIGH];
-
-    //     for (let urgency of transactionUrgencies) {
-    //         const transaction = {
-    //             lowLevelUnsignedTransaction: {
-    //                 to: '0xTEST',
-    //                 value: BigInt('0'), // converted to bigint
-    //                 data: '0xTEST',
-    //             },
-    //             executor: Executor.LEVERAGE,
-    //             postEvalUniqueKey: `test_uniqueUrgency_${urgency}`,
-    //             urgencyLevel: UrgencyLevel.LOW,
-    //             ttlSeconds: 1, // 1 sec for quick expiration
-    //         } as OutboundTransaction;
-
-    //         await txQueue.addTransactionToQueue(transaction);
-
-    //         await new Promise(resolve => setTimeout(resolve, 5000)); // 5 seconds
-
-    //         const result = await dbClient.query('SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1', [`test_uniqueUrgency_${urgency}`]);
-    //         expect(result.rows.length).to.equal(1);
-    //         expect(result.rows[0].urgencyLevel).to.equal(urgency);
-    //     }
-    // });
-
-    // it('Overwriting an Expired Transaction', async () => {
-    //     // Insert a transaction that will be considered outside TTL (expired)
-    //     const expiredTransaction = {
-    //         lowLevelUnsignedTransaction: {
-    //             to: '0xTEST',
-    //             value: BigInt('0'),
-    //             data: '0xTEST',
-    //         },
-    //         executor: Executor.LEVERAGE,
-    //         postEvalUniqueKey: 'test_uniqueIdentifier3',
-    //         urgencyLevel: UrgencyLevel.LOW,
-    //         ttlSeconds: -300, // Expired TTL
-    //     } as OutboundTransaction;
-
-    //     await txQueue.addTransactionToQueue(expiredTransaction);
-
-    //     // Wait a bit to ensure the TTL is expired
-    //     await new Promise(resolve => setTimeout(resolve, 5000)); // 5 second
-
-    //     // Insert the new transaction with the same identifier
-    //     const newTransaction = {
-    //         ...expiredTransaction,
-    //         lowLevelUnsignedTransaction: { ...expiredTransaction.lowLevelUnsignedTransaction, data: '0xNEW_TEST' },
-    //     };
-
-    //     let errorOccurred = false;
-    //     try {
-    //         await txQueue.addTransactionToQueue(newTransaction);
-    //     } catch (error) {
-    //         errorOccurred = true;
-    //     }
-    //     expect(errorOccurred).to.be.false;
-
-    //     const result = await dbClient.query('SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1', ['test_uniqueIdentifier3']);
-    //     expect(result.rows.length).to.equal(1);
-    //     expect(result.rows[0].data).to.equal('0xNEW_TEST');
-    // });
+    }).timeout(1000000000);
 });
