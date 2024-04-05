@@ -12,6 +12,7 @@ interface LogRecord {
   level: string;
   timestamp: number;
   service: string;
+  callerInfo: string;
 }
 
 interface LogFormatter {
@@ -84,11 +85,14 @@ export class LoggerNewRelic extends Logger implements ILoggerNewRelic {
   }
 
   private log(level: LogLevel, message: string): void {
+    const callerInfo = this.getCallerInfo();
+
     const record: LogRecord = {
       message,
       level: LogLevel[level],
       timestamp: Date.now(),
       service: this.config.serviceName,
+      callerInfo: callerInfo,
     };
     const formattedRecord = this.formatter.format(record);
     this.emit(JSON.parse(formattedRecord));
