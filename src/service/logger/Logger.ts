@@ -1,4 +1,6 @@
+import * as stackTrace from 'stacktrace-parser';
 import {injectable} from 'inversify';
+
 import {ILogger} from './interfaces/ILogger';
 import {LogLevel} from './LogLevel';
 import {LogMessageCycleTime} from './TypeLogItem';
@@ -34,6 +36,24 @@ export abstract class Logger implements ILogger {
     };
 
     this.info(JSON.stringify(message));
+  }
+
+  protected getCallerInfo(): string {
+    const error = new Error();
+    const stack = error.stack as string;
+    const frames = stackTrace.parse(stack);
+    console.log(frames);
+
+    for (const frame of frames) {
+      const fileName = frame.file?.split('/').pop();
+      if (fileName && !fileName.startsWith('Logger')) {
+        const functionName = frame.methodName || '<anonymous>';
+        const lineNumber = frame.lineNumber;
+        const columnNumber = frame.column;
+        return `[${fileName}:${lineNumber}:${columnNumber} ${functionName}]`;
+      }
+    }
+    return '';
   }
 }
 
