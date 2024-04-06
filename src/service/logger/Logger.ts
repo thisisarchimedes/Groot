@@ -50,7 +50,7 @@ export abstract class Logger implements ILogger {
         const functionName = frame.methodName || '<anonymous>';
         const lineNumber = frame.lineNumber;
         const columnNumber = frame.column;
-        return `[${fileName}:${lineNumber}:${columnNumber} ${functionName}]`;
+        return `${fileName}:${lineNumber}:${columnNumber} ${functionName}`;
       }
     }
     return '';
