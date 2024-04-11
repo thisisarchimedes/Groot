@@ -30,7 +30,7 @@ import { Client } from 'pg';
 import { ILeverageDataSource } from '../../src/rule_engine/tool/data_source/interfaces/ILeverageDataSource';
 import PostgreDataSource from '../../src/rule_engine/tool/data_source/PostgreDataSource';
 import { ILoggerAll } from '../../src/service/logger/interfaces/ILoggerAll';
-import { IConfigService } from '../../src/service/config/interfaces/IConfigService';
+import { ConfigService } from '../../src/service/config/ConfigService';
 
 export const createTestContainer = (): Container => {
     const container = new Container();
@@ -84,21 +84,11 @@ export const createTestContainer = (): Container => {
 
     container.bind<ConfigServiceAdapter>(ConfigServiceAdapter).toSelf().inSingletonScope();
 
-    container.bind<IConfigService>(TYPES.IConfigServiceAWS).to(ConfigServiceAdapter).inSingletonScope();
-
-
-    container.bind<Client>(TYPES.LeverageDBClient).toDynamicValue(() => {
-        const configService = container.resolve(ConfigServiceAdapter);
-
-        const connectionString = configService.getLeverageDBURL();
-        return new Client({ connectionString: connectionString });
-    }).inRequestScope();
+    container.bind<ConfigService>(TYPES.ConfigServiceAWS).to(ConfigServiceAdapter).inSingletonScope();
 
     container.bind<ILeverageDataSource>(TYPES.ILeverageDataSource).to(PostgreDataSource).inRequestScope();
 
-
     container.bind<Container>(Container).toConstantValue(container);
-
 
     return container;
 };

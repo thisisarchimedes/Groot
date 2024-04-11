@@ -13,7 +13,6 @@ import { IRuleEngine } from '../../src/rule_engine/interfaces/IRuleEngine';
 import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
 import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
-import { IConfigService } from '../../src/service/config/interfaces/IConfigService';
 
 describe('Rule Engine Testings', function () {
   let container: Container;
@@ -23,7 +22,7 @@ describe('Rule Engine Testings', function () {
   beforeEach(async function () {
     container = createTestContainer();
     logger = container.get<LoggerAdapter>(TYPES.ILoggerAll);
-    configService = container.get<ConfigServiceAdapter>(TYPES.IConfigServiceAWS);
+    configService = container.get<ConfigServiceAdapter>(TYPES.ConfigServiceAWS);
     configService.setLeverageContractInfo({
       positionOpener: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
       positionLiquidator: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',

@@ -5,16 +5,16 @@ import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
 import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
-import {IConfigService} from '../../service/config/interfaces/IConfigService';
 import fs from 'fs';
 import {Address} from '../../types/LeverageContractAddresses';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
+import {ConfigService} from '../../service/config/ConfigService';
 
 
 @injectable()
 export class RuleExpirePositions extends Rule {
   private leverageDataSource: ILeverageDataSource;
-  private configService: IConfigService;
+  private configService: ConfigService;
   private positionLedgerContract!: PositionLedgerContract;
   private positionLedgerAddress!: Address;
   private positionLedgerABI!: string;
@@ -27,7 +27,7 @@ export class RuleExpirePositions extends Rule {
     @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
     @inject('IAbiRepo') abiRepo: IAbiRepo,
     @inject('ILeverageDataSource') leverageDataSource: ILeverageDataSource,
-    @inject('IConfigServiceAWS') configService: IConfigService,
+    @inject('ConfigServiceAWS') configService: ConfigService,
   ) {
     super(logger, blockchainReader, abiRepo);
     this.leverageDataSource = leverageDataSource;

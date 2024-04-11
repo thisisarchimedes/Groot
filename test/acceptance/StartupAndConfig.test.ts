@@ -11,7 +11,6 @@ import { AppConfigInterceptor } from './interceptors/AppConfigInterceptor';
 import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
 import { EthNodeInterceptor } from './interceptors/EthNodeInterceptor';
 import { Container } from 'inversify';
-import { IConfigServiceAWS } from '../../src/service/config/interfaces/IConfigServiceAWS';
 import { InversifyConfig } from '../../src/inversify.config';
 import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 
@@ -159,17 +158,17 @@ describe('Startup and Config', function () {
     expect(isMessageObserved).to.be.true;
   });
 
-  function createConfigService(): IConfigServiceAWS {
+  function createConfigService(): ConfigServiceAWS {
     const environment = process.env.ENVIRONMENT as string;
     const region = process.env.AWS_REGION as string;
     return new ConfigServiceAWS(environment, region);
   }
 
-  async function initializeConfigService(configService: IConfigServiceAWS): Promise<void> {
+  async function initializeConfigService(configService: ConfigServiceAWS): Promise<void> {
     await configService.refreshConfig();
   }
 
-  function createNewRelicMock(configService: IConfigServiceAWS): NewRelicInterceptor {
+  function createNewRelicMock(configService: ConfigServiceAWS): NewRelicInterceptor {
     const newRelicURL = new URL(configService.getNewRelicUrl());
     return new NewRelicInterceptor(`${newRelicURL.protocol}//${newRelicURL.host}`);
   }

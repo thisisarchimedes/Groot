@@ -1,11 +1,11 @@
 import {Client} from 'pg';
-import {IConfigService} from '../config/interfaces/IConfigService';
+import {ConfigService} from '../config/ConfigService';
 
 export default class dbService {
   private transactionsClient:Client;
   private leverageClient:Client;
 
-  constructor(configService: IConfigService) {
+  constructor(configService: ConfigService) {
     this.transactionsClient = new Client({
       connectionString: configService.getTransactionsDBURL(),
       ssl: {

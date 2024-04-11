@@ -3,8 +3,8 @@ import {injectable} from 'inversify';
 
 import {Logger} from './Logger';
 import {LogLevel} from './LogLevel';
-import {IConfigServiceAWS} from '../config/interfaces/IConfigServiceAWS';
 import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
+import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 
 
 interface LogRecord {
@@ -44,7 +44,7 @@ export class LoggerNewRelic extends Logger implements ILoggerNewRelic {
   private pendingPromises: Promise<void>[] = [];
 
   constructor(
-      configService: IConfigServiceAWS,
+      configService: ConfigServiceAWS,
       serviceName: string,
       formatter: LogFormatter = new CustomJsonFormatter(),
       maxRetries = 3,

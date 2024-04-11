@@ -1,7 +1,7 @@
 const TYPES = {
   ILoggerAll: 'ILoggerAll',
   ILoggerConsole: 'ILoggerConsole',
-  IConfigServiceAWS: 'IConfigServiceAWS',
+  ConfigServiceAWS: 'ConfigServiceAWS',
   DBService: 'DBService',
   Environment: 'Environment',
   Region: 'Region',

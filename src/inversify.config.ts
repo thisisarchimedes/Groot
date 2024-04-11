@@ -2,7 +2,6 @@
 import 'reflect-metadata';
 import {Container, interfaces} from 'inversify';
 import {LoggerAll} from './service/logger/LoggerAll';
-import {IConfigServiceAWS} from './service/config/interfaces/IConfigServiceAWS';
 import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
 import {Groot} from './Groot';
 import {TYPES} from './inversify.types';
@@ -31,7 +30,6 @@ import {IGroot} from './interfaces/IGroot';
 import {IBlockchainNodeHealthMonitor} from './service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
 import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealthMonitor';
 import {IAbiRepo} from './rule_engine/tool/abi_repository/interfaces/IAbiRepo';
-import {IConfigService} from './service/config/interfaces/IConfigService';
 import {ILogger} from './service/logger/interfaces/ILogger';
 import {ITxQueue} from './tx_queue/interfaces/ITxQueue';
 import PostgreTxQueue from './tx_queue/PostgreTxQueue';
@@ -48,11 +46,13 @@ import {LoggerConsole} from './service/logger/LoggerConsole';
 import {RuleBalanceCurvePoolWithVault} from './rule_engine/rule/RuleBalanceCurvePoolWithVault';
 import PositionLedgerContract from './rule_engine/tool/contracts/PositionLedgerContract';
 import DBService from './service/db/dbService';
+import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
+import {ConfigService} from './service/config/ConfigService';
 
 export class InversifyConfig {
   private container: Container;
 
-  constructor(configServiceAWS: IConfigServiceAWS, dbService: DBService) {
+  constructor(configServiceAWS: ConfigServiceAWS, dbService: DBService) {
     this.container = new Container();
 
     this.bindDBConfiguration(dbService);
@@ -74,7 +74,7 @@ export class InversifyConfig {
     this.container.bind<ILeverageDataSource>(TYPES.ILeverageDataSource).to(PostgreDataSource).inTransientScope();
   }
 
-  private bindConstants(configServiceAWS: IConfigServiceAWS) {
+  private bindConstants(configServiceAWS: ConfigServiceAWS) {
     this.container.bind<string>(TYPES.MainLocalNodeURI)
         .toConstantValue(`http://localhost:${process.env.MAIN_LOCAL_NODE_PORT || 8545}`);
 
@@ -87,7 +87,7 @@ export class InversifyConfig {
     this.container.bind<string>(TYPES.AlchemyNodeLabel).toConstantValue('alchemy-node');
     this.container.bind<string>(TYPES.InfuraNodeLabel).toConstantValue('infura-node');
 
-    this.container.bind<IConfigService>(TYPES.IConfigServiceAWS).toConstantValue(configServiceAWS);
+    this.container.bind<ConfigService>(TYPES.ConfigServiceAWS).toConstantValue(configServiceAWS);
   }
 
   private bindContracts() {

@@ -5,14 +5,11 @@ import { spawn } from 'child_process';
 import { ethers } from 'ethers';
 import { Container } from 'inversify';
 import { TYPES } from '../../src/inversify.types';
-import { IConfigServiceAWS } from '../../src/service/config/interfaces/IConfigServiceAWS';
 import { IBlockchainNodeLocal } from '../../src/blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import { BlockchainNodeProxyInfo } from '../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
 import { InversifyConfig } from '../../src/inversify.config';
 import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
 import DBService from '../../src/service/db/dbService';
-import { IConfigService } from '../../src/service/config/interfaces/IConfigService';
-import { ConfigService } from '../../src/service/config/ConfigService';
 
 dotenv.config();
 const { expect } = chai;
@@ -85,7 +82,7 @@ describe('Check that we work with local Hardhat node correctly', function () {
     expect(res.implementationAddress.length).to.be.equal(0);
   });
 
-  async function createConfigService(): Promise<IConfigServiceAWS> {
+  async function createConfigService(): Promise<ConfigServiceAWS> {
     const environment = process.env.ENVIRONMENT as string;
     const region = process.env.AWS_REGION as string;
     const configServiceAWS = new ConfigServiceAWS(environment, region);
@@ -93,7 +90,7 @@ describe('Check that we work with local Hardhat node correctly', function () {
     return configServiceAWS;
   }
 
-  async function initializeConfigService(configService: IConfigServiceAWS): Promise<void> {
+  async function initializeConfigService(configService: ConfigServiceAWS): Promise<void> {
     await configService.refreshConfig();
   }
 });

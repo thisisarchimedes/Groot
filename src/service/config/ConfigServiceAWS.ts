@@ -4,10 +4,9 @@ import {injectable} from 'inversify';
 
 import {AppConfigClient} from './AppConfigClient';
 import {ConfigService} from './ConfigService';
-import {IConfigServiceAWS} from './interfaces/IConfigServiceAWS';
 
 @injectable()
-export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS {
+export class ConfigServiceAWS extends ConfigService {
   private readonly appConfigClient: AppConfigClient;
   private readonly awsRegion: string;
 

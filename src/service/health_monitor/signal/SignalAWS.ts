@@ -9,21 +9,21 @@ import {
 } from '@aws-sdk/client-cloudwatch';
 
 import {ILogger} from '../../logger/interfaces/ILogger';
-import {IConfigService} from '../../config/interfaces/IConfigService';
 import {IHostNameProvider} from '../IHostNameProvider';
 import {ISignalAWS} from './interfaces/ISignalAWS';
+import {ConfigService} from '../../config/ConfigService';
 
 @injectable()
 export abstract class SignalAWS implements ISignalAWS {
   protected readonly cloudWatchClient: CloudWatchClient;
   protected readonly logger: ILogger;
-  protected readonly configService: IConfigService;
+  protected readonly configService: ConfigService;
   protected readonly hostNameProvider: IHostNameProvider;
   protected readonly metricNamespace: string;
 
   constructor(
       logger: ILogger,
-      configService: IConfigService,
+      configService: ConfigService,
       hostNameProvider: IHostNameProvider,
       metricNamespace: string,
   ) {

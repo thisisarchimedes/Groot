@@ -1,11 +1,11 @@
 import {injectable, inject} from 'inversify';
 import {Logger} from './Logger';
 import {LoggerNewRelic} from './LoggerNewRelic';
-import {IConfigServiceAWS} from '../config/interfaces/IConfigServiceAWS';
 import {ILoggerAll} from './interfaces/ILoggerAll';
 import {TYPES} from '../../inversify.types';
 import {ILoggerConsole} from './interfaces/ILoggerConsole';
 import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
+import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 
 @injectable()
 export class LoggerAll extends Logger implements ILoggerAll {
@@ -13,7 +13,7 @@ export class LoggerAll extends Logger implements ILoggerAll {
   private loggerNewRelic: ILoggerNewRelic;
 
   constructor(
-    @inject(TYPES.IConfigServiceAWS) configService: IConfigServiceAWS,
+    @inject(TYPES.ConfigServiceAWS) configService: ConfigServiceAWS,
     @inject(TYPES.ILoggerConsole) loggerConsole: ILoggerConsole,
     @inject(TYPES.ServiceName) serviceName: string,
   ) {

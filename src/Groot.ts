@@ -7,18 +7,18 @@ import {IBlockchainNodeLocal} from './blockchain/blockchain_nodes/interfaces/IBl
 import {IRuleEngine} from './rule_engine/interfaces/IRuleEngine';
 import {IGroot} from './interfaces/IGroot';
 import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealthMonitor';
-import {IConfigService} from './service/config/interfaces/IConfigService';
 import {ILogger} from './service/logger/interfaces/ILogger';
 import {ITransactionQueuer} from './tx_queue/interfaces/ITransactionQueuer';
 import {TYPES} from './inversify.types';
 import DBService from './service/db/dbService';
+import {ConfigService} from './service/config/ConfigService';
 
 dotenv.config();
 
 @injectable()
 export class Groot implements IGroot {
   public readonly logger: ILogger;
-  private readonly configService: IConfigService;
+  private readonly configService: ConfigService;
   private readonly mainNode: IBlockchainNodeLocal;
   private readonly altNode: IBlockchainNodeLocal;
   private readonly healthMonitor: IHealthMonitor;
@@ -27,7 +27,7 @@ export class Groot implements IGroot {
   private container: Container;
 
   constructor(
-    @inject('IConfigServiceAWS') _configService: IConfigService,
+    @inject('ConfigServiceAWS') _configService: ConfigService,
     @inject('ILoggerAll') _logger: ILogger,
     @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
     @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal,

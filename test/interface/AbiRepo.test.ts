@@ -4,13 +4,12 @@ import { expect } from 'chai';
 import { AbiFetcherEtherscan } from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
 import { AbiStorageDynamoDB } from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
-import { IConfigServiceAWS } from '../../src/service/config/interfaces/IConfigServiceAWS';
 
 describe('ABI Repo external services', function () {
   // eslint-disable-next-line no-invalid-this
   this.timeout(25000);
 
-  let configService: IConfigServiceAWS;
+  let configService: ConfigServiceAWS;
 
   beforeEach(async function () {
     configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
