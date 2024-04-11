@@ -10,6 +10,9 @@ import { IBlockchainNodeLocal } from '../../src/blockchain/blockchain_nodes/inte
 import { BlockchainNodeProxyInfo } from '../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
 import { InversifyConfig } from '../../src/inversify.config';
 import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
+import DBService from '../../src/service/db/dbService';
+import { IConfigService } from '../../src/service/config/interfaces/IConfigService';
+import { ConfigService } from '../../src/service/config/ConfigService';
 
 dotenv.config();
 const { expect } = chai;
@@ -31,7 +34,10 @@ describe('Check that we work with local Hardhat node correctly', function () {
     const configService = await createConfigService();
     await initializeConfigService(configService);
 
-    const inversifyConfig = new InversifyConfig(configService);
+    const _dbService = new DBService(configService);
+    await configService.refreshConfig();
+
+    const inversifyConfig = new InversifyConfig(configService, _dbService);
     container = inversifyConfig.getContainer();
 
     localNode = container.get<IBlockchainNodeLocal>(TYPES.BlockchainNodeLocalMain);

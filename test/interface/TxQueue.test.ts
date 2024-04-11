@@ -5,33 +5,34 @@ import { ITxQueue } from '../../src/tx_queue/interfaces/ITxQueue';
 import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
 import { InversifyConfig } from '../../src/inversify.config';
 import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
-import { Client } from 'pg';
 import { Executor, UrgencyLevel } from '../../src/rule_engine/TypesRule';
+import DBService from '../../src/service/db/dbService';
 
 describe('Transaction Insertion Tests', function () {
     let txQueue: ITxQueue;
-    let dbClient: Client;
+    let dbService: DBService;
 
     this.beforeAll(async () => {
         const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
         await configService.refreshConfig();
 
-        const inversifyConfig = new InversifyConfig(configService);
+        const _dbService = new DBService(configService);
+        await configService.refreshConfig();
+
+        const inversifyConfig = new InversifyConfig(configService, _dbService);
         const container = inversifyConfig.getContainer();
 
-        dbClient = container.get<Client>(TYPES.TransactionsDBClient);
         txQueue = container.get<ITxQueue>(TYPES.PostgreTxQueue);
-
-        await txQueue.refresh();
+        dbService = container.get<DBService>(TYPES.DBService);
     })
 
     this.afterAll(async () => {
-        await dbClient.query('DELETE FROM "Transactions"."Transaction" WHERE "identifier" LIKE $1', ['test_%']);
-        await dbClient.end();
+        await dbService.getTransactionsClient().query('DELETE FROM "Transactions"."Transaction" WHERE "identifier" LIKE $1', ['test_%']);
+        await dbService.end();
     });
 
     afterEach(async () => {
-        await dbClient.query('DELETE FROM "Transactions"."Transaction" WHERE "identifier" LIKE $1', ['test_%']);
+        await dbService.getTransactionsClient().query('DELETE FROM "Transactions"."Transaction" WHERE "identifier" LIKE $1', ['test_%']);
         await new Promise(resolve => setTimeout(resolve, 1000)); // 5 seconds
     });
 
@@ -58,7 +59,7 @@ describe('Transaction Insertion Tests', function () {
         expect(errorOccurred).to.be.false;
 
         // // Verify insertion
-        const result = await dbClient.query('SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1', ['test_uniqueIdentifier1']);
+        const result = await dbService.getTransactionsClient().query('SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1', ['test_uniqueIdentifier1']);
         expect(result.rows.length).to.equal(1);
         expect(result.rows[0].identifier).to.equal('test_uniqueIdentifier1');
     });
@@ -121,8 +122,8 @@ describe('Transaction Insertion Tests', function () {
         }
         expect(errorOccurred).to.be.false;
 
-        const pendingResult = await dbClient.query('SELECT * FROM "Transactions"."Transaction" WHERE status = $1 AND identifier = $2', ['PENDING', 'test_expiredTransaction']);
-        const failedResult = await dbClient.query('SELECT * FROM "Transactions"."Transaction" WHERE status = $1 AND identifier = $2', ['FAILED', 'test_expiredTransaction']);
+        const pendingResult = await dbService.getTransactionsClient().query('SELECT * FROM "Transactions"."Transaction" WHERE status = $1 AND identifier = $2', ['PENDING', 'test_expiredTransaction']);
+        const failedResult = await dbService.getTransactionsClient().query('SELECT * FROM "Transactions"."Transaction" WHERE status = $1 AND identifier = $2', ['FAILED', 'test_expiredTransaction']);
 
         expect(pendingResult.rows.length).to.equal(1);
         expect(failedResult.rows.length).to.equal(1);
@@ -157,7 +158,7 @@ describe('Transaction Insertion Tests', function () {
 
         // Verify each transaction was inserted
         for (let tx of transactions) {
-            const result = await dbClient.query('SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1', [tx.postEvalUniqueKey]);
+            const result = await dbService.getTransactionsClient().query('SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1', [tx.postEvalUniqueKey]);
             expect(result.rows.length).to.equal(1);
         }
     }).timeout(1000000000);

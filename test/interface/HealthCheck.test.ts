@@ -11,6 +11,7 @@ import { Container } from 'inversify';
 import { ISignalHeartbeat } from '../../src/service/health_monitor/signal/interfaces/ISignalHeartbeat';
 import { TYPES } from '../../src/inversify.types';
 import { ISignalCriticalFailure } from '../../src/service/health_monitor/signal/interfaces/ISignalCriticalFailure';
+import DBService from '../../src/service/db/dbService';
 
 dotenv.config();
 
@@ -33,7 +34,10 @@ describe('Check that we work with AWS Health Check system correctly', function (
     configService = new ConfigServiceAWS(environment, region);
     await configService.refreshConfig();
 
-    const inversifyConfig = new InversifyConfig(configService);
+    const _dbService = new DBService(configService);
+    await configService.refreshConfig();
+
+    const inversifyConfig = new InversifyConfig(configService, _dbService);
     container = inversifyConfig.getContainer();
   });
 
