@@ -3,13 +3,11 @@ import 'reflect-metadata';
 import LeveragePosition from '../../../types/LeveragePosition';
 import {ILogger} from '../../../service/logger/interfaces/ILogger';
 import {inject, injectable} from 'inversify';
-import {ILeverageDataSource} from './interfaces/ILeverageDataSource';
 import DBService from '../../../service/db/dbService';
 import {TYPES} from '../../../inversify.types';
 
-
 @injectable()
-export default class PostgreDataSource implements ILeverageDataSource {
+export default class PostgreDataSource {
   protected logger: ILogger;
   protected dbService: DBService;
 
@@ -25,6 +23,7 @@ export default class PostgreDataSource implements ILeverageDataSource {
       text: 'SELECT * FROM "LeveragePosition" WHERE "nftId" = ANY($1::int[])',
       values: [nftIds],
     };
+    console.log(this.dbService);
     const resp = await this.dbService.getLeverageClient().query(query);
     return resp ? (resp.rows as LeveragePosition[]) : [];
   }

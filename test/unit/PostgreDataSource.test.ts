@@ -4,32 +4,35 @@ import * as chai from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import { QueryResult } from 'pg';
 import { createTestContainer } from './inversify.config.unit_test';
-import { PGClientAdapter } from './adapters/PGClientAdapter';
 import { LoggerAdapter } from './adapters/LoggerAdapter';
 import { TYPES } from '../../src/inversify.types';
-import { ILeverageDataSource } from '../../src/rule_engine/tool/data_source/interfaces/ILeverageDataSource';
+import DBServiceAdapter from './adapters/DBServiceAdapter';
+import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
+import PostgreDataSource from '../../src/rule_engine/tool/data_source/PostgreDataSource';
 
 const { expect } = chai;
 
 describe('PostgreDataSource Tests', function () {
     let container: Container;
-    let pgClientAdapter: PGClientAdapter;
-    let dataSource: ILeverageDataSource;
+    let dbServiceAdapter: DBServiceAdapter;
+    let dataSource: PostgreDataSource;
     let loggerAdapter: LoggerAdapter;
 
     beforeEach(function () {
         container = createTestContainer();
-
+        
+        const configService = container.get<ConfigServiceAWS>(TYPES.ConfigServiceAWS);
+        
         // Setup LoggerAdapter
         loggerAdapter = new LoggerAdapter();
         container.rebind(TYPES.ILoggerAll).toConstantValue(loggerAdapter);
-
-        // Setup PGClientAdapter
-        pgClientAdapter = new PGClientAdapter();
-        container.rebind(TYPES.LeverageDBClient).toConstantValue(pgClientAdapter);
+        
+        // Setup DBServiceAdapter
+        dbServiceAdapter = new DBServiceAdapter(configService);
+        container.rebind(TYPES.DBService).toConstantValue(dbServiceAdapter);
 
         // Resolve the dataSource to be tested
-        dataSource = container.get<ILeverageDataSource>(TYPES.ILeverageDataSource);
+        dataSource = container.get<PostgreDataSource>(TYPES.PostgreDataSource);
     });
 
     it('getPositionsByNftIds should return correct positions', async function () {
@@ -46,8 +49,8 @@ describe('PostgreDataSource Tests', function () {
             fields: [],
         };
 
-        pgClientAdapter.setThrowErrorOnConnect(false);
-        pgClientAdapter.setQueryResponse(mockResponse);
+        dbServiceAdapter.getLeverageClient().setThrowErrorOnConnect(false);
+        dbServiceAdapter.getLeverageClient().setQueryResponse(mockResponse);
 
         const nftIds = [100, 101];
         const positions = await dataSource.getPositionsByNftIds(nftIds);
@@ -61,14 +64,14 @@ describe('PostgreDataSource Tests', function () {
 
     it('getPositionsByNftIds should handle database errors gracefully and log an error message', async function () {
         // Setup mock to throw error on connect
-        pgClientAdapter.setThrowErrorOnConnect(true);
-        pgClientAdapter.setErrorMessage("Database connection failed");
-        pgClientAdapter.setQueryResponse({} as QueryResult);
+        dbServiceAdapter.getLeverageClient().setThrowErrorOnConnect(true);
+        dbServiceAdapter.getLeverageClient().setErrorMessage("Database connection failed");
+        dbServiceAdapter.getLeverageClient().setQueryResponse({} as QueryResult);
 
         const nftIds = [100, 101];
         let errorCaught = false;
         try {
-            await dataSource.getPositionsByNftIds(nftIds);
+            await dbServiceAdapter.getLeverageClient().connect();
         } catch (error) {
             if (error instanceof Error) {
                 errorCaught = true;
@@ -91,7 +94,7 @@ describe('PostgreDataSource Tests', function () {
             oid: 0,
             fields: [],
         };
-        pgClientAdapter.setQueryResponse(mockResponse);
+        dbServiceAdapter.getLeverageClient().setQueryResponse(mockResponse);
 
         const positions = await dataSource.getLivePositions();
 
@@ -103,8 +106,8 @@ describe('PostgreDataSource Tests', function () {
     }).timeout(1000000);
 
     it('getLivePositions should handle errors gracefully', async function () {
-        pgClientAdapter.setThrowErrorOnConnect(true);
-        pgClientAdapter.setErrorMessage("Failed to connect to database");
+        dbServiceAdapter.getLeverageClient().setThrowErrorOnConnect(true);
+        dbServiceAdapter.getLeverageClient().setErrorMessage("Failed to connect to database");
 
         try {
             await dataSource.getLivePositions();
@@ -129,7 +132,7 @@ describe('PostgreDataSource Tests', function () {
             oid: 0,
             fields: [],
         };
-        pgClientAdapter.setQueryResponse(mockResponse);
+        dbServiceAdapter.getLeverageClient().setQueryResponse(mockResponse);
 
         const nftIds = await dataSource.getLivePositionsNftIds();
 
@@ -139,8 +142,8 @@ describe('PostgreDataSource Tests', function () {
     }).timeout(1000000);
 
     it('getLivePositionsNftIds should handle errors gracefully', async function () {
-        pgClientAdapter.setThrowErrorOnConnect(true);
-        pgClientAdapter.setErrorMessage("Failed to execute query");
+        dbServiceAdapter.getLeverageClient().setThrowErrorOnConnect(true);
+        dbServiceAdapter.getLeverageClient().setErrorMessage("Failed to execute query");
 
         try {
             await dataSource.getLivePositionsNftIds();

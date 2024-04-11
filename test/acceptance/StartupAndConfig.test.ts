@@ -13,9 +13,9 @@ import { EthNodeInterceptor } from './interceptors/EthNodeInterceptor';
 import { Container } from 'inversify';
 import { InversifyConfig } from '../../src/inversify.config';
 import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
+import DBService from '../../src/service/db/dbService';
 
 let timeoutId: NodeJS.Timeout | null = null;
-
 
 describe('Startup and Config', function () {
   // eslint-disable-next-line no-invalid-this
@@ -27,13 +27,14 @@ describe('Startup and Config', function () {
   let ethNodeMainInterceptor: EthNodeInterceptor | undefined;
   let ethNodeAltInterceptor: EthNodeInterceptor | undefined;
 
-
-
   beforeEach(async function () {
     const configService = createConfigService();
     await initializeConfigService(configService);
 
-    const inversifyConfig = new InversifyConfig(configService);
+    const _dbService = new DBService(configService);
+    await configService.refreshConfig();
+
+    const inversifyConfig = new InversifyConfig(configService, _dbService);
     container = inversifyConfig.getContainer();
 
     newRelicInterceptor = createNewRelicMock(configService);

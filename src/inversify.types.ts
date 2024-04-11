@@ -29,7 +29,7 @@ const TYPES = {
   PostgreTxQueue: 'PostgreTxQueue',
   ITransactionQueuer: 'ITransactionQueuer',
   TransactionsDataSource: 'TransactionsDataSource',
-  ILeverageDataSource: 'ILeverageDataSource',
+  PostgreDataSource: 'PostgreDataSource',
   PositionLedgerContract: 'PositionLedgerContract',
 };
 

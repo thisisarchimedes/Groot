@@ -1,5 +1,4 @@
 import {Rule, RuleParams} from './Rule';
-import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
 import {inject, injectable} from 'inversify';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
@@ -9,11 +8,12 @@ import fs from 'fs';
 import {Address} from '../../types/LeverageContractAddresses';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
 import {ConfigService} from '../../service/config/ConfigService';
+import PostgreDataSource from '../tool/data_source/PostgreDataSource';
 
 
 @injectable()
 export class RuleExpirePositions extends Rule {
-  private leverageDataSource: ILeverageDataSource;
+  private leverageDataSource: PostgreDataSource;
   private configService: ConfigService;
   private positionLedgerContract!: PositionLedgerContract;
   private positionLedgerAddress!: Address;
@@ -26,7 +26,7 @@ export class RuleExpirePositions extends Rule {
     @inject('ILoggerAll') logger: ILogger,
     @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
     @inject('IAbiRepo') abiRepo: IAbiRepo,
-    @inject('ILeverageDataSource') leverageDataSource: ILeverageDataSource,
+    @inject('LeverageDataSource') leverageDataSource: PostgreDataSource,
     @inject('ConfigServiceAWS') configService: ConfigService,
   ) {
     super(logger, blockchainReader, abiRepo);

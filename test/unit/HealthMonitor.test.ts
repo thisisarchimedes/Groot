@@ -13,7 +13,6 @@ import { Container } from 'inversify';
 import { TYPES } from '../../src/inversify.types';
 import { IBlockchainNodeHealthMonitor } from '../../src/service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
 import { createTestContainer } from './inversify.config.unit_test';
-import { ILogger } from '../../src/service/logger/interfaces/ILogger';
 
 const { expect } = chai;
 

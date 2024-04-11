@@ -26,26 +26,20 @@ import { RuleDummy } from '../../src/rule_engine/rule/RuleDummy';
 import { RuleExpirePositions } from '../../src/rule_engine/rule/RuleExpirePositions';
 import { RuleBalanceCurvePoolWithVault } from '../../src/rule_engine/rule/RuleBalanceCurvePoolWithVault';
 import { RuleUniswapPSPRebalance } from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
-import { Client } from 'pg';
-import { ILeverageDataSource } from '../../src/rule_engine/tool/data_source/interfaces/ILeverageDataSource';
 import PostgreDataSource from '../../src/rule_engine/tool/data_source/PostgreDataSource';
 import { ILoggerAll } from '../../src/service/logger/interfaces/ILoggerAll';
 import { ConfigService } from '../../src/service/config/ConfigService';
+import DBService from '../../src/service/db/dbService';
 
 export const createTestContainer = (): Container => {
     const container = new Container();
 
-
-
     // Binding logger
     container.bind<LoggerAdapter>(LoggerAdapter).toSelf().inSingletonScope();
 
-
     const loggerAdapter = container.resolve(LoggerAdapter);
 
-
     container.bind<ILoggerAll>(TYPES.ILoggerAll).toConstantValue(loggerAdapter);
-
 
     // Binding the BlockchainNode with the adapter for testing
     container.bind<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain).toDynamicValue(() => {
@@ -86,7 +80,9 @@ export const createTestContainer = (): Container => {
 
     container.bind<ConfigService>(TYPES.ConfigServiceAWS).to(ConfigServiceAdapter).inSingletonScope();
 
-    container.bind<ILeverageDataSource>(TYPES.ILeverageDataSource).to(PostgreDataSource).inRequestScope();
+    container.bind<PostgreDataSource>(TYPES.PostgreDataSource).to(PostgreDataSource).inRequestScope();
+
+    container.bind<DBService>(TYPES.DBService).to(DBService).inRequestScope();
 
     container.bind<Container>(Container).toConstantValue(container);
 

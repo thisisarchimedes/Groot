@@ -35,7 +35,6 @@ import {ITxQueue} from './tx_queue/interfaces/ITxQueue';
 import PostgreTxQueue from './tx_queue/PostgreTxQueue';
 import {ITransactionQueuer} from './tx_queue/interfaces/ITransactionQueuer';
 import {TransactionQueuer} from './tx_queue/TransactionQueuer';
-import {ILeverageDataSource} from './rule_engine/tool/data_source/interfaces/ILeverageDataSource';
 import PostgreDataSource from './rule_engine/tool/data_source/PostgreDataSource';
 import {Rule} from './rule_engine/rule/Rule';
 import {TypeRule} from './rule_engine/TypesRule';
@@ -71,7 +70,7 @@ export class InversifyConfig {
   private bindDBConfiguration(dbService: DBService) {
     this.container.bind<DBService>(TYPES.DBService).toConstantValue(dbService);
 
-    this.container.bind<ILeverageDataSource>(TYPES.ILeverageDataSource).to(PostgreDataSource).inTransientScope();
+    this.container.bind<PostgreDataSource>(TYPES.PostgreDataSource).to(PostgreDataSource).inTransientScope();
   }
 
   private bindConstants(configServiceAWS: ConfigServiceAWS) {
