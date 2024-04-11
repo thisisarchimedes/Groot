@@ -10,8 +10,8 @@ import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealth
 import {IConfigService} from './service/config/interfaces/IConfigService';
 import {ILogger} from './service/logger/interfaces/ILogger';
 import {ITransactionQueuer} from './tx_queue/interfaces/ITransactionQueuer';
-import {Client} from 'pg';
 import {TYPES} from './inversify.types';
+import DBService from './service/db/dbService';
 
 dotenv.config();
 
@@ -50,7 +50,6 @@ export class Groot implements IGroot {
   public async initalizeGroot() {
     this.logger.info('Initializing Groot...');
     await this.configService.refreshConfig();
-    await this.transactionsQueuer.refresh();
     this.logger.info('Groot initialized successfully.');
   }
 
@@ -64,8 +63,7 @@ export class Groot implements IGroot {
   }
 
   public async shutdownDBClients() {
-    await this.container.get<Client>(TYPES.LeverageDBClient).end();
-    await this.container.get<Client>(TYPES.TransactionsDBClient).end();
+    await this.container.get<DBService>(TYPES.DBService).end();
   }
 
   private async shutdownReadOnlyLocalNodes() {
@@ -81,7 +79,6 @@ export class Groot implements IGroot {
 
     await this.configService.refreshConfig();
     await this.setLocalNodesToNewestBlock();
-    await this.resetTransactionQueuer();
 
     this.healthMonitor.endOfCycleSequence();
     this.logger.info('Groot is ready for cycle.');
@@ -92,10 +89,6 @@ export class Groot implements IGroot {
       this.mainNode.resetNode(this.configService.getMainRPCURL()),
       this.altNode.resetNode(this.configService.getAlternativeRPCURL()),
     ]);
-  }
-
-  private async resetTransactionQueuer() {
-    await this.transactionsQueuer.refresh();
   }
 
   public async runOneGrootCycle(): Promise<void> {

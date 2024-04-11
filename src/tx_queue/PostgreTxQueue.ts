@@ -1,31 +1,25 @@
 import 'reflect-metadata';
 
-import {Client, QueryConfig} from 'pg';
+import {QueryConfig} from 'pg';
 import {TYPES} from '../inversify.types';
 import {inject, injectable} from 'inversify';
 import {ITxQueue} from './interfaces/ITxQueue';
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Executor, UrgencyLevel} from '../rule_engine/TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
+import DBService from '../service/db/dbService';
 
 @injectable()
 class PostgreTxQueue implements ITxQueue {
-  private client: Client;
+  private dbService: DBService;
   private logger: ILogger;
 
-  constructor(@inject('ILoggerAll') logger: ILogger,
-    @inject(TYPES.TransactionsDBClient) client: Client) {
-    this.client = client;
+  constructor(
+    @inject('ILoggerAll') logger: ILogger,
+    @inject(TYPES.DBService) dbService: DBService,
+  ) {
+    this.dbService = dbService;
     this.logger = logger;
-  }
-  public async refresh(): Promise<void> {
-    await this.client.connect().catch((e) => {
-      if (e instanceof Error) {
-        this.logger.error(e.message);
-      } else {
-        console.error(e);
-      }
-    });
   }
 
   public async addTransactionToQueue(tx: OutboundTransaction): Promise<void> {
@@ -57,16 +51,16 @@ class PostgreTxQueue implements ITxQueue {
       ttlSeconds: number,
   ): Promise<void> {
     try {
-      await this.client.query('BEGIN');
+      await this.dbService.getTransactionsClient().query('BEGIN');
       const queryConfig: QueryConfig = {
         text: 'CALL "Transactions".insert_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
         values: [createdAt, updatedAt, status, to, executor, txHash, identifier, value, data, urgency, ttlSeconds],
       };
 
-      await this.client.query(queryConfig);
-      await this.client.query('COMMIT');
+      await this.dbService.getTransactionsClient().query(queryConfig);
+      await this.dbService.getTransactionsClient().query('COMMIT');
     } catch (err) {
-      await this.client.query('ROLLBACK');
+      await this.dbService.getTransactionsClient().query('ROLLBACK');
       throw err;
     }
   }

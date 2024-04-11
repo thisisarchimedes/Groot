@@ -16,9 +16,6 @@ export class TransactionQueuer implements ITransactionQueuer {
     this.logger = _logger;
     this.queue = _queue;
   }
-  public async refresh(): Promise<void> {
-    await this.queue.refresh();
-  }
 
   public async queueTransactions(txs: OutboundTransaction[]): Promise<void> {
     for (const tx of txs) {

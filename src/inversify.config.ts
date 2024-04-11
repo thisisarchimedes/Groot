@@ -31,7 +31,6 @@ import {IGroot} from './interfaces/IGroot';
 import {IBlockchainNodeHealthMonitor} from './service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
 import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealthMonitor';
 import {IAbiRepo} from './rule_engine/tool/abi_repository/interfaces/IAbiRepo';
-import {Client} from 'pg';
 import {IConfigService} from './service/config/interfaces/IConfigService';
 import {ILogger} from './service/logger/interfaces/ILogger';
 import {ITxQueue} from './tx_queue/interfaces/ITxQueue';
@@ -48,14 +47,15 @@ import {RuleUniswapPSPRebalance} from './rule_engine/rule/RuleUniswapPSPRebalanc
 import {LoggerConsole} from './service/logger/LoggerConsole';
 import {RuleBalanceCurvePoolWithVault} from './rule_engine/rule/RuleBalanceCurvePoolWithVault';
 import PositionLedgerContract from './rule_engine/tool/contracts/PositionLedgerContract';
+import DBService from './service/db/dbService';
 
 export class InversifyConfig {
   private container: Container;
 
-  constructor(configServiceAWS: IConfigServiceAWS) {
+  constructor(configServiceAWS: IConfigServiceAWS, dbService: DBService) {
     this.container = new Container();
 
-    this.bindDBConfiguration(configServiceAWS);
+    this.bindDBConfiguration(dbService);
     this.bindConstants(configServiceAWS);
     this.bindLogging();
     this.bindBlockchainNodes();
@@ -68,26 +68,8 @@ export class InversifyConfig {
     this.bindGroot();
   }
 
-  private bindDBConfiguration(configServiceAWS: IConfigServiceAWS) {
-    this.container.bind<Client>(TYPES.TransactionsDBClient).toDynamicValue(() => {
-      const connectionString = configServiceAWS.getTransactionsDBURL();
-      return new Client({
-        connectionString: connectionString,
-        ssl: {
-          rejectUnauthorized: false,
-        },
-      });
-    }).inSingletonScope();
-
-    this.container.bind<Client>(TYPES.LeverageDBClient).toDynamicValue(() => {
-      const connectionString = configServiceAWS.getLeverageDBURL();
-      return new Client({
-        connectionString: connectionString,
-        ssl: {
-          rejectUnauthorized: false,
-        },
-      });
-    }).inSingletonScope();
+  private bindDBConfiguration(dbService: DBService) {
+    this.container.bind<DBService>(TYPES.DBService).toConstantValue(dbService);
 
     this.container.bind<ILeverageDataSource>(TYPES.ILeverageDataSource).to(PostgreDataSource).inTransientScope();
   }

@@ -9,6 +9,7 @@ import {InversifyConfig} from './inversify.config';
 import {Container} from 'inversify';
 import {TYPES} from './inversify.types';
 import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
+import DBService from './service/db/dbService';
 
 dotenv.config();
 
@@ -21,7 +22,10 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
   const configServiceAWS = new ConfigServiceAWS(grootParams.environment, grootParams.region);
   await configServiceAWS.refreshConfig();
 
-  const inversifyConfig = new InversifyConfig(configServiceAWS);
+  const dbService = new DBService(configServiceAWS);
+  await dbService.connect();
+
+  const inversifyConfig = new InversifyConfig(configServiceAWS, dbService);
   container = inversifyConfig.getContainer();
   const groot = container.get<IGroot>(TYPES.Groot);
 
