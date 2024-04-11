@@ -1,6 +1,7 @@
 
 import fs from 'fs';
-import {ConfigService} from '../../../src/service/config/ConfigService';
+import { ConfigService } from '../../../src/service/config/ConfigService';
+import { LeverageContractAddresses } from '../../../src/types/LeverageContractAddresses';
 
 export class ConfigServiceAdapter extends ConfigService {
   private ruleFilePath: string = '';
@@ -24,7 +25,15 @@ export class ConfigServiceAdapter extends ConfigService {
     this.altRPCURL = url;
   }
 
+  public setLeverageContractInfo(addresses: LeverageContractAddresses) {
+    this.leverageContractAddresses = addresses;
+  }
+
   private async refreshRPCURL(): Promise<void> {
+  }
+
+  public getTransactionsDBURL(): string {
+    return '';
   }
 
   private refreshRules(): void {

@@ -1,5 +1,8 @@
+import {injectable, inject} from 'inversify';
+
 import axios from 'axios';
-import {IAbiFetcher} from './IAbiFetcher';
+import {IAbiFetcher} from './interfaces/IAbiFetcher';
+import {IConfigService} from '../../../service/config/interfaces/IConfigService';
 
 interface EtherscanResponse {
   status: string;
@@ -7,12 +10,17 @@ interface EtherscanResponse {
   result: string;
 }
 
+@injectable()
 export class AbiFetcherEtherscan implements IAbiFetcher {
   private readonly apiKey: string;
   private readonly baseUrl: string = 'https://api.etherscan.io/api';
+  private readonly configService: IConfigService;
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
+  constructor(
+    @inject('IConfigServiceAWS') _configService: IConfigService,
+  ) {
+    this.configService = _configService;
+    this.apiKey = this.configService.getEtherscanAPIKey();
   }
 
   public async getAbiByAddress(contractAddress: string): Promise<string> {

@@ -1,8 +1,8 @@
 import {ethers} from 'ethers';
-import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
 import UNISWAPV3_STRATEGY_ABI from '../../constants/abis/UNISWAPV3_STRATEGY_ABI.json';
 import {Contract} from 'ethers';
 import {RawTransactionData} from '../../blockchain/OutboundTransaction';
+import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 export interface UniswapStrategyPosition {
   liquidity: bigint;
   amount0: bigint;
@@ -10,9 +10,9 @@ export interface UniswapStrategyPosition {
 }
 export class ToolStrategyUniswap {
   private readonly strategyAddress: string;
-  private readonly blockchainReader: BlockchainReader;
+  private readonly blockchainReader: IBlockchainReader;
 
-  constructor(strategyAddress: string, blockchainReader: BlockchainReader) {
+  constructor(strategyAddress: string, blockchainReader: IBlockchainReader) {
     this.strategyAddress = strategyAddress;
     this.blockchainReader = blockchainReader;
   }

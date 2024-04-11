@@ -1,37 +1,56 @@
 import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
-import {BlockchainReader} from '../../blockchain/blockchain_reader/BlockchainReader';
-import {Logger} from '../../service/logger/Logger';
-import {UrgencyLevel} from '../TypesRule';
-import {AbiRepo} from '../tool/abi_repository/AbiRepo';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {Executor, UrgencyLevel} from '../TypesRule';
+import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import {injectable} from 'inversify';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
+  ttlSeconds: number;
+  executor: Executor;
 }
 
 export interface RuleConstructorInput {
-  logger: Logger;
-  blockchainReader: BlockchainReader;
-  abiRepo: AbiRepo
+  logger: ILogger;
+  blockchainReader: IBlockchainReader;
+  abiRepo: IAbiRepo
   ruleLabel: string;
   params: RuleParams;
 
 }
 
+@injectable()
 export abstract class Rule {
-  protected logger: Logger;
-  protected blockchainReader: BlockchainReader;
-  protected abiRepo: AbiRepo;
+  protected readonly logger: ILogger;
+  protected readonly blockchainReader: IBlockchainReader;
+  protected readonly abiRepo: IAbiRepo;
 
+  protected ruleLabel: string;
   protected params: RuleParams;
-  protected readonly ruleLabel: string;
   protected pendingTxQueue: OutboundTransaction[] = [];
 
-  constructor(constructorInput: RuleConstructorInput) {
-    this.logger = constructorInput.logger;
-    this.params = constructorInput.params;
-    this.abiRepo = constructorInput.abiRepo;
-    this.ruleLabel = constructorInput.ruleLabel;
-    this.blockchainReader = constructorInput.blockchainReader;
+  constructor(
+      logger: ILogger,
+      blockchainReader: IBlockchainReader,
+      abiRepo: IAbiRepo,
+  ) {
+    this.logger = logger;
+    this.blockchainReader = blockchainReader;
+    this.abiRepo = abiRepo;
+    this.ruleLabel = ''; // Default initialization
+    this.params = {
+      urgencyLevel: UrgencyLevel.LOW,
+      executor: Executor.LEVERAGE,
+      ttlSeconds: 300,
+    }; // Default initialization
+  }
+
+
+  public async initialize(ruleLabel: string, params: RuleParams): Promise<void> {
+    this.ruleLabel = ruleLabel;
+    this.params = params;
+    return await Promise.resolve();
   }
 
   public abstract evaluate(): Promise<void>;

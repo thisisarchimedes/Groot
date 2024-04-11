@@ -1,17 +1,26 @@
+import {RuleParams} from './rule/Rule';
+
 export enum TypeRule {
     Invalid = 'invalid',
     Dummy = 'dummy',
     UniswapPSPRebalance = 'uniswapPSPRebalance',
-    ExpirePositions = 'expirePosition'
+    ExpirePositions = 'expirePosition',
+    RuleBalanceCurvePoolWithVault = 'balanceCurvePoolWithVault'
+}
+
+
+export enum Executor {
+    PSP = 'PSP',
+    LEVERAGE = 'LEVERAGE'
 }
 
 export enum UrgencyLevel {
-    NORMAL = 0,
-    URGENT = 1
+    LOW = 'LOW',
+    HIGH = 'HIGH'
 }
 
 export interface RuleJSONConfigItem {
     ruleType: TypeRule;
     label: string;
-    params: unknown;
+    params: RuleParams;
 }

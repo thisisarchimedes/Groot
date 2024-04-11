@@ -1,14 +1,12 @@
+import * as stackTrace from 'stacktrace-parser';
+import {injectable} from 'inversify';
+
+import {ILogger} from './interfaces/ILogger';
+import {LogLevel} from './LogLevel';
 import {LogMessageCycleTime} from './TypeLogItem';
 
-export enum LogLevel {
-  None = 0,
-  Error = 1,
-  Warn = 2,
-  Info = 3,
-  Debug = 4,
-}
-
-export abstract class Logger {
+@injectable()
+export abstract class Logger implements ILogger {
   protected currentLevel: LogLevel = LogLevel.Debug;
 
   public setLogLevel(level: LogLevel): void {
@@ -39,4 +37,24 @@ export abstract class Logger {
 
     this.info(JSON.stringify(message));
   }
+
+  protected getCallerInfo(): string {
+    const error = new Error();
+    const stack = error.stack as string;
+    const frames = stackTrace.parse(stack);
+    console.log(frames);
+
+    for (const frame of frames) {
+      const fileName = frame.file?.split('/').pop();
+      if (fileName && !fileName.startsWith('Logger')) {
+        const functionName = frame.methodName || '<anonymous>';
+        const lineNumber = frame.lineNumber;
+        const columnNumber = frame.column;
+        return `${fileName}:${lineNumber}:${columnNumber} ${functionName}`;
+      }
+    }
+    return '';
+  }
 }
+
+export {LogLevel};

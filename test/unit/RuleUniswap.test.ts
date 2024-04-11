@@ -1,4 +1,5 @@
-import {expect} from 'chai';
+import 'reflect-metadata';
+import { expect } from 'chai';
 import * as dotenv from 'dotenv';
 import {ethers, parseUnits} from 'ethers';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';

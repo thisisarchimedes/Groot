@@ -47,10 +47,20 @@ stringData:
   ALCHEMY_API_KEY: $ALCHEMY_API_KEY
 EOF
 
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: newrelic-api-key
+  namespace: groot
+type: Opaque
+stringData:
+  NEW_RELIC_API_KEY: $NEW_RELIC_API_KEY
+EOF
+
 # deploy pod
 kubectl apply -f scripts/k8s/local/demoapp-configmap.yaml --namespace groot
 kubectl apply -f scripts/k8s/local/deployment.yaml --namespace groot
 kubectl apply -f scripts/k8s/local/service.yaml --namespace groot
-kubectl apply -f scripts/k8s/local/cronjob.yaml --namespace groot
 
 kubectl get pods --namespace groot

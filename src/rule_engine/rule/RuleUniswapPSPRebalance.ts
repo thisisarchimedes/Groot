@@ -1,7 +1,11 @@
 import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
 import {UrgencyLevel} from '../TypesRule';
 import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
-import {Rule, RuleConstructorInput, RuleParams} from './Rule';
+import {Rule, RuleParams} from './Rule';
+import {injectable, inject} from 'inversify';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 // import {UNISWAPV3_POOL_ABI} from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json';
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
@@ -18,15 +22,19 @@ export interface MinOutputAmounts {
 }
 /* eslint-enable max-len */
 
+@injectable()
 export class RuleUniswapPSPRebalance extends Rule {
   private uniswapStrategy: ToolStrategyUniswap;
-  constructor(constructorInput: RuleConstructorInput) {
-    super(constructorInput);
+  constructor(
+    @inject('ILoggerAll') logger: ILogger,
+    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
+    @inject('IAbiRepo') abiRepo: IAbiRepo,
+        params: RuleParams,
+  ) {
+    super(logger, blockchainReader, abiRepo);
     this.uniswapStrategy = new ToolStrategyUniswap(
-        (
-        constructorInput.params as RuleParamsUniswapPSPRebalance
-        ).strategyAddress,
-        constructorInput.blockchainReader,
+        (params as RuleParamsUniswapPSPRebalance).strategyAddress,
+        blockchainReader,
     );
   }
   public async evaluate(): Promise<void> {
@@ -45,7 +53,7 @@ export class RuleUniswapPSPRebalance extends Rule {
     const minOutputAmounts = await this.calculateMinOOutAndMin1Out();
 
     const tx = {
-      urgencyLevel: UrgencyLevel.URGENT,
+      urgencyLevel: UrgencyLevel.HIGH,
       context: 'UniswapPSPRebalance',
       postEvalUniqueKey: 'uniqueKey',
       lowLevelUnsignedTransaction: {},
@@ -109,7 +117,7 @@ export class RuleUniswapPSPRebalance extends Rule {
     return lowerTick;
   }
   protected generateUniqueKey(): string {
-    throw new Error('Method not implemented.');
+    return '';
   }
   private async calculateMinOOutAndMin1Out(): Promise<MinOutputAmounts> {
     const position = await this.uniswapStrategy.getPosition();

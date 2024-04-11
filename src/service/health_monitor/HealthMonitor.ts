@@ -1,16 +1,30 @@
-import {Logger} from '../logger/Logger';
-import {BlockchainNodeHealthMonitor} from './BlockchainNodeHealthMonitor';
-import {ISignalCriticalFailure} from './signal/ISignalCriticalFailure';
-import {ISignalHeartbeat} from './signal/ISignalHeartbeat';
+import {injectable, inject} from 'inversify';
 
-export class HealthMonitor {
+import {ILogger} from '../logger/interfaces/ILogger';
+import {ISignalCriticalFailure} from './signal/interfaces/ISignalCriticalFailure';
+import {ISignalHeartbeat} from './signal/interfaces/ISignalHeartbeat';
+import {IHealthMonitor} from './signal/interfaces/IHealthMonitor';
+import {IBlockchainNodeHealthMonitor} from './interfaces/BlockchainNodeHealthMonitor';
+
+@injectable()
+export class HealthMonitor implements IHealthMonitor {
   private cycleStartTimestamp!: Date;
 
+  private readonly logger: ILogger;
+  private readonly blockchainHealthMonitor: IBlockchainNodeHealthMonitor;
+  private readonly signalHeartbeat: ISignalHeartbeat;
+  private readonly signalCriticalFailure: ISignalCriticalFailure;
+
   constructor(
-    private readonly logger: Logger,
-    private readonly blockchainHealthMonitor: BlockchainNodeHealthMonitor,
-    private readonly signalHeartbeat: ISignalHeartbeat,
-    private readonly signalCriticalFailure: ISignalCriticalFailure) { }
+    @inject('ILoggerAll') _logger: ILogger,
+    @inject('IBlockchainNodeHealthMonitor') blockchainHealthMonitor: IBlockchainNodeHealthMonitor,
+    @inject('ISignalHeartbeat') signalHeartbeat: ISignalHeartbeat,
+    @inject('ISignalCriticalFailure') signalCriticalFailure: ISignalCriticalFailure) {
+    this.logger = _logger;
+    this.blockchainHealthMonitor = blockchainHealthMonitor;
+    this.signalHeartbeat = signalHeartbeat;
+    this.signalCriticalFailure = signalCriticalFailure;
+  }
 
   public async startOfCycleSequence(): Promise<void> {
     this.cycleStartTimestamp = new Date();

@@ -1,49 +1,27 @@
-import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
-import {Logger} from '../service/logger/Logger';
-import {Rule, RuleParams} from './rule/Rule';
-import {RuleDummy} from './rule/RuleDummy';
-import {RuleExpirePositions} from './rule/RuleExpirePositions';
-import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
-import {AbiRepo} from './tool/abi_repository/AbiRepo';
-import {RuleJSONConfigItem, TypeRule} from './TypesRule';
+import 'reflect-metadata';
 
-export class ErrorRuleFactory extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'ErrorRuleFactory';
-  }
-}
+import {Container, inject, injectable} from 'inversify';
+import {IFactoryRule} from './interfaces/IFactoryRule';
+import {RuleJSONConfigItem} from './TypesRule';
+import {ILogger} from '../service/logger/interfaces/ILogger';
+import {Rule} from './rule/Rule';
 
-export class FactoryRule {
-  private readonly logger: Logger;
-  private readonly blockchainReader: BlockchainReader;
-  private readonly abiRepo: AbiRepo;
 
-  constructor(logger: Logger, blockchainReader: BlockchainReader, abiRepo: AbiRepo) {
-    this.logger = logger;
-    this.blockchainReader = blockchainReader;
-    this.abiRepo = abiRepo;
-  }
+@injectable()
+export class FactoryRule implements IFactoryRule {
+  constructor(
+    @inject(Container) private container: Container,
+    @inject('ILoggerAll') private logger: ILogger,
+  ) { }
 
-  public createRule(config: RuleJSONConfigItem): Rule | null {
-    const constructorInput = {
-      logger: this.logger,
-      blockchainReader: this.blockchainReader,
-      abiRepo: this.abiRepo,
-      ruleLabel: config.label,
-      params: config.params as RuleParams,
-    };
-
-    switch (config.ruleType) {
-      case TypeRule.Dummy:
-        return new RuleDummy(constructorInput);
-      case TypeRule.UniswapPSPRebalance:
-        return new RuleUniswapPSPRebalance(constructorInput);
-      case TypeRule.ExpirePositions:
-        return new RuleExpirePositions(constructorInput);
-      default:
-        this.logger.warn(`Unsupported rule type: ${config.ruleType}`);
-        return null;
+  public async createRule(config: RuleJSONConfigItem): Promise<Rule | null> {
+    try {
+      const ruleInstance = this.container.get<Rule>(config.ruleType);
+      await ruleInstance.initialize(config.label, config.params);
+      return ruleInstance;
+    } catch (error) {
+      this.logger.warn(`Error creating rule instance for type ${config.ruleType}: ${error}`);
+      return null;
     }
   }
 }

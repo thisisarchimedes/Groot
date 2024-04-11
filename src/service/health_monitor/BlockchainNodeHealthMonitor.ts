@@ -1,8 +1,21 @@
-import {BlockchainNode} from '../../blockchain/blockchain_nodes/BlockchainNode';
-import {Logger} from '../logger/Logger';
+import {IBlockchainNode} from '../../blockchain/blockchain_nodes/interfaces/IBlockchainNode';
+import {IBlockchainNodeLocal} from '../../blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
+import {injectable, inject} from 'inversify';
+import {IBlockchainNodeHealthMonitor} from './interfaces/BlockchainNodeHealthMonitor';
+import {ILogger} from '../logger/interfaces/ILogger';
 
-export class BlockchainNodeHealthMonitor {
-  constructor(private readonly logger: Logger, private readonly nodes: BlockchainNode[]) { }
+@injectable()
+export class BlockchainNodeHealthMonitor implements IBlockchainNodeHealthMonitor {
+  private readonly nodes: IBlockchainNodeLocal[] = [];
+  private readonly logger: ILogger;
+
+  constructor(
+    @inject('ILoggerAll') _logger: ILogger,
+    @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
+    @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal) {
+    this.logger = _logger;
+    this.nodes = [_mainLocalNode, _altLocalNode];
+  }
 
   public async checkBlockchainNodesHealth(): Promise<void> {
     const unhealthyNodes = this.getUnhealthyNodes();
@@ -19,11 +32,11 @@ export class BlockchainNodeHealthMonitor {
     }
   }
 
-  private getUnhealthyNodes(): BlockchainNode[] {
+  private getUnhealthyNodes(): IBlockchainNode[] {
     return this.nodes.filter((node) => !node.isHealthy());
   }
 
-  private recoverNodesInParallel(unhealthyNodes: BlockchainNode[]): Promise<PromiseSettledResult<boolean>[]> {
+  private recoverNodesInParallel(unhealthyNodes: IBlockchainNode[]): Promise<PromiseSettledResult<boolean>[]> {
     return Promise.allSettled(
         unhealthyNodes.map((node) => {
           this.logAttemptingNodeRecovery(node);
@@ -32,11 +45,11 @@ export class BlockchainNodeHealthMonitor {
     );
   }
 
-  private logAttemptingNodeRecovery(node: BlockchainNode): void {
+  private logAttemptingNodeRecovery(node: IBlockchainNode): void {
     this.logger.warn(`Node ${node.getNodeName()} is unhealthy. Attempting to recover it...`);
   }
 
-  private async recoverNodeWithErrorHandling(node: BlockchainNode): Promise<boolean> {
+  private async recoverNodeWithErrorHandling(node: IBlockchainNode): Promise<boolean> {
     try {
       await node.recoverNode();
       this.logNodeRecoverySuccess(node);
@@ -53,16 +66,16 @@ export class BlockchainNodeHealthMonitor {
 
   private allNodesFailedToRecover(
       failedRecoveries: PromiseSettledResult<boolean>[],
-      unhealthyNodes: BlockchainNode[],
+      unhealthyNodes: IBlockchainNode[],
   ): boolean {
     return failedRecoveries.length === unhealthyNodes.length;
   }
 
-  private logNodeRecoverySuccess(node: BlockchainNode): void {
+  private logNodeRecoverySuccess(node: IBlockchainNode): void {
     this.logger.info(`Node ${node.getNodeName()} has been recovered.`);
   }
 
-  private logNodeRecoveryFailure(node: BlockchainNode, error: unknown): void {
+  private logNodeRecoveryFailure(node: IBlockchainNode, error: unknown): void {
     this.logger.error(`Blockchain Nodes Health Monitor failed to recover node ${node.getNodeName()}: ${error}`);
   }
 

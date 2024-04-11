@@ -1,20 +1,30 @@
+import {injectable, inject} from 'inversify';
+
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {Logger} from '../service/logger/Logger';
 import {Rule} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
-import {FactoryRule} from './FactoryRule';
+import {ILogger} from '../service/logger/interfaces/ILogger';
+import {IFactoryRule} from './interfaces/IFactoryRule';
+import {IRuleEngine} from './interfaces/IRuleEngine';
 
-export class RuleEngine {
+@injectable()
+export class RuleEngine implements IRuleEngine {
   private rules: Rule[] = [];
   private outboundTransactions: OutboundTransaction[] = [];
 
-  constructor(
-    private readonly logger: Logger,
-    private readonly ruleFactory: FactoryRule,
-  ) { }
+  private readonly logger: ILogger;
+  private readonly ruleFactory: IFactoryRule;
 
-  public loadRulesFromJSONConfig(ruleConfig: RuleJSONConfigItem[]): void {
-    this.rules = this.createRules(ruleConfig);
+  constructor(
+    @inject('ILoggerAll') _logger: ILogger,
+    @inject('IFactoryRule') _factoryRule: IFactoryRule,
+  ) {
+    this.logger = _logger;
+    this.ruleFactory = _factoryRule;
+  }
+
+  public async loadRulesFromJSONConfig(ruleConfig: RuleJSONConfigItem[]): Promise<void> {
+    this.rules = await this.createRules(ruleConfig);
     this.logRuleCount();
   }
 
@@ -27,10 +37,16 @@ export class RuleEngine {
     return this.outboundTransactions;
   }
 
-  private createRules(ruleConfig: RuleJSONConfigItem[]): Rule[] {
-    return ruleConfig
-        .map((config) => this.ruleFactory.createRule(config))
-        .filter((rule): rule is Rule => rule !== null);
+  private async createRules(ruleConfig: RuleJSONConfigItem[]): Promise<Rule[]> {
+    const rules: Rule[] = [];
+
+    for (const config of ruleConfig) {
+      const rule = await this.ruleFactory.createRule(config);
+      if (rule !== null) {
+        rules.push(rule);
+      }
+    }
+    return rules;
   }
 
   private logRuleCount(): void {

@@ -4,19 +4,29 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - 'src/**'
+      - 'scripts/**'
+      - '.github/workflows/deploy.yml'
 
 env:
   ENVIRONMENT: ${{ vars.DEFAULT_ENVIRONMENT }}
   DOTENV_KEY: ${{ secrets.DOTENV_KEY }}
   AWS_REGION: ${{ vars.AWS_REGION }}
+
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+
   API_DEVOPS_EVENT_CATCHER: ${{ vars.API_DEVOPS_EVENT_CATCHER }}
   DEVOPS_EVENTS_SECRET_TOKEN: ${{ secrets.DEVOPS_EVENTS_SECRET_TOKEN }}
   EKS_REGION: ${{ vars.EKS_REGION }}
+
   ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
   ECR_REPO: ${{ vars.ECR_REPO }}
+  ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+
+  NEW_RELIC_API_KEY: ${{ secrets.NEW_RELIC_API_KEY }}
 
 jobs:
   build:
@@ -43,11 +53,11 @@ jobs:
         run: yarn install
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.EKS_REGION }}    
+          aws-region: ${{ env.EKS_REGION }}
 
       - name: Build and Push main Groot container
         run: |
@@ -61,9 +71,9 @@ jobs:
         run: |
           ./scripts/container_reader_node/build_read_node_container.sh
           
-          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{env.ECR_REGISTRY}}
-          docker tag arch-production-node:latest ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:arch-production-node
-          docker push ${{env.ECR_REGISTRY}}/${{ env.ECR_REPO }}:arch-production-node
+          aws ecr get-login-password --region ${{ env.EKS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+          docker tag arch-production-node:latest ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:arch-production-node
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPO }}:arch-production-node
 
       - name: Install kubectl
         run: |
@@ -73,67 +83,33 @@ jobs:
 
       - name: Deploy to EKS (DemoApp)
         run: |
-          # Update kubeconfig
-          aws eks update-kubeconfig --name groot-demo-app --region ${{ env.EKS_REGION }}
-                    
-          # Create the groot namespace if it doesn't exist
-          kubectl create namespace groot --dry-run=client -o yaml | kubectl apply -f -
-          
-          # Create secrets
-          kubectl apply -f - <<EOF
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: aws-access-key-id
-            namespace: groot
-          type: Opaque
-          stringData:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          EOF
-      
-          kubectl apply -f - <<EOF
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: aws-secret-access-key
-            namespace: groot
-          type: Opaque
-          stringData:
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          EOF
+          ./scripts/k8s/eks/deploy_eks.sh configmap-demoapp.yaml
 
-          kubectl apply -f - <<EOF
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: alchemy-api-key
-            namespace: groot
-          type: Opaque
-          stringData:
-            ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
-          EOF
-          
-          # Deploy or update Kubernetes manifests
-          kubectl apply -f scripts/k8s/demoapp-configmap.yaml --namespace groot
-          kubectl apply -f scripts/k8s/deployment.yaml --namespace groot
-          kubectl apply -f scripts/k8s/service.yaml --namespace groot
-          kubectl apply -f scripts/k8s/cronjob.yaml --namespace groot
-                    
-          # Verify deployment
-          kubectl get pods --namespace groot
+      - name: Wait for DemoApp deployment to complete
+        run: |
+          kubectl rollout status deployment/groot-deployment -n groot
 
+      - name: Check container status (fail if Demo didn't deploy correctly)
+        run: |
+          ./scripts/k8s/eks/check_container_status.sh groot-container groot-deployment
+          ./scripts/k8s/eks/check_container_status.sh eth-node-1 groot-deployment
+          ./scripts/k8s/eks/check_container_status.sh eth-node-2 groot-deployment
+    
+      - name: Deploy to EKS (StableApp)
+        run: |
+          ./scripts/k8s/eks/deploy_eks.sh configmap-stableapp.yaml
+          
       - name: List all commit SHAs involved in the push
         id: format_commits
         shell: bash
         run: |
           ./devops/github_actions_templates/get_commit_shas.sh ${{ github.event.before }} ${{ github.event.after }} > commit_shas.txt
-          COMMIT_SHAS_JSON=$(cat commit_shas.txt)
-          echo "::set-output name=commit_shas::$COMMIT_SHAS_JSON"
+          echo "commit_shas=$(cat commit_shas.txt)" >> $GITHUB_ENV
 
       - name: Report DevOps Event
         run: |
           yarn add axios dotenv
-          node devops/metrics/src/cicd_script/report_devops_event.js ${{ github.repository }} deploy '{"commit_ids": ${{ steps.format_commits.outputs.commit_shas }} }'
+          node devops/metrics/src/cicd_script/report_devops_event.js ${{ github.repository }} deploy '{"commit_ids": ${{ env.commit_shas }} }'
 
       - name: Slack Notification
         if: always()

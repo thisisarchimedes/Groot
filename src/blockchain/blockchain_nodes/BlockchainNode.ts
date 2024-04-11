@@ -1,5 +1,9 @@
 import {ethers, Contract} from 'ethers';
-import {Logger} from '../../service/logger/Logger';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {injectable} from 'inversify';
+import {BlockchainNodeProxyInfo} from './BlockchainNodeProxyInfo';
+import {IBlockchainNode} from './interfaces/IBlockchainNode';
+
 
 export class BlockchainNodeError extends Error {
   constructor(message: string) {
@@ -11,15 +15,20 @@ export class BlockchainNodeError extends Error {
   }
 }
 
-export abstract class BlockchainNode {
+@injectable()
+export abstract class BlockchainNode implements IBlockchainNode {
   protected provider!: ethers.Provider;
-  protected readonly logger: Logger;
+  protected readonly logger: ILogger;
   protected isNodeHealthy: boolean = true;
   protected nodeName: string = '';
 
-  constructor(logger: Logger, nodeName: string) {
+  constructor(logger: ILogger, nodeName: string) {
     this.logger = logger;
     this.nodeName = nodeName;
+  }
+
+  public getProvider(): ethers.Provider {
+    return this.provider;
   }
 
   public async getBlockNumber(): Promise<number> {
@@ -107,21 +116,6 @@ export abstract class BlockchainNode {
     return new Promise((resolve) => {
       setTimeout(resolve, duration);
     });
-  }
-}
-
-export class BlockchainNodeProxyInfo {
-  private constructor(
-    public readonly isProxy: boolean,
-    public readonly implementationAddress: string,
-  ) { }
-
-  static notProxy(): BlockchainNodeProxyInfo {
-    return new BlockchainNodeProxyInfo(false, '');
-  }
-
-  static proxy(implementationAddress: string): BlockchainNodeProxyInfo {
-    return new BlockchainNodeProxyInfo(true, implementationAddress);
   }
 }
 

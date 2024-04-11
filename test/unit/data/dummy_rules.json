@@ -1,20 +1,30 @@
 [
     {
         "ruleType": "dummy",
-        "label": "dummy1",
-        "params": {
-            "message": "I AM GROOT 1",
-            "NumberOfDummyTxs": 2,
-            "evalSuccess": true
+        "label":"Dummy rule",
+        "params":{
+           "urgencyLevel":"LOW",
+            "executor":"LEVERAGE",
+            "ttlSeconds":300,
+            "NumberOfDummyTxs":1
         }
     },
-    {
-        "ruleType": "dummy",
-        "label": "dummy2",
-        "params": {
-            "message": "I AM GROOT 2",
-            "NumberOfDummyTxs": 1,
-            "evalSuccess": true
+        {
+        "ruleType": "uniswapPSPRebalance",
+        "label":"PSP uniswap rebalance pool",
+        "params":{
+            "urgencyLevel":"LOW",
+            "executor":"LEVERAGE",
+            "ttlSeconds":300
+        }
+    },
+      {
+        "ruleType": "expirePosition",
+        "label":"Positions expirator rule",
+        "params":{
+            "urgencyLevel":"LOW",
+            "executor":"LEVERAGE",
+            "ttlSeconds":300
         }
     }
 ]

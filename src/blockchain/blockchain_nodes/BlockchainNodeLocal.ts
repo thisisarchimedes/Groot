@@ -1,13 +1,21 @@
 import axios from 'axios';
-import {JsonRpcProvider} from 'ethers';
-import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
-import {Logger} from '../../service/logger/Logger';
+import {injectable, inject} from 'inversify';
 
-export class BlockchainNodeLocal extends BlockchainNode {
+import {JsonRpcProvider, ethers} from 'ethers';
+import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
+import {IBlockchainNodeLocal} from './interfaces/IBlockchainNodeLocal';
+import {ILogger} from '../../service/logger/interfaces/ILogger';
+
+@injectable()
+export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNodeLocal {
   private readonly localRpcUrl: string;
 
-  constructor(logger: Logger, localRpcUrl: string, nodeName: string) {
-    super(logger, nodeName);
+  constructor(
+    @inject('ILoggerAll') _logger: ILogger,
+    @inject('MainLocalNodeURI') localRpcUrl: string,
+    @inject('AlchemyNodeLabel') nodeName: string,
+  ) {
+    super(_logger, nodeName);
     this.localRpcUrl = localRpcUrl;
     this.logger.debug(`Initializing ${this.nodeName} with local RPC URL: ${localRpcUrl}`);
     this.provider = new JsonRpcProvider(localRpcUrl);
@@ -16,6 +24,10 @@ export class BlockchainNodeLocal extends BlockchainNode {
   public async startNode(): Promise<void> {
     this.logger.debug(`Starting local node...${this.localRpcUrl}`);
     await this.waitForNodeToBeReady();
+  }
+
+  public getProvider(): ethers.Provider {
+    return this.provider;
   }
 
   public async stopNode(): Promise<void> {
@@ -32,6 +44,7 @@ export class BlockchainNodeLocal extends BlockchainNode {
 
   public async resetNode(externalProviderRpcUrl: string): Promise<void> {
     try {
+      this.logger.debug(`Resetting node to external RPC URL: ${externalProviderRpcUrl}`);
       const responseData = await this.performResetRpcCall(externalProviderRpcUrl);
       this.handleResetResponse(responseData);
     } catch (error) {

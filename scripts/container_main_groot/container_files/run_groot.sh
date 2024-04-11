@@ -1,3 +1,3 @@
 #!/bin/bash
 
-yarn tsx src/main.ts
+yarn tsx src/EntryK8s.ts

@@ -11,6 +11,10 @@
     "@types/pg": "^8.11.2",
     "@typescript-eslint/eslint-plugin": "^7.1.0",
     "@typescript-eslint/parser": "^7.1.0",
+    "@uniswap/router-sdk": "^1.7.1",
+    "@uniswap/sdk-core": "^4.0.10",
+    "@uniswap/smart-order-router": "^3.20.0",
+    "@uniswap/v3-sdk": "^3.10.0",
     "chai": "^5.1.0",
     "eslint": "^8.57.0",
     "eslint-config-google": "^0.14.0",
@@ -34,9 +38,9 @@
   "dependencies": {
     "@aws-sdk/client-appconfig": "^3.525.0",
     "@aws-sdk/client-cloudwatch": "^3.529.1",
-    "@dotenvx/dotenvx": "^0.24.0",
     "@types/chai-as-promised": "^7.1.8",
     "@uniswap/v3-core": "^1.0.1",
+    "@dotenvx/dotenvx": "^0.29.1",
     "@ethersproject/abstract-provider": "^5.7.0",
     "aws-sdk": "^2.1571.0",
     "awssdk": "^1.0.1",
@@ -44,9 +48,12 @@
     "dockerode": "^4.0.2",
     "dotenv": "^16.4.5",
     "ethers": "^6.11.1",
+    "inversify": "^6.0.2",
     "kubectl": "^0.0.0",
     "nyc": "^15.1.0",
     "pg": "^8.11.3",
+    "reflect-metadata": "^0.2.1",
+    "stacktrace-parser": "^0.1.10",
     "tsx": "^4.7.1"
   }
 }
