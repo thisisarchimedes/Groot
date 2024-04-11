@@ -11,7 +11,7 @@ import { AppConfigInterceptor } from './interceptors/AppConfigInterceptor';
 import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
 import { EthNodeInterceptor } from './interceptors/EthNodeInterceptor';
 import { Container } from 'inversify';
-import { InversifyConfig } from '../../src/inversify.config';
+import { InversifyConfig } from '../../src/inversify.config.tmp';
 import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 import DBService from '../../src/service/db/dbService';
 

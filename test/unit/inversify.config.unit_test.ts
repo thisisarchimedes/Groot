@@ -17,9 +17,9 @@ import { TxQueueAdapter } from './adapters/TxQueueAdapter';
 import { IBlockchainNodeHealthMonitor } from '../../src/service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
 import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 import { RuleEngine } from '../../src/rule_engine/RuleEngine';
-import { IRuleEngine } from '../../src/rule_engine/interfaces/IRuleEngine';
+import { RuleEngine } from '../../src/rule_engine/interfaces/RuleEngine';
 import { FactoryRule } from '../../src/rule_engine/FactoryRule';
-import { IFactoryRule } from '../../src/rule_engine/interfaces/IFactoryRule';
+import { FactoryRule } from '../../src/rule_engine/interfaces/FactoryRule';
 import { Rule } from '../../src/rule_engine/rule/Rule';
 import { TypeRule } from '../../src/rule_engine/TypesRule';
 import { RuleDummy } from '../../src/rule_engine/rule/RuleDummy';
@@ -61,9 +61,9 @@ export const createTestContainer = (): Container => {
     container.bind<TxQueueAdapter>(TxQueueAdapter).toSelf().inSingletonScope();
 
 
-    container.bind<IFactoryRule>(TYPES.IFactoryRule).to(FactoryRule).inSingletonScope();
+    container.bind<FactoryRule>(TYPES.FactoryRule).to(FactoryRule).inSingletonScope();
 
-    container.bind<IRuleEngine>(TYPES.IRuleEngine).to(RuleEngine).inSingletonScope();
+    container.bind<RuleEngine>(TYPES.RuleEngine).to(RuleEngine).inSingletonScope();
 
     container.bind<AbiFetcherAdapter>(AbiFetcherAdapter).toSelf().inSingletonScope();
     container.bind<IAbiRepo>(TYPES.IAbiRepo).to(AbiRepoAdapter).inRequestScope();

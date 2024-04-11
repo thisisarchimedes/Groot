@@ -1,5 +1,3 @@
-import {injectable} from 'inversify';
-
 import {
   CloudWatchClient,
   PutMetricDataCommand,
@@ -13,7 +11,7 @@ import {IHostNameProvider} from '../IHostNameProvider';
 import {ISignalAWS} from './interfaces/ISignalAWS';
 import {ConfigService} from '../../config/ConfigService';
 
-@injectable()
+
 export abstract class SignalAWS implements ISignalAWS {
   protected readonly cloudWatchClient: CloudWatchClient;
   protected readonly logger: ILogger;

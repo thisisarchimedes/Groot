@@ -7,7 +7,7 @@ import { Container } from 'inversify';
 import { TYPES } from '../../src/inversify.types';
 import { IBlockchainNodeLocal } from '../../src/blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import { BlockchainNodeProxyInfo } from '../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
-import { InversifyConfig } from '../../src/inversify.config';
+import { InversifyConfig } from '../../src/inversify.config.tmp';
 import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
 import DBService from '../../src/service/db/dbService';
 

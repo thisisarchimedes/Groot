@@ -5,11 +5,13 @@ import * as dotenv from 'dotenv';
 import {GrootParams} from './GrootParams';
 import {IGroot} from './interfaces/IGroot';
 import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
-import {InversifyConfig} from './inversify.config';
+import {InversifyConfig} from './inversify.config.tmp';
 import {Container} from 'inversify';
 import {TYPES} from './inversify.types';
 import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
 import DBService from './service/db/dbService';
+import { LoggerAll } from './service/logger/LoggerAll';
+import { Groot } from './Groot';
 
 dotenv.config();
 
@@ -22,11 +24,17 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
   const configServiceAWS = new ConfigServiceAWS(grootParams.environment, grootParams.region);
   await configServiceAWS.refreshConfig();
 
-  const dbService = new DBService(configServiceAWS);
+  const logger = new LoggerAll(configServiceAWS);
+
+  const dbService = new DBService(logger, configServiceAWS);
   await dbService.connect();
 
-  const inversifyConfig = new InversifyConfig(configServiceAWS, dbService);
-  container = inversifyConfig.getContainer();
+  const groot = new Groot(
+    configServiceAWS,
+    logger,
+    
+    dbService);
+
   const groot = container.get<IGroot>(TYPES.Groot);
 
   process.on('unhandledRejection', (reason, promise) => {

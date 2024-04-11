@@ -1,12 +1,13 @@
-import {injectable, inject} from 'inversify';
+
 
 import {ILogger} from '../logger/interfaces/ILogger';
 import {ISignalCriticalFailure} from './signal/interfaces/ISignalCriticalFailure';
 import {ISignalHeartbeat} from './signal/interfaces/ISignalHeartbeat';
 import {IHealthMonitor} from './signal/interfaces/IHealthMonitor';
 import {IBlockchainNodeHealthMonitor} from './interfaces/BlockchainNodeHealthMonitor';
+import {BlockchainNodeHealthMonitor} from './BlockchainNodeHealthMonitor';
 
-@injectable()
+
 export class HealthMonitor implements IHealthMonitor {
   private cycleStartTimestamp!: Date;
 
@@ -16,12 +17,13 @@ export class HealthMonitor implements IHealthMonitor {
   private readonly signalCriticalFailure: ISignalCriticalFailure;
 
   constructor(
-    @inject('ILoggerAll') _logger: ILogger,
-    @inject('IBlockchainNodeHealthMonitor') blockchainHealthMonitor: IBlockchainNodeHealthMonitor,
+      _logger: ILogger,
+      _blockchainHealthMonitor: BlockchainNodeHealthMonitor,
     @inject('ISignalHeartbeat') signalHeartbeat: ISignalHeartbeat,
-    @inject('ISignalCriticalFailure') signalCriticalFailure: ISignalCriticalFailure) {
+    @inject('ISignalCriticalFailure') signalCriticalFailure: ISignalCriticalFailure,
+  ) {
     this.logger = _logger;
-    this.blockchainHealthMonitor = blockchainHealthMonitor;
+    this.blockchainHealthMonitor = _blockchainHealthMonitor;
     this.signalHeartbeat = signalHeartbeat;
     this.signalCriticalFailure = signalCriticalFailure;
   }

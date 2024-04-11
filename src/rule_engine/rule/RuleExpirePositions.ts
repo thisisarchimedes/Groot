@@ -11,7 +11,6 @@ import {ConfigService} from '../../service/config/ConfigService';
 import PostgreDataSource from '../tool/data_source/PostgreDataSource';
 
 
-@injectable()
 export class RuleExpirePositions extends Rule {
   private leverageDataSource: PostgreDataSource;
   private configService: ConfigService;
@@ -23,11 +22,11 @@ export class RuleExpirePositions extends Rule {
   // private positionLedger: PositionLedger;
 
   constructor(
-    @inject('ILoggerAll') logger: ILogger,
+      logger: ILogger,
     @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
     @inject('IAbiRepo') abiRepo: IAbiRepo,
     @inject('LeverageDataSource') leverageDataSource: PostgreDataSource,
-    @inject('ConfigServiceAWS') configService: ConfigService,
+      configService: ConfigService,
   ) {
     super(logger, blockchainReader, abiRepo);
     this.leverageDataSource = leverageDataSource;

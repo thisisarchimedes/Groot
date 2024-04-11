@@ -9,7 +9,7 @@ import { TYPES } from '../../src/inversify.types';
 import { Container } from 'inversify';
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { createTestContainer } from './inversify.config.unit_test';
-import { IFactoryRule } from '../../src/rule_engine/interfaces/IFactoryRule';
+import { FactoryRule } from '../../src/rule_engine/interfaces/FactoryRule';
 import { RuleParamsUniswapPSPRebalance } from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
 
 dotenv.config();
@@ -32,7 +32,7 @@ describe('Rule Factory Testings: Uniswap', function () {
   });
 
   it('should create Uniswap PSP rebalance Rule object from a rule config', function () {
-    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
+    const ruleFactory = container.get<FactoryRule>(TYPES.FactoryRule);
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.UniswapPSPRebalance,
       label: 'Uniswap PSP rebalance - test',
@@ -52,7 +52,7 @@ describe('Rule Factory Testings: Uniswap', function () {
   });
 
   it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', async function () {
-    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
+    const ruleFactory = container.get<FactoryRule>(TYPES.FactoryRule);
     const uniswapRule: RuleJSONConfigItem = {
       ruleType: TypeRule.UniswapPSPRebalance,
       label: 'Uniswap PSP rebalance - test',

@@ -1,50 +1,78 @@
 import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
-import {injectable, inject, Container} from 'inversify';
-
-import {IBlockchainNodeLocal} from './blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
-import {IRuleEngine} from './rule_engine/interfaces/IRuleEngine';
+import {RuleEngine} from './rule_engine/interfaces/RuleEngine';
 import {IGroot} from './interfaces/IGroot';
-import {IHealthMonitor} from './service/health_monitor/signal/interfaces/IHealthMonitor';
 import {ILogger} from './service/logger/interfaces/ILogger';
 import {ITransactionQueuer} from './tx_queue/interfaces/ITransactionQueuer';
-import {TYPES} from './inversify.types';
-import DBService from './service/db/dbService';
 import {ConfigService} from './service/config/ConfigService';
+import {BlockchainNodeLocal} from './blockchain/blockchain_nodes/BlockchainNodeLocal';
+import {HealthMonitor} from './service/health_monitor/HealthMonitor';
+import {BlockchainNodeHealthMonitor} from './service/health_monitor/BlockchainNodeHealthMonitor';
+import {SignalAWSHeartbeat} from './service/health_monitor/signal/SignalAWSHeartbeat';
+import {SignalAWSCriticalFailure} from './service/health_monitor/signal/SignalAWSCriticalFailure';
+import {HostNameProvider} from './service/health_monitor/HostNameProvider';
 
 dotenv.config();
 
-@injectable()
 export class Groot implements IGroot {
-  public readonly logger: ILogger;
-  private readonly configService: ConfigService;
-  private readonly mainNode: IBlockchainNodeLocal;
-  private readonly altNode: IBlockchainNodeLocal;
-  private readonly healthMonitor: IHealthMonitor;
-  private ruleEngine!: IRuleEngine;
+  public logger: ILogger;
+  private configService: ConfigService;
+  private mainNode: BlockchainNodeLocal;
+  private altNode: BlockchainNodeLocal;
+  private signalHeartbeat: SignalAWSHeartbeat;
+  private hostnameProvider: HostNameProvider;
+  private signalCriticalFailure: SignalAWSCriticalFailure;
+  private blockchainNodeHealthMonitor: BlockchainNodeHealthMonitor;
+  private healthMonitor: HealthMonitor;
+  private ruleEngine!: RuleEngine;
   private transactionsQueuer: ITransactionQueuer;
-  private container: Container;
 
   constructor(
-    @inject('ConfigServiceAWS') _configService: ConfigService,
-    @inject('ILoggerAll') _logger: ILogger,
-    @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
-    @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal,
-    @inject('IHealthMonitor') _healthMonitor: IHealthMonitor,
-    @inject('IRuleEngine') _ruleEngine: IRuleEngine,
-    @inject('ITransactionQueuer') _transactionsQueuer: ITransactionQueuer,
-    @inject(Container) container: Container,
-
+      _configService: ConfigService,
+      _logger: ILogger,
+      _ruleEngine: RuleEngine,
+      _transactionsQueuer: ITransactionQueuer,
   ) {
+    const namespace = 'Groot';
     this.logger = _logger;
     this.configService = _configService;
-    this.mainNode = _mainLocalNode;
-    this.altNode = _altLocalNode;
-    this.healthMonitor = _healthMonitor;
+    this.mainNode = new BlockchainNodeLocal(
+        _logger,
+        `http://localhost:${process.env.MAIN_LOCAL_NODE_PORT || 8545}`,
+        'AlchemyNodeLabel',
+    );
+    this.altNode = new BlockchainNodeLocal(
+        _logger,
+        `http://localhost:${process.env.ALT_LOCAL_NODE_PORT || 18545}`,
+        'InfuraNodeLabel',
+    );
+    this.blockchainNodeHealthMonitor = new BlockchainNodeHealthMonitor(
+        _logger,
+        this.mainNode,
+        this.altNode,
+    );
+    this.hostnameProvider = new HostNameProvider(_logger);
+    this.signalCriticalFailure = new SignalAWSCriticalFailure(
+        _configService,
+        _logger,
+        this.hostnameProvider,
+        namespace,
+    );
+    this.signalHeartbeat = new SignalAWSHeartbeat(
+        _configService,
+        _logger,
+        this.hostnameProvider,
+        namespace,
+    );
+    this.healthMonitor = new HealthMonitor(
+        _logger,
+        this.blockchainNodeHealthMonitor,
+        this.signalHeartbeat,
+        this.signalCriticalFailure,
+    );
     this.ruleEngine = _ruleEngine;
     this.transactionsQueuer = _transactionsQueuer;
-    this.container = container;
   }
 
   public async initalizeGroot() {
@@ -57,13 +85,8 @@ export class Groot implements IGroot {
     this.logger.warn('Shutting down Groot...');
 
     await this.shutdownReadOnlyLocalNodes();
-    await this.shutdownDBClients();
 
     this.logger.warn('Groot shutdown successfully.');
-  }
-
-  public async shutdownDBClients() {
-    await this.container.get<DBService>(TYPES.DBService).end();
   }
 
   private async shutdownReadOnlyLocalNodes() {

@@ -1,9 +1,6 @@
-import {inject, injectable} from 'inversify';
 import {Rule, RuleParams} from './Rule';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
 import {RawTransactionData} from '../../blockchain/OutboundTransaction';
+import {RuleConstractorInput} from '../TypesRule';
 
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
@@ -16,14 +13,10 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
 /* eslint-enable max-len */
 
 
-@injectable()
 export class RuleUniswapPSPRebalance extends Rule {
   // private uniswapStrategy: ToolStrategyUniswap;
-  constructor(
-    @inject('ILoggerAll') logger: ILogger,
-    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
-    @inject('IAbiRepo') abiRepo: IAbiRepo) {
-    super(logger, blockchainReader, abiRepo);
+  constructor(input: RuleConstractorInput) {
+    super(input.logger, input.blockchainReader, input.abiRepo);
   }
   public async evaluate(): Promise<void> {
     const blockNumber = await this.blockchainReader.getBlockNumber();

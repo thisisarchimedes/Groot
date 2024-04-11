@@ -3,7 +3,6 @@ import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {Executor, UrgencyLevel} from '../TypesRule';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
-import {injectable} from 'inversify';
 
 export interface RuleParams {
   urgencyLevel: UrgencyLevel;
@@ -20,7 +19,7 @@ export interface RuleConstructorInput {
 
 }
 
-@injectable()
+
 export abstract class Rule {
   protected readonly logger: ILogger;
   protected readonly blockchainReader: IBlockchainReader;

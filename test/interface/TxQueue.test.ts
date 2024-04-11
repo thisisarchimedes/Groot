@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { TYPES } from '../../src/inversify.types';
 import { ITxQueue } from '../../src/tx_queue/interfaces/ITxQueue';
 import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
-import { InversifyConfig } from '../../src/inversify.config';
+import { InversifyConfig } from '../../src/inversify.config.tmp';
 import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
 import { Executor, UrgencyLevel } from '../../src/rule_engine/TypesRule';
 import DBService from '../../src/service/db/dbService';

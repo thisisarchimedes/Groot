@@ -1,17 +1,15 @@
 import {Client, ClientConfig} from 'pg';
-import {inject, injectable} from 'inversify';
-import {TYPES} from '../../inversify.types';
 import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 import {ILogger} from '../logger/interfaces/ILogger';
 
-@injectable()
+
 export default class DBService {
   private transactionsClient:LoggedClient;
   private leverageClient:LoggedClient;
 
   constructor(
-    @inject('ILoggerAll') private logger: ILogger,
-    @inject(TYPES.ConfigServiceAWS) configService: ConfigServiceAWS,
+     private logger: ILogger,
+     configService: ConfigServiceAWS,
   ) {
     this.transactionsClient = new LoggedClient({
       connectionString: configService.getTransactionsDBURL(),

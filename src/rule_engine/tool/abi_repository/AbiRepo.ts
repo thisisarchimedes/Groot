@@ -1,13 +1,12 @@
 import 'reflect-metadata';
 
-import {injectable, inject} from 'inversify';
 
 import {IBlockchainReader} from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiFetcher} from './interfaces/IAbiFetcher';
 import {IAbiStorage} from './interfaces/IAbiStorage';
 import {IAbiRepo} from './interfaces/IAbiRepo';
 
-@injectable()
+
 export class AbiRepo implements IAbiRepo {
   private readonly blockchainReader: IBlockchainReader;
   private readonly abiStorage: IAbiStorage;

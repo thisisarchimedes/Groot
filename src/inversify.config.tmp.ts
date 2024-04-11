@@ -22,9 +22,9 @@ import {AbiStorageDynamoDB} from './rule_engine/tool/abi_repository/AbiStorageDy
 import {IAbiFetcher} from './rule_engine/tool/abi_repository/interfaces/IAbiFetcher';
 import {AbiFetcherEtherscan} from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 import {AbiRepo} from './rule_engine/tool/abi_repository/AbiRepo';
-import {IFactoryRule} from './rule_engine/interfaces/IFactoryRule';
+import {FactoryRule} from './rule_engine/interfaces/FactoryRule';
 import {FactoryRule} from './rule_engine/FactoryRule';
-import {IRuleEngine} from './rule_engine/interfaces/IRuleEngine';
+import {RuleEngine} from './rule_engine/interfaces/RuleEngine';
 import {RuleEngine} from './rule_engine/RuleEngine';
 import {IGroot} from './interfaces/IGroot';
 import {IBlockchainNodeHealthMonitor} from './service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
@@ -48,7 +48,7 @@ import DBService from './service/db/dbService';
 import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
 import {ConfigService} from './service/config/ConfigService';
 
-export class InversifyConfig {
+export class InversifyConfig123 {
   private container: Container;
 
   constructor(configServiceAWS: ConfigServiceAWS, dbService: DBService) {
@@ -141,9 +141,9 @@ export class InversifyConfig {
   }
 
   private bindRuleEngine() {
-    this.container.bind<IFactoryRule>(TYPES.IFactoryRule).to(FactoryRule).inTransientScope();
+    this.container.bind<FactoryRule>(TYPES.FactoryRule).to(FactoryRule).inTransientScope();
 
-    this.container.bind<IRuleEngine>(TYPES.IRuleEngine).to(RuleEngine).inTransientScope();
+    this.container.bind<RuleEngine>(TYPES.RuleEngine).to(RuleEngine).inTransientScope();
   }
 
   private bindTransactionQueue() {

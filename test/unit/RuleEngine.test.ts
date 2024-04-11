@@ -9,7 +9,7 @@ import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import { TYPES } from '../../src/inversify.types';
 import { createTestContainer } from './inversify.config.unit_test';
-import { IRuleEngine } from '../../src/rule_engine/interfaces/IRuleEngine';
+import { RuleEngine } from '../../src/rule_engine/interfaces/RuleEngine';
 import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
 import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
@@ -70,14 +70,14 @@ describe('Rule Engine Testings', function () {
     assertTransactionsValid(transactions, 3);
   });
 
-  async function createRuleEngineWithConfiguredRules(rulesFilePath: string): Promise<IRuleEngine> {
+  async function createRuleEngineWithConfiguredRules(rulesFilePath: string): Promise<RuleEngine> {
     configService.setRulesFromFile(rulesFilePath);
     await configService.refreshConfig();
     return await createRuleEngine(configService.getRules());
   }
 
-  async function createRuleEngine(rules: RuleJSONConfigItem[]): Promise<IRuleEngine> {
-    const ruleEngine: IRuleEngine = container.get<IRuleEngine>(TYPES.IRuleEngine);
+  async function createRuleEngine(rules: RuleJSONConfigItem[]): Promise<RuleEngine> {
+    const ruleEngine: RuleEngine = container.get<RuleEngine>(TYPES.RuleEngine);
     await ruleEngine.loadRulesFromJSONConfig(rules);
     return ruleEngine;
   }

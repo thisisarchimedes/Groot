@@ -9,13 +9,13 @@ import {Executor, UrgencyLevel} from '../rule_engine/TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import DBService from '../service/db/dbService';
 
-@injectable()
+
 class PostgreTxQueue implements ITxQueue {
   private dbService: DBService;
   private logger: ILogger;
 
   constructor(
-    @inject('ILoggerAll') logger: ILogger,
+      logger: ILogger,
     @inject(TYPES.DBService) dbService: DBService,
   ) {
     this.dbService = dbService;

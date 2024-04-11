@@ -1,4 +1,4 @@
-import {injectable, inject} from 'inversify';
+
 import {Logger} from './Logger';
 import {LoggerNewRelic} from './LoggerNewRelic';
 import {ILoggerAll} from './interfaces/ILoggerAll';
@@ -6,20 +6,20 @@ import {TYPES} from '../../inversify.types';
 import {ILoggerConsole} from './interfaces/ILoggerConsole';
 import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
 import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
+import {LoggerConsole} from './LoggerConsole';
 
-@injectable()
+
 export class LoggerAll extends Logger implements ILoggerAll {
+  private serviceName = 'Groot';
   private loggerConsole: ILoggerConsole;
   private loggerNewRelic: ILoggerNewRelic;
 
   constructor(
     @inject(TYPES.ConfigServiceAWS) configService: ConfigServiceAWS,
-    @inject(TYPES.ILoggerConsole) loggerConsole: ILoggerConsole,
-    @inject(TYPES.ServiceName) serviceName: string,
   ) {
     super();
-    this.loggerConsole = loggerConsole;
-    this.loggerNewRelic = new LoggerNewRelic(configService, serviceName);
+    this.loggerConsole = new LoggerConsole();
+    this.loggerNewRelic = new LoggerNewRelic(configService, this.serviceName);
   }
 
   public async flush(): Promise<void> {

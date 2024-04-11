@@ -9,7 +9,7 @@ import { Container } from 'inversify';
 import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 import { createTestContainer } from './inversify.config.unit_test';
-import { IFactoryRule } from '../../src/rule_engine/interfaces/IFactoryRule';
+import { FactoryRule } from '../../src/rule_engine/interfaces/FactoryRule';
 import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 
 describe('Rule Factory Testings', function () {
@@ -30,7 +30,7 @@ describe('Rule Factory Testings', function () {
   });
 
   it('should create Rule object from a dummy rule config', async function () {
-    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
+    const ruleFactory = container.get<FactoryRule>(TYPES.FactoryRule);
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
@@ -50,7 +50,7 @@ describe('Rule Factory Testings', function () {
       label: 'dummyRule',
       params: { message: 'I AM GROOT', NumberOfDummyTxs: 3, evalSuccess: true } as RuleParamsDummy,
     };
-    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
+    const ruleFactory = container.get<FactoryRule>(TYPES.FactoryRule);
     const rule = await ruleFactory.createRule(dummyRule);
     if (rule) {
       await rule.evaluate();
@@ -68,7 +68,7 @@ describe('Rule Factory Testings', function () {
   });
 
   it('should create identifier when the Rule evaluates itself', async function () {
-    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
+    const ruleFactory = container.get<FactoryRule>(TYPES.FactoryRule);
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',

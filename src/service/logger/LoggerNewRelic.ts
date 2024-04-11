@@ -37,7 +37,7 @@ interface NewRelicConfig {
   backoffFactor: number;
 }
 
-@injectable()
+
 export class LoggerNewRelic extends Logger implements ILoggerNewRelic {
   private readonly config: NewRelicConfig;
   private readonly formatter: LogFormatter;
