@@ -1,26 +1,24 @@
 
 
 import {ILogger} from '../logger/interfaces/ILogger';
-import {ISignalCriticalFailure} from './signal/interfaces/ISignalCriticalFailure';
 import {ISignalHeartbeat} from './signal/interfaces/ISignalHeartbeat';
-import {IHealthMonitor} from './signal/interfaces/IHealthMonitor';
-import {IBlockchainNodeHealthMonitor} from './interfaces/BlockchainNodeHealthMonitor';
 import {BlockchainNodeHealthMonitor} from './BlockchainNodeHealthMonitor';
+import {SignalAWSCriticalFailure} from './signal/SignalAWSCriticalFailure';
 
 
-export class HealthMonitor implements IHealthMonitor {
+export class HealthMonitor {
   private cycleStartTimestamp!: Date;
 
   private readonly logger: ILogger;
-  private readonly blockchainHealthMonitor: IBlockchainNodeHealthMonitor;
+  private readonly blockchainHealthMonitor: BlockchainNodeHealthMonitor;
   private readonly signalHeartbeat: ISignalHeartbeat;
-  private readonly signalCriticalFailure: ISignalCriticalFailure;
+  private readonly signalCriticalFailure: SignalAWSCriticalFailure;
 
   constructor(
       _logger: ILogger,
       _blockchainHealthMonitor: BlockchainNodeHealthMonitor,
       signalHeartbeat: ISignalHeartbeat,
-      signalCriticalFailure: ISignalCriticalFailure,
+      signalCriticalFailure: SignalAWSCriticalFailure,
   ) {
     this.logger = _logger;
     this.blockchainHealthMonitor = _blockchainHealthMonitor;

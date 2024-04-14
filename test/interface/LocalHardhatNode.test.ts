@@ -3,7 +3,6 @@ import * as chai from 'chai';
 import * as dotenv from 'dotenv';
 import {spawn} from 'child_process';
 import {ethers} from 'ethers';
-import {IBlockchainNodeLocal} from '../../src/blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import {BlockchainNodeProxyInfo} from '../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {BlockchainNodeLocal} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
@@ -16,7 +15,7 @@ describe('Check that we work with local Hardhat node correctly', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
-  let localNode: IBlockchainNodeLocal;
+  let localNode: BlockchainNodeLocal;
 
   before(function() {
     spawn('./scripts/container_reader_node/run_nodes_containers_locally.sh', [], {

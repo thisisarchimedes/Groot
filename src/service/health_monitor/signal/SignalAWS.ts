@@ -7,22 +7,21 @@ import {
 } from '@aws-sdk/client-cloudwatch';
 
 import {ILogger} from '../../logger/interfaces/ILogger';
-import {IHostNameProvider} from '../IHostNameProvider';
-import {ISignalAWS} from './interfaces/ISignalAWS';
+import {HostNameProvider} from '../HostNameProvider';
 import {ConfigService} from '../../config/ConfigService';
 
 
-export abstract class SignalAWS implements ISignalAWS {
+export abstract class SignalAWS {
   protected readonly cloudWatchClient: CloudWatchClient;
   protected readonly logger: ILogger;
   protected readonly configService: ConfigService;
-  protected readonly hostNameProvider: IHostNameProvider;
+  protected readonly hostNameProvider: HostNameProvider;
   protected readonly metricNamespace: string;
 
   constructor(
       logger: ILogger,
       configService: ConfigService,
-      hostNameProvider: IHostNameProvider,
+      hostNameProvider: HostNameProvider,
       metricNamespace: string,
   ) {
     this.cloudWatchClient = new CloudWatchClient({});

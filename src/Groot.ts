@@ -1,9 +1,7 @@
 import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
-import {IGroot} from './interfaces/IGroot';
 import {ILogger} from './service/logger/interfaces/ILogger';
-import {ITransactionQueuer} from './tx_queue/interfaces/ITransactionQueuer';
 import {BlockchainNodeLocal} from './blockchain/blockchain_nodes/BlockchainNodeLocal';
 import {HealthMonitor} from './service/health_monitor/HealthMonitor';
 import {BlockchainNodeHealthMonitor} from './service/health_monitor/BlockchainNodeHealthMonitor';
@@ -19,7 +17,7 @@ import {namespace} from './constants/constants';
 
 dotenv.config();
 
-export class Groot implements IGroot {
+export class Groot {
   public logger: ILogger;
   private configService: ConfigServiceAWS;
   private mainNode: BlockchainNodeLocal;
@@ -30,7 +28,7 @@ export class Groot implements IGroot {
   private blockchainNodeHealthMonitor: BlockchainNodeHealthMonitor;
   private healthMonitor: HealthMonitor;
   private ruleEngine: RuleEngine;
-  private transactionsQueuer: ITransactionQueuer;
+  private transactionsQueuer: TransactionQueuer;
 
   constructor(
       _configService: ConfigServiceAWS,

@@ -15,17 +15,11 @@ export class BlockchainNodeAdapter extends BlockchainNode {
   private expectRecoverToSucceed: boolean = true;
   private proxyInfo!: BlockchainNodeProxyInfo;
 
-  public async startNode(): Promise<void> {
+  public async startNode(): Promise<void> {}
 
-  }
+  public async stopNode(): Promise<void> {}
 
-  public async stopNode(): Promise<void> {
-
-  }
-
-  public async resetNode(externalProviderRpcUrl: string): Promise<void> {
-
-  }
+  public async resetNode(externalProviderRpcUrl: string): Promise<void> {}
 
   // eslint-disable-next-line require-await
   public async recoverNode(): Promise<void> {

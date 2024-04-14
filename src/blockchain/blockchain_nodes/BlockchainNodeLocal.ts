@@ -2,11 +2,10 @@ import axios from 'axios';
 
 import {JsonRpcProvider, ethers} from 'ethers';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
-import {IBlockchainNodeLocal} from './interfaces/IBlockchainNodeLocal';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
 
 
-export class BlockchainNodeLocal extends BlockchainNode implements IBlockchainNodeLocal {
+export class BlockchainNodeLocal extends BlockchainNode {
   private readonly localRpcUrl: string;
 
   constructor(

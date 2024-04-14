@@ -1,10 +1,9 @@
 import 'reflect-metadata';
 
 import {AppConfig, GetConfigurationCommandOutput} from '@aws-sdk/client-appconfig';
-import {IAppConfigClient} from './interfaces/IAppConfigClient';
 import {namespace} from '../../constants/constants';
 
-export class AppConfigClient implements IAppConfigClient {
+export class AppConfigClient {
   private readonly DEFAULT_APPCONFIG_ENVIRONMENT = 'env';
 
   private readonly appConfigClient: AppConfig;

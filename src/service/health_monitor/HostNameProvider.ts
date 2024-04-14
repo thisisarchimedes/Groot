@@ -1,9 +1,8 @@
 import os from 'os';
-import {IHostNameProvider} from './IHostNameProvider';
 import {ILogger} from '../logger/interfaces/ILogger';
 
 
-export class HostNameProvider implements IHostNameProvider {
+export class HostNameProvider {
   private readonly logger: ILogger;
 
   constructor( _logger: ILogger) {

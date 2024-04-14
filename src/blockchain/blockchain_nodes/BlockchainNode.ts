@@ -1,7 +1,6 @@
 import {ethers, Contract} from 'ethers';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {BlockchainNodeProxyInfo} from './BlockchainNodeProxyInfo';
-import {IBlockchainNode} from './interfaces/IBlockchainNode';
 
 
 export class BlockchainNodeError extends Error {
@@ -14,7 +13,7 @@ export class BlockchainNodeError extends Error {
   }
 }
 
-export abstract class BlockchainNode implements IBlockchainNode {
+export abstract class BlockchainNode {
   protected provider!: ethers.Provider;
   protected readonly logger: ILogger;
   protected isNodeHealthy: boolean = true;

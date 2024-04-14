@@ -1,6 +1,6 @@
 
 
-import {IHostNameProvider} from '../IHostNameProvider';
+import {HostNameProvider} from '../HostNameProvider';
 import {ISignalHeartbeat} from './interfaces/ISignalHeartbeat';
 import {SignalAWS} from './SignalAWS';
 import {ILogger} from '../../logger/interfaces/ILogger';
@@ -13,7 +13,7 @@ export class SignalAWSHeartbeat extends SignalAWS implements ISignalHeartbeat {
   constructor(
       _configService: ConfigService,
       _logger: ILogger,
-      _hostNameProvider: IHostNameProvider,
+      _hostNameProvider: HostNameProvider,
       namespace: string,
   ) {
     super(_logger, _configService, _hostNameProvider, namespace);

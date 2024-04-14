@@ -9,7 +9,7 @@ import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader
 import {BlockchainNodeLocal} from '../blockchain/blockchain_nodes/BlockchainNodeLocal';
 import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
 
-export class RuleEngine implements RuleEngine {
+export class RuleEngine {
   private rules: Rule[] = [];
   private outboundTransactions: OutboundTransaction[] = [];
 
