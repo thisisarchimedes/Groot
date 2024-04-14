@@ -49,7 +49,7 @@ export default class DBService {
   }
 }
 
-class LoggedClient extends Client {
+export class LoggedClient extends Client {
   constructor(config: ClientConfig, private logger: ILogger) {
     super(config);
   }

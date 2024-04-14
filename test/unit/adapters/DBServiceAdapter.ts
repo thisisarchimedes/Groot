@@ -1,8 +1,18 @@
-import DBService from "../../../src/service/db/dbService";
-import { PGClientAdapter } from "./PGClientAdapter";
+import {ConfigServiceAWS} from '../../../src/service/config/ConfigServiceAWS';
+import DBService from '../../../src/service/db/dbService';
+import {LoggerAll} from '../../../src/service/logger/LoggerAll';
+import {PGClientAdapter} from './PGClientAdapter';
 
 export default class DBServiceAdapter extends DBService {
-  private pgClientAdapter: PGClientAdapter = new PGClientAdapter();
+  private pgClientAdapter: PGClientAdapter;
+
+  constructor(
+      logger: LoggerAll,
+      configService: ConfigServiceAWS,
+  ) {
+    super(logger, configService);
+    this.pgClientAdapter = new PGClientAdapter(logger);
+  }
 
   public getTransactionsClient() {
     return this.pgClientAdapter;
@@ -12,11 +22,11 @@ export default class DBServiceAdapter extends DBService {
     return this.pgClientAdapter;
   }
 
-  async connect() {
-    return;
+  connect() {
+    return Promise.resolve();
   }
 
-  async end() {
-    return;
+  end() {
+    return Promise.resolve();
   }
 }

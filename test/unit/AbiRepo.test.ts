@@ -1,42 +1,43 @@
-import { expect } from 'chai';
-import { AbiRepo } from '../../src/rule_engine/tool/abi_repository/AbiRepo';
-import { AbiStorageAdapter } from './adapters/AbiStorageAdapter';
-import { AbiFetcherAdapter } from './adapters/AbiFetcherAdapter';
-import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
-import { TYPES } from '../../src/inversify.types';
-import { IBlockchainReader } from '../../src/blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import { Container } from 'inversify';
-import { createTestContainer } from './inversify.config.unit_test';
+import {expect} from 'chai';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
+import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
+import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
+import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {LoggerAll} from '../../src/service/logger/LoggerAll';
+import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 
 
-describe('ABI Repo', function () {
-  let container: Container;
-
+describe('ABI Repo', function() {
   let abiStorage: AbiStorageAdapter;
   let abiFetcher: AbiFetcherAdapter;
   let abiRepo: AbiRepo;
+  let localNodeAlchemy: BlockchainNodeAdapter;
+  let localNodeInfura: BlockchainNodeAdapter;
 
-  beforeEach(async function () {
-    container = createTestContainer();
+  beforeEach(async function() {
+    const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
+    await configService.refreshConfig();
 
-    abiStorage = container.resolve(AbiStorageAdapter);
-    abiFetcher = container.resolve(AbiFetcherAdapter);
+    const logger = new LoggerAll(configService);
 
+    abiStorage = new AbiStorageAdapter();
+    abiFetcher = new AbiFetcherAdapter();
 
     // Starting nodes
-    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
-    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
 
     Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
 
-    localNodeInfura.setProxyInfoForAddressResponse({ isProxy: false, implementationAddress: '' });
+    localNodeInfura.setProxyInfoForAddressResponse({isProxy: false, implementationAddress: ''});
 
-    const blockchainReader = container.get<IBlockchainReader>(TYPES.IBlockchainReader);
+    const blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
 
-    abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+    abiRepo = new AbiRepo(configService, blockchainReader);
   });
 
-  it('should load ABI from AbiRepo if exists in DB', async function () {
+  it('should load ABI from AbiRepo if exists in DB', async function() {
     abiStorage.setReturnValue('mockAbi');
     abiFetcher.setReturnValue('INVALID');
     const abi = await abiRepo.getAbiByAddress('Exists');
@@ -44,7 +45,7 @@ describe('ABI Repo', function () {
     expect(abi === 'mockAbi').to.be.true;
   });
 
-  it('should fetch ABI from external service if not exists DB', async function () {
+  it('should fetch ABI from external service if not exists DB', async function() {
     abiStorage.setReturnValue(null);
     abiFetcher.setReturnValue('mockAbi');
     const abi = await abiRepo.getAbiByAddress('Exists');
@@ -53,13 +54,11 @@ describe('ABI Repo', function () {
     expect(await abiStorage.getAbiForAddress('Exists')).to.equal('mockAbi');
   });
 
-  it('should fetch ABI from external service and traverse proxy', async function () {
+  it('should fetch ABI from external service and traverse proxy', async function() {
     abiStorage.setReturnValue(null);
     abiFetcher.setReturnValue('mockAbiImplementation');
-    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
-    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
-    localNodeAlchemy.setProxyInfoForAddressResponse({ isProxy: true, implementationAddress: 'mockAbiImplementation' });
-    localNodeInfura.setProxyInfoForAddressResponse({ isProxy: true, implementationAddress: 'mockAbiImplementation' });
+    localNodeAlchemy.setProxyInfoForAddressResponse({isProxy: true, implementationAddress: 'mockAbiImplementation'});
+    localNodeInfura.setProxyInfoForAddressResponse({isProxy: true, implementationAddress: 'mockAbiImplementation'});
 
     const abi = await abiRepo.getAbiByAddress('Exists');
 

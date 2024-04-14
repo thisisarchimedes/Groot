@@ -1,7 +1,7 @@
 
 import fs from 'fs';
-import { ConfigService } from '../../../src/service/config/ConfigService';
-import { LeverageContractAddresses } from '../../../src/types/LeverageContractAddresses';
+import {ConfigService} from '../../../src/service/config/ConfigService';
+import {LeverageContractAddresses} from '../../../src/types/LeverageContractAddresses';
 
 export class ConfigServiceAdapter extends ConfigService {
   private ruleFilePath: string = '';

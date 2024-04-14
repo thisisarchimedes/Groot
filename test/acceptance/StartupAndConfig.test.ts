@@ -2,21 +2,19 @@ import 'reflect-metadata';
 
 
 import axios from 'axios';
-import { ethers } from 'ethers';
-import { expect } from 'chai';
-import { NewRelicInterceptor } from './interceptors/NewRelicInterceptor';
-import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
-import { startGroot } from '../../src/main';
-import { AppConfigInterceptor } from './interceptors/AppConfigInterceptor';
-import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
-import { EthNodeInterceptor } from './interceptors/EthNodeInterceptor';
-import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
-import DBService from '../../src/service/db/dbService';
-import { LoggerAll } from '../../src/service/logger/LoggerAll';
+import {ethers} from 'ethers';
+import {expect} from 'chai';
+import {NewRelicInterceptor} from './interceptors/NewRelicInterceptor';
+import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {startGroot} from '../../src/main';
+import {AppConfigInterceptor} from './interceptors/AppConfigInterceptor';
+import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
+import {EthNodeInterceptor} from './interceptors/EthNodeInterceptor';
+import {RuleParamsDummy} from '../../src/rule_engine/rule/RuleDummy';
 
 let timeoutId: NodeJS.Timeout | null = null;
 
-describe('Startup and Config', function () {
+describe('Startup and Config', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
@@ -25,14 +23,9 @@ describe('Startup and Config', function () {
   let ethNodeMainInterceptor: EthNodeInterceptor | undefined;
   let ethNodeAltInterceptor: EthNodeInterceptor | undefined;
 
-  beforeEach(async function () {
+  beforeEach(async function() {
     const configService = createConfigService();
     await initializeConfigService(configService);
-
-    const logger = new LoggerAll(configService);
-
-    const dbService = new DBService(logger, configService);
-    await configService.refreshConfig();
 
     newRelicInterceptor = createNewRelicMock(configService);
 
@@ -41,7 +34,7 @@ describe('Startup and Config', function () {
     ethNodeAltInterceptor = undefined;
   });
 
-  afterEach(function () {
+  afterEach(function() {
     cleanupTestDoubles();
     clearMessageProcessingTimeout();
   });
@@ -53,7 +46,7 @@ describe('Startup and Config', function () {
     }
   }
 
-  it('Should return block number from mock node', async function () {
+  it('Should return block number from mock node', async function() {
     const expectedBlockNumber = 10001;
     ethNodeMainInterceptor = new EthNodeInterceptor('http://localhost:8545');
     ethNodeMainInterceptor.setMockBlockNumber(expectedBlockNumber);
@@ -63,7 +56,7 @@ describe('Startup and Config', function () {
     expect(blockNumber).to.be.equal(expectedBlockNumber);
   });
 
-  it('Should fake reset', async function () {
+  it('Should fake reset', async function() {
     ethNodeMainInterceptor = new EthNodeInterceptor('http://localhost:8545');
     ethNodeMainInterceptor.interceptCalls();
 
@@ -77,7 +70,7 @@ describe('Startup and Config', function () {
     expect(response.status).to.be.eq(200);
   });
 
-  it('should load dummy rule and emit a log item', async function () {
+  it('should load dummy rule and emit a log item', async function() {
     const expectedBlockNumber = 10001;
 
     const mockRules: RuleJSONConfigItem[] = [
@@ -118,7 +111,7 @@ describe('Startup and Config', function () {
     expect(isMessageObserved).to.be.true;
   });
 
-  it('Should handle invalid rules gracefully', async function () {
+  it('Should handle invalid rules gracefully', async function() {
     ethNodeMainInterceptor = new EthNodeInterceptor('http://localhost:8545');
     ethNodeMainInterceptor.interceptCalls();
 
@@ -199,5 +192,4 @@ describe('Startup and Config', function () {
     }, 1000);
     return timeoutId;
   }
-
 });

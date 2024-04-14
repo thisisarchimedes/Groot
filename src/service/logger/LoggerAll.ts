@@ -6,10 +6,10 @@ import {ILoggerConsole} from './interfaces/ILoggerConsole';
 import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
 import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 import {LoggerConsole} from './LoggerConsole';
+import {namespace} from '../../constants/constants';
 
 
 export class LoggerAll extends Logger implements ILoggerAll {
-  private serviceName = 'Groot';
   private loggerConsole: ILoggerConsole;
   private loggerNewRelic: ILoggerNewRelic;
 
@@ -18,7 +18,7 @@ export class LoggerAll extends Logger implements ILoggerAll {
   ) {
     super();
     this.loggerConsole = new LoggerConsole();
-    this.loggerNewRelic = new LoggerNewRelic(configService, this.serviceName);
+    this.loggerNewRelic = new LoggerNewRelic(configService, namespace);
   }
 
   public async flush(): Promise<void> {

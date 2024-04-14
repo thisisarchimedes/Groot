@@ -15,6 +15,7 @@ import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
 import {TransactionQueuer} from './tx_queue/TransactionQueuer';
 import PostgreTxQueue from './tx_queue/PostgreTxQueue';
 import DBService from './service/db/dbService';
+import {namespace} from './constants/constants';
 
 dotenv.config();
 
@@ -36,7 +37,6 @@ export class Groot implements IGroot {
       _logger: ILogger,
       _dbService: DBService,
   ) {
-    const namespace = 'Groot';
     this.logger = _logger;
     this.configService = _configService;
     this.mainNode = new BlockchainNodeLocal(

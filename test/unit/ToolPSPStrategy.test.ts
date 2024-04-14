@@ -1,33 +1,30 @@
 import 'reflect-metadata';
-import { expect } from 'chai';
-import { ToolStrategyUniswap } from '../../src/rule_engine/tool/ToolStrategyUniswap';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import { TYPES } from '../../src/inversify.types';
-import { Container } from 'inversify';
-import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
-import { createTestContainer } from './inversify.config.unit_test';
+import {expect} from 'chai';
+import {ToolStrategyUniswap} from '../../src/rule_engine/tool/ToolStrategyUniswap';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
+import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 
-describe('Check we create the PSP strategy tool correctly', function () {
-  let container: Container;
+describe('Check we create the PSP strategy tool correctly', function() {
   let logger: LoggerAdapter;
   let blockchainReader: BlockchainReader;
+  let localNodeAlchemy: BlockchainNodeAdapter;
+  let localNodeInfura: BlockchainNodeAdapter;
 
-  beforeEach(async function () {
-    container = createTestContainer();
-    logger = container.get<LoggerAdapter>(TYPES.ILoggerAll);
-    blockchainReader = container.get<BlockchainReader>(TYPES.IBlockchainReader);
+  beforeEach(async function() {
+    logger = new LoggerAdapter();
 
-    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
-    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    // Starting nodes
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
+
+    blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
   });
 
-  it('should create uniswap strategy object and get pool address', async function () {
+  it('should create uniswap strategy object and get pool address', async function() {
     const strategyAddress: string = '0x1234';
 
-    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
-    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
     localNodeAlchemy.setReadResponse(strategyAddress);
     localNodeInfura.setReadResponse(strategyAddress);
 

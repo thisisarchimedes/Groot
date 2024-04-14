@@ -1,38 +1,44 @@
 import 'reflect-metadata';
-import { expect } from 'chai';
+import {expect} from 'chai';
 import * as dotenv from 'dotenv';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { Executor, RuleJSONConfigItem, TypeRule, UrgencyLevel } from '../../src/rule_engine/TypesRule';
-import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import { AbiRepo } from '../../src/rule_engine/tool/abi_repository/AbiRepo';
-import { TYPES } from '../../src/inversify.types';
-import { Container } from 'inversify';
-import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
-import { createTestContainer } from './inversify.config.unit_test';
-import { FactoryRule } from '../../src/rule_engine/interfaces/FactoryRule';
-import { RuleParamsUniswapPSPRebalance } from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
+import {Executor, RuleJSONConfigItem, TypeRule, UrgencyLevel} from '../../src/rule_engine/TypesRule';
+import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
+import {RuleParamsUniswapPSPRebalance} from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
+import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 
 dotenv.config();
 
-describe('Rule Factory Testings: Uniswap', function () {
-  let container: Container;
+describe('Rule Factory Testings: Uniswap', function() {
+  let abiRepo: AbiRepo;
   let logger: LoggerAdapter;
   let blockchainReader: BlockchainReader;
-  let abiRepo: AbiRepo;
+  let localNodeAlchemy: BlockchainNodeAdapter;
+  let localNodeInfura: BlockchainNodeAdapter;
+  let ruleFactory: FactoryRule;
 
-  beforeEach(async function () {
-    container = createTestContainer();
-    logger = container.get<LoggerAdapter>(TYPES.ILoggerAll);
-    blockchainReader = container.get<BlockchainReader>(TYPES.IBlockchainReader);
-    abiRepo = container.get<AbiRepo>(TYPES.IAbiRepo);
+  beforeEach(async function() {
+    const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
+    await configService.refreshConfig();
 
-    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
-    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    logger = new LoggerAdapter();
+
+    // Starting nodes
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
+
+    blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
+
+    abiRepo = new AbiRepo(configService, blockchainReader);
+
+    ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo);
   });
 
-  it('should create Uniswap PSP rebalance Rule object from a rule config', function () {
-    const ruleFactory = container.get<FactoryRule>(TYPES.FactoryRule);
+  it('should create Uniswap PSP rebalance Rule object from a rule config', function() {
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.UniswapPSPRebalance,
       label: 'Uniswap PSP rebalance - test',
@@ -51,8 +57,7 @@ describe('Rule Factory Testings: Uniswap', function () {
     expect(rule).not.to.be.null;
   });
 
-  it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', async function () {
-    const ruleFactory = container.get<FactoryRule>(TYPES.FactoryRule);
+  it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', async function() {
     const uniswapRule: RuleJSONConfigItem = {
       ruleType: TypeRule.UniswapPSPRebalance,
       label: 'Uniswap PSP rebalance - test',

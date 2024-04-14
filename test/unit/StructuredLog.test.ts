@@ -1,21 +1,16 @@
 import 'reflect-metadata';
-import { expect } from 'chai';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { LogMessageCycleTime, RuleEvalResult } from '../../src/service/logger/TypeLogItem';
-import { TYPES } from '../../src/inversify.types';
-import { Container } from 'inversify';
-import { createTestContainer } from './inversify.config.unit_test';
+import {expect} from 'chai';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
+import {LogMessageCycleTime, RuleEvalResult} from '../../src/service/logger/TypeLogItem';
 
-describe('Check that we build the structured log messages correctly', function () {
-  let container: Container;
+describe('Check that we build the structured log messages correctly', function() {
   let logger: LoggerAdapter;
 
-  beforeEach(async function () {
-    container = createTestContainer();
-    logger = container.get<LoggerAdapter>(TYPES.ILoggerAll);
+  beforeEach(function() {
+    logger = new LoggerAdapter();
   });
 
-  it('should build cycle time log correctly', function () {
+  it('should build cycle time log correctly', function() {
     const cycleTime: number = 1000;
     const expectedLogMessage: LogMessageCycleTime = {
       message: 'Cycle time (milliseconds)',
@@ -26,7 +21,7 @@ describe('Check that we build the structured log messages correctly', function (
     expect(actualLogMessage === JSON.stringify(expectedLogMessage)).to.be.true;
   });
 
-  it('should build rule eval report log correctly', function () {
+  it('should build rule eval report log correctly', function() {
     const successes: number = 10;
     const failures: number = 2;
     const expectedLogMessage: RuleEvalResult = {
