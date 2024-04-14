@@ -1,7 +1,5 @@
 import {ethers} from 'ethers';
 import {Address} from '../../../types/LeverageContractAddresses';
-import {injectable} from 'inversify';
-
 
 class PositionLedgerContract {
   public contract: ethers.Contract;

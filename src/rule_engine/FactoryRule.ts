@@ -7,13 +7,15 @@ import {RuleDummy} from './rule/RuleDummy';
 import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
 import {AbiRepo} from './tool/abi_repository/AbiRepo';
+import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
 
 
 export class FactoryRule {
   constructor(
      private logger: ILogger,
+     _configService: ConfigServiceAWS,
      private blockchainReader: BlockchainReader,
-     private abiRepo: AbiRepo,
+     private abiRepo: AbiRepo = new AbiRepo(_configService, this.blockchainReader),
   ) { }
 
   public createRule(config: RuleJSONConfigItem): Rule | null {

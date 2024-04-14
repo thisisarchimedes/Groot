@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 
-import {inject, injectable} from 'inversify';
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {ITxQueue} from './interfaces/ITxQueue';
@@ -12,7 +11,7 @@ export class TransactionQueuer implements ITransactionQueuer {
   private readonly queue: ITxQueue;
 
   constructor( _logger: ILogger,
-    @inject('PostgreTxQueue') _queue: ITxQueue) {
+      _queue: ITxQueue) {
     this.logger = _logger;
     this.queue = _queue;
   }

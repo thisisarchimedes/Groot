@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-
-
 import {IBlockchainReader} from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiFetcher} from './interfaces/IAbiFetcher';
 import {IAbiStorage} from './interfaces/IAbiStorage';
 import {IAbiRepo} from './interfaces/IAbiRepo';
-
+import {AbiStorageDynamoDB} from './AbiStorageDynamoDB';
+import {AbiFetcherEtherscan} from './AbiFetcherEtherscan';
+import {ConfigServiceAWS} from '../../../service/config/ConfigServiceAWS';
 
 export class AbiRepo implements IAbiRepo {
   private readonly blockchainReader: IBlockchainReader;
@@ -14,13 +14,12 @@ export class AbiRepo implements IAbiRepo {
 
 
   constructor(
-    @inject('IBlockchainReader') _blockchainReader: IBlockchainReader,
-    @inject('IAbiStorageDynamoDB') _abiStorage: IAbiStorage,
-    @inject('IAbiFetcherEtherScan') _abiFetcher: IAbiFetcher,
+      _configService: ConfigServiceAWS,
+      _blockchainReader: IBlockchainReader,
   ) {
     this.blockchainReader = _blockchainReader;
-    this.abiStorage = _abiStorage;
-    this.abiFetcher = _abiFetcher;
+    this.abiStorage = new AbiStorageDynamoDB(_configService);
+    this.abiFetcher = new AbiFetcherEtherscan(_configService);
   }
 
   public async getAbiByAddress(contractAddress: string): Promise<string> {

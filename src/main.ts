@@ -3,19 +3,13 @@ import 'reflect-metadata';
 import * as dotenv from 'dotenv';
 
 import {GrootParams} from './GrootParams';
-import {IGroot} from './interfaces/IGroot';
 import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
-import {InversifyConfig} from './inversify.config.tmp';
-import {Container} from 'inversify';
-import {TYPES} from './inversify.types';
 import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
 import DBService from './service/db/dbService';
-import { LoggerAll } from './service/logger/LoggerAll';
-import { Groot } from './Groot';
+import {LoggerAll} from './service/logger/LoggerAll';
+import {Groot} from './Groot';
 
 dotenv.config();
-
-let container: Container = new Container();
 
 export async function startGroot(runInfinite: boolean = true): Promise<void> {
   const grootParams = getGrootParamsFromEnv();
@@ -30,12 +24,10 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
   await dbService.connect();
 
   const groot = new Groot(
-    configServiceAWS,
-    logger,
-    
-    dbService);
-
-  const groot = container.get<IGroot>(TYPES.Groot);
+      configServiceAWS,
+      logger,
+      dbService,
+  );
 
   process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
@@ -53,7 +45,7 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
       await groot.sleepBetweenCycles();
     } while (runInfinite);
   } catch (error) {
-    reportCriticalError(grootParams.environment, grootParams.region, error);
+    reportCriticalError(logger, grootParams.environment, grootParams.region, error);
     process.exit(1);
   } finally {
     await groot.logger.flush();
@@ -71,7 +63,7 @@ function getGrootParamsFromEnv(): GrootParams {
   const altLocalNodeUrl = process.env.ALT_LOCAL_NODE_URL + ':' + altLocalNodePort;
 
   if (!environment || !region || !mainLocalNodeUrl || !altLocalNodeUrl) {
-    reportCriticalError(environment, region, 'Cannot boot. Missing environment variables');
+    console.error(environment, region, 'Cannot boot. Missing environment variables');
   }
 
   return {environment, region, mainLocalNodeUrl, altLocalNodeUrl};
@@ -82,9 +74,8 @@ function reportGrootStartup(grootParams: GrootParams): void {
   console.log(`[${currentDateTime}] Starting Groot: ${JSON.stringify(grootParams)}`);
 }
 
-function reportCriticalError(environment: string, region: string, error: unknown): void {
+function reportCriticalError(logger: ILoggerAll, environment: string, region: string, error: unknown): void {
   const errorMessage = `Unexpected CRITICAL ERROR in main loop: ${error}`;
-  const logger = container.get<ILoggerAll>(TYPES.ILoggerAll);
   logger.error(errorMessage);
 }
 

@@ -1,6 +1,4 @@
 import axios from 'axios';
-import {injectable} from 'inversify';
-
 import {Logger} from './Logger';
 import {LogLevel} from './LogLevel';
 import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';

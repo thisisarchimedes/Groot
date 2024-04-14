@@ -1,10 +1,7 @@
 import 'reflect-metadata';
 
-import {injectable} from 'inversify';
-
 import {AppConfig, GetConfigurationCommandOutput} from '@aws-sdk/client-appconfig';
 import {IAppConfigClient} from './interfaces/IAppConfigClient';
-
 
 export class AppConfigClient implements IAppConfigClient {
   private readonly DEFAULT_APPCONFIG_ENVIRONMENT = 'env';

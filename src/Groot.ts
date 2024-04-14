@@ -1,23 +1,26 @@
 import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
-import {RuleEngine} from './rule_engine/interfaces/RuleEngine';
 import {IGroot} from './interfaces/IGroot';
 import {ILogger} from './service/logger/interfaces/ILogger';
 import {ITransactionQueuer} from './tx_queue/interfaces/ITransactionQueuer';
-import {ConfigService} from './service/config/ConfigService';
 import {BlockchainNodeLocal} from './blockchain/blockchain_nodes/BlockchainNodeLocal';
 import {HealthMonitor} from './service/health_monitor/HealthMonitor';
 import {BlockchainNodeHealthMonitor} from './service/health_monitor/BlockchainNodeHealthMonitor';
 import {SignalAWSHeartbeat} from './service/health_monitor/signal/SignalAWSHeartbeat';
 import {SignalAWSCriticalFailure} from './service/health_monitor/signal/SignalAWSCriticalFailure';
 import {HostNameProvider} from './service/health_monitor/HostNameProvider';
+import {RuleEngine} from './rule_engine/RuleEngine';
+import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
+import {TransactionQueuer} from './tx_queue/TransactionQueuer';
+import PostgreTxQueue from './tx_queue/PostgreTxQueue';
+import DBService from './service/db/dbService';
 
 dotenv.config();
 
 export class Groot implements IGroot {
   public logger: ILogger;
-  private configService: ConfigService;
+  private configService: ConfigServiceAWS;
   private mainNode: BlockchainNodeLocal;
   private altNode: BlockchainNodeLocal;
   private signalHeartbeat: SignalAWSHeartbeat;
@@ -25,14 +28,13 @@ export class Groot implements IGroot {
   private signalCriticalFailure: SignalAWSCriticalFailure;
   private blockchainNodeHealthMonitor: BlockchainNodeHealthMonitor;
   private healthMonitor: HealthMonitor;
-  private ruleEngine!: RuleEngine;
+  private ruleEngine: RuleEngine;
   private transactionsQueuer: ITransactionQueuer;
 
   constructor(
-      _configService: ConfigService,
+      _configService: ConfigServiceAWS,
       _logger: ILogger,
-      _ruleEngine: RuleEngine,
-      _transactionsQueuer: ITransactionQueuer,
+      _dbService: DBService,
   ) {
     const namespace = 'Groot';
     this.logger = _logger;
@@ -71,8 +73,10 @@ export class Groot implements IGroot {
         this.signalHeartbeat,
         this.signalCriticalFailure,
     );
-    this.ruleEngine = _ruleEngine;
-    this.transactionsQueuer = _transactionsQueuer;
+    this.ruleEngine = new RuleEngine(_logger, this.configService, this.mainNode, this.altNode);
+
+    const txQueue = new PostgreTxQueue(_logger, _dbService);
+    this.transactionsQueuer = new TransactionQueuer(_logger, txQueue);
   }
 
   public async initalizeGroot() {

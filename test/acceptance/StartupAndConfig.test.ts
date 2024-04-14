@@ -10,10 +10,9 @@ import { startGroot } from '../../src/main';
 import { AppConfigInterceptor } from './interceptors/AppConfigInterceptor';
 import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
 import { EthNodeInterceptor } from './interceptors/EthNodeInterceptor';
-import { Container } from 'inversify';
-import { InversifyConfig } from '../../src/inversify.config.tmp';
 import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
 import DBService from '../../src/service/db/dbService';
+import { LoggerAll } from '../../src/service/logger/LoggerAll';
 
 let timeoutId: NodeJS.Timeout | null = null;
 
@@ -21,7 +20,6 @@ describe('Startup and Config', function () {
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
-  let container: Container;
   let newRelicInterceptor: NewRelicInterceptor;
   let appConfigInterceptor: AppConfigInterceptor | undefined;
   let ethNodeMainInterceptor: EthNodeInterceptor | undefined;
@@ -31,11 +29,10 @@ describe('Startup and Config', function () {
     const configService = createConfigService();
     await initializeConfigService(configService);
 
-    const _dbService = new DBService(configService);
-    await configService.refreshConfig();
+    const logger = new LoggerAll(configService);
 
-    const inversifyConfig = new InversifyConfig(configService, _dbService);
-    container = inversifyConfig.getContainer();
+    const dbService = new DBService(logger, configService);
+    await configService.refreshConfig();
 
     newRelicInterceptor = createNewRelicMock(configService);
 

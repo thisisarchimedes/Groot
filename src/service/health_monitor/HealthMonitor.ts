@@ -19,8 +19,8 @@ export class HealthMonitor implements IHealthMonitor {
   constructor(
       _logger: ILogger,
       _blockchainHealthMonitor: BlockchainNodeHealthMonitor,
-    @inject('ISignalHeartbeat') signalHeartbeat: ISignalHeartbeat,
-    @inject('ISignalCriticalFailure') signalCriticalFailure: ISignalCriticalFailure,
+      signalHeartbeat: ISignalHeartbeat,
+      signalCriticalFailure: ISignalCriticalFailure,
   ) {
     this.logger = _logger;
     this.blockchainHealthMonitor = _blockchainHealthMonitor;

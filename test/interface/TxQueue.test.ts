@@ -3,10 +3,11 @@ import { expect } from 'chai';
 import { TYPES } from '../../src/inversify.types';
 import { ITxQueue } from '../../src/tx_queue/interfaces/ITxQueue';
 import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
-import { InversifyConfig } from '../../src/inversify.config.tmp';
 import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
 import { Executor, UrgencyLevel } from '../../src/rule_engine/TypesRule';
 import DBService from '../../src/service/db/dbService';
+import PostgreTxQueue from '../../src/tx_queue/PostgreTxQueue';
+import { LoggerAll } from '../../src/service/logger/LoggerAll';
 
 describe('Transaction Insertion Tests', function () {
     let txQueue: ITxQueue;
@@ -16,14 +17,12 @@ describe('Transaction Insertion Tests', function () {
         const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
         await configService.refreshConfig();
 
-        const _dbService = new DBService(configService);
+        const logger = new LoggerAll(configService);
+
+        const dbService = new DBService(logger, configService);
         await configService.refreshConfig();
 
-        const inversifyConfig = new InversifyConfig(configService, _dbService);
-        const container = inversifyConfig.getContainer();
-
-        txQueue = container.get<ITxQueue>(TYPES.PostgreTxQueue);
-        dbService = container.get<DBService>(TYPES.DBService);
+        txQueue = new PostgreTxQueue(logger, dbService);
     })
 
     this.afterAll(async () => {

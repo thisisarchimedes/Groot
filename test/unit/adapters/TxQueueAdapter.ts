@@ -1,7 +1,5 @@
 import { OutboundTransaction } from '../../../src/blockchain/OutboundTransaction';
 import { ITxQueue } from '../../../src/tx_queue/interfaces/ITxQueue';
-import { injectable } from 'inversify';
-
 
 export class TxQueueAdapter implements ITxQueue {
   refresh(): Promise<void> {

@@ -13,8 +13,8 @@ export class SignalAWSCriticalFailure extends SignalAWS implements ISignalCritic
   constructor(
       _configService: ConfigService,
       _logger: ILogger,
-    @inject('IHostNameProvider') _hostNameProvider: IHostNameProvider,
-    @inject('MetricNamespaceCriticalFailure') namespace: string) {
+      _hostNameProvider: IHostNameProvider,
+      namespace: string) {
     super(_logger, _configService, _hostNameProvider, namespace);
     this.namespace = namespace;
   }

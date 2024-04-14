@@ -1,6 +1,4 @@
 import * as stackTrace from 'stacktrace-parser';
-import {injectable} from 'inversify';
-
 import {ILogger} from './interfaces/ILogger';
 import {LogLevel} from './LogLevel';
 import {LogMessageCycleTime} from './TypeLogItem';

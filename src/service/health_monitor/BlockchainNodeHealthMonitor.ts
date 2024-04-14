@@ -1,9 +1,7 @@
 import {IBlockchainNode} from '../../blockchain/blockchain_nodes/interfaces/IBlockchainNode';
 import {IBlockchainNodeLocal} from '../../blockchain/blockchain_nodes/interfaces/IBlockchainNodeLocal';
-
 import {IBlockchainNodeHealthMonitor} from './interfaces/BlockchainNodeHealthMonitor';
 import {ILogger} from '../logger/interfaces/ILogger';
-
 
 export class BlockchainNodeHealthMonitor implements IBlockchainNodeHealthMonitor {
   private readonly nodes: IBlockchainNodeLocal[] = [];
@@ -11,8 +9,8 @@ export class BlockchainNodeHealthMonitor implements IBlockchainNodeHealthMonitor
 
   constructor(
       _logger: ILogger,
-    @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
-    @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal) {
+      _mainLocalNode: IBlockchainNodeLocal,
+      _altLocalNode: IBlockchainNodeLocal) {
     this.logger = _logger;
     this.nodes = [_mainLocalNode, _altLocalNode];
   }

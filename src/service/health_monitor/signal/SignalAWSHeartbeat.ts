@@ -13,8 +13,8 @@ export class SignalAWSHeartbeat extends SignalAWS implements ISignalHeartbeat {
   constructor(
       _configService: ConfigService,
       _logger: ILogger,
-    @inject('IHostNameProvider') _hostNameProvider: IHostNameProvider,
-    @inject('MetricNamespaceHeartBeat') namespace: string,
+      _hostNameProvider: IHostNameProvider,
+      namespace: string,
   ) {
     super(_logger, _configService, _hostNameProvider, namespace);
     this.namespace = namespace;

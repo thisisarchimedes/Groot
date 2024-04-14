@@ -1,5 +1,3 @@
-import {injectable} from 'inversify';
-
 import {LogLevel} from './LogLevel';
 import {Logger} from './Logger';
 import {ILoggerConsole} from './interfaces/ILoggerConsole';

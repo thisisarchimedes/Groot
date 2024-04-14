@@ -2,7 +2,6 @@
 import {Logger} from './Logger';
 import {LoggerNewRelic} from './LoggerNewRelic';
 import {ILoggerAll} from './interfaces/ILoggerAll';
-import {TYPES} from '../../inversify.types';
 import {ILoggerConsole} from './interfaces/ILoggerConsole';
 import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
 import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
@@ -15,7 +14,7 @@ export class LoggerAll extends Logger implements ILoggerAll {
   private loggerNewRelic: ILoggerNewRelic;
 
   constructor(
-    @inject(TYPES.ConfigServiceAWS) configService: ConfigServiceAWS,
+      configService: ConfigServiceAWS,
   ) {
     super();
     this.loggerConsole = new LoggerConsole();

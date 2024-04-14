@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {injectable} from 'inversify';
 import {IAbiFetcher} from '../../../src/rule_engine/tool/abi_repository/interfaces/IAbiFetcher';
-
 
 export class AbiFetcherAdapter implements IAbiFetcher {
   private returnAbi: string = '';

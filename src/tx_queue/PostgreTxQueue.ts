@@ -1,8 +1,6 @@
 import 'reflect-metadata';
 
 import {QueryConfig} from 'pg';
-import {TYPES} from '../inversify.types';
-import {inject, injectable} from 'inversify';
 import {ITxQueue} from './interfaces/ITxQueue';
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Executor, UrgencyLevel} from '../rule_engine/TypesRule';
@@ -16,7 +14,7 @@ class PostgreTxQueue implements ITxQueue {
 
   constructor(
       logger: ILogger,
-    @inject(TYPES.DBService) dbService: DBService,
+      dbService: DBService,
   ) {
     this.dbService = dbService;
     this.logger = logger;

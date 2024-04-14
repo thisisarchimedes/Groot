@@ -1,5 +1,4 @@
 import {Rule, RuleParams} from './Rule';
-import {inject, injectable} from 'inversify';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
@@ -23,9 +22,9 @@ export class RuleExpirePositions extends Rule {
 
   constructor(
       logger: ILogger,
-    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
-    @inject('IAbiRepo') abiRepo: IAbiRepo,
-    @inject('LeverageDataSource') leverageDataSource: PostgreDataSource,
+      blockchainReader: IBlockchainReader,
+      abiRepo: IAbiRepo,
+      leverageDataSource: PostgreDataSource,
       configService: ConfigService,
   ) {
     super(logger, blockchainReader, abiRepo);

@@ -1,4 +1,4 @@
-import {Client, ClientConfig} from 'pg';
+import {Client, ClientConfig, QueryResult} from 'pg';
 import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 import {ILogger} from '../logger/interfaces/ILogger';
 
@@ -74,7 +74,7 @@ class LoggedClient extends Client {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  public query(...args: unknown[]) {
+  public query(...args: unknown[]): QueryResult<QueryResultRow> {
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
