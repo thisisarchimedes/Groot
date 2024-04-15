@@ -3,7 +3,7 @@
 import {ILogger} from '../logger/interfaces/ILogger';
 import {ISignalHeartbeat} from './signal/interfaces/ISignalHeartbeat';
 import {BlockchainNodeHealthMonitor} from './BlockchainNodeHealthMonitor';
-import {SignalAWSCriticalFailure} from './signal/SignalAWSCriticalFailure';
+import {ISignalCriticalFailure} from './signal/interfaces/ISignalCriticalFailure';
 
 
 export class HealthMonitor {
@@ -12,13 +12,13 @@ export class HealthMonitor {
   private readonly logger: ILogger;
   private readonly blockchainHealthMonitor: BlockchainNodeHealthMonitor;
   private readonly signalHeartbeat: ISignalHeartbeat;
-  private readonly signalCriticalFailure: SignalAWSCriticalFailure;
+  private readonly signalCriticalFailure: ISignalCriticalFailure;
 
   constructor(
       _logger: ILogger,
       _blockchainHealthMonitor: BlockchainNodeHealthMonitor,
       signalHeartbeat: ISignalHeartbeat,
-      signalCriticalFailure: SignalAWSCriticalFailure,
+      signalCriticalFailure: ISignalCriticalFailure,
   ) {
     this.logger = _logger;
     this.blockchainHealthMonitor = _blockchainHealthMonitor;

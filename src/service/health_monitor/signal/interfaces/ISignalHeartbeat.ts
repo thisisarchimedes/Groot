@@ -1,5 +1,3 @@
-import {ISignalAWS} from './ISignalAWS';
-
-export interface ISignalHeartbeat extends ISignalAWS {
+export interface ISignalHeartbeat {
     sendHeartbeat(): Promise<boolean>;
 }

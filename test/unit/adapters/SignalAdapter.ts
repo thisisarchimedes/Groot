@@ -1,6 +1,7 @@
+import {ISignalCriticalFailure} from '../../../src/service/health_monitor/signal/interfaces/ISignalCriticalFailure';
 import {ISignalHeartbeat} from '../../../src/service/health_monitor/signal/interfaces/ISignalHeartbeat';
 
-export class SignalAdapter implements ISignalHeartbeat {
+export class SignalAdapter implements ISignalHeartbeat, ISignalCriticalFailure {
   private heatbeatSent: boolean = false;
   private criticalFailureSent: boolean = false;
 

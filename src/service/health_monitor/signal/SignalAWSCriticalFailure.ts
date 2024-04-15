@@ -3,11 +3,11 @@ import {HostNameProvider} from '../HostNameProvider';
 import {SignalAWS} from './SignalAWS';
 import {ILogger} from '../../logger/interfaces/ILogger';
 import {ConfigService} from '../../config/ConfigService';
+import {ISignalCriticalFailure} from './interfaces/ISignalCriticalFailure';
 
 
-export class SignalAWSCriticalFailure extends SignalAWS {
+export class SignalAWSCriticalFailure extends SignalAWS implements ISignalCriticalFailure {
   private readonly namespace: string;
-
 
   constructor(
       _configService: ConfigService,
