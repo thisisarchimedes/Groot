@@ -1,19 +1,24 @@
 import {ethers} from 'ethers';
 import {
-  BlockchainNode,
   BlockchainNodeError,
 } from '../../../src/blockchain/blockchain_nodes/BlockchainNode';
 import {BlockchainNodeProxyInfo} from '../../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
+import {BlockchainNodeLocal} from '../../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
+import {ILoggerAll} from '../../../src/service/logger/interfaces/ILoggerAll';
 
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export class BlockchainNodeAdapter extends BlockchainNode {
+export class BlockchainNodeAdapter extends BlockchainNodeLocal {
   private currentBlockNumber: number = 100;
   private currentReadResponse: unknown = {};
   private throwErrorOnGetBlockNumber: boolean = false;
   private throwErrorOnCallViewFunction: boolean = false;
   private expectRecoverToSucceed: boolean = true;
   private proxyInfo!: BlockchainNodeProxyInfo;
+
+  constructor(logger: ILoggerAll, nodeName: string) {
+    super(logger, '', nodeName);
+  }
 
   public async startNode(): Promise<void> {}
 
