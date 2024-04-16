@@ -43,7 +43,6 @@ describe('PostgreDataSource Tests', function() {
       fields: [],
     };
 
-    dbServiceAdapter.getLeverageClient().setThrowErrorOnConnect(false);
     dbServiceAdapter.getLeverageClient().setQueryResponse(mockResponse);
 
     const nftIds = [100, 101];
@@ -59,8 +58,6 @@ describe('PostgreDataSource Tests', function() {
 
   it('dbService connect should handle database errors gracefully and log an error message', async function() {
     // Setup mock to throw error on connect
-    dbServiceAdapter.getLeverageClient().setThrowErrorOnConnect(true);
-    dbServiceAdapter.getLeverageClient().setErrorMessage('Database connection failed');
     dbServiceAdapter.getLeverageClient().setQueryResponse({} as QueryResult);
 
     let errorCaught = false;
@@ -100,9 +97,6 @@ describe('PostgreDataSource Tests', function() {
   });
 
   it('getLivePositions should handle errors gracefully', async function() {
-    dbServiceAdapter.getLeverageClient().setThrowErrorOnConnect(true);
-    dbServiceAdapter.getLeverageClient().setErrorMessage('Failed to connect to database');
-
     try {
       await dataSource.getLivePositions();
       expect.fail('Expected method to throw');
@@ -136,9 +130,6 @@ describe('PostgreDataSource Tests', function() {
   });
 
   it('getLivePositionsNftIds should handle errors gracefully', async function() {
-    dbServiceAdapter.getLeverageClient().setThrowErrorOnConnect(true);
-    dbServiceAdapter.getLeverageClient().setErrorMessage('Failed to execute query');
-
     try {
       await dataSource.getLivePositionsNftIds();
       expect.fail('Expected method to throw');

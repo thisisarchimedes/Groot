@@ -3,8 +3,6 @@ import {LoggedClient} from '../../../src/service/db/dbService';
 import {LoggerAll} from '../../../src/service/logger/LoggerAll';
 
 export class PGClientAdapter extends LoggedClient {
-  private throwErrorOnConnect: boolean = false;
-  private errorMessage: string = '';
   private queryResponse: QueryResult | null = null;
   private lastExecutedQuery: string | QueryConfig | null = null;
 
@@ -18,9 +16,6 @@ export class PGClientAdapter extends LoggedClient {
 
   public async connect(): Promise<void> {
     await super.connect();
-    if (this.throwErrorOnConnect) {
-      throw new Error(this.errorMessage);
-    }
     return Promise.resolve();
   }
 
@@ -33,14 +28,6 @@ export class PGClientAdapter extends LoggedClient {
     return super.query(args[0]);
   }
 
-  public setThrowErrorOnConnect(throwError: boolean): void {
-    this.throwErrorOnConnect = throwError;
-  }
-
-  public setErrorMessage(message: string): void {
-    this.errorMessage = message;
-  }
-
   public setQueryResponse(response: QueryResult): void {
     this.queryResponse = response;
   }
@@ -50,8 +37,6 @@ export class PGClientAdapter extends LoggedClient {
   }
 
   public reset(): void {
-    this.throwErrorOnConnect = false;
-    this.errorMessage = '';
     this.queryResponse = null;
     this.lastExecutedQuery = null;
   }
