@@ -23,8 +23,6 @@ import {AbiFetcherEtherscan} from './rule_engine/tool/abi_repository/AbiFetcherE
 dotenv.config();
 
 export class Groot {
-  public logger: ILogger;
-  private configService: ConfigServiceAWS;
   private mainNode: BlockchainNodeLocal;
   private altNode: BlockchainNodeLocal;
   private signalHeartbeat: SignalAWSHeartbeat;
@@ -34,59 +32,80 @@ export class Groot {
   private healthMonitor: HealthMonitor;
   private ruleEngine: RuleEngine;
   private transactionsQueuer: TransactionQueuer;
+  private blockchainReader: BlockchainReader;
+  private abiRepo: AbiRepo;
 
   constructor(
-      _configService: ConfigServiceAWS,
-      _logger: ILogger,
-      _dbService: DBService,
+      private configService: ConfigServiceAWS,
+      private logger: ILogger,
+      dbService: DBService,
   ) {
-    this.logger = _logger;
-    this.configService = _configService;
+    this.initializeNodes();
+    this.initializeHealthMonitor();
+
+    this.blockchainReader = new BlockchainReader(this.logger, this.mainNode, this.altNode);
+
+    this.initializeAbiRepo();
+
+    this.initializeRuleEngine();
+
+    this.initializeTxQueuer(dbService);
+  }
+
+  private initializeNodes() {
     this.mainNode = new BlockchainNodeLocal(
-        _logger,
+        this.logger,
         `http://localhost:${process.env.MAIN_LOCAL_NODE_PORT || 8545}`,
         'AlchemyNodeLabel',
     );
     this.altNode = new BlockchainNodeLocal(
-        _logger,
+        this.logger,
         `http://localhost:${process.env.ALT_LOCAL_NODE_PORT || 18545}`,
         'InfuraNodeLabel',
     );
+  }
+
+  private initializeHealthMonitor() {
     this.blockchainNodeHealthMonitor = new BlockchainNodeHealthMonitor(
-        _logger,
+        this.logger,
         this.mainNode,
         this.altNode,
     );
-    this.hostnameProvider = new HostNameProvider(_logger);
+    this.hostnameProvider = new HostNameProvider(this.logger);
     this.signalCriticalFailure = new SignalAWSCriticalFailure(
-        _configService,
-        _logger,
+        this.configService,
+        this.logger,
         this.hostnameProvider,
         namespace,
     );
     this.signalHeartbeat = new SignalAWSHeartbeat(
-        _configService,
-        _logger,
+        this.configService,
+        this.logger,
         this.hostnameProvider,
         namespace,
     );
     this.healthMonitor = new HealthMonitor(
-        _logger,
+        this.logger,
         this.blockchainNodeHealthMonitor,
         this.signalHeartbeat,
         this.signalCriticalFailure,
     );
+  }
 
-    const abiStorage = new AbiStorageDynamoDB(_configService);
-    const abiFetcher = new AbiFetcherEtherscan(_configService);
-    const blockchainReader = new BlockchainReader(_logger, this.mainNode, this.altNode);
-    const abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+  private initializeAbiRepo() {
+    const abiStorage = new AbiStorageDynamoDB(this.configService);
+    const abiFetcher = new AbiFetcherEtherscan(this.configService);
+    this.abiRepo = new AbiRepo(this.blockchainReader, abiStorage, abiFetcher);
+  }
 
-    const ruleFactory = new FactoryRule(_logger, _configService, blockchainReader, abiRepo);
-    this.ruleEngine = new RuleEngine(_logger, ruleFactory);
+  private initializeRuleEngine() {
+    const ruleFactory = new FactoryRule(this.logger, this.configService, this.blockchainReader, this.abiRepo);
+    this.ruleEngine = new RuleEngine(this.logger, ruleFactory);
+  }
 
-    const txQueue = new PostgreTxQueue(_logger, _dbService);
-    this.transactionsQueuer = new TransactionQueuer(_logger, txQueue);
+  private initializeTxQueuer(dbService: DBService) {
+    const txQueue = new PostgreTxQueue(this.logger, dbService);
+    this.transactionsQueuer = new TransactionQueuer(this.logger, txQueue);
   }
 
   public async initalizeGroot() {
