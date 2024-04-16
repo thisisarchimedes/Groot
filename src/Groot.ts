@@ -125,7 +125,7 @@ export class Groot {
         await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
       } catch (err) {
         if (err instanceof Error) {
-          console.log(err.message);
+          console.error(err.message);
         }
       }
       const txs = this.ruleEngine.getOutboundTransactions();

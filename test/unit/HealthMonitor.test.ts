@@ -28,7 +28,7 @@ describe('Health Monitor tests', function() {
     const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
     await configService.refreshConfig();
 
-    const logger = new LoggerAll(configService);
+    logger = new LoggerAdapter();
 
     // Starting nodes
     localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');

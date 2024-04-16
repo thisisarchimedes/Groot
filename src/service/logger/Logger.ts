@@ -40,7 +40,6 @@ export abstract class Logger implements ILogger {
     const error = new Error();
     const stack = error.stack as string;
     const frames = stackTrace.parse(stack);
-    console.log(frames);
 
     for (const frame of frames) {
       const fileName = frame.file?.split('/').pop();

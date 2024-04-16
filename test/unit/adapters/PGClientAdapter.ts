@@ -9,10 +9,15 @@ export class PGClientAdapter extends LoggedClient {
   private lastExecutedQuery: string | QueryConfig | null = null;
 
   constructor(logger: LoggerAll) {
-    super({}, logger);
+    super({
+      query_timeout: 1000,
+      connectionTimeoutMillis: 1000,
+      statement_timeout: 1000,
+    }, logger);
   }
 
-  public connect(): Promise<void> {
+  public async connect(): Promise<void> {
+    await super.connect();
     if (this.throwErrorOnConnect) {
       throw new Error(this.errorMessage);
     }

@@ -7,7 +7,6 @@ import {LoggerAdapter} from '../unit/adapters/LoggerAdapter';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {HostNameProvider} from '../../src/service/health_monitor/HostNameProvider';
 import {SignalAWSHeartbeat} from '../../src/service/health_monitor/signal/SignalAWSHeartbeat';
-import {LoggerAll} from '../../src/service/logger/LoggerAll';
 import {namespace} from '../../src/constants/constants';
 import {SignalAWSCriticalFailure} from '../../src/service/health_monitor/signal/SignalAWSCriticalFailure';
 
@@ -20,7 +19,7 @@ describe('Check that we work with AWS Health Check system correctly', function()
   this.timeout(120000);
 
   let configService: ConfigServiceAWS;
-  const logger: LoggerAdapter = new LoggerAdapter();
+  const logger = new LoggerAdapter();
   let signalHeartbeat: SignalAWSHeartbeat;
   const hostNameProvider: HostNameProvider = new HostNameProvider(logger);
   let signalCriticalFailure: SignalAWSCriticalFailure;
@@ -31,8 +30,6 @@ describe('Check that we work with AWS Health Check system correctly', function()
 
     configService = new ConfigServiceAWS(environment, region);
     await configService.refreshConfig();
-
-    const logger = new LoggerAll(configService);
 
     signalHeartbeat = new SignalAWSHeartbeat(
         configService,

@@ -54,18 +54,18 @@ export class LoggedClient extends Client {
     super(config);
   }
 
-  public connect() {
+  public async connect() {
     try {
-      return super.connect();
+      return await super.connect();
     } catch (e) {
       this.logger.error(`Error connecting to database: ${JSON.stringify(e)}`);
       throw e;
     }
   }
 
-  public end() {
+  public async end() {
     try {
-      return super.end();
+      return await super.end();
     } catch (e) {
       this.logger.error(`Error ending connection to database: ${JSON.stringify(e)}`);
       throw e;
@@ -74,11 +74,11 @@ export class LoggedClient extends Client {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  public query(...args: unknown[]): QueryResult<QueryResultRow> {
+  public async query(...args: unknown[]): QueryResult<QueryResultRow> {
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return super['query'](...args);
+      return await super['query'](...args);
     } catch (e) {
       this.logger.error(`Error executing DB query: ${JSON.stringify(e)}`);
       throw e;

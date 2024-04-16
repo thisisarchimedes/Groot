@@ -25,7 +25,7 @@ export class AbiFetcherEtherscan implements IAbiFetcher {
 
   public async getAbiByAddress(contractAddress: string): Promise<string> {
     const url = `${this.baseUrl}?module=contract&action=getabi&address=${contractAddress}&apikey=${this.apiKey}`;
-
+    console.log(url);
     const response = await axios.get<EtherscanResponse>(url);
 
     if (response.data.status === '1') {

@@ -15,7 +15,7 @@ describe('Check that we work with remote node correctly', function() {
 
   let remoteNode: BlockchainNodeRemoteRPC;
   let configService: ConfigServiceAWS;
-  const logger: LoggerAdapter = new LoggerAdapter();
+  const logger = new LoggerAdapter();
 
   beforeEach(async function() {
     const environment = process.env.ENVIRONMENT as string;
