@@ -14,6 +14,11 @@ import {TransactionQueuer} from './tx_queue/TransactionQueuer';
 import PostgreTxQueue from './tx_queue/PostgreTxQueue';
 import DBService from './service/db/dbService';
 import {namespace} from './constants/constants';
+import {AbiRepo} from './rule_engine/tool/abi_repository/AbiRepo';
+import {BlockchainReader} from './blockchain/blockchain_reader/BlockchainReader';
+import {FactoryRule} from './rule_engine/FactoryRule';
+import {AbiStorageDynamoDB} from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
+import {AbiFetcherEtherscan} from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 
 dotenv.config();
 
@@ -71,7 +76,14 @@ export class Groot {
         this.signalHeartbeat,
         this.signalCriticalFailure,
     );
-    this.ruleEngine = new RuleEngine(_logger, this.configService, this.mainNode, this.altNode);
+
+    const abiStorage = new AbiStorageDynamoDB(_configService);
+    const abiFetcher = new AbiFetcherEtherscan(_configService);
+    const blockchainReader = new BlockchainReader(_logger, this.mainNode, this.altNode);
+    const abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+
+    const ruleFactory = new FactoryRule(_logger, _configService, blockchainReader, abiRepo);
+    this.ruleEngine = new RuleEngine(_logger, ruleFactory);
 
     const txQueue = new PostgreTxQueue(_logger, _dbService);
     this.transactionsQueuer = new TransactionQueuer(_logger, txQueue);

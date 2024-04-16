@@ -5,26 +5,15 @@ import {Rule} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {FactoryRule} from './FactoryRule';
-import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
-import {BlockchainNodeLocal} from '../blockchain/blockchain_nodes/BlockchainNodeLocal';
-import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
 
 export class RuleEngine {
   private rules: Rule[] = [];
   private outboundTransactions: OutboundTransaction[] = [];
 
-  private readonly logger: ILogger;
-  private readonly ruleFactory: FactoryRule;
-
   constructor(
-      _logger: ILogger,
-      _configService: ConfigServiceAWS,
-      _mainLocalNode: BlockchainNodeLocal,
-      _altLocalNode: BlockchainNodeLocal,
+      private readonly logger: ILogger,
+      private readonly ruleFactory: FactoryRule,
   ) {
-    this.logger = _logger;
-    const blockchainReader = new BlockchainReader(_logger, _mainLocalNode, _altLocalNode);
-    this.ruleFactory = new FactoryRule(_logger, _configService, blockchainReader);
   }
 
   public async loadRulesFromJSONConfig(ruleConfig: RuleJSONConfigItem[]): Promise<void> {

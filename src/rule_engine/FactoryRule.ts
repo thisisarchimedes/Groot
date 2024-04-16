@@ -15,7 +15,7 @@ export class FactoryRule {
      private logger: ILogger,
      _configService: ConfigServiceAWS,
      private blockchainReader: BlockchainReader,
-     private abiRepo: AbiRepo = new AbiRepo(_configService, this.blockchainReader),
+     private abiRepo: AbiRepo,
   ) { }
 
   public createRule(config: RuleJSONConfigItem): Rule | null {

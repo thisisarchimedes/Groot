@@ -9,6 +9,8 @@ import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {RuleParamsUniswapPSPRebalance} from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
+import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
+import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 
 dotenv.config();
 
@@ -33,7 +35,9 @@ describe('Rule Factory Testings: Uniswap', function() {
 
     blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
 
-    abiRepo = new AbiRepo(configService, blockchainReader);
+    const abiStorage = new AbiStorageAdapter();
+    const abiFetcher = new AbiFetcherAdapter();
+    abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
 
     ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo);
   });

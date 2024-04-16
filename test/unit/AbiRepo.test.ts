@@ -21,9 +21,6 @@ describe('ABI Repo', function() {
 
     const logger = new LoggerAll(configService);
 
-    abiStorage = new AbiStorageAdapter();
-    abiFetcher = new AbiFetcherAdapter();
-
     // Starting nodes
     localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
     localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
@@ -34,7 +31,9 @@ describe('ABI Repo', function() {
 
     const blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
 
-    abiRepo = new AbiRepo(configService, blockchainReader);
+    abiStorage = new AbiStorageAdapter();
+    abiFetcher = new AbiFetcherAdapter();
+    abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
   });
 
   it('should load ABI from AbiRepo if exists in DB', async function() {

@@ -9,6 +9,11 @@ import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 import {RuleParamsDummy} from '../../src/rule_engine/rule/RuleDummy';
 import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
 import {RuleEngine} from '../../src/rule_engine/RuleEngine';
+import {FactoryRule} from '../../src/rule_engine/FactoryRule';
+import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
+import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
+import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 
 describe('Rule Engine Testings', function() {
   let logger: LoggerAdapter;
@@ -30,11 +35,17 @@ describe('Rule Engine Testings', function() {
     localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
     localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
+
+    const blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
+
+    const abiStorage = new AbiStorageAdapter();
+    const abiFetcher = new AbiFetcherAdapter();
+    const abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+
+    const ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo);
     ruleEngine = new RuleEngine(
         logger,
-        configService,
-        localNodeAlchemy,
-        localNodeInfura,
+        ruleFactory,
     );
   });
 
