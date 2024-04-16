@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 
-import {RuleConstractorInput, RuleJSONConfigItem, TypeRule} from './TypesRule';
+import {RuleConstructorInput, RuleJSONConfigItem, RuleParams, TypeRule} from './TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
-import {Rule, RuleParams} from './rule/Rule';
+import {Rule} from './rule/Rule';
 import {RuleDummy} from './rule/RuleDummy';
 import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
@@ -19,7 +19,7 @@ export class FactoryRule {
   ) { }
 
   public createRule(config: RuleJSONConfigItem): Rule | null {
-    const constractorInput: RuleConstractorInput = {
+    const constractorInput: RuleConstructorInput = {
       logger: this.logger,
       blockchainReader: this.blockchainReader,
       abiRepo: this.abiRepo,

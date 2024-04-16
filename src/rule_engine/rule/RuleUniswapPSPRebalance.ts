@@ -1,6 +1,6 @@
-import {Rule, RuleParams} from './Rule';
+import {Rule} from './Rule';
 import {RawTransactionData} from '../../blockchain/OutboundTransaction';
-import {RuleConstractorInput} from '../TypesRule';
+import {RuleConstructorInput, RuleParams} from '../TypesRule';
 
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
@@ -12,11 +12,10 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
 }
 /* eslint-enable max-len */
 
-
 export class RuleUniswapPSPRebalance extends Rule {
   // private uniswapStrategy: ToolStrategyUniswap;
-  constructor(input: RuleConstractorInput) {
-    super(input.logger, input.blockchainReader, input.abiRepo);
+  constructor(input: RuleConstructorInput) {
+    super(input);
   }
   public async evaluate(): Promise<void> {
     const blockNumber = await this.blockchainReader.getBlockNumber();

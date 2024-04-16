@@ -1,6 +1,5 @@
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
 import {ILogger} from '../service/logger/interfaces/ILogger';
-import {RuleParams} from './rule/Rule';
 import {AbiRepo} from './tool/abi_repository/AbiRepo';
 
 export enum TypeRule {
@@ -10,7 +9,6 @@ export enum TypeRule {
     ExpirePositions = 'expirePosition',
     RuleBalanceCurvePoolWithVault = 'balanceCurvePoolWithVault'
 }
-
 
 export enum Executor {
     PSP = 'PSP',
@@ -22,13 +20,19 @@ export enum UrgencyLevel {
     HIGH = 'HIGH'
 }
 
+export interface RuleParams {
+    urgencyLevel: UrgencyLevel;
+    ttlSeconds: number;
+    executor: Executor;
+}
+
 export interface RuleJSONConfigItem {
     ruleType: TypeRule;
     label: string;
     params: RuleParams;
 }
 
-export interface RuleConstractorInput {
+export interface RuleConstructorInput {
     logger: ILogger;
     blockchainReader: BlockchainReader;
     abiRepo: AbiRepo;

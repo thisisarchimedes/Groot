@@ -1,13 +1,11 @@
-import {Rule, RuleParams} from './Rule';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import {Rule} from './Rule';
 import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
 import fs from 'fs';
 import {Address} from '../../types/LeverageContractAddresses';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
 import {ConfigService} from '../../service/config/ConfigService';
 import PostgreDataSource from '../tool/data_source/PostgreDataSource';
+import {RuleConstructorInput} from '../TypesRule';
 
 
 export class RuleExpirePositions extends Rule {
@@ -20,17 +18,20 @@ export class RuleExpirePositions extends Rule {
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 
-  constructor(
-      logger: ILogger,
-      blockchainReader: IBlockchainReader,
-      abiRepo: IAbiRepo,
-      leverageDataSource: PostgreDataSource,
-      configService: ConfigService,
-  ) {
-    super(logger, blockchainReader, abiRepo);
+  constructor(input: RuleConstructorInput, leverageDataSource: PostgreDataSource, configService: ConfigService) {
+    super(input);
     this.leverageDataSource = leverageDataSource;
     this.configService = configService;
     // this.uniswap = new Uniswap('');
+
+    this.positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;
+    try {
+      // this.positionLedgerABI = await this.abiRepo.getAbiByAddress(positionLedgerAddress);
+      throw new Error('failed to fetch');
+    } catch {
+      this.positionLedgerABI = fs.readFileSync('./src/constants/abis/POSITION_LEDGER_ABI.json', 'utf-8');
+    }
+    this.positionLedgerContract = new PositionLedgerContract(this.positionLedgerAddress, this.positionLedgerABI);
   }
 
   public async evaluate(): Promise<void> {
@@ -54,21 +55,6 @@ export class RuleExpirePositions extends Rule {
     } as OutboundTransaction;
 
     this.pushTransactionToRuleLocalQueue(outboundTx);
-  }
-
-  public override async initialize(ruleLabel: string, params: RuleParams): Promise<void> {
-    this.ruleLabel = ruleLabel;
-    this.params = params;
-
-    this.positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;
-    try {
-      // this.positionLedgerABI = await this.abiRepo.getAbiByAddress(positionLedgerAddress);
-      throw new Error('failed to fetch');
-    } catch {
-      this.positionLedgerABI = fs.readFileSync('./src/constants/abis/POSITION_LEDGER_ABI.json', 'utf-8');
-    }
-    this.positionLedgerContract = new PositionLedgerContract(this.positionLedgerAddress, this.positionLedgerABI);
-    await Promise.resolve();
   }
 
   /**

@@ -11,7 +11,6 @@ import {
 import {HealthMonitor} from '../../src/service/health_monitor/HealthMonitor';
 import {SignalAdapter} from './adapters/SignalAdapter';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {LoggerAll} from '../../src/service/logger/LoggerAll';
 
 const {expect} = chai;
 

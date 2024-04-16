@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 
-import {Rule, RuleParams} from './Rule';
+import {Rule} from './Rule';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
-import {RuleConstractorInput} from '../TypesRule';
+import {RuleConstructorInput, RuleParams} from '../TypesRule';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -10,10 +10,9 @@ export interface RuleParamsDummy extends RuleParams {
   evalSuccess: boolean;
 }
 
-
 export class RuleDummy extends Rule {
-  constructor(input: RuleConstractorInput) {
-    super(input.logger, input.blockchainReader, input.abiRepo);
+  constructor(input: RuleConstructorInput) {
+    super(input);
     // this.uniswap = new Uniswap('');
   }
 

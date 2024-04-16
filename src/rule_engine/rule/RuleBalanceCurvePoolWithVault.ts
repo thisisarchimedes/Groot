@@ -1,4 +1,5 @@
-import {Rule, RuleConstructorInput} from './Rule';
+import {Rule} from './Rule';
+import {RuleConstructorInput} from '../TypesRule';
 
 export class RuleBalanceCurvePoolWithVault extends Rule {
   public evaluate(): Promise<void> {
@@ -8,6 +9,6 @@ export class RuleBalanceCurvePoolWithVault extends Rule {
     throw new Error('Method not implemented.');
   }
   constructor(input: RuleConstructorInput) {
-    super(input.logger, input.blockchainReader, input.abiRepo);
+    super(input);
   }
 }
