@@ -1,16 +1,16 @@
-import { OutboundTransaction } from '../../../src/blockchain/OutboundTransaction';
-import { ITxQueue } from '../../../src/tx_queue/interfaces/ITxQueue';
-import { injectable } from 'inversify';
+import {OutboundTransaction} from '../../../src/blockchain/OutboundTransaction';
+import {ITxQueue} from '../../../src/tx_queue/interfaces/ITxQueue';
 
-@injectable()
 export class TxQueueAdapter implements ITxQueue {
   refresh(): Promise<void> {
     throw new Error('Method not implemented.');
   }
+
   private transactions: OutboundTransaction[] = [];
 
-  public async addTransactionToQueue(tx: OutboundTransaction): Promise<void> {
+  public addTransactionToQueue(tx: OutboundTransaction):Promise<void> {
     this.transactions.push(tx);
+    return Promise.resolve();
   }
 
   public getTransactions(): OutboundTransaction[] {

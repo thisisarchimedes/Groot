@@ -1,10 +1,8 @@
 import axios from 'axios';
-import {injectable} from 'inversify';
-
 import {Logger} from './Logger';
 import {LogLevel} from './LogLevel';
-import {IConfigServiceAWS} from '../config/interfaces/IConfigServiceAWS';
 import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
+import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 
 
 interface LogRecord {
@@ -37,14 +35,14 @@ interface NewRelicConfig {
   backoffFactor: number;
 }
 
-@injectable()
+
 export class LoggerNewRelic extends Logger implements ILoggerNewRelic {
   private readonly config: NewRelicConfig;
   private readonly formatter: LogFormatter;
   private pendingPromises: Promise<void>[] = [];
 
   constructor(
-      configService: IConfigServiceAWS,
+      configService: ConfigServiceAWS,
       serviceName: string,
       formatter: LogFormatter = new CustomJsonFormatter(),
       maxRetries = 3,

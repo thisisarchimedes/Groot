@@ -1,5 +1,5 @@
-import {LogLevel, Logger} from '../../../src/service/logger/Logger';
-import { LoggerConsole } from '../../../src/service/logger/LoggerConsole';
+import {LogLevel} from '../../../src/service/logger/Logger';
+import {LoggerConsole} from '../../../src/service/logger/LoggerConsole';
 
 export class LoggerAdapter extends LoggerConsole {
   private latestInfoLogLine: string = '';

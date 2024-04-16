@@ -1,40 +1,52 @@
 import 'reflect-metadata';
-import { expect } from 'chai';
-import { FactoryRule } from '../../src/rule_engine/FactoryRule';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { RuleJSONConfigItem, TypeRule } from '../../src/rule_engine/TypesRule';
-import { BlockchainReader } from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import { TYPES } from '../../src/inversify.types';
-import { Container } from 'inversify';
-import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
-import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
-import { createTestContainer } from './inversify.config.unit_test';
-import { IFactoryRule } from '../../src/rule_engine/interfaces/IFactoryRule';
-import { RuleParamsDummy } from '../../src/rule_engine/rule/RuleDummy';
+import {expect} from 'chai';
+import {FactoryRule} from '../../src/rule_engine/FactoryRule';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
+import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
+import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
+import {RuleParamsDummy} from '../../src/rule_engine/rule/RuleDummy';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
+import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
+import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 
-describe('Rule Factory Testings', function () {
-  let container: Container;
+describe('Rule Factory Testings', function() {
   let logger: LoggerAdapter;
   let blockchainReader: BlockchainReader;
-  let abiRepo: IAbiRepo;
+  let localNodeAlchemy: BlockchainNodeAdapter;
+  let localNodeInfura: BlockchainNodeAdapter;
+  let abiRepo: AbiRepo;
+  let ruleFactory: FactoryRule;
 
-  beforeEach(async function () {
-    container = createTestContainer();
-    logger = container.resolve(LoggerAdapter);
-    blockchainReader = container.get<BlockchainReader>(TYPES.IBlockchainReader);
-    abiRepo = container.get<IAbiRepo>(TYPES.IAbiRepo);
+  beforeEach(async function() {
+    const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
+    await configService.refreshConfig();
 
-    const localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
-    const localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
-    await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
+    logger = new LoggerAdapter();
+
+    // Starting nodes
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
+
+    Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
+
+    localNodeInfura.setProxyInfoForAddressResponse({isProxy: false, implementationAddress: ''});
+
+    blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
+
+    const abiStorage = new AbiStorageAdapter();
+    const abiFetcher = new AbiFetcherAdapter();
+    abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+
+    ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo);
   });
 
-  it('should create Rule object from a dummy rule config', async function () {
-    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
+  it('should create Rule object from a dummy rule config', async function() {
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
-      params: { message: 'I AM GROOT', NumberOfDummyTxs: 1, evalSuccess: true } as RuleParamsDummy,
+      params: {message: 'I AM GROOT', NumberOfDummyTxs: 1, evalSuccess: true} as RuleParamsDummy,
     };
     const rule = await ruleFactory.createRule(dummyRule);
     expect(rule).not.to.be.undefined;
@@ -44,13 +56,12 @@ describe('Rule Factory Testings', function () {
     expect(logger.getLatestInfoLogLine()).to.contain('I AM GROOT');
   });
 
-  it('should generate more than one tx per rule', async function () {
+  it('should generate more than one tx per rule', async function() {
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
-      params: { message: 'I AM GROOT', NumberOfDummyTxs: 3, evalSuccess: true } as RuleParamsDummy,
+      params: {message: 'I AM GROOT', NumberOfDummyTxs: 3, evalSuccess: true} as RuleParamsDummy,
     };
-    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
     const rule = await ruleFactory.createRule(dummyRule);
     if (rule) {
       await rule.evaluate();
@@ -67,12 +78,11 @@ describe('Rule Factory Testings', function () {
     expect(rule.popTransactionFromRuleLocalQueue()).to.be.undefined;
   });
 
-  it('should create identifier when the Rule evaluates itself', async function () {
-    const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
+  it('should create identifier when the Rule evaluates itself', async function() {
     const dummyRule: RuleJSONConfigItem = {
       ruleType: TypeRule.Dummy,
       label: 'dummyRule',
-      params: { message: 'I AM GROOT', NumberOfDummyTxs: 1, evalSuccess: true } as RuleParamsDummy,
+      params: {message: 'I AM GROOT', NumberOfDummyTxs: 1, evalSuccess: true} as RuleParamsDummy,
     };
     const rule = await ruleFactory.createRule(dummyRule);
     expect(rule).not.to.be.undefined;

@@ -1,10 +1,8 @@
-import {injectable} from 'inversify';
 import {RuleJSONConfigItem} from '../../rule_engine/TypesRule';
 import {LeverageContractAddresses} from '../../types/LeverageContractAddresses';
-import {IConfigService} from './interfaces/IConfigService';
 
-@injectable()
-export abstract class ConfigService implements IConfigService {
+
+export abstract class ConfigService {
   protected environment: string = '';
   protected mainRPCURL: string = '';
   protected altRPCURL: string = '';

@@ -1,13 +1,14 @@
 import { ethers } from 'ethers';
 import {
-  BlockchainNode,
   BlockchainNodeError,
 } from '../../../src/blockchain/blockchain_nodes/BlockchainNode';
-import { BlockchainNodeProxyInfo } from '../../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
+import {BlockchainNodeProxyInfo} from '../../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
+import {BlockchainNodeLocal} from '../../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
+import {ILoggerAll} from '../../../src/service/logger/interfaces/ILoggerAll';
 
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export class BlockchainNodeAdapter extends BlockchainNode {
+export class BlockchainNodeAdapter extends BlockchainNodeLocal {
   private currentBlockNumber: number = 100;
   private currentReadResponse: unknown = {};
   private throwErrorOnGetBlockNumber: boolean = false;
@@ -15,17 +16,15 @@ export class BlockchainNodeAdapter extends BlockchainNode {
   private expectRecoverToSucceed: boolean = true;
   private proxyInfo!: BlockchainNodeProxyInfo;
 
-  public async startNode(): Promise<void> {
-
+  constructor(logger: ILoggerAll, nodeName: string) {
+    super(logger, '', nodeName);
   }
 
-  public async stopNode(): Promise<void> {
+  public async startNode(): Promise<void> {}
 
-  }
+  public async stopNode(): Promise<void> {}
 
-  public async resetNode(externalProviderRpcUrl: string): Promise<void> {
-
-  }
+  public async resetNode(externalProviderRpcUrl: string): Promise<void> {}
 
   // eslint-disable-next-line require-await
   public async recoverNode(): Promise<void> {

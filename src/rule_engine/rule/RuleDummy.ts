@@ -1,11 +1,8 @@
 import 'reflect-metadata';
 
-import {Rule, RuleParams} from './Rule';
+import {Rule} from './Rule';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
-import {inject, injectable} from 'inversify';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {RuleConstructorInput, RuleParams} from '../TypesRule';
 
 export interface RuleParamsDummy extends RuleParams {
   message: string;
@@ -13,13 +10,9 @@ export interface RuleParamsDummy extends RuleParams {
   evalSuccess: boolean;
 }
 
-@injectable()
 export class RuleDummy extends Rule {
-  constructor(
-    @inject('ILoggerAll') logger: ILogger,
-    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
-    @inject('IAbiRepo') abiRepo: IAbiRepo) {
-    super(logger, blockchainReader, abiRepo);
+  constructor(input: RuleConstructorInput) {
+    super(input);
     // this.uniswap = new Uniswap('');
   }
 
