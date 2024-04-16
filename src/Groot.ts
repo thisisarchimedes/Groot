@@ -23,17 +23,17 @@ import {AbiFetcherEtherscan} from './rule_engine/tool/abi_repository/AbiFetcherE
 dotenv.config();
 
 export class Groot {
-  private mainNode: BlockchainNodeLocal;
-  private altNode: BlockchainNodeLocal;
-  private signalHeartbeat: SignalAWSHeartbeat;
-  private hostnameProvider: HostNameProvider;
-  private signalCriticalFailure: SignalAWSCriticalFailure;
-  private blockchainNodeHealthMonitor: BlockchainNodeHealthMonitor;
-  private healthMonitor: HealthMonitor;
-  private ruleEngine: RuleEngine;
-  private transactionsQueuer: TransactionQueuer;
-  private blockchainReader: BlockchainReader;
-  private abiRepo: AbiRepo;
+  private mainNode!: BlockchainNodeLocal;
+  private altNode!: BlockchainNodeLocal;
+  private signalHeartbeat!: SignalAWSHeartbeat;
+  private hostnameProvider!: HostNameProvider;
+  private signalCriticalFailure!: SignalAWSCriticalFailure;
+  private blockchainNodeHealthMonitor!: BlockchainNodeHealthMonitor;
+  private healthMonitor!: HealthMonitor;
+  private ruleEngine!: RuleEngine;
+  private transactionsQueuer!: TransactionQueuer;
+  private blockchainReader!: BlockchainReader;
+  private abiRepo!: AbiRepo;
 
   constructor(
       private configService: ConfigServiceAWS,
