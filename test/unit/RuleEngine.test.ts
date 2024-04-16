@@ -9,8 +9,6 @@ import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 import {RuleParamsDummy} from '../../src/rule_engine/rule/RuleDummy';
 import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
 import {RuleEngine} from '../../src/rule_engine/RuleEngine';
-import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {BlockchainNodeLocal} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
 
 describe('Rule Engine Testings', function() {
   let logger: LoggerAdapter;
@@ -34,9 +32,9 @@ describe('Rule Engine Testings', function() {
     await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
     ruleEngine = new RuleEngine(
         logger,
-        configService as unknown as ConfigServiceAWS,
-        localNodeAlchemy as unknown as BlockchainNodeLocal,
-        localNodeInfura as unknown as BlockchainNodeLocal,
+        configService,
+        localNodeAlchemy,
+        localNodeInfura,
     );
   });
 
@@ -56,7 +54,7 @@ describe('Rule Engine Testings', function() {
 
     await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
     const transactions = ruleEngine.getOutboundTransactions();
-    assertTransactionsValid(transactions, 3);
+    assertTransactionsValid(transactions, 5);
     expect(logger.isExpectedLogLineInfoFound()).to.be.true;
   });
 
