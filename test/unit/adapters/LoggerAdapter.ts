@@ -1,6 +1,7 @@
 import {LogLevel, Logger} from '../../../src/service/logger/Logger';
+import { LoggerConsole } from '../../../src/service/logger/LoggerConsole';
 
-export class LoggerAdapter extends Logger {
+export class LoggerAdapter extends LoggerConsole {
   private latestInfoLogLine: string = '';
   private latestErrorLogLine: string = '';
 
@@ -12,14 +13,12 @@ export class LoggerAdapter extends Logger {
   }
 
   public debug(message: string): void {
-    if (this.currentLevel >= LogLevel.Debug) {
-      console.debug('\x1b[2;37m%s\x1b[0m', '[DEBUG] ' + message);
-    }
+    super.debug(message);
   }
 
   public info(message: string): void {
     if (this.currentLevel >= LogLevel.Info) {
-      console.info('\x1b[36m%s\x1b[0m', '[INFO] ' + message);
+      super.info(message);
       this.latestInfoLogLine = message;
 
       if (this.expectedLogLineInfo && message.includes(this.expectedLogLineInfo)) {
@@ -29,14 +28,12 @@ export class LoggerAdapter extends Logger {
   }
 
   public warn(message: string): void {
-    if (this.currentLevel >= LogLevel.Warn) {
-      console.warn('\x1b[33m%s\x1b[0m', '[WARN] ' + message);
-    }
+    super.warn(message);
   }
 
   public error(message: string): void {
     if (this.currentLevel >= LogLevel.Error) {
-      console.error('\x1b[31m%s\x1b[0m', '[ERROR] ' + message);
+      super.error(message);
       this.latestErrorLogLine = message;
     }
   }

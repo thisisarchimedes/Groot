@@ -5,9 +5,7 @@ import 'reflect-metadata';
 
 import { LoggerAdapter } from '../unit/adapters/LoggerAdapter';
 import { ConfigServiceAWS } from '../../src/service/config/ConfigServiceAWS';
-import { SignalAWSHeartbeat } from '../../src/service/health_monitor/signal/SignalAWSHeartbeat';
 import { HostNameProvider } from '../../src/service/health_monitor/HostNameProvider';
-import { SignalAWSCriticalFailure } from '../../src/service/health_monitor/signal/SignalAWSCriticalFailure';
 import { InversifyConfig } from '../../src/inversify.config';
 import { Container } from 'inversify';
 import { ISignalHeartbeat } from '../../src/service/health_monitor/signal/interfaces/ISignalHeartbeat';

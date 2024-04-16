@@ -175,9 +175,9 @@ export class InversifyConfig {
   }
 
   private bindTransactionQueue() {
-    this.container.bind<ITxQueue>(TYPES.PostgreTxQueue).to(PostgreTxQueue).inTransientScope();
+    this.container.bind<ITxQueue>(TYPES.PostgreTxQueue).to(PostgreTxQueue).inSingletonScope();
 
-    this.container.bind<ITransactionQueuer>(TYPES.ITransactionQueuer).to(TransactionQueuer).inTransientScope();
+    this.container.bind<ITransactionQueuer>(TYPES.ITransactionQueuer).to(TransactionQueuer).inSingletonScope();
   }
 
   private bindRules() {

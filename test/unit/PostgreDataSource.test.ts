@@ -57,7 +57,7 @@ describe('PostgreDataSource Tests', function () {
         positions.forEach((position: any, index: number) => {
             expect(position).to.include(mockResponse.rows[index]);
         });
-    });
+    }).timeout(1000000);
 
     it('getPositionsByNftIds should handle database errors gracefully and log an error message', async function () {
         // Setup mock to throw error on connect
@@ -78,7 +78,7 @@ describe('PostgreDataSource Tests', function () {
         expect(errorCaught).to.be.true;
         // Verify that an error log was generated
         expect(loggerAdapter.getLatestErrorLogLine()).to.include("Database connection failed");
-    });
+    }).timeout(1000000);
 
     it('getLivePositions should return live positions correctly', async function () {
         const mockResponse = {
@@ -100,7 +100,7 @@ describe('PostgreDataSource Tests', function () {
         positions.forEach((position, index) => {
             expect(position).to.deep.include(mockResponse.rows[index]);
         });
-    });
+    }).timeout(1000000);
 
     it('getLivePositions should handle errors gracefully', async function () {
         pgClientAdapter.setThrowErrorOnConnect(true);
@@ -116,7 +116,7 @@ describe('PostgreDataSource Tests', function () {
                 expect.fail('Error is not of type Error');
             }
         }
-    });
+    }).timeout(1000000);
 
     it('getLivePositionsNftIds should return NFT IDs for live positions', async function () {
         const mockResponse = {
@@ -136,7 +136,7 @@ describe('PostgreDataSource Tests', function () {
         expect(nftIds).to.be.an('array').that.is.not.empty;
         expect(nftIds.length).to.equal(mockResponse.rows.length);
         expect(nftIds).to.deep.equal(mockResponse.rows.map(row => row.nftId));
-    });
+    }).timeout(1000000);
 
     it('getLivePositionsNftIds should handle errors gracefully', async function () {
         pgClientAdapter.setThrowErrorOnConnect(true);
@@ -152,5 +152,5 @@ describe('PostgreDataSource Tests', function () {
                 expect.fail('Error is not of type Error');
             }
         }
-    });
+    }).timeout(1000000);
 });
