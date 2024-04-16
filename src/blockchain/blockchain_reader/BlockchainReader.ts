@@ -1,10 +1,9 @@
-import {injectable, inject} from 'inversify';
+
 import {Interface} from 'ethers';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IBlockchainNode} from '../blockchain_nodes/interfaces/IBlockchainNode';
-import {IBlockchainNodeLocal} from '../blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import {BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNodeProxyInfo';
-import {IBlockchainReader} from './interfaces/IBlockchainReader';
+import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
+import {BlockchainNodeLocal} from '../blockchain_nodes/BlockchainNodeLocal';
 
 export class BlockchainReaderError extends Error {
   constructor(message: string) {
@@ -26,17 +25,17 @@ interface ValidNodeResponse {
   blockNumber: number;
 }
 
-@injectable()
-export class BlockchainReader implements IBlockchainReader {
-  private readonly nodes: IBlockchainNode[];
+
+export class BlockchainReader {
+  private readonly nodes: BlockchainNode[];
   private readonly logger: ILogger;
 
   private initialized: boolean;
 
   constructor(
-    @inject('ILoggerAll') _logger: ILogger,
-    @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
-    @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal) {
+      _logger: ILogger,
+      _mainLocalNode: BlockchainNodeLocal,
+      _altLocalNode: BlockchainNodeLocal) {
     this.nodes = [_mainLocalNode, _altLocalNode];
     this.logger = _logger;
     this.initialized = false;

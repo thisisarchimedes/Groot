@@ -1,28 +1,23 @@
 import 'reflect-metadata';
-import { expect } from 'chai';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
-import { Executor, UrgencyLevel } from '../../src/rule_engine/TypesRule';
-import { OutboundTransaction } from '../../src/blockchain/OutboundTransaction';
-import { TxQueueAdapter } from './adapters/TxQueueAdapter';
-import { TransactionQueuer } from '../../src/tx_queue/TransactionQueuer';
-import { TYPES } from '../../src/inversify.types';
-import { Container } from 'inversify';
-import { createTestContainer } from './inversify.config.unit_test';
+import {expect} from 'chai';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
+import {Executor, UrgencyLevel} from '../../src/rule_engine/TypesRule';
+import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
+import {TxQueueAdapter} from './adapters/TxQueueAdapter';
+import {TransactionQueuer} from '../../src/tx_queue/TransactionQueuer';
 
-describe('Transaction Queuer', function () {
-  let container: Container;
+describe('Transaction Queuer', function() {
   let logger: LoggerAdapter;
   let txQueuer: TransactionQueuer;
   let queue: TxQueueAdapter;
 
-  beforeEach(async function () {
-    container = createTestContainer();
-    logger = container.get<LoggerAdapter>(TYPES.ILoggerAll);
-    queue = container.get<TxQueueAdapter>(TxQueueAdapter);
+  beforeEach(function() {
+    logger = new LoggerAdapter();
+    queue = new TxQueueAdapter();
     txQueuer = new TransactionQueuer(logger, queue);
   });
 
-  it('should filter out and report on all tx that dont have a hash', async function () {
+  it('should filter out and report on all tx that dont have a hash', async function() {
     const txs: OutboundTransaction[] = [
       {
         urgencyLevel: UrgencyLevel.HIGH,

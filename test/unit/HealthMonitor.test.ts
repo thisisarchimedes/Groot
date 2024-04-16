@@ -2,47 +2,47 @@ import 'reflect-metadata';
 
 import * as chai from 'chai';
 
-import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
-import { LoggerAdapter } from './adapters/LoggerAdapter';
+import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
+import {LoggerAdapter} from './adapters/LoggerAdapter';
 import {
+  BlockchainNodeHealthMonitor,
   ErrorBlockchainNodeHealthMonitor,
 } from '../../src/service/health_monitor/BlockchainNodeHealthMonitor';
-import { HealthMonitor } from '../../src/service/health_monitor/HealthMonitor';
-import { SignalAdapter } from './adapters/SignalAdapter';
-import { Container } from 'inversify';
-import { TYPES } from '../../src/inversify.types';
-import { IBlockchainNodeHealthMonitor } from '../../src/service/health_monitor/interfaces/BlockchainNodeHealthMonitor';
-import { createTestContainer } from './inversify.config.unit_test';
-import { ILogger } from '../../src/service/logger/interfaces/ILogger';
+import {HealthMonitor} from '../../src/service/health_monitor/HealthMonitor';
+import {SignalAdapter} from './adapters/SignalAdapter';
+import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 
-const { expect } = chai;
+const {expect} = chai;
 
 const should = chai.should();
 
 
-describe('Health Monitor tests', function () {
+describe('Health Monitor tests', function() {
   let localNodeAlchemy: BlockchainNodeAdapter;
   let localNodeInfura: BlockchainNodeAdapter;
-  let container: Container;
-  let blockchainNodeHealth: IBlockchainNodeHealthMonitor;
+  let blockchainNodeHealth: BlockchainNodeHealthMonitor;
   let logger: LoggerAdapter;
-  beforeEach(async function () {
-    container = createTestContainer();
+
+  beforeEach(async function() {
+    const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
+    await configService.refreshConfig();
+
+    logger = new LoggerAdapter();
+
     // Starting nodes
-    logger = container.get<LoggerAdapter>(LoggerAdapter);
-    localNodeAlchemy = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalMain);
-    localNodeInfura = container.get<BlockchainNodeAdapter>(TYPES.BlockchainNodeLocalAlt);
+    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
+    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
     Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
 
-    blockchainNodeHealth = container.get<IBlockchainNodeHealthMonitor>(TYPES.IBlockchainNodeHealthMonitor);
+    blockchainNodeHealth = new BlockchainNodeHealthMonitor(logger, localNodeAlchemy, localNodeInfura);
   });
 
-  afterEach(async function () {
+  afterEach(async function() {
     await localNodeAlchemy.stopNode();
     await localNodeInfura.stopNode();
   });
 
-  it('Should be able to recover node that is currently unhealthy', async function () {
+  it('Should be able to recover node that is currently unhealthy', async function() {
     localNodeAlchemy.setNodeHealthy(true);
     localNodeInfura.setNodeHealthy(false);
     localNodeInfura.setExpectRecoverToSucceed(true);
@@ -50,12 +50,12 @@ describe('Health Monitor tests', function () {
     await blockchainNodeHealth.checkBlockchainNodesHealth();
     const loggLastLine = logger.getLatestInfoLogLine();
     expect(loggLastLine.includes(`Node ${localNodeInfura.getNodeName()} has been recovered`))
-      .to.be.true;
+        .to.be.true;
     expect(localNodeInfura.isHealthy()).to.be.true;
     expect(localNodeAlchemy.isHealthy()).to.be.true;
   });
 
-  it('Should throw if all nodes failed and cannot recover', async function () {
+  it('Should throw if all nodes failed and cannot recover', async function() {
     localNodeAlchemy.setNodeHealthy(false);
     localNodeAlchemy.setExpectRecoverToSucceed(false);
     localNodeInfura.setNodeHealthy(false);
@@ -70,7 +70,7 @@ describe('Health Monitor tests', function () {
     }
   });
 
-  it('Should correctly invoke Health Monitor start of cycle sequence', async function () {
+  it('Should correctly invoke Health Monitor start of cycle sequence', async function() {
     localNodeAlchemy.setNodeHealthy(true);
     localNodeInfura.setNodeHealthy(true);
 
@@ -78,7 +78,7 @@ describe('Health Monitor tests', function () {
     const signalCriticalFailure: SignalAdapter = new SignalAdapter();
 
     const healthMonitor: HealthMonitor = new HealthMonitor(
-      logger, blockchainNodeHealth, signalHeartbeat, signalCriticalFailure);
+        logger, blockchainNodeHealth, signalHeartbeat, signalCriticalFailure);
 
     await healthMonitor.startOfCycleSequence();
 
@@ -86,7 +86,7 @@ describe('Health Monitor tests', function () {
     expect(signalCriticalFailure.isCriticalFailureSent()).to.be.false;
   });
 
-  it('Should correctly invoke Health Monitor start of cycle and send critical failure', async function () {
+  it('Should correctly invoke Health Monitor start of cycle and send critical failure', async function() {
     localNodeAlchemy.setNodeHealthy(false);
     localNodeAlchemy.setExpectRecoverToSucceed(false);
 
@@ -97,7 +97,7 @@ describe('Health Monitor tests', function () {
     const signalCriticalFailure: SignalAdapter = new SignalAdapter();
 
     const healthMonitor: HealthMonitor = new HealthMonitor(
-      logger, blockchainNodeHealth, signalHeartbeat, signalCriticalFailure);
+        logger, blockchainNodeHealth, signalHeartbeat, signalCriticalFailure);
 
     await healthMonitor.startOfCycleSequence();
 
@@ -105,12 +105,12 @@ describe('Health Monitor tests', function () {
     expect(signalCriticalFailure.isCriticalFailureSent()).to.be.true;
   });
 
-  it('Should correctly invoke Health Monitor end of cycle and report on cycle time', async function () {
+  it('Should correctly invoke Health Monitor end of cycle and report on cycle time', async function() {
     const signalHeartbeat: SignalAdapter = new SignalAdapter();
     const signalCriticalFailure: SignalAdapter = new SignalAdapter();
 
     const healthMonitor: HealthMonitor = new HealthMonitor(
-      logger, blockchainNodeHealth, signalHeartbeat, signalCriticalFailure);
+        logger, blockchainNodeHealth, signalHeartbeat, signalCriticalFailure);
 
     await healthMonitor.startOfCycleSequence();
     healthMonitor.endOfCycleSequence();
