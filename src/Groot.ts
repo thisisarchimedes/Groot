@@ -38,7 +38,7 @@ export class Groot {
   constructor(
       private configService: ConfigServiceAWS,
       private logger: ILogger,
-      dbService: DBService,
+      private dbService: DBService,
   ) {
     this.initializeNodes();
     this.initializeHealthMonitor();
@@ -49,7 +49,7 @@ export class Groot {
 
     this.initializeRuleEngine();
 
-    this.initializeTxQueuer(dbService);
+    this.initializeTxQueuer();
   }
 
   private initializeNodes() {
@@ -103,8 +103,8 @@ export class Groot {
     this.ruleEngine = new RuleEngine(this.logger, ruleFactory);
   }
 
-  private initializeTxQueuer(dbService: DBService) {
-    const txQueue = new PostgreTxQueue(this.logger, dbService);
+  private initializeTxQueuer() {
+    const txQueue = new PostgreTxQueue(this.logger, this.dbService);
     this.transactionsQueuer = new TransactionQueuer(this.logger, txQueue);
   }
 
@@ -117,7 +117,10 @@ export class Groot {
   public async shutdownGroot() {
     this.logger.warn('Shutting down Groot...');
 
-    await this.shutdownReadOnlyLocalNodes();
+    await Promise.all([
+      this.shutdownReadOnlyLocalNodes(),
+      this.dbService.end(),
+    ]);
 
     this.logger.warn('Groot shutdown successfully.');
   }
