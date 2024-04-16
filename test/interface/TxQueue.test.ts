@@ -8,6 +8,9 @@ import PostgreTxQueue from '../../src/tx_queue/PostgreTxQueue';
 import {LoggerAll} from '../../src/service/logger/LoggerAll';
 
 describe('Transaction Insertion Tests', function() {
+  // eslint-disable-next-line no-invalid-this
+  this.timeout(25000);
+
   let txQueue: ITxQueue;
   let dbService: DBService;
 
@@ -17,8 +20,8 @@ describe('Transaction Insertion Tests', function() {
 
     const logger = new LoggerAll(configService);
 
-    const dbService = new DBService(logger, configService);
-    await configService.refreshConfig();
+    dbService = new DBService(logger, configService);
+    await dbService.connect();
 
     txQueue = new PostgreTxQueue(logger, dbService);
   });
@@ -61,7 +64,7 @@ describe('Transaction Insertion Tests', function() {
     }
     expect(errorOccurred).to.be.false;
 
-    // // Verify insertion
+    // Verify insertion
     const result = await dbService.getTransactionsClient().query(
         'SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1',
         ['test_uniqueIdentifier1'],

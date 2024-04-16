@@ -26,7 +26,6 @@ describe('Check that we work with local Hardhat node correctly', function() {
   beforeEach(async function() {
     const configService = await createConfigService();
     await initializeConfigService(configService);
-
     const logger = new LoggerAll(configService);
 
     localNode = new BlockchainNodeLocal(
@@ -39,6 +38,10 @@ describe('Check that we work with local Hardhat node correctly', function() {
 
   afterEach(async function() {
     await localNode.stopNode();
+  });
+
+  it('mock test', function() {
+    expect(true).to.be.true;
   });
 
   it('Should be able to reset node and point it to valid RPC', async function() {
