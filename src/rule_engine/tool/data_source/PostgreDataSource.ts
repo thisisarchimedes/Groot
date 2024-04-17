@@ -31,6 +31,17 @@ export default class PostgreDataSource {
     return resp ? (resp.rows as LeveragePosition[]) : [];
   }
 
+  async getLivePositionsForLiquidaton(): Promise<LeveragePosition[]> {
+    const query = `SELECT *, (debtAmount + collateralAmount) AS positionSize
+      FROM "LeveragePosition"
+      WHERE "positionState" = 'LIVE'
+      ORDER BY positionSize DESC
+      LIMIT 1000
+    `;
+    const resp = await this.dbService.getLeverageClient().query(query);
+    return resp ? (resp.rows as LeveragePosition[]) : [];
+  }
+
   async getLivePositionsNftIds(): Promise<number[]> {
     const resp = await this.dbService.getLeverageClient().query(
         'SELECT "nftId" FROM "LeveragePosition" WHERE "positionState" = \'LIVE\'',

@@ -1,17 +1,11 @@
 import pLimit from 'p-limit';
-import {Rule, RuleParams} from './Rule';
-import {Executor, UrgencyLevel} from '../TypesRule';
+import {Rule} from './Rule';
+import {Executor, RuleConstructorInput, RuleParams, UrgencyLevel} from '../TypesRule';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
 import LeveragePosition from '../../types/LeveragePosition';
 import {Contract} from 'ethers';
 import {Address} from '../../types/LeverageContractAddresses';
-import {inject, injectable} from 'inversify';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
-import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
-import {IConfigService} from '../../service/config/interfaces/IConfigService';
-import {IUniSwapPayloadBuilder} from '../tool/uni_swap/interfaces/IUniSwapPayloadBuilder';
+import UniSwapPayloadBuilder from '../tool/uni_swap/UniSwapPayloadBuilder';
 
 const MAX_CONCURRENCY = 20;
 
@@ -21,28 +15,18 @@ export interface RuleParamsLiquidatePositions extends RuleParams {
   message: string;
   numberOfLiquidatePositionsTxs: number;
   evalSuccess: boolean;
+  uniswapPayloadBuilder: UniSwapPayloadBuilder;
 }
 
-@injectable()
 export class RuleLiquidatePositions extends Rule {
-  private leverageDataSource: ILeverageDataSource;
   private positionLiquidator!: Contract;
-  private config: IConfigService;
-  private uniSwapPayloadBuilder: IUniSwapPayloadBuilder;
+  private uniSwapPayloadBuilder: UniSwapPayloadBuilder;
 
   constructor(
-    @inject('ILoggerAll') logger: ILogger,
-    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
-    @inject('IAbiRepo') abiRepo: IAbiRepo,
-    @inject('PostgreDataSource') leverageDataSource: ILeverageDataSource,
-    @inject('IConfigServiceAWS') configService: IConfigService,
-    @inject('IUniSwapPayloadBuilder') uniSwapPayloadBuilder: IUniSwapPayloadBuilder,
+      input: RuleConstructorInput,
   ) {
-    super(logger, blockchainReader, abiRepo);
-    this.leverageDataSource = leverageDataSource;
-    this.config = configService;
-    this.uniSwapPayloadBuilder = uniSwapPayloadBuilder;
-    // this.uniswap = new Uniswap('');
+    super(input);
+    this.uniSwapPayloadBuilder = new UniSwapPayloadBuilder(this.blockchainReader, this.abiRepo);
   }
 
   public async evaluate(): Promise<void> {
@@ -54,8 +38,8 @@ export class RuleLiquidatePositions extends Rule {
     const currentTimestamp = await this.blockchainReader.getBlockTimestamp(blockNumber);
 
     this.positionLiquidator = new Contract(
-        this.config.getLeverageContractInfo().positionLiquidator,
-        await this.abiRepo.getAbiByAddress(this.config.getLeverageContractInfo().positionLiquidator),
+        this.configService.getLeverageContractInfo().positionLiquidator,
+        await this.abiRepo.getAbiByAddress(this.configService.getLeverageContractInfo().positionLiquidator),
     );
 
     // Query to get all live positions data
@@ -150,7 +134,7 @@ export class RuleLiquidatePositions extends Rule {
 
     // Create a transaction object
     const tx = {
-      to: this.config.getLeverageContractInfo().positionLiquidator,
+      to: this.configService.getLeverageContractInfo().positionLiquidator,
       value: 0n,
       data,
     };

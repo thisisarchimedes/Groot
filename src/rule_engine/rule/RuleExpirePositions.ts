@@ -3,14 +3,10 @@ import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
 import fs from 'fs';
 import {Address} from '../../types/LeverageContractAddresses';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
-import {ConfigService} from '../../service/config/ConfigService';
-import PostgreDataSource from '../tool/data_source/PostgreDataSource';
 import {RuleConstructorInput} from '../TypesRule';
 
 
 export class RuleExpirePositions extends Rule {
-  private leverageDataSource: PostgreDataSource;
-  private configService: ConfigService;
   private positionLedgerContract!: PositionLedgerContract;
   private positionLedgerAddress!: Address;
   private positionLedgerABI!: string;
@@ -18,10 +14,8 @@ export class RuleExpirePositions extends Rule {
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 
-  constructor(input: RuleConstructorInput, leverageDataSource: PostgreDataSource, configService: ConfigService) {
+  constructor(input: RuleConstructorInput) {
     super(input);
-    this.leverageDataSource = leverageDataSource;
-    this.configService = configService;
     // this.uniswap = new Uniswap('');
 
     this.positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;

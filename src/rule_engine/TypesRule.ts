@@ -1,6 +1,8 @@
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {AbiRepo} from './tool/abi_repository/AbiRepo';
+import {ConfigService} from '../service/config/ConfigService';
+import PostgreDataSource from './tool/data_source/PostgreDataSource';
 
 export enum TypeRule {
     Invalid = 'invalid',
@@ -35,8 +37,10 @@ export interface RuleJSONConfigItem {
 
 export interface RuleConstructorInput {
     logger: ILogger;
+    configService: ConfigService;
     blockchainReader: BlockchainReader;
     abiRepo: AbiRepo;
     ruleLabel: string;
+    leverageDataSource: PostgreDataSource;
     params: RuleParams;
 }

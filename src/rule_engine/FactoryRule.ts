@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {RuleConstructorInput, RuleJSONConfigItem, RuleParams, TypeRule} from './TypesRule';
+import {RuleConstructorInput, RuleJSONConfigItem, TypeRule} from './TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {Rule} from './rule/Rule';
 import {RuleDummy} from './rule/RuleDummy';
@@ -8,23 +8,28 @@ import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
 import {AbiRepo} from './tool/abi_repository/AbiRepo';
 import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
+import {RuleLiquidatePositions} from './rule/RuleLiquidatePositions';
+import PostgreDataSource from './tool/data_source/PostgreDataSource';
 
 
 export class FactoryRule {
   constructor(
      private logger: ILogger,
-     _configService: ConfigServiceAWS,
+     private configService: ConfigServiceAWS,
      private blockchainReader: BlockchainReader,
      private abiRepo: AbiRepo,
+     private leverageDataSource: PostgreDataSource,
   ) { }
 
   public createRule(config: RuleJSONConfigItem): Rule | null {
     const constractorInput: RuleConstructorInput = {
       logger: this.logger,
+      configService: this.configService,
       blockchainReader: this.blockchainReader,
       abiRepo: this.abiRepo,
+      leverageDataSource: this.leverageDataSource,
       ruleLabel: config.label,
-      params: config.params as RuleParams,
+      params: config.params,
     };
 
     switch (config.ruleType) {
@@ -32,6 +37,8 @@ export class FactoryRule {
         return new RuleDummy(constractorInput);
       case TypeRule.UniswapPSPRebalance:
         return new RuleUniswapPSPRebalance(constractorInput);
+      case TypeRule.LiquidatePositions:
+        return new RuleLiquidatePositions(constractorInput);
       default:
         this.logger.warn(`Unsupported rule type: ${config.ruleType}`);
         return null;

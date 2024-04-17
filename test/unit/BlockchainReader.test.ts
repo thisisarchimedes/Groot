@@ -2,7 +2,6 @@ import 'reflect-metadata';
 import * as chai from 'chai';
 import {BlockchainReader, BlockchainReaderError} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
-import {ethers} from 'ethers';
 import {LoggerAll} from '../../src/service/logger/LoggerAll';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 
@@ -56,7 +55,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
     const res = Number(await blockchainReader.callViewFunction(usdcContractAddress,
-        new ethers.Interface(abi), 'decimals'));
+        abi, 'decimals'));
 
     expect(res).to.be.eq(2);
   });
@@ -108,7 +107,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     const usdcContractAddress: string = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
     const abi = getStubAbi();
     const res = Number(await blockchainReader.callViewFunction(usdcContractAddress,
-        new ethers.Interface(abi), 'decimals'));
+        abi, 'decimals'));
 
     expect(res).to.be.eq(1);
   });
@@ -189,7 +188,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
   });
 
   function getStubAbi() {
-    return [
+    return `[
       {
         'inputs': [],
         'name': 'decimals',
@@ -203,7 +202,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
         'stateMutability': 'view',
         'type': 'function',
       },
-    ];
+    ]`;
   }
 });
 

@@ -1,9 +1,9 @@
 
-import {Interface} from 'ethers';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNodeProxyInfo';
 import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
 import {BlockchainNodeLocal} from '../blockchain_nodes/BlockchainNodeLocal';
+import {Block} from 'ethers';
 
 export class BlockchainReaderError extends Error {
   constructor(message: string) {

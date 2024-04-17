@@ -19,6 +19,7 @@ import {BlockchainReader} from './blockchain/blockchain_reader/BlockchainReader'
 import {FactoryRule} from './rule_engine/FactoryRule';
 import {AbiStorageDynamoDB} from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import {AbiFetcherEtherscan} from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import PostgreDataSource from './rule_engine/tool/data_source/PostgreDataSource';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ export class Groot {
   private transactionsQueuer!: TransactionQueuer;
   private blockchainReader!: BlockchainReader;
   private abiRepo!: AbiRepo;
+  private leverageDataSource!: PostgreDataSource;
 
   constructor(
       private configService: ConfigServiceAWS,
@@ -44,6 +46,8 @@ export class Groot {
     this.initializeHealthMonitor();
 
     this.blockchainReader = new BlockchainReader(this.logger, this.mainNode, this.altNode);
+
+    this.leverageDataSource = new PostgreDataSource(this.logger, this.dbService);
 
     this.initializeAbiRepo();
 
@@ -99,7 +103,13 @@ export class Groot {
   }
 
   private initializeRuleEngine() {
-    const ruleFactory = new FactoryRule(this.logger, this.configService, this.blockchainReader, this.abiRepo);
+    const ruleFactory = new FactoryRule(
+        this.logger,
+        this.configService,
+        this.blockchainReader,
+        this.abiRepo,
+        this.leverageDataSource,
+    );
     this.ruleEngine = new RuleEngine(this.logger, ruleFactory);
   }
 

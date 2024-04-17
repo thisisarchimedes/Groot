@@ -2,7 +2,6 @@ import 'reflect-metadata';
 import * as chai from 'chai';
 import * as dotenv from 'dotenv';
 import {spawn} from 'child_process';
-import {ethers} from 'ethers';
 import {BlockchainNodeProxyInfo} from '../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {BlockchainNodeLocal} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';

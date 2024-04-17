@@ -1,27 +1,24 @@
 import UniSwap from './UniSwap';
 import {ethers} from 'ethers';
-import {IBlockchainReader} from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {Address} from '../../../types/LeverageContractAddresses';
-import {IAbiRepo} from '../abi_repository/interfaces/IAbiRepo';
 import {WBTC, WBTC_DECIMALS} from '../../../constants/addresses';
-import {inject, injectable} from 'inversify';
-import {IUniSwapPayloadBuilder} from './interfaces/IUniSwapPayloadBuilder';
+import {IBlockchainReader} from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {IAbiRepo} from '../abi_repository/interfaces/IAbiRepo';
 
-@injectable()
-export default class UniSwapPayloadBuilder implements IUniSwapPayloadBuilder {
+export default class UniSwapPayloadBuilder {
   protected readonly blockchainReader: IBlockchainReader;
   protected readonly abiRepo: IAbiRepo;
 
-  constructor(@inject('IBlockchainReader') blockchainReader: IBlockchainReader,
-        @inject('IAbiRepo') abiRepo: IAbiRepo) {
+  constructor(
+      blockchainReader: IBlockchainReader,
+      abiRepo: IAbiRepo,
+  ) {
     this.blockchainReader = blockchainReader;
     this.abiRepo = abiRepo;
   }
 
   /**
     * Returns the swap payload to open a position
-    * @param blockchainReader blockchain reader class
-    * @param abiRepo ABI repository class
     * @param amount open position amount
     * @param strategy strategy address
     * @param currentTimestamp timestamp of the latest block
@@ -61,8 +58,6 @@ export default class UniSwapPayloadBuilder implements IUniSwapPayloadBuilder {
 
   /**
     * Returns the swap payload to close the position
-    * @param blockchainReader blockchain reader class
-    * @param abiRepo ABI repository class
     * @param strategy strategy address
     * @param strategyShares shares amount
     * @param currentTimestamp timestamp of the latest block
