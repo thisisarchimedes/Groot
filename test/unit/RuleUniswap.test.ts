@@ -12,7 +12,7 @@ import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
 import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import DBService from '../../src/service/db/dbService';
-import LeverageDataSource from '../../src/rule_engine/tool/data_source/LeverageDataSource';
+import LeverageDataSourceDB from '../../src/rule_engine/tool/data_source/LeverageDataSourceDB';
 
 dotenv.config();
 
@@ -37,13 +37,13 @@ describe('Rule Factory Testings: Uniswap', function() {
 
     blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
     const dbService = new DBService(logger, configService);
-    const leverageDataSource = new LeverageDataSource(logger, dbService);
+    const LeverageDataSourceDB = new LeverageDataSourceDB(logger, dbService);
 
     const abiStorage = new AbiStorageAdapter();
     const abiFetcher = new AbiFetcherAdapter();
     abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
 
-    ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo, leverageDataSource);
+    ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo, LeverageDataSourceDB);
   });
 
   it('should create Uniswap PSP rebalance Rule object from a rule config', function() {

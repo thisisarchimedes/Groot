@@ -1,18 +1,18 @@
 import 'reflect-metadata';
 import * as chai from 'chai';
 import {describe, it, beforeEach} from 'mocha';
-import {QueryResult} from 'pg';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
 import DBServiceAdapter from './adapters/DBServiceAdapter';
-import LeverageDataSource from '../../src/rule_engine/tool/data_source/LeverageDataSource';
+import LeverageDataSourceDB from '../../src/rule_engine/tool/data_source/LeverageDataSourceDB';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {LoggerAll} from '../../src/service/logger/LoggerAll';
+import {QueryResult} from 'pg';
 
 const {expect} = chai;
 
 describe('LeverageDataSource Tests', function() {
   let dbServiceAdapter: DBServiceAdapter;
-  let dataSource: LeverageDataSource;
+  let dataSource: LeverageDataSourceDB;
   let loggerAdapter: LoggerAdapter;
 
   beforeEach(async function() {
@@ -26,7 +26,7 @@ describe('LeverageDataSource Tests', function() {
     dbServiceAdapter = new DBServiceAdapter(loggerAdapter as unknown as LoggerAll, configService);
 
     // Resolve the dataSource to be tested
-    dataSource = new LeverageDataSource(loggerAdapter, dbServiceAdapter);
+    dataSource = new LeverageDataSourceDB(loggerAdapter, dbServiceAdapter);
   });
 
   it('getPositionsByNftIds should return correct positions', async function() {

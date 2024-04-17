@@ -9,7 +9,7 @@ import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader
 import {AbiRepo} from './tool/abi_repository/AbiRepo';
 import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
 import {RuleLiquidatePositions} from './rule/RuleLiquidatePositions';
-import LeverageDataSource from './tool/data_source/LeverageDataSource';
+import LeverageDataSourceDB from './tool/data_source/LeverageDataSourceDB';
 
 
 export class FactoryRule {
@@ -18,7 +18,7 @@ export class FactoryRule {
      private configService: ConfigServiceAWS,
      private blockchainReader: BlockchainReader,
      private abiRepo: AbiRepo,
-     private leverageDataSource: LeverageDataSource,
+     private LeverageDataSourceDB: LeverageDataSourceDB,
   ) { }
 
   public createRule(config: RuleJSONConfigItem): Rule | null {
@@ -27,7 +27,7 @@ export class FactoryRule {
       configService: this.configService,
       blockchainReader: this.blockchainReader,
       abiRepo: this.abiRepo,
-      leverageDataSource: this.leverageDataSource,
+      LeverageDataSourceDB: this.LeverageDataSourceDB,
       ruleLabel: config.label,
       params: config.params,
     };

@@ -4,14 +4,14 @@ import {RuleConstructorInput, RuleParams} from '../TypesRule';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
 import {ConfigService} from '../../service/config/ConfigService';
-import LeverageDataSource from '../tool/data_source/LeverageDataSource';
+import LeverageDataSourceDB from '../tool/data_source/LeverageDataSourceDB';
 
 export abstract class Rule {
   protected readonly logger: ILogger;
   protected readonly blockchainReader: IBlockchainReader;
   protected readonly abiRepo: IAbiRepo;
   protected readonly configService: ConfigService;
-  protected readonly leverageDataSource: LeverageDataSource;
+  protected readonly LeverageDataSourceDB: LeverageDataSourceDB;
 
   protected ruleLabel: string;
   protected params: RuleParams;
@@ -22,7 +22,7 @@ export abstract class Rule {
     this.blockchainReader = input.blockchainReader;
     this.abiRepo = input.abiRepo;
     this.configService = input.configService;
-    this.leverageDataSource = input.leverageDataSource;
+    this.LeverageDataSourceDB = input.LeverageDataSourceDB;
     this.ruleLabel = input.ruleLabel;
     this.params = input.params;
   }
