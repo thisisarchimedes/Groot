@@ -11,6 +11,8 @@ import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
 import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
+import DBService from '../../src/service/db/dbService';
+import LeverageDataSource from '../../src/rule_engine/tool/data_source/LeverageDataSource';
 
 dotenv.config();
 
@@ -34,12 +36,14 @@ describe('Rule Factory Testings: Uniswap', function() {
     await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
 
     blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
+    const dbService = new DBService(logger, configService);
+    const leverageDataSource = new LeverageDataSource(logger, dbService);
 
     const abiStorage = new AbiStorageAdapter();
     const abiFetcher = new AbiFetcherAdapter();
     abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
 
-    ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo);
+    ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo, leverageDataSource);
   });
 
   it('should create Uniswap PSP rebalance Rule object from a rule config', function() {

@@ -14,6 +14,8 @@ import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
 import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import LeverageDataSource from '../../src/rule_engine/tool/data_source/LeverageDataSource';
+import DBService from '../../src/service/db/dbService';
 
 describe('Rule Engine Testings', function() {
   let logger: LoggerAdapter;
@@ -37,12 +39,14 @@ describe('Rule Engine Testings', function() {
     await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
 
     const blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
+    const dbService = new DBService(logger, configService);
+    const leverageDataSource = new LeverageDataSource(logger, dbService);
 
     const abiStorage = new AbiStorageAdapter();
     const abiFetcher = new AbiFetcherAdapter();
     const abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
 
-    const ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo);
+    const ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo, leverageDataSource);
     ruleEngine = new RuleEngine(
         logger,
         ruleFactory,

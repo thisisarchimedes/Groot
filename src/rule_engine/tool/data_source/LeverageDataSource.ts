@@ -4,7 +4,7 @@ import LeveragePosition from '../../../types/LeveragePosition';
 import {ILogger} from '../../../service/logger/interfaces/ILogger';
 import DBService from '../../../service/db/dbService';
 
-export default class PostgreDataSource {
+export default class LeverageDataSource {
   protected logger: ILogger;
   protected dbService: DBService;
 

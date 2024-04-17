@@ -9,7 +9,7 @@ import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader
 import {AbiRepo} from './tool/abi_repository/AbiRepo';
 import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
 import {RuleLiquidatePositions} from './rule/RuleLiquidatePositions';
-import PostgreDataSource from './tool/data_source/PostgreDataSource';
+import LeverageDataSource from './tool/data_source/LeverageDataSource';
 
 
 export class FactoryRule {
@@ -18,7 +18,7 @@ export class FactoryRule {
      private configService: ConfigServiceAWS,
      private blockchainReader: BlockchainReader,
      private abiRepo: AbiRepo,
-     private leverageDataSource: PostgreDataSource,
+     private leverageDataSource: LeverageDataSource,
   ) { }
 
   public createRule(config: RuleJSONConfigItem): Rule | null {

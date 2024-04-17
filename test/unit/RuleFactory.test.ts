@@ -10,6 +10,8 @@ import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
 import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
+import DBService from '../../src/service/db/dbService';
+import LeverageDataSource from '../../src/rule_engine/tool/data_source/LeverageDataSource';
 
 describe('Rule Factory Testings', function() {
   let logger: LoggerAdapter;
@@ -34,12 +36,14 @@ describe('Rule Factory Testings', function() {
     localNodeInfura.setProxyInfoForAddressResponse({isProxy: false, implementationAddress: ''});
 
     blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
+    const dbService = new DBService(logger, configService);
+    const leverageDataSource = new LeverageDataSource(logger, dbService);
 
     const abiStorage = new AbiStorageAdapter();
     const abiFetcher = new AbiFetcherAdapter();
     abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
 
-    ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo);
+    ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo, leverageDataSource);
   });
 
   it('should create Rule object from a dummy rule config', async function() {

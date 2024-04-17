@@ -4,14 +4,14 @@ import {RuleConstructorInput, RuleParams} from '../TypesRule';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
 import {ConfigService} from '../../service/config/ConfigService';
-import PostgreDataSource from '../tool/data_source/PostgreDataSource';
+import LeverageDataSource from '../tool/data_source/LeverageDataSource';
 
 export abstract class Rule {
   protected readonly logger: ILogger;
   protected readonly blockchainReader: IBlockchainReader;
   protected readonly abiRepo: IAbiRepo;
   protected readonly configService: ConfigService;
-  protected readonly leverageDataSource: PostgreDataSource;
+  protected readonly leverageDataSource: LeverageDataSource;
 
   protected ruleLabel: string;
   protected params: RuleParams;

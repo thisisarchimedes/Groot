@@ -4,15 +4,15 @@ import {describe, it, beforeEach} from 'mocha';
 import {QueryResult} from 'pg';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
 import DBServiceAdapter from './adapters/DBServiceAdapter';
-import PostgreDataSource from '../../src/rule_engine/tool/data_source/PostgreDataSource';
+import LeverageDataSource from '../../src/rule_engine/tool/data_source/LeverageDataSource';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {LoggerAll} from '../../src/service/logger/LoggerAll';
 
 const {expect} = chai;
 
-describe('PostgreDataSource Tests', function() {
+describe('LeverageDataSource Tests', function() {
   let dbServiceAdapter: DBServiceAdapter;
-  let dataSource: PostgreDataSource;
+  let dataSource: LeverageDataSource;
   let loggerAdapter: LoggerAdapter;
 
   beforeEach(async function() {
@@ -26,7 +26,7 @@ describe('PostgreDataSource Tests', function() {
     dbServiceAdapter = new DBServiceAdapter(loggerAdapter as unknown as LoggerAll, configService);
 
     // Resolve the dataSource to be tested
-    dataSource = new PostgreDataSource(loggerAdapter as unknown as LoggerAll, dbServiceAdapter);
+    dataSource = new LeverageDataSource(loggerAdapter, dbServiceAdapter);
   });
 
   it('getPositionsByNftIds should return correct positions', async function() {
