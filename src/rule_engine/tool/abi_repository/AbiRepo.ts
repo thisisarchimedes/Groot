@@ -3,13 +3,18 @@ import {IBlockchainReader} from '../../../blockchain/blockchain_reader/interface
 import {IAbiFetcher} from './interfaces/IAbiFetcher';
 import {IAbiStorage} from './interfaces/IAbiStorage';
 import {IAbiRepo} from './interfaces/IAbiRepo';
+import {ModulesParams} from '../../../types/ModulesParams';
 
 export class AbiRepo implements IAbiRepo {
+  private blockchainReader: IBlockchainReader;
+
   constructor(
-      private blockchainReader: IBlockchainReader,
+      modulesParams: ModulesParams,
       private abiStorage: IAbiStorage,
       private abiFetcher: IAbiFetcher,
-  ) { }
+  ) {
+    this.blockchainReader = modulesParams.blockchainReader!;
+  }
 
   public async getAbiByAddress(contractAddress: string): Promise<string> {
     const implementationAddress = await this.getImplementationAddress(contractAddress);

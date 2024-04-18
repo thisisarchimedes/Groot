@@ -1,18 +1,19 @@
 import {Client, ClientConfig, QueryResult} from 'pg';
-import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 import {ILogger} from '../logger/interfaces/ILogger';
+import {ModulesParams} from '../../types/ModulesParams';
 
 
 export default class DBService {
+  private logger: ILogger;
   private transactionsClient:LoggedClient;
   private leverageClient:LoggedClient;
 
   constructor(
-     private logger: ILogger,
-     configService: ConfigServiceAWS,
+      modulesParams: ModulesParams,
   ) {
+    this.logger = modulesParams.logger!;
     this.transactionsClient = new LoggedClient({
-      connectionString: configService.getTransactionsDBURL(),
+      connectionString: modulesParams.configService!.getTransactionsDBURL(),
       ssl: {
         rejectUnauthorized: false,
       },
@@ -21,7 +22,7 @@ export default class DBService {
     );
 
     this.leverageClient = new LoggedClient({
-      connectionString: configService.getLeverageDBURL(),
+      connectionString: modulesParams.configService!.getLeverageDBURL(),
       ssl: {
         rejectUnauthorized: false,
       },

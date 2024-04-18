@@ -3,6 +3,7 @@
 import axios from 'axios';
 import {IAbiFetcher} from './interfaces/IAbiFetcher';
 import {ConfigService} from '../../../service/config/ConfigService';
+import {ModulesParams} from '../../../types/ModulesParams';
 
 interface EtherscanResponse {
   status: string;
@@ -17,9 +18,9 @@ export class AbiFetcherEtherscan implements IAbiFetcher {
   private readonly configService: ConfigService;
 
   constructor(
-      _configService: ConfigService,
+      modulesParams: ModulesParams,
   ) {
-    this.configService = _configService;
+    this.configService = modulesParams.configService!;
     this.apiKey = this.configService.getEtherscanAPIKey();
   }
 

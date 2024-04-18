@@ -1,23 +1,24 @@
 import LeveragePosition, {PositionState} from '../../../types/LeveragePosition';
 import LeverageDataSource from './LeverageDataSource';
-import {ILogger} from '../../../service/logger/interfaces/ILogger';
 import {BlockchainReader} from '../../../blockchain/blockchain_reader/BlockchainReader';
-import {ConfigService} from '../../../service/config/ConfigService';
 import {IAbiRepo} from '../abi_repository/interfaces/IAbiRepo';
+import {ModulesParams} from '../../../types/ModulesParams';
 
 const UNINITIALIZED_POSITIONS_THRESHOLD = 5;
 
 export default class LeverageDataSourceNode extends LeverageDataSource {
+  private blockchainReader: BlockchainReader;
+  private abiRepo: IAbiRepo;
   private positionLedger:string;
 
   constructor(
-      logger: ILogger,
-      configService: ConfigService,
-      private blockchainReader: BlockchainReader,
-      private abiRepo: IAbiRepo,
+      modulesParams: ModulesParams,
+
   ) {
-    super(logger);
-    this.positionLedger = configService.getLeverageContractInfo().positionLedger;
+    super(modulesParams.logger!);
+    this.blockchainReader = modulesParams.blockchainReader!;
+    this.abiRepo = modulesParams.abiRepo!;
+    this.positionLedger = modulesParams.configService!.getLeverageContractInfo().positionLedger;
   }
 
   getPositionsByNftIds(): Promise<LeveragePosition[]> {

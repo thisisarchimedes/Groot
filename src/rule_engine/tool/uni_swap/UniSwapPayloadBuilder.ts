@@ -4,17 +4,18 @@ import {Address} from '../../../types/LeverageContractAddresses';
 import {WBTC, WBTC_DECIMALS} from '../../../constants/addresses';
 import {IBlockchainReader} from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../abi_repository/interfaces/IAbiRepo';
+import {ConfigService} from '../../../service/config/ConfigService';
 
 export default class UniSwapPayloadBuilder {
-  protected readonly blockchainReader: IBlockchainReader;
-  protected readonly abiRepo: IAbiRepo;
+  private readonly uniSwap: UniSwap;
 
   constructor(
-      blockchainReader: IBlockchainReader,
-      abiRepo: IAbiRepo,
+      configService: ConfigService,
+      private readonly blockchainReader: IBlockchainReader,
+      private readonly abiRepo: IAbiRepo,
   ) {
-    this.blockchainReader = blockchainReader;
-    this.abiRepo = abiRepo;
+    console.log(configService.getMainRPCURL());
+    this.uniSwap = new UniSwap(configService.getMainRPCURL());
   }
 
   /**
@@ -43,8 +44,7 @@ export default class UniSwapPayloadBuilder {
         [],
     ) as bigint;
 
-    const uniSwap = new UniSwap(process.env.MAINNET_RPC_URL!);
-    const {payload} = await uniSwap.buildPayload(
+    const {payload} = await this.uniSwap.buildPayload(
         ethers.formatUnits(amount, WBTC_DECIMALS),
         WBTC,
         WBTC_DECIMALS,
@@ -92,8 +92,7 @@ export default class UniSwapPayloadBuilder {
         [strategySharesN],
     ) as bigint;
 
-    const uniSwap = new UniSwap(process.env.MAINNET_RPC_URL!);
-    const {payload} = await uniSwap.buildPayload(
+    const {payload} = await this.uniSwap.buildPayload(
         ethers.formatUnits(minimumExpectedAssets, assetDecimals),
         strategyAsset,
         Number(assetDecimals),

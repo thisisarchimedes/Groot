@@ -1,22 +1,23 @@
 
 
-import {HostNameProvider} from '../HostNameProvider';
 import {ISignalHeartbeat} from './interfaces/ISignalHeartbeat';
 import {SignalAWS} from './SignalAWS';
-import {ILogger} from '../../logger/interfaces/ILogger';
-import {ConfigService} from '../../config/ConfigService';
+import {ModulesParams} from '../../../types/ModulesParams';
 
 
 export class SignalAWSHeartbeat extends SignalAWS implements ISignalHeartbeat {
   private readonly namespace: string;
 
   constructor(
-      _configService: ConfigService,
-      _logger: ILogger,
-      _hostNameProvider: HostNameProvider,
+      modulesParams: ModulesParams,
       namespace: string,
   ) {
-    super(_logger, _configService, _hostNameProvider, namespace);
+    super(
+      modulesParams.logger!,
+      modulesParams.configService!,
+      modulesParams.hostnameProvider!,
+      namespace,
+    );
     this.namespace = namespace;
   }
 

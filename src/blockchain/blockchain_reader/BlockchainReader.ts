@@ -2,8 +2,8 @@
 import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNodeProxyInfo';
 import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
-import {BlockchainNodeLocal} from '../blockchain_nodes/BlockchainNodeLocal';
 import {Block} from 'ethers';
+import {ModulesParams} from '../../types/ModulesParams';
 
 export class BlockchainReaderError extends Error {
   constructor(message: string) {
@@ -33,11 +33,10 @@ export class BlockchainReader {
   private initialized: boolean;
 
   constructor(
-      _logger: ILogger,
-      _mainLocalNode: BlockchainNodeLocal,
-      _altLocalNode: BlockchainNodeLocal) {
-    this.nodes = [_mainLocalNode, _altLocalNode];
-    this.logger = _logger;
+      modulesParams: ModulesParams,
+  ) {
+    this.nodes = [modulesParams.mainNode!, modulesParams.altNode!];
+    this.logger = modulesParams.logger!;
     this.initialized = false;
   }
 

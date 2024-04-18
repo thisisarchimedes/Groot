@@ -15,7 +15,6 @@ export interface RuleParamsLiquidatePositions extends RuleParams {
   message: string;
   numberOfLiquidatePositionsTxs: number;
   evalSuccess: boolean;
-  uniswapPayloadBuilder: UniSwapPayloadBuilder;
 }
 
 export class RuleLiquidatePositions extends Rule {
@@ -26,7 +25,7 @@ export class RuleLiquidatePositions extends Rule {
       input: RuleConstructorInput,
   ) {
     super(input);
-    this.uniSwapPayloadBuilder = new UniSwapPayloadBuilder(this.blockchainReader, this.abiRepo);
+    this.uniSwapPayloadBuilder = new UniSwapPayloadBuilder(input.configService, this.blockchainReader, this.abiRepo);
   }
 
   public async evaluate(): Promise<void> {
@@ -43,7 +42,7 @@ export class RuleLiquidatePositions extends Rule {
     );
 
     // Query to get all live positions data
-    const res = await this.LeverageDataSourceDB.getLivePositionsForLiquidaton();
+    const res = await this.leverageDataSource.getLivePositions();
 
     // Looping through the positions and preparing the semaphore with the liquidation process
     const promises = [];

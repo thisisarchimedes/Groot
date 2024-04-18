@@ -4,25 +4,29 @@ import {RuleConstructorInput, RuleParams} from '../TypesRule';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
 import {ConfigService} from '../../service/config/ConfigService';
-import LeverageDataSourceDB from '../tool/data_source/LeverageDataSourceDB';
+import LeverageDataSource from '../tool/data_source/LeverageDataSource';
 
 export abstract class Rule {
   protected readonly logger: ILogger;
   protected readonly blockchainReader: IBlockchainReader;
   protected readonly abiRepo: IAbiRepo;
   protected readonly configService: ConfigService;
-  protected readonly LeverageDataSourceDB: LeverageDataSourceDB;
+  protected readonly leverageDataSource: LeverageDataSource;
 
   protected ruleLabel: string;
   protected params: RuleParams;
   protected pendingTxQueue: OutboundTransaction[] = [];
 
   constructor(input: RuleConstructorInput) {
+    if (!input.leverageDataSource) {
+      throw new Error('LeverageDataSource is required for LiquidatePositions rule');
+    }
+
     this.logger = input.logger;
     this.blockchainReader = input.blockchainReader;
     this.abiRepo = input.abiRepo;
     this.configService = input.configService;
-    this.LeverageDataSourceDB = input.LeverageDataSourceDB;
+    this.leverageDataSource = input.leverageDataSource;
     this.ruleLabel = input.ruleLabel;
     this.params = input.params;
   }

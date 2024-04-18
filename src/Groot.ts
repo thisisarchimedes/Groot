@@ -19,35 +19,32 @@ import {BlockchainReader} from './blockchain/blockchain_reader/BlockchainReader'
 import {FactoryRule} from './rule_engine/FactoryRule';
 import {AbiStorageDynamoDB} from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import {AbiFetcherEtherscan} from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import {ModulesParams} from './types/ModulesParams';
 import LeverageDataSourceDB from './rule_engine/tool/data_source/LeverageDataSourceDB';
+import LeverageDataSourceNode from './rule_engine/tool/data_source/LeverageDataSourceNode';
 
 dotenv.config();
 
 export class Groot {
-  private mainNode!: BlockchainNodeLocal;
-  private altNode!: BlockchainNodeLocal;
-  private signalHeartbeat!: SignalAWSHeartbeat;
-  private hostnameProvider!: HostNameProvider;
-  private signalCriticalFailure!: SignalAWSCriticalFailure;
-  private blockchainNodeHealthMonitor!: BlockchainNodeHealthMonitor;
-  private healthMonitor!: HealthMonitor;
-  private ruleEngine!: RuleEngine;
-  private transactionsQueuer!: TransactionQueuer;
-  private blockchainReader!: BlockchainReader;
-  private abiRepo!: AbiRepo;
-  private LeverageDataSourceDB!: LeverageDataSourceDB;
+  private modulesParams: ModulesParams = {};
 
   constructor(
-      private configService: ConfigServiceAWS,
-      private logger: ILogger,
-      private dbService: DBService,
+      configService: ConfigServiceAWS,
+      logger: ILogger,
+      dbService: DBService,
   ) {
+    this.modulesParams.configService = configService;
+    this.modulesParams.logger = logger;
+    this.modulesParams.dbService = dbService;
+
     this.initializeNodes();
     this.initializeHealthMonitor();
 
-    this.blockchainReader = new BlockchainReader(this.logger, this.mainNode, this.altNode);
+    this.initializeDataSources();
 
-    this.LeverageDataSourceDB = new LeverageDataSourceDB(this.logger, this.dbService);
+    this.modulesParams.blockchainReader = new BlockchainReader(
+        this.modulesParams,
+    );
 
     this.initializeAbiRepo();
 
@@ -57,136 +54,132 @@ export class Groot {
   }
 
   private initializeNodes() {
-    this.mainNode = new BlockchainNodeLocal(
-        this.logger,
+    this.modulesParams.mainNode = new BlockchainNodeLocal(
+        this.modulesParams,
         `http://localhost:${process.env.MAIN_LOCAL_NODE_PORT || 8545}`,
         'AlchemyNodeLabel',
     );
-    this.altNode = new BlockchainNodeLocal(
-        this.logger,
+    this.modulesParams.altNode = new BlockchainNodeLocal(
+        this.modulesParams,
         `http://localhost:${process.env.ALT_LOCAL_NODE_PORT || 18545}`,
         'InfuraNodeLabel',
     );
   }
 
   private initializeHealthMonitor() {
-    this.blockchainNodeHealthMonitor = new BlockchainNodeHealthMonitor(
-        this.logger,
-        this.mainNode,
-        this.altNode,
+    this.modulesParams.blockchainNodeHealthMonitor = new BlockchainNodeHealthMonitor(
+        this.modulesParams,
     );
-    this.hostnameProvider = new HostNameProvider(this.logger);
-    this.signalCriticalFailure = new SignalAWSCriticalFailure(
-        this.configService,
-        this.logger,
-        this.hostnameProvider,
+    this.modulesParams.hostnameProvider = new HostNameProvider(this.modulesParams);
+    this.modulesParams.signalCriticalFailure = new SignalAWSCriticalFailure(
+        this.modulesParams,
         namespace,
     );
-    this.signalHeartbeat = new SignalAWSHeartbeat(
-        this.configService,
-        this.logger,
-        this.hostnameProvider,
+    this.modulesParams.signalHeartbeat = new SignalAWSHeartbeat(
+        this.modulesParams,
         namespace,
     );
-    this.healthMonitor = new HealthMonitor(
-        this.logger,
-        this.blockchainNodeHealthMonitor,
-        this.signalHeartbeat,
-        this.signalCriticalFailure,
+    this.modulesParams.healthMonitor = new HealthMonitor(
+        this.modulesParams,
     );
   }
 
+  private initializeDataSources() {
+    this.modulesParams.leverageDataSource = {
+      leverageDataSourceDB: new LeverageDataSourceDB(this.modulesParams),
+      leverageDataSourceNode: new LeverageDataSourceNode(
+          this.modulesParams,
+      ),
+    };
+  }
+
   private initializeAbiRepo() {
-    const abiStorage = new AbiStorageDynamoDB(this.configService);
-    const abiFetcher = new AbiFetcherEtherscan(this.configService);
-    this.abiRepo = new AbiRepo(this.blockchainReader, abiStorage, abiFetcher);
+    const abiStorage = new AbiStorageDynamoDB(this.modulesParams);
+    const abiFetcher = new AbiFetcherEtherscan(this.modulesParams);
+    this.modulesParams.abiRepo = new AbiRepo(this.modulesParams, abiStorage, abiFetcher);
   }
 
   private initializeRuleEngine() {
     const ruleFactory = new FactoryRule(
-        this.logger,
-        this.configService,
-        this.blockchainReader,
-        this.abiRepo,
-        this.LeverageDataSourceDB,
+        this.modulesParams,
     );
-    this.ruleEngine = new RuleEngine(this.logger, ruleFactory);
+    this.modulesParams.ruleEngine = new RuleEngine(this.modulesParams, ruleFactory);
   }
 
   private initializeTxQueuer() {
-    const txQueue = new PostgreTxQueue(this.logger, this.dbService);
-    this.transactionsQueuer = new TransactionQueuer(this.logger, txQueue);
+    const txQueue = new PostgreTxQueue(this.modulesParams);
+    this.modulesParams.transactionsQueuer = new TransactionQueuer(this.modulesParams, txQueue);
   }
 
   public async initalizeGroot() {
-    this.logger.info('Initializing Groot...');
-    await this.configService.refreshConfig();
-    this.logger.info('Groot initialized successfully.');
+    this.modulesParams.logger!.info('Initializing Groot...');
+    await this.modulesParams.configService!.refreshConfig();
+    this.modulesParams.logger!.info('Groot initialized successfully.');
   }
 
   public async shutdownGroot() {
-    this.logger.warn('Shutting down Groot...');
+    this.modulesParams.logger!.warn('Shutting down Groot...');
 
     await Promise.all([
       this.shutdownReadOnlyLocalNodes(),
-      this.dbService.end(),
+      this.modulesParams.dbService!.end(),
     ]);
 
-    this.logger.warn('Groot shutdown successfully.');
+    this.modulesParams.logger!.warn('Groot shutdown successfully.');
   }
 
   private async shutdownReadOnlyLocalNodes() {
     await Promise.all([
-      this.mainNode.stopNode(),
-      this.altNode.stopNode(),
+      this.modulesParams.mainNode!.stopNode(),
+      this.modulesParams.altNode!.stopNode(),
     ]);
   }
 
   public async prepareForAnotherCycle() {
-    this.logger.info('Preparing Groot for cycle...');
-    await this.healthMonitor.startOfCycleSequence();
+    this.modulesParams.logger!.info('Preparing Groot for cycle...');
+    await this.modulesParams.healthMonitor!.startOfCycleSequence();
 
-    await this.configService.refreshConfig();
+    await this.modulesParams.configService!.refreshConfig();
     await this.setLocalNodesToNewestBlock();
 
-    this.healthMonitor.endOfCycleSequence();
-    this.logger.info('Groot is ready for cycle.');
+    this.modulesParams.healthMonitor!.endOfCycleSequence();
+    this.modulesParams.logger!.info('Groot is ready for cycle.');
   }
 
   private async setLocalNodesToNewestBlock() {
     await Promise.all([
-      this.mainNode.resetNode(this.configService.getMainRPCURL()),
-      this.altNode.resetNode(this.configService.getAlternativeRPCURL()),
+      this.modulesParams.mainNode!.resetNode(this.modulesParams.configService!.getMainRPCURL()),
+      this.modulesParams.altNode!.resetNode(this.modulesParams.configService!.getAlternativeRPCURL()),
     ]);
   }
 
   public async runOneGrootCycle(): Promise<void> {
-    this.logger.info('Running Groot cycle...');
+    this.modulesParams.logger!.info('Running Groot cycle...');
 
     try {
-      await this.ruleEngine.loadRulesFromJSONConfig(this.configService.getRules());
+      await this.modulesParams.ruleEngine!.loadRulesFromJSONConfig(this.modulesParams.configService!.getRules());
       try {
-        await this.ruleEngine.evaluateRulesAndCreateOutboundTransactions();
+        await this.modulesParams.ruleEngine!.evaluateRulesAndCreateOutboundTransactions();
       } catch (err) {
         if (err instanceof Error) {
           console.error(err.message);
         }
       }
-      const txs = this.ruleEngine.getOutboundTransactions();
-      await this.transactionsQueuer.queueTransactions(txs);
+      const txs = this.modulesParams.ruleEngine!.getOutboundTransactions();
+      await this.modulesParams.transactionsQueuer!.queueTransactions(txs);
     } catch (ex) {
       if (ex instanceof Error) {
-        this.logger.error(ex.message);
+        this.modulesParams.logger!.error(ex.message);
       }
     } finally {
-      this.logger.info('Groot cycle ran successfully.');
-      await this.logger.flush();
+      this.modulesParams.logger!.info('Groot cycle ran successfully.');
+      await this.modulesParams.logger!.flush();
     }
   }
 
   public async sleepBetweenCycles(): Promise<void> {
-    const sleepTime = this.configService.getSleepMillisecondsBetweenCycles();
-    this.logger.debug(`Sleeping for ${sleepTime} seconds...`);
+    const sleepTime = this.modulesParams.configService!.getSleepMillisecondsBetweenCycles();
+    this.modulesParams.logger!.debug(`Sleeping for ${sleepTime} seconds...`);
     await new Promise((resolve) => setTimeout(resolve, sleepTime));
   }
 }

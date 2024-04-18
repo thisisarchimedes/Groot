@@ -1,16 +1,18 @@
 import 'reflect-metadata';
 
 import LeveragePosition from '../../../types/LeveragePosition';
-import {ILogger} from '../../../service/logger/interfaces/ILogger';
 import DBService from '../../../service/db/dbService';
 import LeverageDataSource from './LeverageDataSource';
+import {ModulesParams} from '../../../types/ModulesParams';
 
 export default class LeverageDataSourceDB extends LeverageDataSource {
+  private dbService: DBService;
+
   constructor(
-      logger: ILogger,
-      private dbService: DBService,
+      modulesParams: ModulesParams,
   ) {
-    super(logger);
+    super(modulesParams.logger!);
+    this.dbService = modulesParams.dbService!;
   }
 
   async getPositionsByNftIds(nftIds: number[]): Promise<LeveragePosition[]> {

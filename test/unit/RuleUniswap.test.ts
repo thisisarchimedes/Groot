@@ -13,37 +13,36 @@ import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
 import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import DBService from '../../src/service/db/dbService';
 import LeverageDataSourceDB from '../../src/rule_engine/tool/data_source/LeverageDataSourceDB';
+import {ModulesParams} from '../../src/types/ModulesParams';
 
 dotenv.config();
 
 describe('Rule Factory Testings: Uniswap', function() {
-  let abiRepo: AbiRepo;
-  let logger: LoggerAdapter;
-  let blockchainReader: BlockchainReader;
-  let localNodeAlchemy: BlockchainNodeAdapter;
-  let localNodeInfura: BlockchainNodeAdapter;
+  const modulesParams: ModulesParams = {};
   let ruleFactory: FactoryRule;
 
   beforeEach(async function() {
-    const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
-    await configService.refreshConfig();
+    modulesParams.configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
+    await modulesParams.configService.refreshConfig();
 
-    logger = new LoggerAdapter();
+    modulesParams.logger = new LoggerAdapter();
 
     // Starting nodes
-    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
-    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
-    await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
+    modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams.logger, 'localNodeAlchemy');
+    modulesParams.altNode = new BlockchainNodeAdapter(modulesParams.logger, 'localNodeInfura');
+    await Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
-    blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
-    const dbService = new DBService(logger, configService);
-    const LeverageDataSourceDB = new LeverageDataSourceDB(logger, dbService);
+    modulesParams.blockchainReader = new BlockchainReader(modulesParams);
+    modulesParams.dbService = new DBService(modulesParams);
+    modulesParams.leverageDataSource = {
+      leverageDataSourceDB: new LeverageDataSourceDB(modulesParams),
+    };
 
     const abiStorage = new AbiStorageAdapter();
     const abiFetcher = new AbiFetcherAdapter();
-    abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
-    ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo, LeverageDataSourceDB);
+    ruleFactory = new FactoryRule(modulesParams);
   });
 
   it('should create Uniswap PSP rebalance Rule object from a rule config', function() {

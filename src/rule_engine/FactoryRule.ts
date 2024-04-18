@@ -10,16 +10,25 @@ import {AbiRepo} from './tool/abi_repository/AbiRepo';
 import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
 import {RuleLiquidatePositions} from './rule/RuleLiquidatePositions';
 import LeverageDataSourceDB from './tool/data_source/LeverageDataSourceDB';
+import LeverageDataSourceNode from './tool/data_source/LeverageDataSourceNode';
+import {RuleExpirePositions} from './rule/RuleExpirePositions';
+import {ModulesParams} from '../types/ModulesParams';
 
 
 export class FactoryRule {
+  private leverageDataSourceDB: LeverageDataSourceDB;
+  private leverageDataSourceNode: LeverageDataSourceNode;
+
   constructor(
-     private logger: ILogger,
-     private configService: ConfigServiceAWS,
-     private blockchainReader: BlockchainReader,
-     private abiRepo: AbiRepo,
-     private LeverageDataSourceDB: LeverageDataSourceDB,
-  ) { }
+      modulesParams: ModulesParams,
+     private logger: ILogger = modulesParams.logger!,
+     private configService: ConfigServiceAWS = modulesParams.configService!,
+     private blockchainReader: BlockchainReader = modulesParams.blockchainReader!,
+     private abiRepo: AbiRepo = modulesParams.abiRepo!,
+  ) {
+    this.leverageDataSourceDB = new LeverageDataSourceDB(modulesParams);
+    this.leverageDataSourceNode = new LeverageDataSourceNode(modulesParams);
+  }
 
   public createRule(config: RuleJSONConfigItem): Rule | null {
     const constractorInput: RuleConstructorInput = {
@@ -27,7 +36,6 @@ export class FactoryRule {
       configService: this.configService,
       blockchainReader: this.blockchainReader,
       abiRepo: this.abiRepo,
-      LeverageDataSourceDB: this.LeverageDataSourceDB,
       ruleLabel: config.label,
       params: config.params,
     };
@@ -38,7 +46,15 @@ export class FactoryRule {
       case TypeRule.UniswapPSPRebalance:
         return new RuleUniswapPSPRebalance(constractorInput);
       case TypeRule.LiquidatePositions:
-        return new RuleLiquidatePositions(constractorInput);
+        return new RuleLiquidatePositions({
+          ...constractorInput,
+          leverageDataSource: this.leverageDataSourceNode,
+        });
+      case TypeRule.ExpirePositions:
+        return new RuleExpirePositions({
+          ...constractorInput,
+          leverageDataSource: this.leverageDataSourceDB,
+        });
       default:
         this.logger.warn(`Unsupported rule type: ${config.ruleType}`);
         return null;

@@ -1,12 +1,13 @@
 import os from 'os';
 import {ILogger} from '../logger/interfaces/ILogger';
+import {ModulesParams} from '../../types/ModulesParams';
 
 
 export class HostNameProvider {
   private readonly logger: ILogger;
 
-  constructor( _logger: ILogger) {
-    this.logger = _logger;
+  constructor(modulesParams: ModulesParams) {
+    this.logger = modulesParams.logger!;
   }
 
   public getHostName(): string {
