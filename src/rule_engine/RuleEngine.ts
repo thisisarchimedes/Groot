@@ -13,10 +13,10 @@ export class RuleEngine {
   private outboundTransactions: OutboundTransaction[] = [];
 
   constructor(
-      moduleParams: ModulesParams,
+      modulesParams: ModulesParams,
       private readonly ruleFactory: FactoryRule,
   ) {
-    this.logger = moduleParams.logger!;
+    this.logger = modulesParams.logger!;
     this.ruleFactory = ruleFactory;
   }
 
