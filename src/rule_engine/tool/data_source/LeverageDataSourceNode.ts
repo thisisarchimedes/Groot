@@ -25,15 +25,14 @@ export default class LeverageDataSourceNode extends LeverageDataSource {
     throw new Error('Method not implemented.');
   }
 
-  async getLivePositions(limit = Number.POSITIVE_INFINITY): Promise<LeveragePosition[]> {
+  async getLivePositions(): Promise<LeveragePosition[]> {
     const positionLedgerAbi = await this.abiRepo.getAbiByAddress(this.positionLedger);
     // TODO: Pagination
     const positions: LeveragePosition[] = [];
     let uninitializedPositionsCount = 0;
     let nftId = 0;
     while (
-      uninitializedPositionsCount < UNINITIALIZED_POSITIONS_THRESHOLD &&
-      nftId < limit
+      uninitializedPositionsCount < UNINITIALIZED_POSITIONS_THRESHOLD
     ) {
       // console.log('Checking position:', nftId); // Debug
 
