@@ -10,39 +10,38 @@ import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import {AbiFetcherEtherscan} from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import LeveragePosition, {PositionState} from '../../src/types/LeveragePosition';
+import {ModulesParams} from '../../src/types/ModulesParams';
 
 const {expect} = chai;
 
-describe('LeverageDataSource Tests', function() {
-  let loggerAdapter: LoggerAdapter;
-  let dataSource: LeverageDataSourceNode;
-  let localNodeAlchemy: BlockchainNodeAdapter;
-  let localNodeInfura: BlockchainNodeAdapter;
-  let blockchainReader: BlockchainReader;
+describe('LeverageDataSourceNode Tests', function() {
+  const modulesParams: ModulesParams = {};
 
   beforeEach(async function() {
-    const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
-    await configService.refreshConfig();
+    modulesParams.configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
+    await modulesParams.configService.refreshConfig();
 
     // Setup LoggerAdapter
-    loggerAdapter = new LoggerAdapter();
+    modulesParams.logger = new LoggerAdapter();
 
     // Starting nodes
-    localNodeAlchemy = new BlockchainNodeAdapter(loggerAdapter, 'localNodeAlchemy');
-    localNodeInfura = new BlockchainNodeAdapter(loggerAdapter, 'localNodeInfura');
-    await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
-    blockchainReader = new BlockchainReader(loggerAdapter, localNodeAlchemy, localNodeInfura);
+    modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams, 'localNodeAlchemy');
+    modulesParams.altNode = new BlockchainNodeAdapter(modulesParams, 'localNodeInfura');
+    await Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
+    modulesParams.blockchainReader = new BlockchainReader(modulesParams);
 
-    localNodeAlchemy.setProxyInfoForAddressResponse({
+    (modulesParams.mainNode as BlockchainNodeAdapter).setProxyInfoForAddressResponse({
       isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
-    localNodeInfura.setProxyInfoForAddressResponse({
+    (modulesParams.altNode as BlockchainNodeAdapter).setProxyInfoForAddressResponse({
       isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
 
-    const abiStorage = new AbiStorageDynamoDB(configService);
-    const abiFetcher = new AbiFetcherEtherscan(configService);
-    const abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+    const abiStorage = new AbiStorageDynamoDB(modulesParams);
+    const abiFetcher = new AbiFetcherEtherscan(modulesParams);
+    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
-    dataSource = new LeverageDataSourceNode(loggerAdapter, configService, blockchainReader, abiRepo);
+    modulesParams.leverageDataSource = {
+      leverageDataSourceNode: new LeverageDataSourceNode(modulesParams),
+    };
   });
 
   it('Get all live positions for liquidation', async function() {
@@ -70,10 +69,14 @@ describe('LeverageDataSource Tests', function() {
       claimableAmount: 0,
     };
 
-    localNodeAlchemy.setReadResponse(nodeLivePositionResponse);
-    localNodeInfura.setReadResponse(nodeLivePositionResponse);
+    (modulesParams.mainNode as BlockchainNodeAdapter).setReadResponse(nodeLivePositionResponse);
+    (modulesParams.altNode as BlockchainNodeAdapter).setReadResponse(nodeLivePositionResponse);
+    (modulesParams.mainNode as BlockchainNodeAdapter).setResponseLimit(3);
+    (modulesParams.altNode as BlockchainNodeAdapter).setResponseLimit(3);
+    (modulesParams.mainNode as BlockchainNodeAdapter).setResponseForOverlimit({state: PositionState.UNINITIALIZED});
+    (modulesParams.altNode as BlockchainNodeAdapter).setResponseForOverlimit({state: PositionState.UNINITIALIZED});
 
-    const livePositions = await dataSource.getLivePositions(3);
+    const livePositions = await modulesParams.leverageDataSource!.leverageDataSourceNode!.getLivePositions();
 
     expect(livePositions).to.be.deep.equal([
       expectedLivePositionStruct,
