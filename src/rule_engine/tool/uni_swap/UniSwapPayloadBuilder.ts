@@ -14,7 +14,6 @@ export default class UniSwapPayloadBuilder {
       private readonly blockchainReader: IBlockchainReader,
       private readonly abiRepo: IAbiRepo,
   ) {
-    console.log(configService.getMainRPCURL());
     this.uniSwap = new UniSwap(configService.getMainRPCURL());
   }
 
@@ -37,6 +36,11 @@ export default class UniSwapPayloadBuilder {
         'asset',
         [],
     ) as Address;
+
+    if (strategyAsset === WBTC) {
+      return '0x';
+    }
+
     const assetDecimals = await this.blockchainReader.callViewFunction( // Optimization: can get from DB
         strategyAsset,
         await this.abiRepo.getAbiByAddress(strategyAsset),
@@ -75,21 +79,23 @@ export default class UniSwapPayloadBuilder {
         'asset',
         [],
     ) as Address;
+
+    if (strategyAsset === WBTC) {
+      return '0x';
+    }
+
     const assetDecimals = await this.blockchainReader.callViewFunction( // Optimization: can get from DB
         strategyAsset,
         await this.abiRepo.getAbiByAddress(strategyAsset),
         'decimals',
         [],
     ) as bigint;
-    const strategySharesN = ethers.parseUnits(
-        strategyShares.toFixed(Number(assetDecimals)),
-        assetDecimals,
-    ); // Converting float to bigint
+
     const minimumExpectedAssets = await this.blockchainReader.callViewFunction( // Must query live
         strategy,
         await this.abiRepo.getAbiByAddress(strategy),
         'convertToAssets',
-        [strategySharesN],
+        [strategyShares],
     ) as bigint;
 
     const {payload} = await this.uniSwap.buildPayload(
