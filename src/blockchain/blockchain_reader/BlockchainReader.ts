@@ -90,7 +90,7 @@ export class BlockchainReader {
       }
     }
 
-    throw new BlockchainReaderError('Error when requesting proxy information from node.');
+    throw new BlockchainReaderError(`Error when requesting proxy information from node for ${proxyAddress}.`);
   }
 
   private fetchBlocksFromNodes(blockNumber: number): Promise<(Block | null)[]> {
