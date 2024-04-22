@@ -23,7 +23,7 @@ export class BlockchainNodeHealthMonitor {
 
     if (this.allNodesFailedToRecover(failedRecoveries, unhealthyNodes)) {
       this.logAllNodesDownError();
-      throw new ErrorBlockchainNodeHealthMonitor('Blockchain Nodes Health Monitor:Nodes are down, none recovered');
+      throw new ErrorBlockchainNodeHealthMonitor('Blockchain Nodes Health Monitor: Nodes are down, none recovered');
     }
   }
 

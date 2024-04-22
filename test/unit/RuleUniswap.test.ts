@@ -28,12 +28,12 @@ describe('Rule Factory Testings: Uniswap', function() {
     modulesParams.logger = new LoggerAdapter();
 
     // Starting nodes
-    modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams.logger, 'localNodeAlchemy');
-    modulesParams.altNode = new BlockchainNodeAdapter(modulesParams.logger, 'localNodeInfura');
+    modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams, 'localNodeAlchemy');
+    modulesParams.altNode = new BlockchainNodeAdapter(modulesParams, 'localNodeInfura');
     await Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
-    modulesParams.dbService = new DBService(modulesParams);
+    modulesParams.dbService = new DBService(modulesParams.logger, modulesParams.configService);
     modulesParams.leverageDataSource = {
       leverageDataSourceDB: new LeverageDataSourceDB(modulesParams),
     };

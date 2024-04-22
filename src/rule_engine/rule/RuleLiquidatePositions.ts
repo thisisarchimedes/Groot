@@ -24,6 +24,10 @@ export class RuleLiquidatePositions extends Rule {
   constructor(
       input: RuleConstructorInput,
   ) {
+    if (!input.leverageDataSource) {
+      throw new Error('LeverageDataSource is required for LiquidatePositions rule');
+    }
+
     super(input);
     this.uniSwapPayloadBuilder = new UniSwapPayloadBuilder(input.configService, this.blockchainReader, this.abiRepo);
   }
@@ -42,7 +46,7 @@ export class RuleLiquidatePositions extends Rule {
     );
 
     // Query to get all live positions data
-    const res = await this.leverageDataSource.getLivePositions();
+    const res = await this.leverageDataSource!.getLivePositions();
 
     // Looping through the positions and preparing the semaphore with the liquidation process
     const promises = [];

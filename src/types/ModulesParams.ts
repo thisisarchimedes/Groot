@@ -9,8 +9,8 @@ import DBService from '../service/db/dbService';
 import {BlockchainNodeHealthMonitor} from '../service/health_monitor/BlockchainNodeHealthMonitor';
 import {HealthMonitor} from '../service/health_monitor/HealthMonitor';
 import {HostNameProvider} from '../service/health_monitor/HostNameProvider';
-import {SignalAWSCriticalFailure} from '../service/health_monitor/signal/SignalAWSCriticalFailure';
-import {SignalAWSHeartbeat} from '../service/health_monitor/signal/SignalAWSHeartbeat';
+import {ISignalCriticalFailure} from '../service/health_monitor/signal/interfaces/ISignalCriticalFailure';
+import {ISignalHeartbeat} from '../service/health_monitor/signal/interfaces/ISignalHeartbeat';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {TransactionQueuer} from '../tx_queue/TransactionQueuer';
 
@@ -20,9 +20,9 @@ export interface ModulesParams {
   dbService?: DBService,
   mainNode?: BlockchainNodeLocal;
   altNode?: BlockchainNodeLocal;
-  signalHeartbeat?: SignalAWSHeartbeat;
+  signalHeartbeat?: ISignalHeartbeat;
   hostnameProvider?: HostNameProvider;
-  signalCriticalFailure?: SignalAWSCriticalFailure;
+  signalCriticalFailure?: ISignalCriticalFailure;
   blockchainNodeHealthMonitor?: BlockchainNodeHealthMonitor;
   healthMonitor?: HealthMonitor;
   ruleEngine?: RuleEngine;

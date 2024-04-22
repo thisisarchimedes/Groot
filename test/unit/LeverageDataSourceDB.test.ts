@@ -5,28 +5,28 @@ import {LoggerAdapter} from './adapters/LoggerAdapter';
 import DBServiceAdapter from './adapters/DBServiceAdapter';
 import LeverageDataSourceDB from '../../src/rule_engine/tool/data_source/LeverageDataSourceDB';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {LoggerAll} from '../../src/service/logger/LoggerAll';
 import {QueryResult} from 'pg';
+import {ModulesParams} from '../../src/types/ModulesParams';
 
 const {expect} = chai;
 
 describe('LeverageDataSource Tests', function() {
-  let dbServiceAdapter: DBServiceAdapter;
-  let dataSource: LeverageDataSourceDB;
-  let loggerAdapter: LoggerAdapter;
+  const modulesParams: ModulesParams = {};
 
   beforeEach(async function() {
-    const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
-    await configService.refreshConfig();
+    modulesParams.configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
+    await modulesParams.configService.refreshConfig();
 
     // Setup LoggerAdapter
-    loggerAdapter = new LoggerAdapter();
+    modulesParams.logger = new LoggerAdapter();
 
     // Setup DBServiceAdapter
-    dbServiceAdapter = new DBServiceAdapter(loggerAdapter as unknown as LoggerAll, configService);
+    modulesParams.dbService = new DBServiceAdapter(modulesParams.logger, modulesParams.configService);
 
     // Resolve the dataSource to be tested
-    dataSource = new LeverageDataSourceDB(loggerAdapter, dbServiceAdapter);
+    modulesParams.leverageDataSource = {
+      leverageDataSourceDB: new LeverageDataSourceDB(modulesParams),
+    };
   });
 
   it('getPositionsByNftIds should return correct positions', async function() {
@@ -43,10 +43,10 @@ describe('LeverageDataSource Tests', function() {
       fields: [],
     };
 
-    dbServiceAdapter.getLeverageClient().setQueryResponse(mockResponse);
+    (modulesParams.dbService as DBServiceAdapter).getLeverageClient().setQueryResponse(mockResponse);
 
     const nftIds = [100, 101];
-    const positions = await dataSource.getPositionsByNftIds(nftIds);
+    const positions = await modulesParams.leverageDataSource!.leverageDataSourceDB!.getPositionsByNftIds(nftIds);
 
     expect(positions).to.be.an('array').that.is.not.empty;
     expect(positions.length).to.equal(mockResponse.rows.length);
@@ -58,11 +58,11 @@ describe('LeverageDataSource Tests', function() {
 
   it('dbService connect should handle database errors gracefully and log an error message', async function() {
     // Setup mock to throw error on connect
-    dbServiceAdapter.getLeverageClient().setQueryResponse({} as QueryResult);
+    (modulesParams.dbService as DBServiceAdapter).getLeverageClient().setQueryResponse({} as QueryResult);
 
     let errorCaught = false;
     try {
-      await dbServiceAdapter.getLeverageClient().connect();
+      await (modulesParams.dbService as DBServiceAdapter).getLeverageClient().connect();
     } catch (error) {
       if (error instanceof Error) {
         errorCaught = true;
@@ -71,7 +71,7 @@ describe('LeverageDataSource Tests', function() {
 
     expect(errorCaught).to.be.true;
     // Verify that an error log was generated
-    expect(loggerAdapter.getLatestErrorLogLine()).to.include('Error connecting to database');
+    expect((modulesParams.logger! as LoggerAdapter).getLatestErrorLogLine()).to.include('Error connecting to database');
   });
 
   it('getLivePositions should return live positions correctly', async function() {
@@ -85,9 +85,9 @@ describe('LeverageDataSource Tests', function() {
       oid: 0,
       fields: [],
     };
-    dbServiceAdapter.getLeverageClient().setQueryResponse(mockResponse);
+    (modulesParams.dbService as DBServiceAdapter).getLeverageClient().setQueryResponse(mockResponse);
 
-    const positions = await dataSource.getLivePositions();
+    const positions = await modulesParams.leverageDataSource!.leverageDataSourceDB!.getLivePositions();
 
     expect(positions).to.be.an('array').that.is.not.empty;
     expect(positions.length).to.equal(mockResponse.rows.length);
@@ -98,7 +98,7 @@ describe('LeverageDataSource Tests', function() {
 
   it('getLivePositions should handle errors gracefully', async function() {
     try {
-      await dataSource.getLivePositions();
+      await modulesParams.leverageDataSource!.leverageDataSourceDB!.getLivePositions();
       expect.fail('Expected method to throw');
     } catch (error) {
       if (error instanceof Error) {
@@ -120,9 +120,9 @@ describe('LeverageDataSource Tests', function() {
       oid: 0,
       fields: [],
     };
-    dbServiceAdapter.getLeverageClient().setQueryResponse(mockResponse);
+    (modulesParams.dbService as DBServiceAdapter).getLeverageClient().setQueryResponse(mockResponse);
 
-    const nftIds = await dataSource.getLivePositionsNftIds();
+    const nftIds = await modulesParams.leverageDataSource!.leverageDataSourceDB!.getLivePositionsNftIds();
 
     expect(nftIds).to.be.an('array').that.is.not.empty;
     expect(nftIds.length).to.equal(mockResponse.rows.length);
@@ -131,7 +131,7 @@ describe('LeverageDataSource Tests', function() {
 
   it('getLivePositionsNftIds should handle errors gracefully', async function() {
     try {
-      await dataSource.getLivePositionsNftIds();
+      await modulesParams.leverageDataSource!.leverageDataSourceDB!.getLivePositionsNftIds();
       expect.fail('Expected method to throw');
     } catch (error) {
       if (error instanceof Error) {

@@ -1,5 +1,3 @@
-
-
 import {ILogger} from '../logger/interfaces/ILogger';
 import {ISignalHeartbeat} from './signal/interfaces/ISignalHeartbeat';
 import {BlockchainNodeHealthMonitor} from './BlockchainNodeHealthMonitor';

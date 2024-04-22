@@ -14,49 +14,42 @@ import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
 import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import LeverageDataSourceDB from '../../src/rule_engine/tool/data_source/LeverageDataSourceDB';
 import DBService from '../../src/service/db/dbService';
+import {ModulesParams} from '../../src/types/ModulesParams';
 
 describe('Rule Engine Testings', function() {
-  let logger: LoggerAdapter;
-  let configService: ConfigServiceAdapter;
-  let localNodeAlchemy: BlockchainNodeAdapter;
-  let localNodeInfura: BlockchainNodeAdapter;
+  const modulesParams: ModulesParams = {};
   let ruleEngine: RuleEngine;
 
   beforeEach(async function() {
-    logger = new LoggerAdapter();
-    configService = new ConfigServiceAdapter();
-    configService.setLeverageContractInfo({
+    modulesParams.logger = new LoggerAdapter();
+    modulesParams.configService = new ConfigServiceAdapter();
+    (modulesParams.configService as ConfigServiceAdapter).setLeverageContractInfo({
       positionOpener: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
       positionLiquidator: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
       positionCloser: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
       positionExpirator: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
       positionLedger: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
     });
-    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
-    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
-    await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
+    modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams, 'localNodeAlchemy');
+    modulesParams.altNode = new BlockchainNodeAdapter(modulesParams, 'localNodeInfura');
+    await Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
-    const blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
-    const dbService = new DBService(logger, configService);
-    const LeverageDataSourceDB = new LeverageDataSourceDB(logger, dbService);
+    modulesParams.blockchainReader = new BlockchainReader(modulesParams);
+    modulesParams.dbService = new DBService(modulesParams.logger, modulesParams.configService);
 
     const abiStorage = new AbiStorageAdapter();
     const abiFetcher = new AbiFetcherAdapter();
-    const abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
-    const ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo, LeverageDataSourceDB);
-    ruleEngine = new RuleEngine(
-        logger,
-        ruleFactory,
-    );
+    const ruleFactory = new FactoryRule(modulesParams);
+    ruleEngine = new RuleEngine(modulesParams, ruleFactory);
   });
 
   it('should load rules from rule JSON and iterate on them, invoke each one', async function() {
     const expectedLogMessage = 'I AM GROOT';
 
-    configService.setLeverageContractInfo({
+    (modulesParams.configService as ConfigServiceAdapter).setLeverageContractInfo({
       positionOpener: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
       positionLiquidator: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
       positionCloser: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
@@ -64,13 +57,13 @@ describe('Rule Engine Testings', function() {
       positionLedger: '0x4838B106FCe9647Bdf1E7877BF73cE8B0BAD5f97',
     });
 
-    logger.lookForInfoLogLineContaining(expectedLogMessage);
+    (modulesParams.logger as LoggerAdapter).lookForInfoLogLineContaining(expectedLogMessage);
     const ruleEngine = await createRuleEngineWithConfiguredRules('./test/unit/data/dummy_rules.json');
 
     await ruleEngine.evaluateRulesAndCreateOutboundTransactions();
     const transactions = ruleEngine.getOutboundTransactions();
     assertTransactionsValid(transactions, 5);
-    expect(logger.isExpectedLogLineInfoFound()).to.be.true;
+    expect((modulesParams.logger as LoggerAdapter).isExpectedLogLineInfoFound()).to.be.true;
   });
 
   it('Should report on 1 successful rule and 1 failed rule', async function() {
@@ -89,9 +82,9 @@ describe('Rule Engine Testings', function() {
   });
 
   async function createRuleEngineWithConfiguredRules(rulesFilePath: string): Promise<RuleEngine> {
-    configService.setRulesFromFile(rulesFilePath);
-    await configService.refreshConfig();
-    return await createRuleEngine(configService.getRules());
+    (modulesParams.configService as ConfigServiceAdapter).setRulesFromFile(rulesFilePath);
+    await (modulesParams.configService as ConfigServiceAdapter).refreshConfig();
+    return await createRuleEngine((modulesParams.configService as ConfigServiceAdapter).getRules());
   }
 
   async function createRuleEngine(rules: RuleJSONConfigItem[]): Promise<RuleEngine> {
@@ -123,7 +116,7 @@ describe('Rule Engine Testings', function() {
   }
 
   function assertRuleEvaluationResult(successfulRuleEval: number, failedRuleEval: number): void {
-    const logLine = logger.getLatestInfoLogLine();
+    const logLine = (modulesParams.logger as LoggerAdapter).getLatestInfoLogLine();
     expect(logLine).to.contain(
         `"message":"Rule Eval Results",` +
       `"successfulRuleEval":${successfulRuleEval},` +

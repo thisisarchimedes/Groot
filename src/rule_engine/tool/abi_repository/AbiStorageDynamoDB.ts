@@ -1,15 +1,14 @@
 
 import DynamoDB from 'aws-sdk/clients/dynamodb';
 import {IAbiStorage} from './interfaces/IAbiStorage';
-import {ConfigServiceAWS} from '../../../service/config/ConfigServiceAWS';
 import {ModulesParams} from '../../../types/ModulesParams';
-import {ConfigService} from '../../../service/config/ConfigService';
+import {ConfigServiceAWS} from '../../../service/config/ConfigServiceAWS';
 
 
 export class AbiStorageDynamoDB implements IAbiStorage {
   private readonly tableName: string;
   private dynamoDB: DynamoDB.DocumentClient;
-  private readonly configService: ConfigService;
+  private readonly configService: ConfigServiceAWS;
 
 
   constructor(

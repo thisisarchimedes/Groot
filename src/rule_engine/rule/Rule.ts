@@ -11,17 +11,13 @@ export abstract class Rule {
   protected readonly blockchainReader: IBlockchainReader;
   protected readonly abiRepo: IAbiRepo;
   protected readonly configService: ConfigService;
-  protected readonly leverageDataSource: LeverageDataSource;
+  protected readonly leverageDataSource: LeverageDataSource | undefined;
 
   protected ruleLabel: string;
   protected params: RuleParams;
   protected pendingTxQueue: OutboundTransaction[] = [];
 
   constructor(input: RuleConstructorInput) {
-    if (!input.leverageDataSource) {
-      throw new Error('LeverageDataSource is required for LiquidatePositions rule');
-    }
-
     this.logger = input.logger;
     this.blockchainReader = input.blockchainReader;
     this.abiRepo = input.abiRepo;

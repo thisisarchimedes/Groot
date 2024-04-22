@@ -1,13 +1,13 @@
-import {ConfigServiceAWS} from '../../../src/service/config/ConfigServiceAWS';
 import DBService from '../../../src/service/db/dbService';
-import {LoggerAll} from '../../../src/service/logger/LoggerAll';
+import {ILogger} from '../../../src/service/logger/interfaces/ILogger';
 import {PGClientAdapter} from './PGClientAdapter';
+import {ConfigServiceAWS} from '../../../src/service/config/ConfigServiceAWS';
 
 export default class DBServiceAdapter extends DBService {
   private pgClientAdapter: PGClientAdapter;
 
   constructor(
-      logger: LoggerAll,
+      logger: ILogger,
       configService: ConfigServiceAWS,
   ) {
     super(logger, configService);

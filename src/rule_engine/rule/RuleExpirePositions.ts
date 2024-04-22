@@ -15,6 +15,10 @@ export class RuleExpirePositions extends Rule {
   // private positionLedger: PositionLedger;
 
   constructor(input: RuleConstructorInput) {
+    if (!input.leverageDataSource) {
+      throw new Error('LeverageDataSource is required for ExpirePositions rule');
+    }
+
     super(input);
     // this.uniswap = new Uniswap('');
 

@@ -11,39 +11,39 @@ import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
 import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import DBService from '../../src/service/db/dbService';
+import {ModulesParams} from '../../src/types/ModulesParams';
 import LeverageDataSourceDB from '../../src/rule_engine/tool/data_source/LeverageDataSourceDB';
 
 describe('Rule Factory Testings', function() {
-  let logger: LoggerAdapter;
-  let blockchainReader: BlockchainReader;
-  let localNodeAlchemy: BlockchainNodeAdapter;
-  let localNodeInfura: BlockchainNodeAdapter;
-  let abiRepo: AbiRepo;
+  const modulesParams: ModulesParams = {};
   let ruleFactory: FactoryRule;
 
   beforeEach(async function() {
-    const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
-    await configService.refreshConfig();
+    modulesParams.configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
+    await modulesParams.configService.refreshConfig();
 
-    logger = new LoggerAdapter();
+    modulesParams.logger = new LoggerAdapter();
 
     // Starting nodes
-    localNodeAlchemy = new BlockchainNodeAdapter(logger, 'localNodeAlchemy');
-    localNodeInfura = new BlockchainNodeAdapter(logger, 'localNodeInfura');
+    modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams, 'localNodeAlchemy');
+    modulesParams.altNode = new BlockchainNodeAdapter(modulesParams, 'localNodeInfura');
 
-    Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
+    Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
-    localNodeInfura.setProxyInfoForAddressResponse({isProxy: false, implementationAddress: ''});
+    (modulesParams.altNode as BlockchainNodeAdapter)
+        .setProxyInfoForAddressResponse({isProxy: false, implementationAddress: ''});
 
-    blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
-    const dbService = new DBService(logger, configService);
-    const LeverageDataSourceDB = new LeverageDataSourceDB(logger, dbService);
+    modulesParams.blockchainReader = new BlockchainReader(modulesParams);
+    modulesParams.dbService = new DBService(modulesParams.logger!, modulesParams.configService);
+    modulesParams.leverageDataSource = {
+      leverageDataSourceDB: new LeverageDataSourceDB(modulesParams),
+    };
 
     const abiStorage = new AbiStorageAdapter();
     const abiFetcher = new AbiFetcherAdapter();
-    abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
-    ruleFactory = new FactoryRule(logger, configService, blockchainReader, abiRepo, LeverageDataSourceDB);
+    ruleFactory = new FactoryRule(modulesParams);
   });
 
   it('should create Rule object from a dummy rule config', async function() {
@@ -57,7 +57,7 @@ describe('Rule Factory Testings', function() {
     if (rule) {
       await rule.evaluate();
     }
-    expect(logger.getLatestInfoLogLine()).to.contain('I AM GROOT');
+    expect((modulesParams.logger as LoggerAdapter).getLatestInfoLogLine()).to.contain('I AM GROOT');
   });
 
   it('should generate more than one tx per rule', async function() {

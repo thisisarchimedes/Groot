@@ -11,6 +11,7 @@ import {LoggerConsole} from '../../src/service/logger/LoggerConsole';
 import {BlockchainNodeLocal} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
 import 'dotenv/config';
 import {PositionState} from '../../src/types/LeveragePosition';
+import {ModulesParams} from '../../src/types/ModulesParams';
 
 const {expect} = chai;
 
@@ -18,42 +19,40 @@ describe('LeverageDataSource Tests', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(60000);
 
-  let logger: LoggerConsole;
-  let dataSource: LeverageDataSourceNode;
-  let localNodeAlchemy: BlockchainNodeLocal;
-  let localNodeInfura: BlockchainNodeLocal;
-  let blockchainReader: BlockchainReader;
+  const modulesParams: ModulesParams = {};
 
   beforeEach(async function() {
-    const configService = new ConfigServiceAWS('StableApp', 'us-east-1');
-    await configService.refreshConfig();
+    modulesParams.configService = new ConfigServiceAWS('StableApp', 'us-east-1');
+    await modulesParams.configService.refreshConfig();
 
     // Setup Logger
-    logger = new LoggerConsole();
+    modulesParams.logger = new LoggerConsole();
 
     // Starting nodes
-    localNodeAlchemy = new BlockchainNodeLocal(
-        logger,
+    modulesParams.mainNode = new BlockchainNodeLocal(
+        modulesParams,
         `http://localhost:${process.env.MAIN_LOCAL_NODE_PORT || 8545}`,
         'localNodeAlchemy',
     );
-    localNodeInfura = new BlockchainNodeLocal(
-        logger,
+    modulesParams.altNode = new BlockchainNodeLocal(
+        modulesParams,
         `http://localhost:${process.env.ALT_LOCAL_NODE_PORT || 18545}`,
         'localNodeInfura',
     );
-    await Promise.all([localNodeAlchemy.startNode(), localNodeInfura.startNode()]);
+    await Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
-    blockchainReader = new BlockchainReader(logger, localNodeAlchemy, localNodeInfura);
-    const abiStorage = new AbiStorageDynamoDB(configService);
-    const abiFetcher = new AbiFetcherEtherscan(configService);
-    const abiRepo = new AbiRepo(blockchainReader, abiStorage, abiFetcher);
+    modulesParams.blockchainReader = new BlockchainReader(modulesParams);
+    const abiStorage = new AbiStorageDynamoDB(modulesParams);
+    const abiFetcher = new AbiFetcherEtherscan(modulesParams);
+    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
-    dataSource = new LeverageDataSourceNode(logger, configService, blockchainReader, abiRepo);
+    modulesParams.leverageDataSource = {
+      leverageDataSourceNode: new LeverageDataSourceNode(modulesParams),
+    };
   });
 
   it('Get all live positions for liquidation', async function() {
-    const livePositions = await dataSource.getLivePositions();
+    const livePositions = await modulesParams.leverageDataSource!.leverageDataSourceNode!.getLivePositions();
 
     expect(livePositions).to.be.an('array').that.is.not.empty;
     livePositions.forEach((position) => {

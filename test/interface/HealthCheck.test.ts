@@ -9,6 +9,7 @@ import {HostNameProvider} from '../../src/service/health_monitor/HostNameProvide
 import {SignalAWSHeartbeat} from '../../src/service/health_monitor/signal/SignalAWSHeartbeat';
 import {namespace} from '../../src/constants/constants';
 import {SignalAWSCriticalFailure} from '../../src/service/health_monitor/signal/SignalAWSCriticalFailure';
+import {ModulesParams} from '../../src/types/ModulesParams';
 
 dotenv.config();
 
@@ -18,30 +19,25 @@ describe('Check that we work with AWS Health Check system correctly', function()
   // eslint-disable-next-line no-invalid-this
   this.timeout(120000);
 
-  let configService: ConfigServiceAWS;
-  const logger = new LoggerAdapter();
-  let signalHeartbeat: SignalAWSHeartbeat;
-  const hostNameProvider: HostNameProvider = new HostNameProvider(logger);
-  let signalCriticalFailure: SignalAWSCriticalFailure;
+  const modulesParams: ModulesParams = {};
+  const hostNameProvider: HostNameProvider = new HostNameProvider(modulesParams);
 
   beforeEach(async function() {
     const environment = process.env.ENVIRONMENT as string;
     const region = process.env.AWS_REGION as string;
 
-    configService = new ConfigServiceAWS(environment, region);
-    await configService.refreshConfig();
+    modulesParams.configService = new ConfigServiceAWS(environment, region);
+    await modulesParams.configService.refreshConfig();
 
-    signalHeartbeat = new SignalAWSHeartbeat(
-        configService,
-        logger,
-        hostNameProvider,
+    modulesParams.logger = new LoggerAdapter();
+
+    modulesParams.signalHeartbeat = new SignalAWSHeartbeat(
+        modulesParams,
         namespace,
     );
 
-    signalCriticalFailure = new SignalAWSCriticalFailure(
-        configService,
-        logger,
-        hostNameProvider,
+    modulesParams.signalCriticalFailure = new SignalAWSCriticalFailure(
+        modulesParams,
         namespace,
     );
   });
@@ -56,12 +52,12 @@ describe('Check that we work with AWS Health Check system correctly', function()
   });
 
   it('Should be able to send heart beat and verify the received heartbeat', async function() {
-    const res = await signalHeartbeat.sendHeartbeat();
+    const res = await modulesParams.signalHeartbeat!.sendHeartbeat();
     expect(res).to.be.true;
   });
 
   it('Should be able to send critical failure signal', async function() {
-    const res = await signalCriticalFailure.sendCriticalFailure();
+    const res = await modulesParams.signalCriticalFailure!.sendCriticalFailure();
     expect(res).to.be.true;
   });
 });
