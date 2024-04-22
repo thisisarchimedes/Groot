@@ -20,7 +20,6 @@ describe('Check that we work with AWS Health Check system correctly', function()
   this.timeout(120000);
 
   const modulesParams: ModulesParams = {};
-  const hostNameProvider: HostNameProvider = new HostNameProvider(modulesParams);
 
   beforeEach(async function() {
     const environment = process.env.ENVIRONMENT as string;
@@ -40,6 +39,8 @@ describe('Check that we work with AWS Health Check system correctly', function()
         modulesParams,
         namespace,
     );
+
+    modulesParams.hostnameProvider = new HostNameProvider(modulesParams);
   });
 
   afterEach(async function() {
@@ -47,7 +48,7 @@ describe('Check that we work with AWS Health Check system correctly', function()
   });
 
   it('Should return hostname', function() {
-    const hostName = hostNameProvider.getHostName();
+    const hostName = modulesParams.hostnameProvider!.getHostName();
     expect(hostName).to.be.not.empty;
   });
 
