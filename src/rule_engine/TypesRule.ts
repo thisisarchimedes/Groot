@@ -1,12 +1,15 @@
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {AbiRepo} from './tool/abi_repository/AbiRepo';
+import {ConfigService} from '../service/config/ConfigService';
+import LeverageDataSource from './tool/data_source/LeverageDataSource';
 
 export enum TypeRule {
     Invalid = 'invalid',
     Dummy = 'dummy',
     UniswapPSPRebalance = 'uniswapPSPRebalance',
     ExpirePositions = 'expirePosition',
+    LiquidatePositions = 'liquidatePosition',
     RuleBalanceCurvePoolWithVault = 'balanceCurvePoolWithVault'
 }
 
@@ -34,8 +37,10 @@ export interface RuleJSONConfigItem {
 
 export interface RuleConstructorInput {
     logger: ILogger;
+    configService: ConfigService;
     blockchainReader: BlockchainReader;
     abiRepo: AbiRepo;
+    leverageDataSource?: LeverageDataSource;
     ruleLabel: string;
     params: RuleParams;
 }

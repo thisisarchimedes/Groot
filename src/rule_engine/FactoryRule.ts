@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 
-import {RuleConstructorInput, RuleJSONConfigItem, RuleParams, TypeRule} from './TypesRule';
+import {RuleConstructorInput, RuleJSONConfigItem, TypeRule} from './TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {Rule} from './rule/Rule';
 import {RuleDummy} from './rule/RuleDummy';
@@ -8,23 +8,36 @@ import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
 import {AbiRepo} from './tool/abi_repository/AbiRepo';
 import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
+import {RuleLiquidatePositions} from './rule/RuleLiquidatePositions';
+import LeverageDataSourceDB from './tool/data_source/LeverageDataSourceDB';
+import LeverageDataSourceNode from './tool/data_source/LeverageDataSourceNode';
+import {RuleExpirePositions} from './rule/RuleExpirePositions';
+import {ModulesParams} from '../types/ModulesParams';
 
 
 export class FactoryRule {
+  private leverageDataSourceDB: LeverageDataSourceDB;
+  private leverageDataSourceNode: LeverageDataSourceNode;
+
   constructor(
-     private logger: ILogger,
-     _configService: ConfigServiceAWS,
-     private blockchainReader: BlockchainReader,
-     private abiRepo: AbiRepo,
-  ) { }
+      modulesParams: ModulesParams,
+     private logger: ILogger = modulesParams.logger!,
+     private configService: ConfigServiceAWS = modulesParams.configService!,
+     private blockchainReader: BlockchainReader = modulesParams.blockchainReader!,
+     private abiRepo: AbiRepo = modulesParams.abiRepo!,
+  ) {
+    this.leverageDataSourceDB = new LeverageDataSourceDB(modulesParams);
+    this.leverageDataSourceNode = new LeverageDataSourceNode(modulesParams);
+  }
 
   public createRule(config: RuleJSONConfigItem): Rule | null {
     const constractorInput: RuleConstructorInput = {
       logger: this.logger,
+      configService: this.configService,
       blockchainReader: this.blockchainReader,
       abiRepo: this.abiRepo,
       ruleLabel: config.label,
-      params: config.params as RuleParams,
+      params: config.params,
     };
 
     switch (config.ruleType) {
@@ -32,6 +45,16 @@ export class FactoryRule {
         return new RuleDummy(constractorInput);
       case TypeRule.UniswapPSPRebalance:
         return new RuleUniswapPSPRebalance(constractorInput);
+      case TypeRule.LiquidatePositions:
+        return new RuleLiquidatePositions({
+          ...constractorInput,
+          leverageDataSource: this.leverageDataSourceNode,
+        });
+      case TypeRule.ExpirePositions:
+        return new RuleExpirePositions({
+          ...constractorInput,
+          leverageDataSource: this.leverageDataSourceDB,
+        });
       default:
         this.logger.warn(`Unsupported rule type: ${config.ruleType}`);
         return null;

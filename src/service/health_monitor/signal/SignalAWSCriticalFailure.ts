@@ -1,20 +1,22 @@
 
-import {HostNameProvider} from '../HostNameProvider';
 import {SignalAWS} from './SignalAWS';
-import {ILogger} from '../../logger/interfaces/ILogger';
-import {ConfigService} from '../../config/ConfigService';
 import {ISignalCriticalFailure} from './interfaces/ISignalCriticalFailure';
+import {ModulesParams} from '../../../types/ModulesParams';
 
 
 export class SignalAWSCriticalFailure extends SignalAWS implements ISignalCriticalFailure {
   private readonly namespace: string;
 
   constructor(
-      _configService: ConfigService,
-      _logger: ILogger,
-      _hostNameProvider: HostNameProvider,
-      namespace: string) {
-    super(_logger, _configService, _hostNameProvider, namespace);
+      modulesParams: ModulesParams,
+      namespace: string,
+  ) {
+    super(
+      modulesParams.logger!,
+      modulesParams.configService!,
+      modulesParams.hostnameProvider!,
+      namespace,
+    );
     this.namespace = namespace;
   }
 

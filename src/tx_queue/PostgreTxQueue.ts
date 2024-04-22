@@ -6,6 +6,7 @@ import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Executor, UrgencyLevel} from '../rule_engine/TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import DBService from '../service/db/dbService';
+import {ModulesParams} from '../types/ModulesParams';
 
 
 class PostgreTxQueue implements ITxQueue {
@@ -13,11 +14,10 @@ class PostgreTxQueue implements ITxQueue {
   private logger: ILogger;
 
   constructor(
-      logger: ILogger,
-      dbService: DBService,
+      modulesParams: ModulesParams,
   ) {
-    this.dbService = dbService;
-    this.logger = logger;
+    this.dbService = modulesParams.dbService!;
+    this.logger = modulesParams.logger!;
   }
 
   public async addTransactionToQueue(tx: OutboundTransaction): Promise<void> {

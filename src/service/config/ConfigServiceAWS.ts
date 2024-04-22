@@ -23,6 +23,8 @@ export class ConfigServiceAWS extends ConfigService {
       this.refreshSleepTime(),
       this.refreshEtherscanAPIKey(),
       this.refreshAbiStorageConfig(),
+      this.refreshLeverageContractInfo(),
+      this.refreshLeverageDBURL(),
       this.refreshTransactionsDatabaseURL(),
       this.refreshLeverageDBURL(),
       this.refreshLeverageContractInfo(),

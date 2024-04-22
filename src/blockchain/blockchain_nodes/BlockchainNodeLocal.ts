@@ -2,18 +2,18 @@ import axios from 'axios';
 
 import {JsonRpcProvider, ethers} from 'ethers';
 import {BlockchainNode, BlockchainNodeError} from './BlockchainNode';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {ModulesParams} from '../../types/ModulesParams';
 
 
 export class BlockchainNodeLocal extends BlockchainNode {
   private readonly localRpcUrl: string;
 
   constructor(
-      _logger: ILogger,
+      modulesParams: ModulesParams,
       localRpcUrl: string,
       nodeName: string,
   ) {
-    super(_logger, nodeName);
+    super(modulesParams.logger!, nodeName);
     this.localRpcUrl = localRpcUrl;
     this.logger.debug(`Initializing ${this.nodeName} with local RPC URL: ${localRpcUrl}`);
     this.provider = new JsonRpcProvider(localRpcUrl);

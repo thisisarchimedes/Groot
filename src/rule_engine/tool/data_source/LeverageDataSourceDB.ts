@@ -1,19 +1,18 @@
 import 'reflect-metadata';
 
 import LeveragePosition from '../../../types/LeveragePosition';
-import {ILogger} from '../../../service/logger/interfaces/ILogger';
 import DBService from '../../../service/db/dbService';
+import LeverageDataSource from './LeverageDataSource';
+import {ModulesParams} from '../../../types/ModulesParams';
 
-export default class PostgreDataSource {
-  protected logger: ILogger;
-  protected dbService: DBService;
+export default class LeverageDataSourceDB extends LeverageDataSource {
+  private dbService: DBService;
 
   constructor(
-      _logger: ILogger,
-      dbService: DBService,
+      modulesParams: ModulesParams,
   ) {
-    this.logger = _logger;
-    this.dbService = dbService;
+    super(modulesParams.logger!);
+    this.dbService = modulesParams.dbService!;
   }
 
   async getPositionsByNftIds(nftIds: number[]): Promise<LeveragePosition[]> {

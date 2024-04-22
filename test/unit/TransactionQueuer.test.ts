@@ -5,16 +5,16 @@ import {Executor, UrgencyLevel} from '../../src/rule_engine/TypesRule';
 import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
 import {TxQueueAdapter} from './adapters/TxQueueAdapter';
 import {TransactionQueuer} from '../../src/tx_queue/TransactionQueuer';
+import {ModulesParams} from '../../src/types/ModulesParams';
 
 describe('Transaction Queuer', function() {
-  let logger: LoggerAdapter;
-  let txQueuer: TransactionQueuer;
+  const modulesParams: ModulesParams = {};
   let queue: TxQueueAdapter;
 
   beforeEach(function() {
-    logger = new LoggerAdapter();
+    modulesParams.logger = new LoggerAdapter();
     queue = new TxQueueAdapter();
-    txQueuer = new TransactionQueuer(logger, queue);
+    modulesParams.transactionsQueuer = new TransactionQueuer(modulesParams, queue);
   });
 
   it('should filter out and report on all tx that dont have a hash', async function() {
@@ -57,11 +57,11 @@ describe('Transaction Queuer', function() {
       },
     ];
 
-    await txQueuer.queueTransactions(txs);
+    await modulesParams.transactionsQueuer!.queueTransactions(txs);
     const txsInQueue = queue.getTransactions();
     expect(txsInQueue[0].postEvalUniqueKey).to.be.eq('0x1234');
     expect(txsInQueue[1].postEvalUniqueKey).to.be.eq('0x345');
     expect(txsInQueue[2]).to.be.undefined;
-    expect(logger.getLatestErrorLogLine()).to.contain('test 2');
+    expect((modulesParams.logger as LoggerAdapter).getLatestErrorLogLine()).to.contain('test 2');
   });
 });

@@ -5,15 +5,19 @@ import {Rule} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {FactoryRule} from './FactoryRule';
+import {ModulesParams} from '../types/ModulesParams';
 
 export class RuleEngine {
+  private logger: ILogger;
   private rules: Rule[] = [];
   private outboundTransactions: OutboundTransaction[] = [];
 
   constructor(
-      private readonly logger: ILogger,
+      modulesParams: ModulesParams,
       private readonly ruleFactory: FactoryRule,
   ) {
+    this.logger = modulesParams.logger!;
+    this.ruleFactory = ruleFactory;
   }
 
   public async loadRulesFromJSONConfig(ruleConfig: RuleJSONConfigItem[]): Promise<void> {

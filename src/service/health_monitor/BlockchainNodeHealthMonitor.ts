@@ -1,18 +1,15 @@
 import {BlockchainNode} from '../../blockchain/blockchain_nodes/BlockchainNode';
 import {BlockchainNodeLocal} from '../../blockchain/blockchain_nodes/BlockchainNodeLocal';
+import {ModulesParams} from '../../types/ModulesParams';
 import {ILogger} from '../logger/interfaces/ILogger';
 
 export class BlockchainNodeHealthMonitor {
   private readonly nodes: BlockchainNodeLocal[] = [];
   private readonly logger: ILogger;
 
-  constructor(
-      _logger: ILogger,
-      _mainLocalNode: BlockchainNodeLocal,
-      _altLocalNode: BlockchainNodeLocal,
-  ) {
-    this.logger = _logger;
-    this.nodes = [_mainLocalNode, _altLocalNode];
+  constructor(modulesParams: ModulesParams) {
+    this.logger = modulesParams.logger!;
+    this.nodes = [modulesParams.mainNode!, modulesParams.altNode!];
   }
 
   public async checkBlockchainNodesHealth(): Promise<void> {
@@ -26,7 +23,7 @@ export class BlockchainNodeHealthMonitor {
 
     if (this.allNodesFailedToRecover(failedRecoveries, unhealthyNodes)) {
       this.logAllNodesDownError();
-      throw new ErrorBlockchainNodeHealthMonitor('Blockchain Nodes Health Monitor:Nodes are down, none recovered');
+      throw new ErrorBlockchainNodeHealthMonitor('Blockchain Nodes Health Monitor: Nodes are down, none recovered');
     }
   }
 

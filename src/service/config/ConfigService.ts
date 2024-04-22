@@ -16,7 +16,8 @@ export abstract class ConfigService {
   protected etherscanAPIKey: string = '';
   protected AbiRepoDynamoDBTable: string = '';
 
-  abstract refreshConfig(): Promise<void>;
+  protected leverageDbUrl: string = '';
+
 
   protected leverageContractAddresses: LeverageContractAddresses = {
     positionOpener: '',
@@ -26,16 +27,7 @@ export abstract class ConfigService {
     positionLedger: '',
   };
 
-  protected leverageDbUrl: string = '';
-
-
-  public getLeverageContractInfo(): LeverageContractAddresses {
-    return this.leverageContractAddresses;
-  }
-
-  public getLeverageDBURL(): string {
-    return this.leverageDbUrl;
-  }
+  abstract refreshConfig(): Promise<void>;
 
   public getEnvironment(): string {
     return this.environment;
@@ -75,5 +67,13 @@ export abstract class ConfigService {
 
   public getDynamoDBAbiRepoTable(): string {
     return this.AbiRepoDynamoDBTable;
+  }
+
+  public getLeverageContractInfo(): LeverageContractAddresses {
+    return this.leverageContractAddresses;
+  }
+
+  public getLeverageDBURL(): string {
+    return this.leverageDbUrl;
   }
 }

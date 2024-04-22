@@ -1,6 +1,7 @@
 
 import DynamoDB from 'aws-sdk/clients/dynamodb';
 import {IAbiStorage} from './interfaces/IAbiStorage';
+import {ModulesParams} from '../../../types/ModulesParams';
 import {ConfigServiceAWS} from '../../../service/config/ConfigServiceAWS';
 
 
@@ -11,9 +12,9 @@ export class AbiStorageDynamoDB implements IAbiStorage {
 
 
   constructor(
-      _configService: ConfigServiceAWS,
+      modulesParams: ModulesParams,
   ) {
-    this.configService = _configService;
+    this.configService = modulesParams.configService!;
     this.tableName = this.configService.getDynamoDBAbiRepoTable();
     const region = this.configService.getAWSRegion();
     this.dynamoDB = new DynamoDB.DocumentClient({region});

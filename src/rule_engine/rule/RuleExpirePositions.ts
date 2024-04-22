@@ -3,14 +3,10 @@ import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
 import fs from 'fs';
 import {Address} from '../../types/LeverageContractAddresses';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
-import {ConfigService} from '../../service/config/ConfigService';
-import PostgreDataSource from '../tool/data_source/PostgreDataSource';
 import {RuleConstructorInput} from '../TypesRule';
 
 
 export class RuleExpirePositions extends Rule {
-  private leverageDataSource: PostgreDataSource;
-  private configService: ConfigService;
   private positionLedgerContract!: PositionLedgerContract;
   private positionLedgerAddress!: Address;
   private positionLedgerABI!: string;
@@ -18,10 +14,12 @@ export class RuleExpirePositions extends Rule {
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 
-  constructor(input: RuleConstructorInput, leverageDataSource: PostgreDataSource, configService: ConfigService) {
+  constructor(input: RuleConstructorInput) {
+    if (!input.leverageDataSource) {
+      throw new Error('LeverageDataSource is required for ExpirePositions rule');
+    }
+
     super(input);
-    this.leverageDataSource = leverageDataSource;
-    this.configService = configService;
     // this.uniswap = new Uniswap('');
 
     this.positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;
@@ -49,7 +47,7 @@ export class RuleExpirePositions extends Rule {
       urgencyLevel: this.params.urgencyLevel,
       executor: this.params.executor,
       context: `this is a expire test context`,
-      postEvalUniqueKey: this.generateUniqueKey(0),
+      postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction: tx,
       ttlSeconds: this.params.ttlSeconds,
     } as OutboundTransaction;
@@ -106,7 +104,7 @@ export class RuleExpirePositions extends Rule {
   //   };
   // }
 
-  protected generateUniqueKey(nftId?: number): string {
-    return 'expire--' + nftId;
+  protected generateUniqueKey(): string {
+    return 'expire--';
   }
 }

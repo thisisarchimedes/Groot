@@ -1,4 +1,4 @@
-import {ethers, Contract} from 'ethers';
+import {ethers, Contract, Block} from 'ethers';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
 import {BlockchainNodeProxyInfo} from './BlockchainNodeProxyInfo';
 
@@ -42,13 +42,30 @@ export abstract class BlockchainNode {
     }
   }
 
+  public async getBlock(blockNumber: number): Promise<Block> {
+    try {
+      const block = await this.provider.getBlock(blockNumber);
+      if (block === null) {
+        throw new Error(`Block ${blockNumber} is null`);
+      }
+      this.isNodeHealthy = true;
+      return block;
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.info(`${this.nodeName} cannot get block number: ${error.message}`);
+      }
+      this.isNodeHealthy = false;
+      throw new BlockchainNodeError(error instanceof Error ? error.message : 'Unknown error');
+    }
+  }
+
   public async callViewFunction(
       contractAddress: string,
-      abi: ethers.Interface,
+      abi: string,
       functionName: string,
       params: unknown[] = [],
   ): Promise<unknown> {
-    const contract = new Contract(contractAddress, abi, this.provider);
+    const contract = new Contract(contractAddress, JSON.parse(abi), this.provider);
 
     try {
       const data = await contract[functionName](...params);

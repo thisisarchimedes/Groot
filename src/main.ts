@@ -2,7 +2,7 @@ import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
 
-import {GrootParams} from './GrootParams';
+import {GrootParams} from './types/GrootParams';
 import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
 import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
 import DBService from './service/db/dbService';

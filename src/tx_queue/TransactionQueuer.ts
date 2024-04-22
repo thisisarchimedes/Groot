@@ -3,14 +3,17 @@ import 'reflect-metadata';
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {ITxQueue} from './interfaces/ITxQueue';
+import {ModulesParams} from '../types/ModulesParams';
 
 export class TransactionQueuer {
   private readonly logger: ILogger;
   private readonly queue: ITxQueue;
 
-  constructor( _logger: ILogger,
-      _queue: ITxQueue) {
-    this.logger = _logger;
+  constructor(
+      modulesParams: ModulesParams,
+      _queue: ITxQueue,
+  ) {
+    this.logger = modulesParams.logger!;
     this.queue = _queue;
   }
 

@@ -6,36 +6,37 @@ import {Executor, UrgencyLevel} from '../../src/rule_engine/TypesRule';
 import DBService from '../../src/service/db/dbService';
 import PostgreTxQueue from '../../src/tx_queue/PostgreTxQueue';
 import {LoggerAll} from '../../src/service/logger/LoggerAll';
+import {ModulesParams} from '../../src/types/ModulesParams';
 
 describe('Transaction Insertion Tests', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(25000);
 
+  const modulesParams: ModulesParams = {};
   let txQueue: ITxQueue;
-  let dbService: DBService;
 
   before(async function() {
-    const configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
-    await configService.refreshConfig();
+    modulesParams.configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
+    await modulesParams.configService.refreshConfig();
 
-    const logger = new LoggerAll(configService);
+    modulesParams.logger = new LoggerAll(modulesParams.configService);
 
-    dbService = new DBService(logger, configService);
-    await dbService.connect();
+    modulesParams.dbService = new DBService(modulesParams.logger, modulesParams.configService);
+    await modulesParams.dbService.connect();
 
-    txQueue = new PostgreTxQueue(logger, dbService);
+    txQueue = new PostgreTxQueue(modulesParams);
   });
 
   after(async function() {
-    await dbService.getTransactionsClient().query(
+    await modulesParams.dbService!.getTransactionsClient().query(
         'DELETE FROM "Transactions"."Transaction" WHERE "identifier" LIKE $1',
         ['test_%'],
     );
-    await dbService.end();
+    await modulesParams.dbService!.end();
   });
 
   afterEach(async function() {
-    await dbService.getTransactionsClient().query(
+    await modulesParams.dbService!.getTransactionsClient().query(
         'DELETE FROM "Transactions"."Transaction" WHERE "identifier" LIKE $1',
         ['test_%'],
     );
@@ -65,7 +66,7 @@ describe('Transaction Insertion Tests', function() {
     expect(errorOccurred).to.be.false;
 
     // Verify insertion
-    const result = await dbService.getTransactionsClient().query(
+    const result = await modulesParams.dbService!.getTransactionsClient().query(
         'SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1',
         ['test_uniqueIdentifier1'],
     );
@@ -133,11 +134,11 @@ describe('Transaction Insertion Tests', function() {
     }
     expect(errorOccurred).to.be.false;
 
-    const pendingResult = await dbService.getTransactionsClient().query(
+    const pendingResult = await modulesParams.dbService!.getTransactionsClient().query(
         'SELECT * FROM "Transactions"."Transaction" WHERE status = $1 AND identifier = $2',
         ['PENDING', 'test_expiredTransaction'],
     );
-    const failedResult = await dbService.getTransactionsClient().query(
+    const failedResult = await modulesParams.dbService!.getTransactionsClient().query(
         'SELECT * FROM "Transactions"."Transaction" WHERE status = $1 AND identifier = $2',
         ['FAILED', 'test_expiredTransaction'],
     );
@@ -175,7 +176,7 @@ describe('Transaction Insertion Tests', function() {
 
     // Verify each transaction was inserted
     for (const tx of transactions) {
-      const result = await dbService.getTransactionsClient().query(
+      const result = await modulesParams.dbService!.getTransactionsClient().query(
           'SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1',
           [tx.postEvalUniqueKey],
       );

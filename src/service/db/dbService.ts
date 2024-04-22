@@ -1,6 +1,6 @@
 import {Client, ClientConfig, QueryResult} from 'pg';
-import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 import {ILogger} from '../logger/interfaces/ILogger';
+import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 
 
 export default class DBService {
@@ -8,8 +8,8 @@ export default class DBService {
   private leverageClient:LoggedClient;
 
   constructor(
-     private logger: ILogger,
-     configService: ConfigServiceAWS,
+      private logger: ILogger,
+      configService: ConfigServiceAWS,
   ) {
     this.transactionsClient = new LoggedClient({
       connectionString: configService.getTransactionsDBURL(),

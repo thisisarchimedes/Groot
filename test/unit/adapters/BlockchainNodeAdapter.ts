@@ -1,23 +1,25 @@
-import {ethers} from 'ethers';
 import {
   BlockchainNodeError,
 } from '../../../src/blockchain/blockchain_nodes/BlockchainNode';
 import {BlockchainNodeProxyInfo} from '../../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
 import {BlockchainNodeLocal} from '../../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
-import {ILoggerAll} from '../../../src/service/logger/interfaces/ILoggerAll';
+import {ModulesParams} from '../../../src/types/ModulesParams';
 
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export class BlockchainNodeAdapter extends BlockchainNodeLocal {
   private currentBlockNumber: number = 100;
   private currentReadResponse: unknown = {};
+  private overlimitReadResponse: unknown = {};
   private throwErrorOnGetBlockNumber: boolean = false;
   private throwErrorOnCallViewFunction: boolean = false;
   private expectRecoverToSucceed: boolean = true;
   private proxyInfo!: BlockchainNodeProxyInfo;
+  private responseLimit = 0;
+  private responseCount = 0;
 
-  constructor(logger: ILoggerAll, nodeName: string) {
-    super(logger, '', nodeName);
+  constructor(modulesParams: ModulesParams, nodeName: string) {
+    super(modulesParams, '', nodeName);
   }
 
   public async startNode(): Promise<void> {}
@@ -47,7 +49,7 @@ export class BlockchainNodeAdapter extends BlockchainNodeLocal {
   // eslint-disable-next-line require-await
   public async callViewFunction(
       contractAddress: string,
-      abi: ethers.Interface,
+      abi: string,
       functionName: string,
       params?: unknown[],
   ): Promise<unknown> {
@@ -55,6 +57,14 @@ export class BlockchainNodeAdapter extends BlockchainNodeLocal {
       throw new Error('callViewFunction: Error');
     }
     this.isNodeHealthy = true;
+    if (this.responseLimit > 0) {
+      if (this.responseCount < this.responseLimit) {
+        this.responseCount++;
+        return this.currentReadResponse;
+      } else {
+        return this.overlimitReadResponse;
+      }
+    }
     return this.currentReadResponse;
   }
 
@@ -76,6 +86,14 @@ export class BlockchainNodeAdapter extends BlockchainNodeLocal {
 
   public setReadResponse(response: unknown): void {
     this.currentReadResponse = response;
+  }
+
+  public setResponseLimit(limit: number): void {
+    this.responseLimit = limit;
+  }
+
+  public setResponseForOverlimit(response: unknown): void {
+    this.overlimitReadResponse = response;
   }
 
   public setNodeHealthy(healthy: boolean): void {

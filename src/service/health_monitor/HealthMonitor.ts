@@ -1,9 +1,8 @@
-
-
 import {ILogger} from '../logger/interfaces/ILogger';
 import {ISignalHeartbeat} from './signal/interfaces/ISignalHeartbeat';
 import {BlockchainNodeHealthMonitor} from './BlockchainNodeHealthMonitor';
 import {ISignalCriticalFailure} from './signal/interfaces/ISignalCriticalFailure';
+import {ModulesParams} from '../../types/ModulesParams';
 
 
 export class HealthMonitor {
@@ -15,15 +14,12 @@ export class HealthMonitor {
   private readonly signalCriticalFailure: ISignalCriticalFailure;
 
   constructor(
-      _logger: ILogger,
-      _blockchainHealthMonitor: BlockchainNodeHealthMonitor,
-      signalHeartbeat: ISignalHeartbeat,
-      signalCriticalFailure: ISignalCriticalFailure,
+      modulesParams: ModulesParams,
   ) {
-    this.logger = _logger;
-    this.blockchainHealthMonitor = _blockchainHealthMonitor;
-    this.signalHeartbeat = signalHeartbeat;
-    this.signalCriticalFailure = signalCriticalFailure;
+    this.logger = modulesParams.logger!;
+    this.blockchainHealthMonitor = modulesParams.blockchainNodeHealthMonitor!;
+    this.signalHeartbeat = modulesParams.signalHeartbeat!;
+    this.signalCriticalFailure = modulesParams.signalCriticalFailure!;
   }
 
   public async startOfCycleSequence(): Promise<void> {
