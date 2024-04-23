@@ -9,22 +9,27 @@ export interface UniswapStrategyPosition {
 }
 export class ToolStrategyUniswap {
   private readonly strategyAddress: string;
+  private readonly uniswapV3StrategyABI: string;
   private readonly blockchainReader: IBlockchainReader;
 
   constructor(strategyAddress: string, blockchainReader: IBlockchainReader) {
     this.strategyAddress = strategyAddress;
+    this.uniswapV3StrategyABI = JSON.stringify(UNISWAPV3_STRATEGY_ABI);
     this.blockchainReader = blockchainReader;
   }
 
   public async getPoolAddress(): Promise<string> {
-    const ret = await this.blockchainReader.callViewFunction(this.strategyAddress,
-        JSON.stringify(UNISWAPV3_STRATEGY_ABI), 'pool');
+    const ret = await this.blockchainReader.callViewFunction(
+        this.strategyAddress,
+        this.uniswapV3StrategyABI,
+        'pool',
+    );
     return ret as string;
   }
   public async upperTick(): Promise<number> {
     const ret = await this.blockchainReader.callViewFunction(
         this.strategyAddress,
-        new ethers.Interface(UNISWAPV3_STRATEGY_ABI),
+        this.uniswapV3StrategyABI,
         'upperTick',
     );
     return ret as number;
@@ -32,7 +37,7 @@ export class ToolStrategyUniswap {
   public async lowerTick(): Promise<number> {
     const ret = await this.blockchainReader.callViewFunction(
         this.strategyAddress,
-        new ethers.Interface(UNISWAPV3_STRATEGY_ABI),
+        this.uniswapV3StrategyABI,
         'lowerTick',
     );
     return ret as number;
@@ -40,7 +45,7 @@ export class ToolStrategyUniswap {
   public async currentTick(): Promise<number> {
     const ret = await this.blockchainReader.callViewFunction(
         this.strategyAddress,
-        new ethers.Interface(UNISWAPV3_STRATEGY_ABI),
+        this.uniswapV3StrategyABI,
         'currentTick',
     );
     return ret as number;
@@ -49,7 +54,7 @@ export class ToolStrategyUniswap {
     const poolAddress = await this.getPoolAddress();
     const ret = await this.blockchainReader.callViewFunction(
         poolAddress,
-        new ethers.Interface(UNISWAPV3_STRATEGY_ABI),
+        this.uniswapV3StrategyABI,
         'tickSpacing',
     );
     return ret as number;
@@ -57,7 +62,7 @@ export class ToolStrategyUniswap {
   public async getPosition(): Promise<UniswapStrategyPosition> {
     const ret = (await this.blockchainReader.callViewFunction(
         this.strategyAddress,
-        new ethers.Interface(UNISWAPV3_STRATEGY_ABI),
+        this.uniswapV3StrategyABI,
         'getPosition',
     )) as Array<bigint>;
 
@@ -77,7 +82,7 @@ export class ToolStrategyUniswap {
     // create transaction
     const strategyContract = new Contract(
         this.strategyAddress,
-        UNISWAPV3_STRATEGY_ABI,
+        this.uniswapV3StrategyABI,
     );
     const tx = await strategyContract['rebalance'].populateTransaction(
         newLowerTick,

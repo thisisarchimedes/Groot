@@ -3,7 +3,7 @@ import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
 import fs from 'fs';
 import {Address} from '../../types/LeverageContractAddresses';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
-import {RuleConstructorInput} from '../TypesRule';
+import {RuleConstructorInput, RuleParams} from '../TypesRule';
 
 
 export class RuleExpirePositions extends Rule {
@@ -58,7 +58,7 @@ export class RuleExpirePositions extends Rule {
     this.pushTransactionToRuleLocalQueue(outboundTx);
   }
 
-  public override async initialize(
+  public async initialize(
       ruleLabel: string,
       params: RuleParams,
   ): Promise<void> {

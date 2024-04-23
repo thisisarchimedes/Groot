@@ -1,6 +1,7 @@
 import {Rule} from './Rule';
-import {RawTransactionData} from '../../blockchain/OutboundTransaction';
-import {RuleConstructorInput, RuleParams} from '../TypesRule';
+import {RuleConstructorInput, RuleParams, UrgencyLevel} from '../TypesRule';
+import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
+import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
 
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
@@ -11,6 +12,7 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
   strategyAddress: string;
   slippagePercentage: bigint; // slippage percentage for the rebalance in 10000 scale
 }
+
 export interface MinOutputAmounts {
   minOut0Amount: bigint;
   minOut1Amount: bigint;
@@ -18,9 +20,13 @@ export interface MinOutputAmounts {
 /* eslint-enable max-len */
 
 export class RuleUniswapPSPRebalance extends Rule {
-  // private uniswapStrategy: ToolStrategyUniswap;
+  private uniswapStrategy: ToolStrategyUniswap;
   constructor(input: RuleConstructorInput) {
     super(input);
+    this.uniswapStrategy = new ToolStrategyUniswap(
+        (input.params as RuleParamsUniswapPSPRebalance).strategyAddress,
+        input.blockchainReader,
+    );
   }
   public async evaluate(): Promise<void> {
     // call rebalance function based on the new params
@@ -51,7 +57,7 @@ export class RuleUniswapPSPRebalance extends Rule {
           minOutputAmounts.minOut0Amount,
           minOutputAmounts.minOut1Amount,
       );
-    await this.pushTransactionToRuleLocalQueue(tx);
+    this.pushTransactionToRuleLocalQueue(tx);
   }
 
   private async isCurrentTickBelowRebalanceUpperTickThreshold(): Promise<boolean> {

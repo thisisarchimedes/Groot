@@ -14,6 +14,9 @@ import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import DBService from '../../src/service/db/dbService';
 import LeverageDataSourceDB from '../../src/rule_engine/tool/data_source/LeverageDataSourceDB';
 import {ModulesParams} from '../../src/types/ModulesParams';
+import {ethers, parseUnits} from 'ethers';
+import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
+import {BlockchainNodeUniswapAdapter} from './adapters/BlockchainNodeUniswapAdapter';
 
 dotenv.config();
 
@@ -46,40 +49,14 @@ describe('Rule Factory Testings: Uniswap', function() {
   });
 
   it('should create Uniswap PSP rebalance Rule object from a rule config', function() {
-    const dummyRule: RuleJSONConfigItem = {
-      ruleType: TypeRule.UniswapPSPRebalance,
-      label: 'Uniswap PSP rebalance - test',
-      params: {
-        upperTriggerThresholdPercentage: 70,
-        lowerTriggerThresholdPercentage: 130,
-        upperTargetTickPercentage: 150,
-        lowerTargetTickPercentage: 50,
-        strategyAddress: '0x1234',
-        ttlSeconds: 300,
-        executor: Executor.LEVERAGE,
-        urgencyLevel: UrgencyLevel.LOW,
-      } as RuleParamsUniswapPSPRebalance,
-    };
-    const rule = ruleFactory.createRule(dummyRule);
+    const uniswapRule = createUniswapRule();
+    const rule = ruleFactory.createRule(uniswapRule);
 
     expect(rule).not.to.be.null;
   });
 
   it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', async function() {
-    const uniswapRule: RuleJSONConfigItem = {
-      ruleType: TypeRule.UniswapPSPRebalance,
-      label: 'Uniswap PSP rebalance - test',
-      params: {
-        upperTriggerThresholdPercentage: 70,
-        lowerTriggerThresholdPercentage: 130,
-        upperTargetTickPercentage: 150,
-        lowerTargetTickPercentage: 50,
-        strategyAddress: '0x1234',
-        ttlSeconds: 300,
-        executor: Executor.LEVERAGE,
-        urgencyLevel: UrgencyLevel.LOW,
-      } as RuleParamsUniswapPSPRebalance,
-    };
+    const uniswapRule = createUniswapRule();
     const rule = await ruleFactory.createRule(uniswapRule);
     expect(rule).not.to.be.null;
     rule?.evaluate();
@@ -116,12 +93,12 @@ describe('Rule Factory Testings: Uniswap', function() {
         tickSpacing,
     );
 
-    logger.lookForInfoLogLineContaining(
+    (modulesParams.logger as LoggerAdapter).lookForInfoLogLineContaining(
         `New upper tick: ${expectedNewUpperTick}`,
     );
     await rule?.evaluate();
 
-    expect(logger.isExpectedLogLineInfoFound()).to.be.true;
+    expect((modulesParams.logger as LoggerAdapter).isExpectedLogLineInfoFound()).to.be.true;
   });
 
   it('should calculate new upper and lower tick correctly when we are too close to lower tick', async function() {
@@ -154,12 +131,12 @@ describe('Rule Factory Testings: Uniswap', function() {
         tickSpacing,
     );
 
-    logger.lookForInfoLogLineContaining(
+    (modulesParams.logger as LoggerAdapter).lookForInfoLogLineContaining(
         `New lower tick: ${expectedNewLowerTick}`,
     );
     await rule?.evaluate();
 
-    expect(logger.isExpectedLogLineInfoFound()).to.be.true;
+    expect((modulesParams.logger as LoggerAdapter).isExpectedLogLineInfoFound()).to.be.true;
   });
 
   it('should generate tx to update ticks', async function() {
@@ -217,66 +194,29 @@ describe('Rule Factory Testings: Uniswap', function() {
     expect(pendingTx.lowLevelUnsignedTransaction.data === data).to.be.true;
   });
 
-  function createBlockchainNodeAdapter(
-      name: string,
-  ): BlockchainNodeUniswapAdapter {
-    const adapter = new BlockchainNodeUniswapAdapter(logger, name);
-    adapter.startNode();
-    return adapter;
-  }
-
-  function createBlockchainReader(): BlockchainReader {
-    return new BlockchainReader(logger, [localNodeAlchemy, localNodeInfura]);
-  }
-
-  function createAbiRepo(): AbiRepo {
-    const environment = process.env.ENVIRONMENT as string;
-    const region = process.env.AWS_REGION as string;
-    const configService = new ConfigServiceAWS(environment, region);
-    const abiStorage = new AbiStorageDynamoDB(
-        configService.getDynamoDBAbiRepoTable(),
-        configService.getAWSRegion(),
-    );
-    const abiFetcher = new AbiFetcherEtherscan(
-        configService.getEtherscanAPIKey(),
-    );
-    return new AbiRepo(blockchainReader, abiStorage, abiFetcher);
-  }
-
   function createRuleFactory(): FactoryRule {
-    return new FactoryRule(logger, blockchainReader, abiRepo);
-  }
-
-  function createDummyRule(): RuleJSONConfigItem {
-    return {
-      ruleType: TypeRule.UniswapPSPRebalance,
-      label: 'Uniswap PSP rebalance - test',
-      params: {
-        upperTriggerThresholdPercentage: 70,
-        lowerTriggerThresholdPercentage: 130,
-        upperTargetTickPercentage: 150,
-        lowerTargetTickPercentage: 50,
-        strategyAddress: '0x1234',
-        slippagePercentage: BigInt(50),
-      },
-    };
+    return new FactoryRule(modulesParams);
   }
 
   function createUniswapRule(
       upperTargetTickPercentage = 150,
       lowerTargetTickPercentage = 50,
   ): RuleJSONConfigItem {
+    const params: RuleParamsUniswapPSPRebalance = {
+      upperTriggerThresholdPercentage: 70,
+      lowerTriggerThresholdPercentage: 130,
+      upperTargetTickPercentage,
+      lowerTargetTickPercentage,
+      strategyAddress: '0x1234',
+      slippagePercentage: BigInt(50),
+      ttlSeconds: 300,
+      executor: Executor.LEVERAGE,
+      urgencyLevel: UrgencyLevel.LOW,
+    };
     return {
       ruleType: TypeRule.UniswapPSPRebalance,
       label: 'Uniswap PSP rebalance - test',
-      params: {
-        upperTriggerThresholdPercentage: 70,
-        lowerTriggerThresholdPercentage: 130,
-        upperTargetTickPercentage,
-        lowerTargetTickPercentage,
-        strategyAddress: '0x1234',
-        slippagePercentage: BigInt(50),
-      },
+      params,
     };
   }
 
@@ -288,11 +228,11 @@ describe('Rule Factory Testings: Uniswap', function() {
       amount0 = BigInt(0),
       amount1 = BigInt(0),
   ): Promise<void> {
-    await localNodeAlchemy.setLowerTickResponse(lowerTick);
-    await localNodeAlchemy.setUpperTickResponse(upperTick);
-    await localNodeAlchemy.setCurrentTickResponse(currentTick);
-    await localNodeAlchemy.setTickSpacingResponse(tickSpacing);
-    await localNodeAlchemy.setCurrentPositionResponse(
+    await (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setLowerTickResponse(lowerTick);
+    await (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setUpperTickResponse(upperTick);
+    await (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setCurrentTickResponse(currentTick);
+    await (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setTickSpacingResponse(tickSpacing);
+    await (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setCurrentPositionResponse(
         BigInt(0),
         amount0,
         amount1,
