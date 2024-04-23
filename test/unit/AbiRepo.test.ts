@@ -27,7 +27,7 @@ describe('ABI Repo', function() {
     Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
     (modulesParams.altNode as BlockchainNodeAdapter)
-        .setProxyInfoForAddressResponse({isProxy: false, implementationAddress: ''});
+        .setProxyInfoForAddressResponse('', {isProxy: false, implementationAddress: ''});
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
 
@@ -57,9 +57,9 @@ describe('ABI Repo', function() {
     abiStorage.setReturnValue(null);
     abiFetcher.setReturnValue('mockAbiImplementation');
     (modulesParams.mainNode as BlockchainNodeAdapter)
-        .setProxyInfoForAddressResponse({isProxy: true, implementationAddress: 'mockAbiImplementation'});
+        .setProxyInfoForAddressResponse('', {isProxy: true, implementationAddress: 'mockAbiImplementation'});
     (modulesParams.altNode as BlockchainNodeAdapter)
-        .setProxyInfoForAddressResponse({isProxy: true, implementationAddress: 'mockAbiImplementation'});
+        .setProxyInfoForAddressResponse('', {isProxy: true, implementationAddress: 'mockAbiImplementation'});
 
     const abi = await modulesParams.abiRepo!.getAbiByAddress('Exists');
 

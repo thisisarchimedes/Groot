@@ -31,7 +31,7 @@ describe('Rule Factory Testings', function() {
     Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
     (modulesParams.altNode as BlockchainNodeAdapter)
-        .setProxyInfoForAddressResponse({isProxy: false, implementationAddress: ''});
+        .setProxyInfoForAddressResponse('', {isProxy: false, implementationAddress: ''});
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
     modulesParams.dbService = new DBService(modulesParams.logger!, modulesParams.configService);

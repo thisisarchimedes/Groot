@@ -30,10 +30,12 @@ describe('LeverageDataSourceNode Tests', function() {
     await Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
 
-    (modulesParams.mainNode as BlockchainNodeAdapter).setProxyInfoForAddressResponse({
-      isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
-    (modulesParams.altNode as BlockchainNodeAdapter).setProxyInfoForAddressResponse({
-      isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
+    (modulesParams.mainNode as BlockchainNodeAdapter).setProxyInfoForAddressResponse(
+        '0x71BFC64f13dF2373eD8AEdd2377B8f7238E0A9B6',
+        {isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
+    (modulesParams.altNode as BlockchainNodeAdapter).setProxyInfoForAddressResponse(
+        '0x71BFC64f13dF2373eD8AEdd2377B8f7238E0A9B6',
+        {isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
 
     const abiStorage = new AbiStorageDynamoDB(modulesParams);
     const abiFetcher = new AbiFetcherEtherscan(modulesParams);

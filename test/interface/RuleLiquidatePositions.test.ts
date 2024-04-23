@@ -70,7 +70,7 @@ describe('Liquidator Test', function() {
     expect(tx?.urgencyLevel).to.be.eq(UrgencyLevel.HIGH);
     expect(tx?.executor).to.be.eq(Executor.LEVERAGE);
     expect(tx?.ttlSeconds).to.be.eq(300);
-    expect(tx?.postEvalUniqueKey).to.be.match(/^liquidate-[0-9]*$/);
+    expect(tx?.postEvalUniqueKey).to.be.match(/^liquidate-\d*$/);
     expect(tx?.lowLevelUnsignedTransaction.value).to.be.eq(0n);
     expect(tx?.lowLevelUnsignedTransaction.to).to.be.eq(
         modulesParams.configService?.getLeverageContractInfo().positionLiquidator,
