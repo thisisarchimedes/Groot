@@ -5,7 +5,6 @@ import {LoggerAdapter} from './adapters/LoggerAdapter';
 import {Executor, RuleJSONConfigItem, TypeRule, UrgencyLevel} from '../../src/rule_engine/TypesRule';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
-import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {RuleParamsUniswapPSPRebalance} from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
@@ -31,8 +30,8 @@ describe('Rule Factory Testings: Uniswap', function() {
     modulesParams.logger = new LoggerAdapter();
 
     // Starting nodes
-    modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams, 'localNodeAlchemy');
-    modulesParams.altNode = new BlockchainNodeAdapter(modulesParams, 'localNodeInfura');
+    modulesParams.mainNode = new BlockchainNodeUniswapAdapter(modulesParams, 'localNodeAlchemy');
+    modulesParams.altNode = new BlockchainNodeUniswapAdapter(modulesParams, 'localNodeInfura');
     await Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
@@ -55,9 +54,9 @@ describe('Rule Factory Testings: Uniswap', function() {
     expect(rule).not.to.be.null;
   });
 
-  it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', async function() {
+  it('should create Uniswap PSP rebalance Rule and evaluate - do nothing when position is in place', function() {
     const uniswapRule = createUniswapRule();
-    const rule = await ruleFactory.createRule(uniswapRule);
+    const rule = ruleFactory.createRule(uniswapRule);
     expect(rule).not.to.be.null;
     rule?.evaluate();
     expect(rule?.getPendingTransactionCount()).to.be.eq(0);
@@ -71,7 +70,7 @@ describe('Rule Factory Testings: Uniswap', function() {
     const amount0 = parseUnits('10', 8);
     const amount1 = parseUnits('10', 18);
 
-    await setupMockResponses(
+    setupMockResponses(
         100,
         200,
         currentTick,
@@ -109,7 +108,7 @@ describe('Rule Factory Testings: Uniswap', function() {
     const amount0 = parseUnits('10', 8);
     const amount1 = parseUnits('10', 18);
 
-    await setupMockResponses(
+    setupMockResponses(
         100,
         200,
         currentTick,
@@ -147,7 +146,7 @@ describe('Rule Factory Testings: Uniswap', function() {
     const amount0 = parseUnits('10', 8);
     const amount1 = parseUnits('10', 18);
 
-    await setupMockResponses(
+    setupMockResponses(
         100,
         200,
         currentTick,
@@ -220,19 +219,19 @@ describe('Rule Factory Testings: Uniswap', function() {
     };
   }
 
-  async function setupMockResponses(
+  function setupMockResponses(
       lowerTick: number,
       upperTick: number,
       currentTick: number,
       tickSpacing = 15,
       amount0 = BigInt(0),
       amount1 = BigInt(0),
-  ): Promise<void> {
-    await (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setLowerTickResponse(lowerTick);
-    await (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setUpperTickResponse(upperTick);
-    await (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setCurrentTickResponse(currentTick);
-    await (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setTickSpacingResponse(tickSpacing);
-    await (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setCurrentPositionResponse(
+  ) {
+    (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setLowerTickResponse(lowerTick);
+    (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setUpperTickResponse(upperTick);
+    (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setCurrentTickResponse(currentTick);
+    (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setTickSpacingResponse(tickSpacing);
+    (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setCurrentPositionResponse(
         BigInt(0),
         amount0,
         amount1,

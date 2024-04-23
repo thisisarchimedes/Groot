@@ -1,4 +1,3 @@
-import {AbiItem} from 'web3';
 import {BlockchainNodeAdapter} from './BlockchainNodeAdapter';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -11,11 +10,11 @@ export class BlockchainNodeUniswapAdapter extends BlockchainNodeAdapter {
   currentPosition = [BigInt(0), BigInt(0), BigInt(0)];
 
   // eslint-disable-next-line require-await
-  public async callViewFunction(
+  public override async callViewFunction(
       contractAddress: string,
-      abi: AbiItem[],
+      abi: string,
       functionName: string,
-      params: unknown[],
+      params?: unknown[],
   ): Promise<unknown> {
     if (this.throwErrorOnCallViewFunction) {
       throw new Error('callViewFunction: Error');

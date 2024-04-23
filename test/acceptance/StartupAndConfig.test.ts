@@ -186,10 +186,11 @@ describe('Startup and Config', function() {
     }
   }
 
-  function waitForMessageProcessing(): NodeJS.Timeout {
-    timeoutId = setTimeout(() => {
-      // Your code here
-    }, 1000);
-    return timeoutId;
+  function waitForMessageProcessing(): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 1000);
+    });
   }
 });

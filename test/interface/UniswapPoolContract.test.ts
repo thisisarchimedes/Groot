@@ -14,7 +14,7 @@ describe('Uniswap contract interface', function() {
   let uniswapStrategy: Contract;
 
   beforeEach(function() {
-    const apiKeyAlchemy = process.env.API_KEY_ALCHEMY;
+    const apiKeyAlchemy = process.env.ALCHEMY_API_KEY;
     alchemyRpc = new JsonRpcProvider(
         `https://eth-mainnet.alchemyapi.io/v2/${apiKeyAlchemy}`,
     );
@@ -27,7 +27,6 @@ describe('Uniswap contract interface', function() {
 
   it('should return expected response structure from Uniswap getPosition', async function() {
     const position = await uniswapStrategy.getPosition();
-    console.log(typeof position[0]);
     const testBigIntVar: bigint = BigInt(0);
     expect(typeof position[0]).to.be.eq(typeof testBigIntVar);
     expect(typeof position[1]).to.be.eq(typeof testBigIntVar);

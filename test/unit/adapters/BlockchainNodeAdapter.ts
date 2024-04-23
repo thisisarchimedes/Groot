@@ -8,15 +8,15 @@ import {ModulesParams} from '../../../src/types/ModulesParams';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export class BlockchainNodeAdapter extends BlockchainNodeLocal {
-  private currentBlockNumber: number = 100;
-  private currentReadResponse: unknown = {};
-  private overlimitReadResponse: unknown = {};
-  private throwErrorOnGetBlockNumber: boolean = false;
-  private throwErrorOnCallViewFunction: boolean = false;
-  private expectRecoverToSucceed: boolean = true;
-  private proxyInfo!: BlockchainNodeProxyInfo;
-  private responseLimit = 0;
-  private responseCount = 0;
+  protected currentBlockNumber: number = 100;
+  protected currentReadResponse: unknown = {};
+  protected overlimitReadResponse: unknown = {};
+  protected throwErrorOnGetBlockNumber: boolean = false;
+  protected throwErrorOnCallViewFunction: boolean = false;
+  protected expectRecoverToSucceed: boolean = true;
+  protected proxyInfo!: BlockchainNodeProxyInfo;
+  protected responseLimit = 0;
+  protected responseCount = 0;
 
   constructor(modulesParams: ModulesParams, nodeName: string) {
     super(modulesParams, '', nodeName);
