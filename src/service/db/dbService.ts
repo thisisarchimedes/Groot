@@ -1,4 +1,4 @@
-import {Client, ClientConfig, QueryResult} from 'pg';
+import {Client, ClientConfig, QueryConfig, QueryConfigValues, QueryResult} from 'pg';
 import {ILogger} from '../logger/interfaces/ILogger';
 import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 
@@ -74,11 +74,15 @@ export class LoggedClient extends Client {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  public async query(...args: unknown[]): QueryResult<QueryResultRow> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public async override query<R extends QueryResultRow = any, I = any[]>(
+      queryTextOrConfig: string | QueryConfig<I>,
+      values?: QueryConfigValues<I>,
+  ): Promise<QueryResult<R>> {
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      return await super['query'](...args);
+      return await super.query(queryTextOrConfig, values);
     } catch (e) {
       this.logger.error(`Error executing DB query: ${JSON.stringify(e)}`);
       throw e;

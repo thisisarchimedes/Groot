@@ -4,9 +4,9 @@ import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
 import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {LoggerAll} from '../../src/service/logger/LoggerAll';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {ModulesParams} from '../../src/types/ModulesParams';
+import {LoggerConsole} from '../../src/service/logger/LoggerConsole';
 
 
 describe('ABI Repo', function() {
@@ -18,7 +18,7 @@ describe('ABI Repo', function() {
     modulesParams.configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
     await modulesParams.configService.refreshConfig();
 
-    modulesParams.logger = new LoggerAll(modulesParams.configService);
+    modulesParams.logger = new LoggerConsole();
 
     // Starting nodes
     modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams, 'localNodeAlchemy');

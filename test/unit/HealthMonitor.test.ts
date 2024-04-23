@@ -30,7 +30,7 @@ describe('Health Monitor tests', function() {
     // Starting nodes
     modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams, 'localNodeAlchemy');
     modulesParams.altNode = new BlockchainNodeAdapter(modulesParams, 'localNodeInfura');
-    Promise.all([modulesParams.mainNode!.startNode(), modulesParams.altNode!.startNode()]);
+    Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
     modulesParams.blockchainNodeHealthMonitor = new BlockchainNodeHealthMonitor(modulesParams);
   });

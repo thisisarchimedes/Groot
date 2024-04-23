@@ -5,8 +5,8 @@ import {spawn} from 'child_process';
 import {BlockchainNodeProxyInfo} from '../../src/blockchain/blockchain_nodes/BlockchainNodeProxyInfo';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {BlockchainNodeLocal} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
-import {LoggerAll} from '../../src/service/logger/LoggerAll';
 import {ModulesParams} from '../../src/types/ModulesParams';
+import {LoggerConsole} from '../../src/service/logger/LoggerConsole';
 
 dotenv.config();
 const {expect} = chai;
@@ -26,11 +26,11 @@ describe('Check that we work with local Hardhat node correctly', function() {
   beforeEach(async function() {
     modulesParams.configService = await createConfigService();
     await modulesParams.configService.refreshConfig();
-    modulesParams.logger = new LoggerAll(modulesParams.configService);
+    modulesParams.logger = new LoggerConsole();
 
     modulesParams.mainNode = new BlockchainNodeLocal(
         modulesParams,
-        `http://localhost:${process.env.MAIN_LOCAL_NODE_PORT || 8545}`,
+        `http://localhost:${process.env.MAIN_LOCAL_NODE_PORT ?? 8545}`,
         'AlchemyNodeLabel',
     );
     await modulesParams.mainNode.startNode();

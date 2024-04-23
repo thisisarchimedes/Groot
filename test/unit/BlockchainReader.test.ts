@@ -2,9 +2,9 @@ import 'reflect-metadata';
 import * as chai from 'chai';
 import {BlockchainReader, BlockchainReaderError} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
-import {LoggerAll} from '../../src/service/logger/LoggerAll';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {ModulesParams} from '../../src/types/ModulesParams';
+import {LoggerConsole} from '../../src/service/logger/LoggerConsole';
 
 const {expect} = chai;
 
@@ -15,7 +15,7 @@ describe('Check that blockchain reader works with multiple underlying nodes', fu
     modulesParams.configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
     await modulesParams.configService.refreshConfig();
 
-    modulesParams.logger = new LoggerAll(modulesParams.configService);
+    modulesParams.logger = new LoggerConsole();
 
     // Starting nodes
     modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams, 'localNodeAlchemy');
