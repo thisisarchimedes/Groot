@@ -15,7 +15,10 @@ export async function startGroot(runInfinite: boolean = true): Promise<void> {
   const grootParams = getGrootParamsFromEnv();
   reportGrootStartup(grootParams);
 
-  const configServiceAWS = new ConfigServiceAWS(grootParams.environment, grootParams.region);
+  const configServiceAWS = new ConfigServiceAWS(
+      grootParams.environment,
+      grootParams.region,
+  );
   await configServiceAWS.refreshConfig();
 
   const logger = new LoggerAll(configServiceAWS);
@@ -56,8 +59,10 @@ function getGrootParamsFromEnv(): GrootParams {
   const region = process.env.AWS_REGION as string;
   const mainLocalNodePort = Number(process.env.MAIN_LOCAL_NODE_PORT as string);
   const altLocalNodePort = Number(process.env.ALT_LOCAL_NODE_PORT as string);
-  const mainLocalNodeUrl = process.env.MAIN_LOCAL_NODE_URL + ':' + mainLocalNodePort;
-  const altLocalNodeUrl = process.env.ALT_LOCAL_NODE_URL + ':' + altLocalNodePort;
+  const mainLocalNodeUrl =
+    process.env.MAIN_LOCAL_NODE_URL + ':' + mainLocalNodePort;
+  const altLocalNodeUrl =
+    process.env.ALT_LOCAL_NODE_URL + ':' + altLocalNodePort;
 
   if (!environment || !region || !mainLocalNodeUrl || !altLocalNodeUrl) {
     console.error(environment, region, 'Cannot boot. Missing environment variables');
@@ -68,7 +73,9 @@ function getGrootParamsFromEnv(): GrootParams {
 
 function reportGrootStartup(grootParams: GrootParams): void {
   const currentDateTime = new Date().toLocaleString();
-  console.log(`[${currentDateTime}] Starting Groot: ${JSON.stringify(grootParams)}`);
+  console.log(
+      `[${currentDateTime}] Starting Groot: ${JSON.stringify(grootParams)}`,
+  );
 }
 
 function reportCriticalError(logger: ILoggerAll, environment: string, region: string, error: unknown): void {

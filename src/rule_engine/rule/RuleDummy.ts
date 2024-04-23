@@ -33,7 +33,9 @@ export class RuleDummy extends Rule {
     }
   }
 
-  private createDummyTransaction(currentBlockNumber: number): OutboundTransaction {
+  private createDummyTransaction(
+      currentBlockNumber: number,
+  ): OutboundTransaction {
     return {
       urgencyLevel: this.params.urgencyLevel,
       executor: this.params.executor,

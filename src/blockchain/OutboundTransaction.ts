@@ -6,6 +6,11 @@ export interface RawTransactionData {
   data: string;
 }
 
+export interface RawTransactionData {
+  to: string;
+  value: bigint;
+  data: string;
+}
 export interface OutboundTransaction {
   urgencyLevel: UrgencyLevel;
   context: string;

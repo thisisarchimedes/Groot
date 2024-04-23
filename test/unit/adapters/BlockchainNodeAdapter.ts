@@ -8,15 +8,15 @@ import {ModulesParams} from '../../../src/types/ModulesParams';
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export class BlockchainNodeAdapter extends BlockchainNodeLocal {
-  private currentBlockNumber: number = 100;
-  private currentReadResponse: unknown = {};
-  private overlimitReadResponse: unknown = {};
-  private throwErrorOnGetBlockNumber: boolean = false;
-  private throwErrorOnCallViewFunction: boolean = false;
-  private expectRecoverToSucceed: boolean = true;
-  private proxyInfo!: BlockchainNodeProxyInfo;
-  private responseLimit = 0;
-  private responseCount = 0;
+  protected currentBlockNumber: number = 100;
+  protected currentReadResponse: unknown = {};
+  protected overlimitReadResponse: unknown = {};
+  protected throwErrorOnGetBlockNumber: boolean = false;
+  protected throwErrorOnCallViewFunction: boolean = false;
+  protected expectRecoverToSucceed: boolean = true;
+  protected proxyInfo!: BlockchainNodeProxyInfo;
+  protected responseLimit = 0;
+  protected responseCount = 0;
 
   constructor(modulesParams: ModulesParams, nodeName: string) {
     super(modulesParams, '', nodeName);
@@ -33,7 +33,9 @@ export class BlockchainNodeAdapter extends BlockchainNodeLocal {
     if (this.expectRecoverToSucceed) {
       this.isNodeHealthy = true;
     } else {
-      throw new BlockchainNodeError(`RecoverNode: Cannot recover ${this.nodeName}`);
+      throw new BlockchainNodeError(
+          `RecoverNode: Cannot recover ${this.nodeName}`,
+      );
     }
   }
 
@@ -68,7 +70,9 @@ export class BlockchainNodeAdapter extends BlockchainNodeLocal {
     return this.currentReadResponse;
   }
 
-  public getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo> {
+  public getProxyInfoForAddress(
+      proxyAddress: string,
+  ): Promise<BlockchainNodeProxyInfo> {
     return Promise.resolve(this.proxyInfo);
   }
 
@@ -103,7 +107,9 @@ export class BlockchainNodeAdapter extends BlockchainNodeLocal {
   public setExpectRecoverToSucceed(expectRecoverToSucceed: boolean): void {
     this.expectRecoverToSucceed = expectRecoverToSucceed;
   }
-  public setProxyInfoForAddressResponse(proxyInfo: BlockchainNodeProxyInfo): void {
+  public setProxyInfoForAddressResponse(
+      proxyInfo: BlockchainNodeProxyInfo,
+  ): void {
     this.proxyInfo = proxyInfo;
   }
 }

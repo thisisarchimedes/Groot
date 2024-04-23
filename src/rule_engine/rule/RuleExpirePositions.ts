@@ -3,7 +3,7 @@ import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
 import fs from 'fs';
 import {Address} from '../../types/LeverageContractAddresses';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
-import {RuleConstructorInput} from '../TypesRule';
+import {RuleConstructorInput, RuleParams} from '../TypesRule';
 
 
 export class RuleExpirePositions extends Rule {
@@ -34,8 +34,11 @@ export class RuleExpirePositions extends Rule {
 
   public async evaluate(): Promise<void> {
     await Promise.resolve();
-    const encodedData = this.positionLedgerContract
-        .contract.interface.encodeFunctionData('setPositionState', [0, 1]);
+    const encodedData =
+      this.positionLedgerContract.contract.interface.encodeFunctionData(
+          'setPositionState',
+          [0, 1],
+      );
 
     const tx = {
       to: this.positionLedgerAddress,
@@ -55,11 +58,36 @@ export class RuleExpirePositions extends Rule {
     this.pushTransactionToRuleLocalQueue(outboundTx);
   }
 
+  public async initialize(
+      ruleLabel: string,
+      params: RuleParams,
+  ): Promise<void> {
+    this.ruleLabel = ruleLabel;
+    this.params = params;
+
+    this.positionLedgerAddress =
+      this.configService.getLeverageContractInfo().positionLedger;
+    try {
+      // this.positionLedgerABI = await this.abiRepo.getAbiByAddress(positionLedgerAddress);
+      throw new Error('failed to fetch');
+    } catch {
+      this.positionLedgerABI = fs.readFileSync(
+          './src/constants/abis/POSITION_LEDGER_ABI.json',
+          'utf-8',
+      );
+    }
+    this.positionLedgerContract = new PositionLedgerContract(
+        this.positionLedgerAddress,
+        this.positionLedgerABI,
+    );
+    await Promise.resolve();
+  }
+
   /**
- * Preview the expiration of a position
- * @param position - The position to preview
- * @returns The minimum WBTC and payload
- */
+   * Preview the expiration of a position
+   * @param position - The position to preview
+   * @returns The minimum WBTC and payload
+   */
   // public async previewExpirePosition(position: LeveragePosition): Promise<{
   //   minimumWBTC: bigint;
   //   payload: string;

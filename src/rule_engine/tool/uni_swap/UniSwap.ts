@@ -40,13 +40,6 @@ export default class Uniswap {
       const protocols = ['V3'] as Protocol[];
       if (!primaryAsset || !secondaryAsset) throw new Error('Please enter a valid asset');
       const amountBN = ethers.parseUnits(amount, inputTokenDecimals).toString();
-      console.log(
-          CurrencyAmount.fromRawAmount(primaryAsset, amountBN),
-          secondaryAsset,
-          TradeType.EXACT_INPUT,
-          undefined,
-          {protocols},
-      );
       const route: SwapRoute | null = await this.router.route(
           CurrencyAmount.fromRawAmount(primaryAsset, amountBN),
           secondaryAsset,
