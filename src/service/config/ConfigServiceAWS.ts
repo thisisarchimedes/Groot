@@ -1,13 +1,10 @@
 import 'reflect-metadata';
 
-import {injectable} from 'inversify';
-
 import {AppConfigClient} from './AppConfigClient';
 import {ConfigService} from './ConfigService';
-import {IConfigServiceAWS} from './interfaces/IConfigServiceAWS';
 
-@injectable()
-export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS {
+
+export class ConfigServiceAWS extends ConfigService {
   private readonly appConfigClient: AppConfigClient;
   private readonly awsRegion: string;
 
@@ -26,6 +23,8 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
       this.refreshSleepTime(),
       this.refreshEtherscanAPIKey(),
       this.refreshAbiStorageConfig(),
+      this.refreshLeverageContractInfo(),
+      this.refreshLeverageDBURL(),
       this.refreshTransactionsDatabaseURL(),
       this.refreshLeverageDBURL(),
       this.refreshLeverageContractInfo(),
@@ -63,7 +62,7 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
     this.leverageDbUrl = await this.appConfigClient.fetchConfigRawString('LeveragePositionDatabaseURL');
   }
 
-  private async refreshRPCURL(): Promise<void> {
+  protected async refreshRPCURL(): Promise<void> {
     const [mainRPCURL, altRPCURL] = await Promise.all([
       this.appConfigClient.fetchConfigRawString('RpcUrl'),
       this.appConfigClient.fetchConfigRawString('AltRpcUrl'),
@@ -73,7 +72,7 @@ export class ConfigServiceAWS extends ConfigService implements IConfigServiceAWS
     this.altRPCURL = altRPCURL;
   }
 
-  private async refreshRules(): Promise<void> {
+  protected async refreshRules(): Promise<void> {
     const rules = await this.appConfigClient.fetchConfigRawString('GrootRules');
     this.rules = JSON.parse(rules);
   }

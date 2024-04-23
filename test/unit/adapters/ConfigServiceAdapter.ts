@@ -1,10 +1,14 @@
 
 import fs from 'fs';
-import { ConfigService } from '../../../src/service/config/ConfigService';
-import { LeverageContractAddresses } from '../../../src/types/LeverageContractAddresses';
+import {LeverageContractAddresses} from '../../../src/types/LeverageContractAddresses';
+import {ConfigServiceAWS} from '../../../src/service/config/ConfigServiceAWS';
 
-export class ConfigServiceAdapter extends ConfigService {
+export class ConfigServiceAdapter extends ConfigServiceAWS {
   private ruleFilePath: string = '';
+
+  constructor() {
+    super('DemoApp', 'us-east-1');
+  }
 
   public async refreshConfig(): Promise<void> {
     await Promise.all([
@@ -29,15 +33,16 @@ export class ConfigServiceAdapter extends ConfigService {
     this.leverageContractAddresses = addresses;
   }
 
-  private async refreshRPCURL(): Promise<void> {
+  protected async refreshRPCURL(): Promise<void> {
   }
 
   public getTransactionsDBURL(): string {
     return '';
   }
 
-  private refreshRules(): void {
+  protected refreshRules(): Promise<void> {
     const rules = fs.readFileSync(this.ruleFilePath, 'utf-8');
     this.rules = JSON.parse(rules);
+    return Promise.resolve();
   }
 }

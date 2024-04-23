@@ -1,12 +1,7 @@
-import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
-import {UrgencyLevel} from '../TypesRule';
-import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
-import {Rule, RuleParams} from './Rule';
-import {injectable, inject} from 'inversify';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-// import {UNISWAPV3_POOL_ABI} from '@uniswap/v3-core/artifacts/contracts/UniswapV3Pool.sol/UniswapV3Pool.json';
+import {Rule} from './Rule';
+import {RawTransactionData} from '../../blockchain/OutboundTransaction';
+import {RuleConstructorInput, RuleParams} from '../TypesRule';
+
 /* eslint-disable max-len */
 export interface RuleParamsUniswapPSPRebalance extends RuleParams {
   upperTriggerThresholdPercentage: number; // trigger rebalance when we are more than (upperThreshold% * upper tick)
@@ -22,20 +17,10 @@ export interface MinOutputAmounts {
 }
 /* eslint-enable max-len */
 
-@injectable()
 export class RuleUniswapPSPRebalance extends Rule {
-  private uniswapStrategy: ToolStrategyUniswap;
-  constructor(
-    @inject('ILoggerAll') logger: ILogger,
-    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
-    @inject('IAbiRepo') abiRepo: IAbiRepo,
-        params: RuleParams,
-  ) {
-    super(logger, blockchainReader, abiRepo);
-    this.uniswapStrategy = new ToolStrategyUniswap(
-        (params as RuleParamsUniswapPSPRebalance).strategyAddress,
-        blockchainReader,
-    );
+  // private uniswapStrategy: ToolStrategyUniswap;
+  constructor(input: RuleConstructorInput) {
+    super(input);
   }
   public async evaluate(): Promise<void> {
     // call rebalance function based on the new params

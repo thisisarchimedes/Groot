@@ -1,14 +1,13 @@
 import os from 'os';
-import {IHostNameProvider} from './IHostNameProvider';
 import {ILogger} from '../logger/interfaces/ILogger';
-import {injectable, inject} from 'inversify';
+import {ModulesParams} from '../../types/ModulesParams';
 
-@injectable()
-export class HostNameProvider implements IHostNameProvider {
+
+export class HostNameProvider {
   private readonly logger: ILogger;
 
-  constructor(@inject('ILoggerAll') _logger: ILogger) {
-    this.logger = _logger;
+  constructor(modulesParams: ModulesParams) {
+    this.logger = modulesParams.logger!;
   }
 
   public getHostName(): string {

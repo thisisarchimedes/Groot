@@ -1,27 +1,63 @@
 import 'reflect-metadata';
 
-import {Container, inject, injectable} from 'inversify';
-import {IFactoryRule} from './interfaces/IFactoryRule';
-import {RuleJSONConfigItem} from './TypesRule';
+import {RuleConstructorInput, RuleJSONConfigItem, TypeRule} from './TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {Rule} from './rule/Rule';
+import {RuleDummy} from './rule/RuleDummy';
+import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
+import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
+import {AbiRepo} from './tool/abi_repository/AbiRepo';
+import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
+import {RuleLiquidatePositions} from './rule/RuleLiquidatePositions';
+import LeverageDataSourceDB from './tool/data_source/LeverageDataSourceDB';
+import LeverageDataSourceNode from './tool/data_source/LeverageDataSourceNode';
+import {RuleExpirePositions} from './rule/RuleExpirePositions';
+import {ModulesParams} from '../types/ModulesParams';
 
 
-@injectable()
-export class FactoryRule implements IFactoryRule {
+export class FactoryRule {
+  private leverageDataSourceDB: LeverageDataSourceDB;
+  private leverageDataSourceNode: LeverageDataSourceNode;
+
   constructor(
-    @inject(Container) private container: Container,
-    @inject('ILoggerAll') private logger: ILogger,
-  ) { }
+      modulesParams: ModulesParams,
+     private logger: ILogger = modulesParams.logger!,
+     private configService: ConfigServiceAWS = modulesParams.configService!,
+     private blockchainReader: BlockchainReader = modulesParams.blockchainReader!,
+     private abiRepo: AbiRepo = modulesParams.abiRepo!,
+  ) {
+    this.leverageDataSourceDB = new LeverageDataSourceDB(modulesParams);
+    this.leverageDataSourceNode = new LeverageDataSourceNode(modulesParams);
+  }
 
-  public async createRule(config: RuleJSONConfigItem): Promise<Rule | null> {
-    try {
-      const ruleInstance = this.container.get<Rule>(config.ruleType);
-      await ruleInstance.initialize(config.label, config.params);
-      return ruleInstance;
-    } catch (error) {
-      this.logger.warn(`Error creating rule instance for type ${config.ruleType}: ${error}`);
-      return null;
+  public createRule(config: RuleJSONConfigItem): Rule | null {
+    const constractorInput: RuleConstructorInput = {
+      logger: this.logger,
+      configService: this.configService,
+      blockchainReader: this.blockchainReader,
+      abiRepo: this.abiRepo,
+      ruleLabel: config.label,
+      params: config.params,
+    };
+
+    switch (config.ruleType) {
+      case TypeRule.Dummy:
+        return new RuleDummy(constractorInput);
+      case TypeRule.UniswapPSPRebalance:
+        return new RuleUniswapPSPRebalance(constractorInput);
+      case TypeRule.LiquidatePositions:
+        return new RuleLiquidatePositions({
+          ...constractorInput,
+          leverageDataSource: this.leverageDataSourceNode,
+        });
+      case TypeRule.ExpirePositions:
+        return new RuleExpirePositions({
+          ...constractorInput,
+          leverageDataSource: this.leverageDataSourceDB,
+        });
+      default:
+        this.logger.warn(`Unsupported rule type: ${config.ruleType}`);
+        return null;
     }
   }
 }

@@ -1,11 +1,9 @@
 import * as stackTrace from 'stacktrace-parser';
-import {injectable} from 'inversify';
-
 import {ILogger} from './interfaces/ILogger';
 import {LogLevel} from './LogLevel';
 import {LogMessageCycleTime} from './TypeLogItem';
 
-@injectable()
+
 export abstract class Logger implements ILogger {
   protected currentLevel: LogLevel = LogLevel.Debug;
 
@@ -42,7 +40,6 @@ export abstract class Logger implements ILogger {
     const error = new Error();
     const stack = error.stack as string;
     const frames = stackTrace.parse(stack);
-    console.log(frames);
 
     for (const frame of frames) {
       const fileName = frame.file?.split('/').pop();

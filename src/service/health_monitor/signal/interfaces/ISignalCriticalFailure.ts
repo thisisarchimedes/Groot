@@ -1,3 +1,3 @@
 export interface ISignalCriticalFailure {
-    sendCriticalFailure(): Promise<boolean>;
+  sendCriticalFailure(): Promise<boolean>;
 }

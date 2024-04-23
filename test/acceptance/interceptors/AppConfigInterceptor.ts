@@ -1,6 +1,7 @@
 import nock from 'nock';
 import {Interceptor} from './Interceptor';
 import {RuleJSONConfigItem} from '../../../src/rule_engine/TypesRule';
+import {namespace} from '../../../src/constants/constants';
 
 export class AppConfigInterceptor extends Interceptor {
   private readonly awsAppConfigBaseUrl = 'https://appconfig.us-east-1.amazonaws.com';
@@ -29,7 +30,7 @@ export class AppConfigInterceptor extends Interceptor {
         .persist()
         .get(url)
         .query({
-          client_id: 'Groot',
+          client_id: namespace,
         })
         .reply(200, grootRulesProfile);
   }

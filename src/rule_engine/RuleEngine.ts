@@ -1,26 +1,23 @@
-import {injectable, inject} from 'inversify';
+
 
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Rule} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
 import {ILogger} from '../service/logger/interfaces/ILogger';
-import {IFactoryRule} from './interfaces/IFactoryRule';
-import {IRuleEngine} from './interfaces/IRuleEngine';
+import {FactoryRule} from './FactoryRule';
+import {ModulesParams} from '../types/ModulesParams';
 
-@injectable()
-export class RuleEngine implements IRuleEngine {
+export class RuleEngine {
+  private logger: ILogger;
   private rules: Rule[] = [];
   private outboundTransactions: OutboundTransaction[] = [];
 
-  private readonly logger: ILogger;
-  private readonly ruleFactory: IFactoryRule;
-
   constructor(
-    @inject('ILoggerAll') _logger: ILogger,
-    @inject('IFactoryRule') _factoryRule: IFactoryRule,
+      modulesParams: ModulesParams,
+      private readonly ruleFactory: FactoryRule,
   ) {
-    this.logger = _logger;
-    this.ruleFactory = _factoryRule;
+    this.logger = modulesParams.logger!;
+    this.ruleFactory = ruleFactory;
   }
 
   public async loadRulesFromJSONConfig(ruleConfig: RuleJSONConfigItem[]): Promise<void> {

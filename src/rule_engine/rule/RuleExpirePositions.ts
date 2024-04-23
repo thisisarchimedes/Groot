@@ -1,22 +1,12 @@
-import {Rule, RuleParams} from './Rule';
-import {ILeverageDataSource} from '../tool/data_source/interfaces/ILeverageDataSource';
-import {inject, injectable} from 'inversify';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
+import {Rule} from './Rule';
 import PositionLedgerContract from '../tool/contracts/PositionLedgerContract';
-import {IConfigService} from '../../service/config/interfaces/IConfigService';
 import fs from 'fs';
 import {Address} from '../../types/LeverageContractAddresses';
-import {
-  OutboundTransaction,
-  RawTransactionData,
-} from '../../blockchain/OutboundTransaction';
+import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
+import {RuleConstructorInput} from '../TypesRule';
 
-@injectable()
+
 export class RuleExpirePositions extends Rule {
-  private leverageDataSource: ILeverageDataSource;
-  private configService: IConfigService;
   private positionLedgerContract!: PositionLedgerContract;
   private positionLedgerAddress!: Address;
   private positionLedgerABI!: string;
@@ -24,17 +14,22 @@ export class RuleExpirePositions extends Rule {
   // private uniswap: Uniswap;
   // private positionLedger: PositionLedger;
 
-  constructor(
-    @inject('ILoggerAll') logger: ILogger,
-    @inject('IBlockchainReader') blockchainReader: IBlockchainReader,
-    @inject('IAbiRepo') abiRepo: IAbiRepo,
-    @inject('ILeverageDataSource') leverageDataSource: ILeverageDataSource,
-    @inject('IConfigServiceAWS') configService: IConfigService,
-  ) {
-    super(logger, blockchainReader, abiRepo);
-    this.leverageDataSource = leverageDataSource;
-    this.configService = configService;
+  constructor(input: RuleConstructorInput) {
+    if (!input.leverageDataSource) {
+      throw new Error('LeverageDataSource is required for ExpirePositions rule');
+    }
+
+    super(input);
     // this.uniswap = new Uniswap('');
+
+    this.positionLedgerAddress = this.configService.getLeverageContractInfo().positionLedger;
+    try {
+      // this.positionLedgerABI = await this.abiRepo.getAbiByAddress(positionLedgerAddress);
+      throw new Error('failed to fetch');
+    } catch {
+      this.positionLedgerABI = fs.readFileSync('./src/constants/abis/POSITION_LEDGER_ABI.json', 'utf-8');
+    }
+    this.positionLedgerContract = new PositionLedgerContract(this.positionLedgerAddress, this.positionLedgerABI);
   }
 
   public async evaluate(): Promise<void> {
@@ -55,7 +50,7 @@ export class RuleExpirePositions extends Rule {
       urgencyLevel: this.params.urgencyLevel,
       executor: this.params.executor,
       context: `this is a expire test context`,
-      postEvalUniqueKey: this.generateUniqueKey(0),
+      postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction: tx,
       ttlSeconds: this.params.ttlSeconds,
     } as OutboundTransaction;
@@ -137,7 +132,7 @@ export class RuleExpirePositions extends Rule {
   //   };
   // }
 
-  protected generateUniqueKey(nftId?: number): string {
-    return 'expire--' + nftId;
+  protected generateUniqueKey(): string {
+    return 'expire--';
   }
 }

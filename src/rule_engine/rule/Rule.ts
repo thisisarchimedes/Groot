@@ -1,61 +1,35 @@
 import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
 import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {Executor, UrgencyLevel} from '../TypesRule';
+import {RuleConstructorInput, RuleParams} from '../TypesRule';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {IAbiRepo} from '../tool/abi_repository/interfaces/IAbiRepo';
-import {injectable} from 'inversify';
+import {ConfigService} from '../../service/config/ConfigService';
+import LeverageDataSource from '../tool/data_source/LeverageDataSource';
 
-export interface RuleParams {
-  urgencyLevel: UrgencyLevel;
-  ttlSeconds: number;
-  executor: Executor;
-}
-
-export interface RuleConstructorInput {
-  logger: ILogger;
-  blockchainReader: IBlockchainReader;
-  abiRepo: IAbiRepo
-  ruleLabel: string;
-  params: RuleParams;
-
-}
-
-@injectable()
 export abstract class Rule {
   protected readonly logger: ILogger;
   protected readonly blockchainReader: IBlockchainReader;
   protected readonly abiRepo: IAbiRepo;
+  protected readonly configService: ConfigService;
+  protected readonly leverageDataSource: LeverageDataSource | undefined;
 
   protected ruleLabel: string;
   protected params: RuleParams;
   protected pendingTxQueue: OutboundTransaction[] = [];
 
-  constructor(
-      logger: ILogger,
-      blockchainReader: IBlockchainReader,
-      abiRepo: IAbiRepo,
-  ) {
-    this.logger = logger;
-    this.blockchainReader = blockchainReader;
-    this.abiRepo = abiRepo;
-    this.ruleLabel = ''; // Default initialization
-    this.params = {
-      urgencyLevel: UrgencyLevel.LOW,
-      executor: Executor.LEVERAGE,
-      ttlSeconds: 300,
-    }; // Default initialization
-  }
-
-
-  public async initialize(ruleLabel: string, params: RuleParams): Promise<void> {
-    this.ruleLabel = ruleLabel;
-    this.params = params;
-    return await Promise.resolve();
+  constructor(input: RuleConstructorInput) {
+    this.logger = input.logger;
+    this.blockchainReader = input.blockchainReader;
+    this.abiRepo = input.abiRepo;
+    this.configService = input.configService;
+    this.leverageDataSource = input.leverageDataSource;
+    this.ruleLabel = input.ruleLabel;
+    this.params = input.params;
   }
 
   public abstract evaluate(): Promise<void>;
 
-  protected abstract generateUniqueKey(): string;
+  protected abstract generateUniqueKey<T extends unknown[]>(...args: T): string;
 
   public getRuleLabel(): string {
     return this.ruleLabel;

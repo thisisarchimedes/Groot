@@ -1,10 +1,8 @@
-import {injectable} from 'inversify';
 import {RuleJSONConfigItem} from '../../rule_engine/TypesRule';
 import {LeverageContractAddresses} from '../../types/LeverageContractAddresses';
-import {IConfigService} from './interfaces/IConfigService';
 
-@injectable()
-export abstract class ConfigService implements IConfigService {
+
+export abstract class ConfigService {
   protected environment: string = '';
   protected mainRPCURL: string = '';
   protected altRPCURL: string = '';
@@ -18,7 +16,8 @@ export abstract class ConfigService implements IConfigService {
   protected etherscanAPIKey: string = '';
   protected AbiRepoDynamoDBTable: string = '';
 
-  abstract refreshConfig(): Promise<void>;
+  protected leverageDbUrl: string = '';
+
 
   protected leverageContractAddresses: LeverageContractAddresses = {
     positionOpener: '',
@@ -28,16 +27,7 @@ export abstract class ConfigService implements IConfigService {
     positionLedger: '',
   };
 
-  protected leverageDbUrl: string = '';
-
-
-  public getLeverageContractInfo(): LeverageContractAddresses {
-    return this.leverageContractAddresses;
-  }
-
-  public getLeverageDBURL(): string {
-    return this.leverageDbUrl;
-  }
+  abstract refreshConfig(): Promise<void>;
 
   public getEnvironment(): string {
     return this.environment;
@@ -77,5 +67,13 @@ export abstract class ConfigService implements IConfigService {
 
   public getDynamoDBAbiRepoTable(): string {
     return this.AbiRepoDynamoDBTable;
+  }
+
+  public getLeverageContractInfo(): LeverageContractAddresses {
+    return this.leverageContractAddresses;
+  }
+
+  public getLeverageDBURL(): string {
+    return this.leverageDbUrl;
   }
 }

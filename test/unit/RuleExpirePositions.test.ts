@@ -10,7 +10,7 @@
 // import { BlockchainNodeAdapter } from './adapters/BlockchainNodeAdapter';
 // import { IAbiRepo } from '../../src/rule_engine/tool/abi_repository/interfaces/IAbiRepo';
 // import { createTestContainer } from './inversify.config.unit_test';
-// import { IFactoryRule } from '../../src/rule_engine/interfaces/IFactoryRule';
+// import { FactoryRule } from '../../src/rule_engine/interfaces/FactoryRule';
 
 // dotenv.config();
 
@@ -32,7 +32,7 @@
 //   });
 
 //   it('should create Expire positions Rule object from a rule config', function () {
-//     const ruleFactory = container.get<IFactoryRule>(TYPES.IFactoryRule);
+//     const ruleFactory = container.get<FactoryRule>(TYPES.FactoryRule);
 
 //     const expirePositionRule: RuleJSONConfigItem = {
 //       ruleType: TypeRule.ExpirePositions,

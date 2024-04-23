@@ -1,10 +1,9 @@
-import {injectable, inject} from 'inversify';
-import {Interface} from 'ethers';
+
 import {ILogger} from '../../service/logger/interfaces/ILogger';
-import {IBlockchainNode} from '../blockchain_nodes/interfaces/IBlockchainNode';
-import {IBlockchainNodeLocal} from '../blockchain_nodes/interfaces/IBlockchainNodeLocal';
 import {BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNodeProxyInfo';
-import {IBlockchainReader} from './interfaces/IBlockchainReader';
+import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
+import {Block} from 'ethers';
+import {ModulesParams} from '../../types/ModulesParams';
 
 export class BlockchainReaderError extends Error {
   constructor(message: string) {
@@ -26,28 +25,28 @@ interface ValidNodeResponse {
   blockNumber: number;
 }
 
-@injectable()
-export class BlockchainReader implements IBlockchainReader {
-  private readonly nodes: IBlockchainNode[];
+
+export class BlockchainReader {
+  private readonly nodes: BlockchainNode[];
   private readonly logger: ILogger;
 
   private initialized: boolean;
 
   constructor(
-    @inject('ILoggerAll') _logger: ILogger,
-    @inject('BlockchainNodeLocalMain') _mainLocalNode: IBlockchainNodeLocal,
-    @inject('BlockchainNodeLocalAlt') _altLocalNode: IBlockchainNodeLocal) {
-    this.nodes = [_mainLocalNode, _altLocalNode];
-    this.logger = _logger;
+      modulesParams: ModulesParams,
+  ) {
+    this.nodes = [modulesParams.mainNode!, modulesParams.altNode!];
+    this.logger = modulesParams.logger!;
     this.initialized = false;
   }
 
   private async init() {
     if (!this.initialized) {
-      await Promise.all([
-        this.nodes[0].startNode(),
-        this.nodes[0].startNode(),
-      ]);
+      const initPromises = this.nodes.map((node) =>
+        node.startNode(),
+      );
+      await Promise.all(initPromises);
+      this.initialized = true;
     }
   }
 
@@ -59,9 +58,18 @@ export class BlockchainReader implements IBlockchainReader {
     return this.findHighestBlockNumber(validBlockNumbers);
   }
 
+  public async getBlockTimestamp(blockNumber: number): Promise<number> {
+    await this.init();
+    const blocks = await this.fetchBlocksFromNodes(blockNumber);
+    const validBlocks = this.extractValidBlocks(blocks);
+    this.ensureValidBlocks(validBlocks);
+    const block = validBlocks[0]; // Take the first valid block
+    return block.timestamp;
+  }
+
   public async callViewFunction(
       contractAddress: string,
-      abi: Interface,
+      abi: string,
       functionName: string,
       params: unknown[] = [],
   ): Promise<unknown> {
@@ -82,7 +90,14 @@ export class BlockchainReader implements IBlockchainReader {
       }
     }
 
-    throw new BlockchainReaderError('Error when requesting proxy information from node.');
+    throw new BlockchainReaderError(`Error when requesting proxy information from node for ${proxyAddress}.`);
+  }
+
+  private fetchBlocksFromNodes(blockNumber: number): Promise<(Block | null)[]> {
+    const blocksPromises = this.nodes.map((node) =>
+      node.getBlock(blockNumber).catch(() => null),
+    );
+    return Promise.all(blocksPromises);
   }
 
   private fetchBlockNumbersFromNodes(): Promise<(number | null)[]> {
@@ -96,10 +111,21 @@ export class BlockchainReader implements IBlockchainReader {
     return blockNumbers.filter((blockNumber): blockNumber is number => blockNumber !== null);
   }
 
+  private extractValidBlocks(blocks: (Block | null)[]): Block[] {
+    return blocks.filter((block): block is Block => block !== null);
+  }
+
   private ensureValidBlockNumbers(validBlockNumbers: number[]): void {
     if (validBlockNumbers.length === 0) {
       this.logger.error('All nodes failed to retrieve block number');
       throw new BlockchainReaderError('All nodes failed to retrieve block number');
+    }
+  }
+
+  private ensureValidBlocks(validBlocks: Block[]): void {
+    if (validBlocks.length === 0) {
+      this.logger.error('All nodes failed to retrieve blocks');
+      throw new BlockchainReaderError('All nodes failed to retrieve blocks');
     }
   }
 
@@ -109,7 +135,7 @@ export class BlockchainReader implements IBlockchainReader {
 
   private async fetchNodeResponses(
       contractAddress: string,
-      abi: Interface,
+      abi: string,
       functionName: string,
       params: unknown[],
   ): Promise<NodeResponse[]> {

@@ -1,4 +1,3 @@
-import {ethers} from 'ethers';
 import UNISWAPV3_STRATEGY_ABI from '../../constants/abis/UNISWAPV3_STRATEGY_ABI.json';
 import {Contract} from 'ethers';
 import {RawTransactionData} from '../../blockchain/OutboundTransaction';
@@ -18,12 +17,8 @@ export class ToolStrategyUniswap {
   }
 
   public async getPoolAddress(): Promise<string> {
-    const ret = await this.blockchainReader.callViewFunction(
-        this.strategyAddress,
-        new ethers.Interface(UNISWAPV3_STRATEGY_ABI),
-        'pool',
-    );
-
+    const ret = await this.blockchainReader.callViewFunction(this.strategyAddress,
+        JSON.stringify(UNISWAPV3_STRATEGY_ABI), 'pool');
     return ret as string;
   }
   public async upperTick(): Promise<number> {

@@ -1,23 +1,20 @@
 import 'reflect-metadata';
 
-import {inject, injectable} from 'inversify';
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {ILogger} from '../service/logger/interfaces/ILogger';
 import {ITxQueue} from './interfaces/ITxQueue';
-import {ITransactionQueuer} from './interfaces/ITransactionQueuer';
+import {ModulesParams} from '../types/ModulesParams';
 
-@injectable()
-export class TransactionQueuer implements ITransactionQueuer {
+export class TransactionQueuer {
   private readonly logger: ILogger;
   private readonly queue: ITxQueue;
 
-  constructor(@inject('ILoggerAll') _logger: ILogger,
-    @inject('PostgreTxQueue') _queue: ITxQueue) {
-    this.logger = _logger;
+  constructor(
+      modulesParams: ModulesParams,
+      _queue: ITxQueue,
+  ) {
+    this.logger = modulesParams.logger!;
     this.queue = _queue;
-  }
-  public async refresh(): Promise<void> {
-    await this.queue.refresh();
   }
 
   public async queueTransactions(txs: OutboundTransaction[]): Promise<void> {
