@@ -4,9 +4,9 @@ import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
 import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
-import {LoggerAll} from '../../src/service/logger/LoggerAll';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {ModulesParams} from '../../src/types/ModulesParams';
+import {LoggerConsole} from '../../src/service/logger/LoggerConsole';
 
 
 describe('ABI Repo', function() {
@@ -18,7 +18,7 @@ describe('ABI Repo', function() {
     modulesParams.configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
     await modulesParams.configService.refreshConfig();
 
-    modulesParams.logger = new LoggerAll(modulesParams.configService);
+    modulesParams.logger = new LoggerConsole();
 
     // Starting nodes
     modulesParams.mainNode = new BlockchainNodeAdapter(modulesParams, 'localNodeAlchemy');
@@ -27,7 +27,7 @@ describe('ABI Repo', function() {
     Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
     (modulesParams.altNode as BlockchainNodeAdapter)
-        .setProxyInfoForAddressResponse({isProxy: false, implementationAddress: ''});
+        .setProxyInfoForAddressResponse('Exists', {isProxy: false, implementationAddress: ''});
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
 
@@ -57,9 +57,9 @@ describe('ABI Repo', function() {
     abiStorage.setReturnValue(null);
     abiFetcher.setReturnValue('mockAbiImplementation');
     (modulesParams.mainNode as BlockchainNodeAdapter)
-        .setProxyInfoForAddressResponse({isProxy: true, implementationAddress: 'mockAbiImplementation'});
+        .setProxyInfoForAddressResponse('', {isProxy: true, implementationAddress: 'mockAbiImplementation'});
     (modulesParams.altNode as BlockchainNodeAdapter)
-        .setProxyInfoForAddressResponse({isProxy: true, implementationAddress: 'mockAbiImplementation'});
+        .setProxyInfoForAddressResponse('', {isProxy: true, implementationAddress: 'mockAbiImplementation'});
 
     const abi = await modulesParams.abiRepo!.getAbiByAddress('Exists');
 

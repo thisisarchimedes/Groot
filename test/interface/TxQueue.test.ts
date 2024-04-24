@@ -5,8 +5,8 @@ import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {Executor, UrgencyLevel} from '../../src/rule_engine/TypesRule';
 import DBService from '../../src/service/db/dbService';
 import PostgreTxQueue from '../../src/tx_queue/PostgreTxQueue';
-import {LoggerAll} from '../../src/service/logger/LoggerAll';
 import {ModulesParams} from '../../src/types/ModulesParams';
+import {LoggerConsole} from '../../src/service/logger/LoggerConsole';
 
 describe('Transaction Insertion Tests', function() {
   // eslint-disable-next-line no-invalid-this
@@ -19,7 +19,7 @@ describe('Transaction Insertion Tests', function() {
     modulesParams.configService = new ConfigServiceAWS('DemoApp', 'us-east-1');
     await modulesParams.configService.refreshConfig();
 
-    modulesParams.logger = new LoggerAll(modulesParams.configService);
+    modulesParams.logger = new LoggerConsole();
 
     modulesParams.dbService = new DBService(modulesParams.logger, modulesParams.configService);
     await modulesParams.dbService.connect();
