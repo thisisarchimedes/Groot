@@ -60,7 +60,7 @@ export class BlockchainNodeAdapter extends BlockchainNodeLocal {
 
   public override getBlockNumber(): Promise<number> {
     if (this.throwErrorOnGetBlockNumber) {
-      throw new Error('getBlockNumber: Error');
+      return Promise.reject(new Error('getBlockNumber: Error'));
     }
     this.isNodeHealthy = true;
     return Promise.resolve(this.currentBlockNumber);
@@ -96,10 +96,7 @@ export class BlockchainNodeAdapter extends BlockchainNodeLocal {
       proxyAddress: string,
   ): Promise<BlockchainNodeProxyInfo> {
     const data = this.proxyInfo.get(proxyAddress);
-    if (!data) {
-      throw new Error(`Proxy info for address ${proxyAddress} not found in the adapter`);
-    }
-    return Promise.resolve(data);
+    return Promise.resolve(data as BlockchainNodeProxyInfo);
   }
 
   public setThrowErrorOnCallViewFunction(throwError: boolean): void {

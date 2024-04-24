@@ -27,7 +27,7 @@ describe('ABI Repo', function() {
     Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
     (modulesParams.altNode as BlockchainNodeAdapter)
-        .setProxyInfoForAddressResponse('', {isProxy: false, implementationAddress: ''});
+        .setProxyInfoForAddressResponse('Exists', {isProxy: false, implementationAddress: ''});
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
 
