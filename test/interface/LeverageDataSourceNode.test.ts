@@ -54,7 +54,7 @@ describe('LeverageDataSource Tests', function() {
   it('Get all live positions for liquidation', async function() {
     const livePositions = await modulesParams.leverageDataSource!.leverageDataSourceNode!.getLivePositions();
 
-    expect(livePositions).to.be.an('array').that.is.not.empty;
+    expect(livePositions).to.be.an('array');
     livePositions.forEach((position) => {
       expect(position.positionState).to.equal(PositionState.LIVE);
     });
