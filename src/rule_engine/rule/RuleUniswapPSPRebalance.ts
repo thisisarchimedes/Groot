@@ -1,5 +1,5 @@
 import {Rule} from './Rule';
-import {RuleConstructorInput, RuleParams, UrgencyLevel} from '../TypesRule';
+import {RuleConstructorInput, RuleParams} from '../TypesRule';
 import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
 import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
 
@@ -43,20 +43,20 @@ export class RuleUniswapPSPRebalance extends Rule {
     const newLowerTick = await this.calculateNewLowerTick();
     const minOutputAmounts = await this.calculateMinOOutAndMin1Out();
 
-    const tx = {
-      urgencyLevel: UrgencyLevel.HIGH,
+    const tx: OutboundTransaction = {
+      urgencyLevel: this.params.urgencyLevel,
       context: 'UniswapPSPRebalance',
-      postEvalUniqueKey: 'uniqueKey',
-      lowLevelUnsignedTransaction: {},
-    } as OutboundTransaction;
-
-    tx.lowLevelUnsignedTransaction =
-      await this.uniswapStrategy.createRebalanceTransaction(
+      executor: this.params.executor,
+      postEvalUniqueKey: this.generateUniqueKey(),
+      lowLevelUnsignedTransaction: await this.uniswapStrategy.createRebalanceTransaction(
           newUpperTick,
           newLowerTick,
           minOutputAmounts.minOut0Amount,
           minOutputAmounts.minOut1Amount,
-      );
+      ),
+      ttlSeconds: this.params.ttlSeconds,
+    };
+
     this.pushTransactionToRuleLocalQueue(tx);
   }
 
