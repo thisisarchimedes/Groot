@@ -21,29 +21,25 @@ class PostgreTxQueue implements ITxQueue {
   }
 
   public async addTransactionToQueue(tx: OutboundTransaction): Promise<void> {
-    const createdAt = new Date();
-    const updatedAt = new Date();
-    const status = 'PENDING';
     const to = tx.lowLevelUnsignedTransaction.to;
     const executor = tx.executor;
+    const context = tx.context;
     const identifier = tx.postEvalUniqueKey;
-    const value = tx.lowLevelUnsignedTransaction.value.toString();
+    const value = tx.lowLevelUnsignedTransaction.value;
     const data = tx.lowLevelUnsignedTransaction.data;
     const urgency = tx.urgencyLevel;
     const ttlSeconds = tx.ttlSeconds;
-    await this.insertTransaction(createdAt, updatedAt, status, to, executor,
+    await this.insertTransaction(to, executor, context,
         '', identifier, value, data, urgency, ttlSeconds);
   }
 
   async insertTransaction(
-      createdAt: Date,
-      updatedAt: Date,
-      status: string,
       to: string,
       executor: Executor,
+      context: string,
       txHash: string,
       identifier: string,
-      value: string,
+      value: bigint,
       data: string,
       urgency: UrgencyLevel,
       ttlSeconds: number,
@@ -51,8 +47,8 @@ class PostgreTxQueue implements ITxQueue {
     try {
       await this.dbService.getTransactionsClient().query('BEGIN');
       const queryConfig: QueryConfig = {
-        text: 'CALL "Transactions".insert_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
-        values: [createdAt, updatedAt, status, to, executor, txHash, identifier, value, data, urgency, ttlSeconds],
+        text: 'CALL insert_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+        values: [to, executor, context, txHash, identifier, value, data, urgency, ttlSeconds],
       };
 
       await this.dbService.getTransactionsClient().query(queryConfig);

@@ -49,7 +49,7 @@ export class RuleExpirePositions extends Rule {
     const outboundTx = {
       urgencyLevel: this.params.urgencyLevel,
       executor: this.params.executor,
-      context: `this is a expire test context`,
+      context: `RuleExpirePositions`,
       postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction: tx,
       ttlSeconds: this.params.ttlSeconds,
@@ -126,7 +126,7 @@ export class RuleExpirePositions extends Rule {
 
   //   return {
   //     urgencyLevel: UrgencyLevel.NORMAL,
-  //     context: `Position expired transaction`,
+  //     context: `RuleExpirePositions`,
   //     postEvalUniqueKey: this.generateUniqueKey(),
   //     lowLevelUnsignedTransaction: { to: '', value: BigInt(0), data: '' } as RawTransactionData,
   //   };

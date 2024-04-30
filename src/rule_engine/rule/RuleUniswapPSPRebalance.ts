@@ -45,7 +45,7 @@ export class RuleUniswapPSPRebalance extends Rule {
 
     const tx = {
       urgencyLevel: UrgencyLevel.HIGH,
-      context: 'UniswapPSPRebalance',
+      context: 'RuleUniswapPSPRebalance',
       postEvalUniqueKey: 'uniqueKey',
       lowLevelUnsignedTransaction: {},
     } as OutboundTransaction;

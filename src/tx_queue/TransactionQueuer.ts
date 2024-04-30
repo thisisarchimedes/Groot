@@ -19,11 +19,11 @@ export class TransactionQueuer {
 
   public async queueTransactions(txs: OutboundTransaction[]): Promise<void> {
     for (const tx of txs) {
-      if (this.isTxValid(tx) == false) {
-        this.logger.error(`Invalid transaction: ${tx.context}`);
+      if (this.isTxValid(tx) === false) {
+        this.logger.error(`Invalid transaction: ${tx.context} [${tx.postEvalUniqueKey}]`);
         continue;
       }
-      this.logger.info(`Queuing transaction: ${tx.context}`);
+      this.logger.info(`Queuing transaction: ${tx.context} [${tx.postEvalUniqueKey}]`);
       await this.queue.addTransactionToQueue(tx);
     }
   }
