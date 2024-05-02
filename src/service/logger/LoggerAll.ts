@@ -1,17 +1,12 @@
-
 import {Logger} from './Logger';
 import {LoggerNewRelic} from './LoggerNewRelic';
-import {ILoggerAll} from './interfaces/ILoggerAll';
-import {ILoggerConsole} from './interfaces/ILoggerConsole';
-import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
-import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 import {LoggerConsole} from './LoggerConsole';
+import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 import {namespace} from '../../constants/constants';
 
-
-export class LoggerAll extends Logger implements ILoggerAll {
-  private loggerConsole: ILoggerConsole;
-  private loggerNewRelic: ILoggerNewRelic;
+export class LoggerAll extends Logger {
+  private loggerConsole: LoggerConsole;
+  private loggerNewRelic: LoggerNewRelic;
 
   constructor(
       configService: ConfigServiceAWS,

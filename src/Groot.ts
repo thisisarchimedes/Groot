@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import * as dotenv from 'dotenv';
-import {ILogger} from './service/logger/interfaces/ILogger';
+import {Logger} from './service/logger/Logger';
 import {BlockchainNodeLocal} from './blockchain/blockchain_nodes/BlockchainNodeLocal';
 import {HealthMonitor} from './service/health_monitor/HealthMonitor';
 import {BlockchainNodeHealthMonitor} from './service/health_monitor/BlockchainNodeHealthMonitor';
@@ -30,7 +30,7 @@ export class Groot {
 
   constructor(
       configService: ConfigServiceAWS,
-      logger: ILogger,
+      logger: Logger,
       dbService: DBService,
   ) {
     this.modulesParams.configService = configService;

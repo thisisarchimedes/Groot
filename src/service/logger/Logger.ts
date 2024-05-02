@@ -1,10 +1,9 @@
 import * as stackTrace from 'stacktrace-parser';
-import {ILogger} from './interfaces/ILogger';
 import {LogLevel} from './LogLevel';
 import {LogMessageCycleTime} from './TypeLogItem';
 
 
-export abstract class Logger implements ILogger {
+export abstract class Logger {
   protected currentLevel: LogLevel = LogLevel.Debug;
 
   public setLogLevel(level: LogLevel): void {

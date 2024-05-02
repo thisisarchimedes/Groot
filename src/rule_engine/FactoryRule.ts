@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import {RuleConstructorInput, RuleJSONConfigItem, TypeRule} from './TypesRule';
-import {ILogger} from '../service/logger/interfaces/ILogger';
+import {Logger} from '../service/logger/Logger';
 import {Rule} from './rule/Rule';
 import {RuleDummy} from './rule/RuleDummy';
 import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
@@ -21,7 +21,7 @@ export class FactoryRule {
 
   constructor(
       modulesParams: ModulesParams,
-     private logger: ILogger = modulesParams.logger!,
+     private logger: Logger = modulesParams.logger!,
      private configService: ConfigServiceAWS = modulesParams.configService!,
      private blockchainReader: BlockchainReader = modulesParams.blockchainReader!,
      private abiRepo: AbiRepo = modulesParams.abiRepo!,

@@ -1,4 +1,4 @@
-import {ILogger} from '../logger/interfaces/ILogger';
+import {Logger} from '../logger/Logger';
 import {ISignalHeartbeat} from './signal/interfaces/ISignalHeartbeat';
 import {BlockchainNodeHealthMonitor} from './BlockchainNodeHealthMonitor';
 import {ISignalCriticalFailure} from './signal/interfaces/ISignalCriticalFailure';
@@ -8,7 +8,7 @@ import {ModulesParams} from '../../types/ModulesParams';
 export class HealthMonitor {
   private cycleStartTimestamp!: Date;
 
-  private readonly logger: ILogger;
+  private readonly logger: Logger;
   private readonly blockchainHealthMonitor: BlockchainNodeHealthMonitor;
   private readonly signalHeartbeat: ISignalHeartbeat;
   private readonly signalCriticalFailure: ISignalCriticalFailure;

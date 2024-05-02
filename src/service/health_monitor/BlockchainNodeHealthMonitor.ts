@@ -1,11 +1,11 @@
 import {BlockchainNode} from '../../blockchain/blockchain_nodes/BlockchainNode';
 import {BlockchainNodeLocal} from '../../blockchain/blockchain_nodes/BlockchainNodeLocal';
 import {ModulesParams} from '../../types/ModulesParams';
-import {ILogger} from '../logger/interfaces/ILogger';
+import {Logger} from '../logger/Logger';
 
 export class BlockchainNodeHealthMonitor {
   private readonly nodes: BlockchainNodeLocal[] = [];
-  private readonly logger: ILogger;
+  private readonly logger: Logger;
 
   constructor(modulesParams: ModulesParams) {
     this.logger = modulesParams.logger!;

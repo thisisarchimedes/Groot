@@ -4,14 +4,14 @@ import {QueryConfig} from 'pg';
 import {ITxQueue} from './interfaces/ITxQueue';
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Executor, UrgencyLevel} from '../rule_engine/TypesRule';
-import {ILogger} from '../service/logger/interfaces/ILogger';
+import {Logger} from '../service/logger/Logger';
 import DBService from '../service/db/dbService';
 import {ModulesParams} from '../types/ModulesParams';
 
 
 class PostgreTxQueue implements ITxQueue {
   private dbService: DBService;
-  private logger: ILogger;
+  private logger: Logger;
 
   constructor(
       modulesParams: ModulesParams,

@@ -4,10 +4,10 @@ import * as dotenv from 'dotenv';
 
 import {GrootParams} from './types/GrootParams';
 import {ConfigServiceAWS} from './service/config/ConfigServiceAWS';
-import {ILoggerAll} from './service/logger/interfaces/ILoggerAll';
 import DBService from './service/db/dbService';
 import {LoggerAll} from './service/logger/LoggerAll';
 import {Groot} from './Groot';
+import {Logger} from './service/logger/Logger';
 
 dotenv.config();
 
@@ -78,7 +78,7 @@ function reportGrootStartup(grootParams: GrootParams): void {
   );
 }
 
-function reportCriticalError(logger: ILoggerAll, environment: string, region: string, error: unknown): void {
+function reportCriticalError(logger: Logger, environment: string, region: string, error: unknown): void {
   const errorMessage = `Unexpected CRITICAL ERROR in main loop: ${error}`;
   logger.error(errorMessage);
 }
