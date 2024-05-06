@@ -1,5 +1,5 @@
 import {Rule} from './Rule';
-import {RuleConstructorInput, RuleParams, UrgencyLevel} from '../TypesRule';
+import {RuleConstructorInput, RuleParams} from '../TypesRule';
 import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
 import {ToolStrategyUniswap} from '../tool/ToolStrategyUniswap';
 
@@ -43,20 +43,25 @@ export class RuleUniswapPSPRebalance extends Rule {
     const newLowerTick = await this.calculateNewLowerTick();
     const minOutputAmounts = await this.calculateMinOOutAndMin1Out();
 
-    const tx = {
-      urgencyLevel: UrgencyLevel.HIGH,
-      context: 'RuleUniswapPSPRebalance',
-      postEvalUniqueKey: 'uniqueKey',
-      lowLevelUnsignedTransaction: {},
-    } as OutboundTransaction;
-
-    tx.lowLevelUnsignedTransaction =
-      await this.uniswapStrategy.createRebalanceTransaction(
+    const tx: OutboundTransaction = {
+      urgencyLevel: this.params.urgencyLevel,
+      context: 'UniswapPSPRebalance',
+      executor: this.params.executor,
+      postEvalUniqueKey: this.generateUniqueKey(
           newUpperTick,
           newLowerTick,
           minOutputAmounts.minOut0Amount,
           minOutputAmounts.minOut1Amount,
-      );
+      ),
+      lowLevelUnsignedTransaction: await this.uniswapStrategy.createRebalanceTransaction(
+          newUpperTick,
+          newLowerTick,
+          minOutputAmounts.minOut0Amount,
+          minOutputAmounts.minOut1Amount,
+      ),
+      ttlSeconds: this.params.ttlSeconds,
+    };
+
     this.pushTransactionToRuleLocalQueue(tx);
   }
 
@@ -107,8 +112,8 @@ export class RuleUniswapPSPRebalance extends Rule {
 
     return lowerTick;
   }
-  protected generateUniqueKey(): string {
-    return '';
+  protected generateUniqueKey<T extends unknown[]>(...args: T): string {
+    return `uniswap-psp-rebalance-${args.join('-')}`;
   }
   private async calculateMinOOutAndMin1Out(): Promise<MinOutputAmounts> {
     const position = await this.uniswapStrategy.getPosition();

@@ -92,7 +92,7 @@ export class ToolStrategyUniswap {
     );
     return {
       to: tx.to,
-      value: tx.value || BigInt(0),
+      value: 0n,
       data: tx.data,
     };
   }

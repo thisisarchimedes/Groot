@@ -1,6 +1,6 @@
 import pLimit from 'p-limit';
 import {Rule} from './Rule';
-import {Executor, RuleConstructorInput, RuleParams, UrgencyLevel} from '../TypesRule';
+import {RuleConstructorInput, RuleParams} from '../TypesRule';
 import {OutboundTransaction, RawTransactionData} from '../../blockchain/OutboundTransaction';
 import LeveragePosition from '../../types/LeveragePosition';
 import {Contract} from 'ethers';
@@ -152,10 +152,10 @@ export class RuleLiquidatePositions extends Rule {
       tx: RawTransactionData,
   ): OutboundTransaction {
     return {
-      urgencyLevel: UrgencyLevel.HIGH,
-      context: `RuleLiquidatePositions`,
-      executor: Executor.LEVERAGE,
-      ttlSeconds: 300,
+      urgencyLevel: this.params.urgencyLevel,
+      context: 'RuleLiquidatePositions',
+      executor: this.params.executor,
+      ttlSeconds: this.params.ttlSeconds,
       postEvalUniqueKey: this.generateUniqueKey(nftId),
       lowLevelUnsignedTransaction: tx,
     };
