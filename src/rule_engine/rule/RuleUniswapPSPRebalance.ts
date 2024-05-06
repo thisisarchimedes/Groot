@@ -107,8 +107,8 @@ export class RuleUniswapPSPRebalance extends Rule {
 
     return lowerTick;
   }
-  protected generateUniqueKey(): string {
-    return '';
+  protected generateUniqueKey<T extends unknown[]>(...args: T): string {
+    return `uniswap-psp-rebalance-${args.join('-')}`;
   }
   private async calculateMinOOutAndMin1Out(): Promise<MinOutputAmounts> {
     const position = await this.uniswapStrategy.getPosition();
