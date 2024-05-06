@@ -11,6 +11,7 @@ import {AppConfigInterceptor} from './interceptors/AppConfigInterceptor';
 import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 import {EthNodeInterceptor} from './interceptors/EthNodeInterceptor';
 import {RuleParamsDummy} from '../../src/rule_engine/rule/RuleDummy';
+import {PostgresDBInterceptor} from './interceptors/PostgresDBInterceptor';
 
 let timeoutId: NodeJS.Timeout | null = null;
 
@@ -102,10 +103,15 @@ describe('Startup and Config', function() {
     ethNodeAltInterceptor.setMockBlockNumber(expectedBlockNumber);
     ethNodeAltInterceptor.interceptCalls();
 
+    const postgresDBInterceptor = new PostgresDBInterceptor();
+    postgresDBInterceptor.setQueryAlwaysSuccessOnce();
+
     const expectedMessage = 'Queuing transaction: RuleDummy';
     newRelicInterceptor.setWaitedOnMessage(expectedMessage);
     await startGroot(false);
     await waitForMessageProcessing();
+
+    postgresDBInterceptor.clearSinonStub();
 
     const isMessageObserved = newRelicInterceptor.isWaitedOnMessageObserved();
     expect(isMessageObserved).to.be.true;
@@ -141,9 +147,14 @@ describe('Startup and Config', function() {
     const expectedMessage = 'Rule Engine loaded 1 rules';
     newRelicInterceptor.setWaitedOnMessage(expectedMessage);
 
+    const postgresDBInterceptor = new PostgresDBInterceptor();
+    postgresDBInterceptor.setQueryAlwaysSuccessOnce();
+
     await startGroot(false);
     console.log('Waiting for message: ', expectedMessage);
     await waitForMessageProcessing();
+
+    postgresDBInterceptor.clearSinonStub();
 
     const isMessageObserved = newRelicInterceptor.isWaitedOnMessageObserved();
     expect(isMessageObserved).to.be.true;
