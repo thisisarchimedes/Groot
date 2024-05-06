@@ -28,19 +28,14 @@ describe('Transaction Insertion Tests', function() {
   });
 
   after(async function() {
-    await modulesParams.dbService!.getTransactionsClient().query(
-        'DELETE FROM "Transactions"."Transaction" WHERE "identifier" LIKE $1',
-        ['test_%'],
-    );
     await modulesParams.dbService!.end();
   });
 
   afterEach(async function() {
     await modulesParams.dbService!.getTransactionsClient().query(
-        'DELETE FROM "Transactions"."Transaction" WHERE "identifier" LIKE $1',
+        'DELETE FROM "Transaction" WHERE "identifier" LIKE $1',
         ['test_%'],
     );
-    await new Promise((resolve) => setTimeout(resolve, 1000)); // 5 seconds
   });
 
   it('Should insert a new transaction', async function() {
@@ -67,9 +62,10 @@ describe('Transaction Insertion Tests', function() {
 
     // Verify insertion
     const result = await modulesParams.dbService!.getTransactionsClient().query(
-        'SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1',
+        'SELECT * FROM "Transaction" WHERE identifier = $1',
         ['test_uniqueIdentifier1'],
     );
+    console.log(result);
     expect(result.rows.length).to.equal(1);
     expect(result.rows[0].identifier).to.equal('test_uniqueIdentifier1');
   });
@@ -101,7 +97,8 @@ describe('Transaction Insertion Tests', function() {
     }
     expect(errorOccurred).to.be.true;
     expect(errorMessage).to.equal(
-        'A transaction with the same identifier and a status other than COMPLETED exists within the TTL.',
+        // eslint-disable-next-line max-len
+        `Transaction with identifier test_uniqueIdentifier2 and status not FAILED already exists and is within TTL 300 sec`,
     );
   });
 
@@ -135,16 +132,11 @@ describe('Transaction Insertion Tests', function() {
     expect(errorOccurred).to.be.false;
 
     const pendingResult = await modulesParams.dbService!.getTransactionsClient().query(
-        'SELECT * FROM "Transactions"."Transaction" WHERE status = $1 AND identifier = $2',
+        'SELECT * FROM "Transaction" WHERE status = $1 AND identifier = $2',
         ['PENDING', 'test_expiredTransaction'],
     );
-    const failedResult = await modulesParams.dbService!.getTransactionsClient().query(
-        'SELECT * FROM "Transactions"."Transaction" WHERE status = $1 AND identifier = $2',
-        ['FAILED', 'test_expiredTransaction'],
-    );
 
-    expect(pendingResult.rows.length).to.equal(1);
-    expect(failedResult.rows.length).to.equal(1);
+    expect(pendingResult.rows.length).to.equal(2);
   }).timeout(1000000000);
 
   it('Concurrent Insertions with Different Identifiers', async function() {
@@ -177,7 +169,7 @@ describe('Transaction Insertion Tests', function() {
     // Verify each transaction was inserted
     for (const tx of transactions) {
       const result = await modulesParams.dbService!.getTransactionsClient().query(
-          'SELECT * FROM "Transactions"."Transaction" WHERE identifier = $1',
+          'SELECT * FROM "Transaction" WHERE identifier = $1',
           [tx.postEvalUniqueKey],
       );
       expect(result.rows.length).to.equal(1);

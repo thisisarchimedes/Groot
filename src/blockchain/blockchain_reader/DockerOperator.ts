@@ -1,5 +1,5 @@
 import Docker from 'dockerode';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {Logger} from '../../service/logger/Logger';
 
 export interface DockerConfig {
   portExternal: number;
@@ -9,14 +9,14 @@ export interface DockerConfig {
 }
 
 export class DockerOperator {
-  private readonly logger: ILogger;
+  private readonly logger: Logger;
   private readonly docker: Docker = new Docker({socketPath: '/var/run/docker.sock'});
   private readonly portExternal: number;
   private readonly portInternal: number;
   private readonly imageName: string;
   private readonly instanceName: string;
 
-  constructor(logger: ILogger, dockerConfig: DockerConfig) {
+  constructor(logger: Logger, dockerConfig: DockerConfig) {
     this.logger = logger;
     this.portExternal = dockerConfig.portExternal;
     this.portInternal = dockerConfig.portInternal;

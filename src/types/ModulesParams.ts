@@ -11,12 +11,12 @@ import {HealthMonitor} from '../service/health_monitor/HealthMonitor';
 import {HostNameProvider} from '../service/health_monitor/HostNameProvider';
 import {ISignalCriticalFailure} from '../service/health_monitor/signal/interfaces/ISignalCriticalFailure';
 import {ISignalHeartbeat} from '../service/health_monitor/signal/interfaces/ISignalHeartbeat';
-import {ILogger} from '../service/logger/interfaces/ILogger';
+import {Logger} from '../service/logger/Logger';
 import {TransactionQueuer} from '../tx_queue/TransactionQueuer';
 
 export interface ModulesParams {
   configService?: ConfigServiceAWS,
-  logger?: ILogger,
+  logger?: Logger,
   dbService?: DBService,
   mainNode?: BlockchainNodeLocal;
   altNode?: BlockchainNodeLocal;

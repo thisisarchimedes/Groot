@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {Logger} from './Logger';
 import {LogLevel} from './LogLevel';
-import {ILoggerNewRelic} from './interfaces/ILoggerNewRelic';
 import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 
 
@@ -36,7 +35,7 @@ interface NewRelicConfig {
 }
 
 
-export class LoggerNewRelic extends Logger implements ILoggerNewRelic {
+export class LoggerNewRelic extends Logger {
   private readonly config: NewRelicConfig;
   private readonly formatter: LogFormatter;
   private pendingPromises: Promise<void>[] = [];

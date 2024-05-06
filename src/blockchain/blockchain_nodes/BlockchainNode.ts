@@ -1,5 +1,5 @@
 import {ethers, Contract, Block} from 'ethers';
-import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {Logger} from '../../service/logger/Logger';
 import {BlockchainNodeProxyInfo} from './BlockchainNodeProxyInfo';
 
 
@@ -15,11 +15,11 @@ export class BlockchainNodeError extends Error {
 
 export abstract class BlockchainNode {
   protected provider!: ethers.Provider;
-  protected readonly logger: ILogger;
+  protected readonly logger: Logger;
   protected isNodeHealthy: boolean = true;
   protected nodeName: string = '';
 
-  constructor(logger: ILogger, nodeName: string) {
+  constructor(logger: Logger, nodeName: string) {
     this.logger = logger;
     this.nodeName = nodeName;
   }

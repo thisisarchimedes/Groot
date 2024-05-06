@@ -1,10 +1,10 @@
 import os from 'os';
-import {ILogger} from '../logger/interfaces/ILogger';
+import {Logger} from '../logger/Logger';
 import {ModulesParams} from '../../types/ModulesParams';
 
 
 export class HostNameProvider {
-  private readonly logger: ILogger;
+  private readonly logger: Logger;
 
   constructor(modulesParams: ModulesParams) {
     this.logger = modulesParams.logger!;

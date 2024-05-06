@@ -1,12 +1,12 @@
 import {QueryConfig, QueryConfigValues, QueryResult, QueryResultRow} from 'pg';
 import {LoggedClient} from '../../../src/service/db/dbService';
-import {ILogger} from '../../../src/service/logger/interfaces/ILogger';
+import {Logger} from '../../../src/service/logger/Logger';
 
 export class PGClientAdapter extends LoggedClient {
   private queryResponse: QueryResult | null = null;
   private lastExecutedQuery: string | QueryConfig | null = null;
 
-  constructor(logger: ILogger) {
+  constructor(logger: Logger) {
     super({
       query_timeout: 1000,
       connectionTimeoutMillis: 1000,

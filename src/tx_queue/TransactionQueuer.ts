@@ -1,12 +1,12 @@
 import 'reflect-metadata';
 
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
-import {ILogger} from '../service/logger/interfaces/ILogger';
+import {Logger} from '../service/logger/Logger';
 import {ITxQueue} from './interfaces/ITxQueue';
 import {ModulesParams} from '../types/ModulesParams';
 
 export class TransactionQueuer {
-  private readonly logger: ILogger;
+  private readonly logger: Logger;
   private readonly queue: ITxQueue;
 
   constructor(
@@ -20,10 +20,10 @@ export class TransactionQueuer {
   public async queueTransactions(txs: OutboundTransaction[]): Promise<void> {
     for (const tx of txs) {
       if (this.isTxValid(tx) === false) {
-        this.logger.error(`Invalid transaction: ${tx.context}`);
+        this.logger.error(`Invalid transaction: ${tx.context} [${tx.postEvalUniqueKey}]`);
         continue;
       }
-      this.logger.info(`Queuing transaction: ${tx.context}`);
+      this.logger.info(`Queuing transaction: ${tx.context} [${tx.postEvalUniqueKey}]`);
       await this.queue.addTransactionToQueue(tx);
     }
   }

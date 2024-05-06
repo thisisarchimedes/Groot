@@ -1,5 +1,5 @@
 
-import {ILogger} from '../../service/logger/interfaces/ILogger';
+import {Logger} from '../../service/logger/Logger';
 import {BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNodeProxyInfo';
 import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
 import {Block} from 'ethers';
@@ -28,7 +28,7 @@ interface ValidNodeResponse {
 
 export class BlockchainReader {
   private readonly nodes: BlockchainNode[];
-  private readonly logger: ILogger;
+  private readonly logger: Logger;
 
   private initialized: boolean;
 

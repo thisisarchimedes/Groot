@@ -1,5 +1,5 @@
 import {Client, ClientConfig, QueryConfig, QueryConfigValues, QueryResult} from 'pg';
-import {ILogger} from '../logger/interfaces/ILogger';
+import {Logger} from '../logger/Logger';
 import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 
 
@@ -8,7 +8,7 @@ export default class DBService {
   private leverageClient:LoggedClient;
 
   constructor(
-      private logger: ILogger,
+      private logger: Logger,
       configService: ConfigServiceAWS,
   ) {
     this.transactionsClient = new LoggedClient({
@@ -50,7 +50,7 @@ export default class DBService {
 }
 
 export class LoggedClient extends Client {
-  constructor(config: ClientConfig, private logger: ILogger) {
+  constructor(config: ClientConfig, private logger: Logger) {
     super(config);
   }
 

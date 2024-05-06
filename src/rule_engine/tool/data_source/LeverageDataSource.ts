@@ -1,8 +1,8 @@
-import {ILogger} from '../../../service/logger/interfaces/ILogger';
+import {Logger} from '../../../service/logger/Logger';
 import LeveragePosition from '../../../types/LeveragePosition';
 
 export default abstract class LeverageDataSource {
-  constructor(protected readonly logger: ILogger) { }
+  constructor(protected readonly logger: Logger) { }
 
   abstract getPositionsByNftIds(nftIds: number[]): Promise<LeveragePosition[]>;
 

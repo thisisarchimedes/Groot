@@ -3,12 +3,12 @@
 import {OutboundTransaction} from '../blockchain/OutboundTransaction';
 import {Rule} from './rule/Rule';
 import {RuleJSONConfigItem} from './TypesRule';
-import {ILogger} from '../service/logger/interfaces/ILogger';
+import {Logger} from '../service/logger/Logger';
 import {FactoryRule} from './FactoryRule';
 import {ModulesParams} from '../types/ModulesParams';
 
 export class RuleEngine {
-  private logger: ILogger;
+  private logger: Logger;
   private rules: Rule[] = [];
   private outboundTransactions: OutboundTransaction[] = [];
 
