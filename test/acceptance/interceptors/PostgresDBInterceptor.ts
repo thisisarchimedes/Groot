@@ -15,7 +15,7 @@ export class PostgresDBInterceptor extends Interceptor {
     });
   }
 
-  public clearSinonStub(): void {
+  public clearInterceptor(): void {
     sinon.restore();
   }
 }
