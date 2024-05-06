@@ -39,7 +39,7 @@ export class RuleDummy extends Rule {
     return {
       urgencyLevel: this.params.urgencyLevel,
       executor: this.params.executor,
-      context: `this is a dummy context - block: ${currentBlockNumber}`,
+      context: `RuleDummy`,
       postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction: {} as RawTransactionData,
       ttlSeconds: this.params.ttlSeconds,

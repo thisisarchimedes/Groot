@@ -102,7 +102,7 @@ describe('Startup and Config', function() {
     ethNodeAltInterceptor.setMockBlockNumber(expectedBlockNumber);
     ethNodeAltInterceptor.interceptCalls();
 
-    const expectedMessage = 'Queuing transaction: this is a dummy context';
+    const expectedMessage = 'Queuing transaction: RuleDummy';
     newRelicInterceptor.setWaitedOnMessage(expectedMessage);
     await startGroot(false);
     await waitForMessageProcessing();

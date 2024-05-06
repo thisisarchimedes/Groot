@@ -153,11 +153,7 @@ export class RuleLiquidatePositions extends Rule {
   ): OutboundTransaction {
     return {
       urgencyLevel: UrgencyLevel.HIGH,
-      context: `this is a liquidatePosition context
-        - number: ${txNumber}
-        - block: ${currentBlockNumber}
-        - nftId: ${nftId}
-      `,
+      context: `RuleLiquidatePositions`,
       executor: Executor.LEVERAGE,
       ttlSeconds: 300,
       postEvalUniqueKey: this.generateUniqueKey(nftId),
