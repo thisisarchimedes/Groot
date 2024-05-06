@@ -111,7 +111,7 @@ describe('Startup and Config', function() {
     await startGroot(false);
     await waitForMessageProcessing();
 
-    postgresDBInterceptor.clearSinonStub();
+    postgresDBInterceptor.clearInterceptor();
 
     const isMessageObserved = newRelicInterceptor.isWaitedOnMessageObserved();
     expect(isMessageObserved).to.be.true;
@@ -154,7 +154,7 @@ describe('Startup and Config', function() {
     console.log('Waiting for message: ', expectedMessage);
     await waitForMessageProcessing();
 
-    postgresDBInterceptor.clearSinonStub();
+    postgresDBInterceptor.clearInterceptor();
 
     const isMessageObserved = newRelicInterceptor.isWaitedOnMessageObserved();
     expect(isMessageObserved).to.be.true;
