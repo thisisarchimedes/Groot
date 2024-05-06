@@ -47,7 +47,12 @@ export class RuleUniswapPSPRebalance extends Rule {
       urgencyLevel: this.params.urgencyLevel,
       context: 'UniswapPSPRebalance',
       executor: this.params.executor,
-      postEvalUniqueKey: this.generateUniqueKey(),
+      postEvalUniqueKey: this.generateUniqueKey(
+          newUpperTick,
+          newLowerTick,
+          minOutputAmounts.minOut0Amount,
+          minOutputAmounts.minOut1Amount,
+      ),
       lowLevelUnsignedTransaction: await this.uniswapStrategy.createRebalanceTransaction(
           newUpperTick,
           newLowerTick,
