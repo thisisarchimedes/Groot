@@ -22,6 +22,8 @@ dotenv.config();
 describe('Rule Factory Testings: Uniswap', function() {
   const modulesParams: ModulesParams = {};
   let ruleFactory: FactoryRule;
+  // eslint-disable-next-line no-invalid-this
+  this.timeout(25000);
 
   beforeEach(async function() {
     modulesParams.configService = new ConfigServiceAWS('DemoApp', 'us-east-1');

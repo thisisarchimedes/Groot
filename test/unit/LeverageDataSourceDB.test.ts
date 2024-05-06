@@ -11,6 +11,8 @@ import {ModulesParams} from '../../src/types/ModulesParams';
 const {expect} = chai;
 
 describe('LeverageDataSource Tests', function() {
+  // eslint-disable-next-line no-invalid-this
+  this.timeout(25000);
   const modulesParams: ModulesParams = {};
 
   beforeEach(async function() {
