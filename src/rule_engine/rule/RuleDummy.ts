@@ -16,9 +16,8 @@ export class RuleDummy extends Rule {
     // this.uniswap = new Uniswap('');
   }
 
-  public async evaluate(): Promise<void> {
+  public evaluate(): Promise<void> {
     const params = this.params as RuleParamsDummy;
-    const blockNumber = await this.blockchainReader.getBlockNumber();
 
     this.logger.info('I AM GROOT');
 
@@ -28,14 +27,14 @@ export class RuleDummy extends Rule {
       throw new Error('RuleDummy.evaluate() failed');
     }
     for (let i = 0; i < params.NumberOfDummyTxs; i++) {
-      const dummyTx = this.createDummyTransaction(blockNumber);
+      const dummyTx = this.createDummyTransaction();
       this.pushTransactionToRuleLocalQueue(dummyTx);
     }
+
+    return Promise.resolve();
   }
 
-  private createDummyTransaction(
-      currentBlockNumber: number,
-  ): OutboundTransaction {
+  private createDummyTransaction(): OutboundTransaction {
     return {
       urgencyLevel: this.params.urgencyLevel,
       executor: this.params.executor,
