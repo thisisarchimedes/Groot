@@ -1,4 +1,3 @@
-
 import {Logger} from '../../service/logger/Logger';
 import {BlockchainNodeProxyInfo} from '../blockchain_nodes/BlockchainNodeProxyInfo';
 import {BlockchainNode} from '../blockchain_nodes/BlockchainNode';
@@ -25,16 +24,13 @@ interface ValidNodeResponse {
   blockNumber: number;
 }
 
-
 export class BlockchainReader {
   private readonly nodes: BlockchainNode[];
   private readonly logger: Logger;
 
   private initialized: boolean;
 
-  constructor(
-      modulesParams: ModulesParams,
-  ) {
+  constructor(modulesParams: ModulesParams) {
     this.nodes = [modulesParams.mainNode!, modulesParams.altNode!];
     this.logger = modulesParams.logger!;
     this.initialized = false;
@@ -42,9 +38,7 @@ export class BlockchainReader {
 
   private async init() {
     if (!this.initialized) {
-      const initPromises = this.nodes.map((node) =>
-        node.startNode(),
-      );
+      const initPromises = this.nodes.map((node) => node.startNode());
       await Promise.all(initPromises);
       this.initialized = true;
     }
@@ -74,13 +68,22 @@ export class BlockchainReader {
       params: unknown[] = [],
   ): Promise<unknown> {
     await this.init();
-    const nodeResponses = await this.fetchNodeResponses(contractAddress, abi, functionName, params);
+    const nodeResponses = await this.fetchNodeResponses(
+        contractAddress,
+        abi,
+        functionName,
+        params,
+    );
+
     const validNodeResponses = this.extractValidNodeResponses(nodeResponses);
+
     this.ensureValidNodeResponses(validNodeResponses);
     return this.findResponseFromNodeWithHighestBlockNumber(validNodeResponses);
   }
 
-  public async getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo> {
+  public async getProxyInfoForAddress(
+      proxyAddress: string,
+  ): Promise<BlockchainNodeProxyInfo> {
     await this.init();
     const proxyInfoResults = await this.fetchProxyInfoFromNodes(proxyAddress);
 
@@ -90,7 +93,9 @@ export class BlockchainReader {
       }
     }
 
-    throw new BlockchainReaderError(`Error when requesting proxy information from node for ${proxyAddress}.`);
+    throw new BlockchainReaderError(
+        `Error when requesting proxy information from node for ${proxyAddress}.`,
+    );
   }
 
   private fetchBlocksFromNodes(blockNumber: number): Promise<(Block | null)[]> {
@@ -108,7 +113,9 @@ export class BlockchainReader {
   }
 
   private extractValidBlockNumbers(blockNumbers: (number | null)[]): number[] {
-    return blockNumbers.filter((blockNumber): blockNumber is number => blockNumber !== null);
+    return blockNumbers.filter(
+        (blockNumber): blockNumber is number => blockNumber !== null,
+    );
   }
 
   private extractValidBlocks(blocks: (Block | null)[]): Block[] {
@@ -118,7 +125,9 @@ export class BlockchainReader {
   private ensureValidBlockNumbers(validBlockNumbers: number[]): void {
     if (validBlockNumbers.length === 0) {
       this.logger.error('All nodes failed to retrieve block number');
-      throw new BlockchainReaderError('All nodes failed to retrieve block number');
+      throw new BlockchainReaderError(
+          'All nodes failed to retrieve block number',
+      );
     }
   }
 
@@ -140,7 +149,9 @@ export class BlockchainReader {
       params: unknown[],
   ): Promise<NodeResponse[]> {
     const functionCalls = this.nodes.map((node) =>
-      node.callViewFunction(contractAddress, abi, functionName, params).catch(() => null),
+      node
+          .callViewFunction(contractAddress, abi, functionName, params)
+          .catch(() => null),
     );
     const blockNumbers = this.nodes.map((node) =>
       node.getBlockNumber().catch(() => null),
@@ -161,34 +172,49 @@ export class BlockchainReader {
     return result.status === 'fulfilled' ? result.value : null;
   }
 
-  private extractValidNodeResponses(nodeResponses: NodeResponse[]): ValidNodeResponse[] {
+  private extractValidNodeResponses(
+      nodeResponses: NodeResponse[],
+  ): ValidNodeResponse[] {
     return nodeResponses.filter(
         (nodeResponse): nodeResponse is ValidNodeResponse =>
           nodeResponse.response !== null && nodeResponse.blockNumber !== null,
     );
   }
 
-  private ensureValidNodeResponses(validNodeResponses: ValidNodeResponse[]): void {
+  private ensureValidNodeResponses(
+      validNodeResponses: ValidNodeResponse[],
+  ): void {
     if (validNodeResponses.length === 0) {
       this.logger.error('All nodes failed to retrieve block number');
-      throw new BlockchainReaderError('All nodes failed to execute callViewFunction or getBlockNumber');
+      throw new BlockchainReaderError(
+          'All nodes failed to execute callViewFunction or getBlockNumber',
+      );
     }
   }
 
-  private findResponseFromNodeWithHighestBlockNumber(validNodeResponses: ValidNodeResponse[]): unknown {
+  private findResponseFromNodeWithHighestBlockNumber(
+      validNodeResponses: ValidNodeResponse[],
+  ): unknown {
     const highestBlockNumberIndex = validNodeResponses.reduce(
         (highestIndex, currentNode, currentIndex) =>
-        currentNode.blockNumber > validNodeResponses[highestIndex].blockNumber ? currentIndex : highestIndex,
+        currentNode.blockNumber > validNodeResponses[highestIndex].blockNumber ?
+          currentIndex :
+          highestIndex,
         0,
     );
     return validNodeResponses[highestBlockNumberIndex].response;
   }
 
-  private async fetchProxyInfoFromNodes(proxyAddress: string): Promise<BlockchainNodeProxyInfo[]> {
-    const proxyInfoPromises = this.nodes.map(async (node) =>
-      await node.getProxyInfoForAddress(proxyAddress).catch(() => null),
+  private async fetchProxyInfoFromNodes(
+      proxyAddress: string,
+  ): Promise<BlockchainNodeProxyInfo[]> {
+    const proxyInfoPromises = this.nodes.map(
+        async (node) =>
+          await node.getProxyInfoForAddress(proxyAddress).catch(() => null),
     );
-    const res: BlockchainNodeProxyInfo[] = await Promise.all(proxyInfoPromises) as BlockchainNodeProxyInfo[];
+    const res: BlockchainNodeProxyInfo[] = (await Promise.all(
+        proxyInfoPromises,
+    )) as BlockchainNodeProxyInfo[];
     return res;
   }
 }

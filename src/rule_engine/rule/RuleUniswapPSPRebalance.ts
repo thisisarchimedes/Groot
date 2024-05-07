@@ -10,7 +10,7 @@ export interface RuleParamsUniswapPSPRebalance extends RuleParams {
   upperTargetTickPercentage: number; // Where we want to be after rebalance currentUniswapTick * newUpperTickPercentage = newUpperTick
   lowerTargetTickPercentage: number; // Where we want to be after rebalance currentUniswapTick * newLowerTickPercentage = newLowerTick
   strategyAddress: string;
-  slippagePercentage: bigint; // slippage percentage for the rebalance in 10000 scale
+  slippagePercentage: number; // slippage percentage for the rebalance in 10000 scale
 }
 
 export interface MinOutputAmounts {
@@ -42,7 +42,7 @@ export class RuleUniswapPSPRebalance extends Rule {
     const newUpperTick = await this.calculateNewUpperTick();
     const newLowerTick = await this.calculateNewLowerTick();
     const minOutputAmounts = await this.calculateMinOOutAndMin1Out();
-
+    console.log('minOutputAmounts', minOutputAmounts);
     const tx: OutboundTransaction = {
       urgencyLevel: this.params.urgencyLevel,
       context: 'UniswapPSPRebalance',
@@ -53,12 +53,13 @@ export class RuleUniswapPSPRebalance extends Rule {
           minOutputAmounts.minOut0Amount,
           minOutputAmounts.minOut1Amount,
       ),
-      lowLevelUnsignedTransaction: await this.uniswapStrategy.createRebalanceTransaction(
-          newUpperTick,
-          newLowerTick,
-          minOutputAmounts.minOut0Amount,
-          minOutputAmounts.minOut1Amount,
-      ),
+      lowLevelUnsignedTransaction:
+        await this.uniswapStrategy.createRebalanceTransaction(
+            newUpperTick,
+            newLowerTick,
+            minOutputAmounts.minOut0Amount,
+            minOutputAmounts.minOut1Amount,
+        ),
       ttlSeconds: this.params.ttlSeconds,
     };
 
@@ -118,13 +119,23 @@ export class RuleUniswapPSPRebalance extends Rule {
   private async calculateMinOOutAndMin1Out(): Promise<MinOutputAmounts> {
     const position = await this.uniswapStrategy.getPosition();
     const params = this.params as RuleParamsUniswapPSPRebalance;
-    const minOut0Amount =
-      position.amount0 -
-      (position.amount0 * params.slippagePercentage) / BigInt(10000);
-    const minOut1Amount =
-      position.amount1 -
-      (position.amount1 * params.slippagePercentage) / BigInt(10000);
+    let minOut0Amount;
+    let minOut1Amount;
+    const slippagePercentage = BigInt(params.slippagePercentage);
 
+    try {
+      minOut0Amount =
+        position.amount0 -
+        (position.amount0 * slippagePercentage) / BigInt(10000);
+      minOut1Amount =
+        position.amount1 -
+        (position.amount1 * slippagePercentage) / BigInt(10000);
+    } catch (error) {
+      this.logger.error(
+          `Error in calculating minOut0Amount and minOut1Amount: ${error}`,
+      );
+      throw error;
+    }
     return {minOut0Amount, minOut1Amount};
   }
 }

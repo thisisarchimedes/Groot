@@ -1,10 +1,9 @@
 import {BlockchainNode} from '../../blockchain/blockchain_nodes/BlockchainNode';
-import {BlockchainNodeLocal} from '../../blockchain/blockchain_nodes/BlockchainNodeLocal';
 import {ModulesParams} from '../../types/ModulesParams';
 import {Logger} from '../logger/Logger';
 
 export class BlockchainNodeHealthMonitor {
-  private readonly nodes: BlockchainNodeLocal[] = [];
+  private readonly nodes: BlockchainNode[] = [];
   private readonly logger: Logger;
 
   constructor(modulesParams: ModulesParams) {
@@ -23,7 +22,9 @@ export class BlockchainNodeHealthMonitor {
 
     if (this.allNodesFailedToRecover(failedRecoveries, unhealthyNodes)) {
       this.logAllNodesDownError();
-      throw new ErrorBlockchainNodeHealthMonitor('Blockchain Nodes Health Monitor: Nodes are down, none recovered');
+      throw new ErrorBlockchainNodeHealthMonitor(
+          'Blockchain Nodes Health Monitor: Nodes are down, none recovered',
+      );
     }
   }
 
@@ -31,7 +32,9 @@ export class BlockchainNodeHealthMonitor {
     return this.nodes.filter((node) => !node.isHealthy());
   }
 
-  private recoverNodesInParallel(unhealthyNodes: BlockchainNode[]): Promise<PromiseSettledResult<boolean>[]> {
+  private recoverNodesInParallel(
+      unhealthyNodes: BlockchainNode[],
+  ): Promise<PromiseSettledResult<boolean>[]> {
     return Promise.allSettled(
         unhealthyNodes.map((node) => {
           this.logAttemptingNodeRecovery(node);
@@ -41,10 +44,14 @@ export class BlockchainNodeHealthMonitor {
   }
 
   private logAttemptingNodeRecovery(node: BlockchainNode): void {
-    this.logger.warn(`Node ${node.getNodeName()} is unhealthy. Attempting to recover it...`);
+    this.logger.warn(
+        `Node ${node.getNodeName()} is unhealthy. Attempting to recover it...`,
+    );
   }
 
-  private async recoverNodeWithErrorHandling(node: BlockchainNode): Promise<boolean> {
+  private async recoverNodeWithErrorHandling(
+      node: BlockchainNode,
+  ): Promise<boolean> {
     try {
       await node.recoverNode();
       this.logNodeRecoverySuccess(node);
@@ -55,8 +62,12 @@ export class BlockchainNodeHealthMonitor {
     }
   }
 
-  private getFailedRecoveries(recoveryResults: PromiseSettledResult<boolean>[]): PromiseSettledResult<boolean>[] {
-    return recoveryResults.filter((result) => result.status === 'rejected' || result.value === false);
+  private getFailedRecoveries(
+      recoveryResults: PromiseSettledResult<boolean>[],
+  ): PromiseSettledResult<boolean>[] {
+    return recoveryResults.filter(
+        (result) => result.status === 'rejected' || result.value === false,
+    );
   }
 
   private allNodesFailedToRecover(
@@ -71,11 +82,15 @@ export class BlockchainNodeHealthMonitor {
   }
 
   private logNodeRecoveryFailure(node: BlockchainNode, error: unknown): void {
-    this.logger.error(`Blockchain Nodes Health Monitor failed to recover node ${node.getNodeName()}: ${error}`);
+    this.logger.error(
+        `Blockchain Nodes Health Monitor failed to recover node ${node.getNodeName()}: ${error}`,
+    );
   }
 
   private logAllNodesDownError(): void {
-    this.logger.error('Blockchain Nodes Monitor: All nodes are down and failed to recover');
+    this.logger.error(
+        'Blockchain Nodes Monitor: All nodes are down and failed to recover',
+    );
   }
 }
 

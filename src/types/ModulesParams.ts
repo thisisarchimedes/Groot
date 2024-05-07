@@ -1,4 +1,4 @@
-import {BlockchainNodeLocal} from '../blockchain/blockchain_nodes/BlockchainNodeLocal';
+import {BlockchainNode} from '../blockchain/blockchain_nodes/BlockchainNode';
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
 import {RuleEngine} from '../rule_engine/RuleEngine';
 import {AbiRepo} from '../rule_engine/tool/abi_repository/AbiRepo';
@@ -15,11 +15,11 @@ import {Logger} from '../service/logger/Logger';
 import {TransactionQueuer} from '../tx_queue/TransactionQueuer';
 
 export interface ModulesParams {
-  configService?: ConfigServiceAWS,
-  logger?: Logger,
-  dbService?: DBService,
-  mainNode?: BlockchainNodeLocal;
-  altNode?: BlockchainNodeLocal;
+  configService?: ConfigServiceAWS;
+  logger?: Logger;
+  dbService?: DBService;
+  mainNode?: BlockchainNode;
+  altNode?: BlockchainNode;
   signalHeartbeat?: ISignalHeartbeat;
   hostnameProvider?: HostNameProvider;
   signalCriticalFailure?: ISignalCriticalFailure;

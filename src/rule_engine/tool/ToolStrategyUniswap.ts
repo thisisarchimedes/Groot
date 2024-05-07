@@ -1,4 +1,5 @@
 import UNISWAPV3_STRATEGY_ABI from '../../constants/abis/UNISWAPV3_STRATEGY_ABI.json';
+import UNISWAPV3_POOL_ABI from '../../constants/abis/UNISWAPV3_POOL_ABI.json';
 import {Contract} from 'ethers';
 import {RawTransactionData} from '../../blockchain/OutboundTransaction';
 import {IBlockchainReader} from '../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
@@ -10,11 +11,13 @@ export interface UniswapStrategyPosition {
 export class ToolStrategyUniswap {
   private readonly strategyAddress: string;
   private readonly uniswapV3StrategyABI: string;
+  private readonly uniV3PoolABI: string;
   private readonly blockchainReader: IBlockchainReader;
 
   constructor(strategyAddress: string, blockchainReader: IBlockchainReader) {
     this.strategyAddress = strategyAddress;
     this.uniswapV3StrategyABI = JSON.stringify(UNISWAPV3_STRATEGY_ABI);
+    this.uniV3PoolABI = JSON.stringify(UNISWAPV3_POOL_ABI);
     this.blockchainReader = blockchainReader;
   }
 
@@ -24,7 +27,7 @@ export class ToolStrategyUniswap {
         this.uniswapV3StrategyABI,
         'pool',
     );
-    return ret as string;
+    return String(ret);
   }
   public async upperTick(): Promise<number> {
     const ret = await this.blockchainReader.callViewFunction(
@@ -32,7 +35,7 @@ export class ToolStrategyUniswap {
         this.uniswapV3StrategyABI,
         'upperTick',
     );
-    return ret as number;
+    return Number(ret);
   }
   public async lowerTick(): Promise<number> {
     const ret = await this.blockchainReader.callViewFunction(
@@ -40,7 +43,7 @@ export class ToolStrategyUniswap {
         this.uniswapV3StrategyABI,
         'lowerTick',
     );
-    return ret as number;
+    return Number(ret);
   }
   public async currentTick(): Promise<number> {
     const ret = await this.blockchainReader.callViewFunction(
@@ -48,16 +51,17 @@ export class ToolStrategyUniswap {
         this.uniswapV3StrategyABI,
         'currentTick',
     );
-    return ret as number;
+
+    return Number(ret);
   }
   public async tickSpacing(): Promise<number> {
     const poolAddress = await this.getPoolAddress();
     const ret = await this.blockchainReader.callViewFunction(
         poolAddress,
-        this.uniswapV3StrategyABI,
+        this.uniV3PoolABI,
         'tickSpacing',
     );
-    return ret as number;
+    return Number(ret);
   }
   public async getPosition(): Promise<UniswapStrategyPosition> {
     const ret = (await this.blockchainReader.callViewFunction(

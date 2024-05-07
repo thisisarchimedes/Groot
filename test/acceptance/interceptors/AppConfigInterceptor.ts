@@ -4,11 +4,14 @@ import {RuleJSONConfigItem} from '../../../src/rule_engine/TypesRule';
 import {namespace} from '../../../src/constants/constants';
 
 export class AppConfigInterceptor extends Interceptor {
-  private readonly awsAppConfigBaseUrl = 'https://appconfig.us-east-1.amazonaws.com';
+  private readonly awsAppConfigBaseUrl =
+    'https://appconfig.us-east-1.amazonaws.com';
   private readonly applicationId = 'DemoApp';
   private readonly environmentId = 'env';
 
-  public setupGrootRulesNock(grootRulesProfile: RuleJSONConfigItem[] = []): void {
+  public setupGrootRulesNock(
+      grootRulesProfile: RuleJSONConfigItem[] = [],
+  ): void {
     const headers = {
       'x-amz-user-agent': /.+/,
       'user-agent': /.+/,
