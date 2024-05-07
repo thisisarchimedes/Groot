@@ -145,54 +145,59 @@ describe('Uniswap PSP Rule Acceptance', function() {
     });
   }
   function setInterceptVariables(): void {
-    ethNodeMainInterceptor.setEthCallResponse(
-        'currentTick',
-        '0x000000000000000000000000000000000000000000000000000000000003f9c8',
-    );
-    ethNodeAltInterceptor.setEthCallResponse(
-        'currentTick',
-        '0x000000000000000000000000000000000000000000000000000000000003f9c8',
-    );
-    ethNodeMainInterceptor.setEthCallResponse(
-        'upperTick',
-        '0x0000000000000000000000000000000000000000000000000000000000042978',
-    );
-    ethNodeAltInterceptor.setEthCallResponse(
-        'upperTick',
-        '0x0000000000000000000000000000000000000000000000000000000000042978',
-    );
+    if (
+      ethNodeMainInterceptor !== undefined &&
+      ethNodeAltInterceptor !== undefined
+    ) {
+      ethNodeMainInterceptor.setEthCallResponse(
+          'currentTick',
+          '0x000000000000000000000000000000000000000000000000000000000003f9c8',
+      );
+      ethNodeAltInterceptor.setEthCallResponse(
+          'currentTick',
+          '0x000000000000000000000000000000000000000000000000000000000003f9c8',
+      );
+      ethNodeMainInterceptor.setEthCallResponse(
+          'upperTick',
+          '0x0000000000000000000000000000000000000000000000000000000000042978',
+      );
+      ethNodeAltInterceptor.setEthCallResponse(
+          'upperTick',
+          '0x0000000000000000000000000000000000000000000000000000000000042978',
+      );
 
-    ethNodeMainInterceptor.setEthCallResponse(
-        'lowerTick',
-        '0x000000000000000000000000000000000000000000000000000000000003c3fc',
-    );
-    ethNodeAltInterceptor.setEthCallResponse(
-        'lowerTick',
-        '0x000000000000000000000000000000000000000000000000000000000003c3fc',
-    );
-    ethNodeMainInterceptor.setEthCallResponse(
-        'pool',
-        '0x000000000000000000000000cbcdf9626bc03e24f779434178a73a0b4bad62ed',
-    );
-    ethNodeAltInterceptor.setEthCallResponse(
-        'pool',
-        '0x000000000000000000000000cbcdf9626bc03e24f779434178a73a0b4bad62ed',
-    );
-    ethNodeAltInterceptor.setEthCallResponse(
-        'tickSpacing',
-        '0x000000000000000000000000000000000000000000000000000000000000003c',
-    );
-    ethNodeMainInterceptor.setEthCallResponse(
-        'tickSpacing',
-        '0x000000000000000000000000000000000000000000000000000000000000003c',
-    );
-    ethNodeMainInterceptor.setEthCallResponse(
-        'getPosition',
-        '0x00000000000000000000000000000000000000000000000000000002380db72d000000000000000000000000000000000000000000000000000000000000256b0000000000000000000000000000000000000000000000000007a8c3e17358e4',
-    );
-    ethNodeAltInterceptor.setEthCallResponse(
-        'getPosition',
-        '0x00000000000000000000000000000000000000000000000000000002380db72d000000000000000000000000000000000000000000000000000000000000256b0000000000000000000000000000000000000000000000000007a8c3e17358e4',
-    );
+      ethNodeMainInterceptor.setEthCallResponse(
+          'lowerTick',
+          '0x000000000000000000000000000000000000000000000000000000000003c3fc',
+      );
+      ethNodeAltInterceptor.setEthCallResponse(
+          'lowerTick',
+          '0x000000000000000000000000000000000000000000000000000000000003c3fc',
+      );
+      ethNodeMainInterceptor.setEthCallResponse(
+          'pool',
+          '0x000000000000000000000000cbcdf9626bc03e24f779434178a73a0b4bad62ed',
+      );
+      ethNodeAltInterceptor.setEthCallResponse(
+          'pool',
+          '0x000000000000000000000000cbcdf9626bc03e24f779434178a73a0b4bad62ed',
+      );
+      ethNodeAltInterceptor.setEthCallResponse(
+          'tickSpacing',
+          '0x000000000000000000000000000000000000000000000000000000000000003c',
+      );
+      ethNodeMainInterceptor.setEthCallResponse(
+          'tickSpacing',
+          '0x000000000000000000000000000000000000000000000000000000000000003c',
+      );
+      ethNodeMainInterceptor.setEthCallResponse(
+          'getPosition',
+          '0x00000000000000000000000000000000000000000000000000000002380db72d000000000000000000000000000000000000000000000000000000000000256b0000000000000000000000000000000000000000000000000007a8c3e17358e4',
+      );
+      ethNodeAltInterceptor.setEthCallResponse(
+          'getPosition',
+          '0x00000000000000000000000000000000000000000000000000000002380db72d000000000000000000000000000000000000000000000000000000000000256b0000000000000000000000000000000000000000000000000007a8c3e17358e4',
+      );
+    }
   }
 });
