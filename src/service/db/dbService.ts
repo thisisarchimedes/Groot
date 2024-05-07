@@ -52,6 +52,7 @@ export default class DBService {
 export class LoggedClient extends Client {
   constructor(config: ClientConfig, private logger: Logger) {
     super(config);
+    this.logger.debug(`Connecting to database: ${config.connectionString}`);
   }
 
   public async connect() {
