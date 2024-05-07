@@ -16,7 +16,7 @@
 
 [doc/TxLogic.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/TxLogic.md)
 
-# Troubleshooting
+## Troubleshooting
 
 ### Looks like our local nodes block number is ahead of the real network
 You might be using our EC2 nodes as RPC url. These nodes auto generate 2 blocks per seconds
