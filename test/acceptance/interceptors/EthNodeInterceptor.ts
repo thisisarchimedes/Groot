@@ -4,6 +4,7 @@ import {Interceptor} from './Interceptor';
 export class EthNodeInterceptor extends Interceptor {
   private readonly mockRpcUrl: string;
   private blockNumber: number = 0; // Property to store the block number
+  private ethCallResponse: any = null; // Property to store the response of the eth_call method
 
   constructor(mockRpcUrl: string) {
     super();
@@ -13,6 +14,7 @@ export class EthNodeInterceptor extends Interceptor {
   public setMockBlockNumber(blockNumber: number): void {
     this.blockNumber = blockNumber;
   }
+  public setEthCallResponse(response: any): void {}
 
   public interceptCalls(): void {
     nock(this.mockRpcUrl)
@@ -21,7 +23,9 @@ export class EthNodeInterceptor extends Interceptor {
           return true;
         })
         .reply(200, (uri, requestBody) => {
-          const requests = Array.isArray(requestBody) ? requestBody : [requestBody];
+          const requests = Array.isArray(requestBody) ?
+          requestBody :
+          [requestBody];
 
           const responses = requests.map((request) => {
             if (request.method === 'eth_chainId') {
@@ -30,7 +34,11 @@ export class EthNodeInterceptor extends Interceptor {
               if (!this.blockNumber) {
                 this.blockNumber = 100;
               }
-              return {jsonrpc: '2.0', id: request.id, result: `0x${this.blockNumber.toString(16)}`};
+              return {
+                jsonrpc: '2.0',
+                id: request.id,
+                result: `0x${this.blockNumber.toString(16)}`,
+              };
             }
           // add other methods handlers here
           });

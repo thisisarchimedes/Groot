@@ -4,11 +4,14 @@ import {RuleJSONConfigItem} from '../../../src/rule_engine/TypesRule';
 import {namespace} from '../../../src/constants/constants';
 
 export class AppConfigInterceptor extends Interceptor {
-  private readonly awsAppConfigBaseUrl = 'https://appconfig.us-east-1.amazonaws.com';
+  private readonly awsAppConfigBaseUrl =
+    'https://appconfig.us-east-1.amazonaws.com';
   private readonly applicationId = 'DemoApp';
   private readonly environmentId = 'env';
 
-  public setupGrootRulesNock(grootRulesProfile: RuleJSONConfigItem[] = []): void {
+  public setupGrootRulesNock(
+      grootRulesProfile: RuleJSONConfigItem[] = [],
+  ): void {
     const headers = {
       'x-amz-user-agent': /.+/,
       'user-agent': /.+/,
@@ -25,6 +28,11 @@ export class AppConfigInterceptor extends Interceptor {
     };
 
     const url = `/applications/${this.applicationId}/environments/${this.environmentId}/configurations/GrootRules`;
+    for (const rule of grootRulesProfile) {
+      if (rule.params.slippagePercentage) {
+        rule.params.slippagePercentage = Number(rule.params.slippagePercentage);
+      }
+    }
 
     nock(this.awsAppConfigBaseUrl, options)
         .persist()
