@@ -53,13 +53,13 @@ jobs:
 
       - name: Run Node Container
         run: |
-          ./scripts/container_reader_node/run_nodes_containers_locally.sh
-
-      - name: Run Tests (Acceptance)
-        run: |
-          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:acceptance
+          docker run -e HARDHAT_PORT=8545 -e ALCHEMY_API_KEY=${{ secrets.ALCHEMY_API_KEY }} -d --rm --name main-eth-node -p 8545:8545 arch-production-node:latest
+          docker run -e HARDHAT_PORT=18545 -e ALCHEMY_API_KEY=${{ secrets.ALCHEMY_API_KEY }} -d --rm --name alt-eth-node -p 18545:18545 arch-production-node:latest
 
       - name: Run Tests (Interface)
         run: |
           AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:interface
   
+      - name: Run Tests (Acceptance)
+        run: |
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} AWS_REGION=${{ vars.AWS_REGION }} DOTENV_KEY='${{ secrets.DOTENV_KEY }}' dotenvx run -- yarn test:acceptance
