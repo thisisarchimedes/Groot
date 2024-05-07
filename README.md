@@ -7,11 +7,6 @@
   - **Observability**: [Pixie](https://github.com/thisisarchimedes/Groot/blob/main/doc/K8sObservability.md)
 - **NewRelic**: [Raw logs](https://onenr.io/0Bj3XDql2QX)
 
-
-## Dependency injection design pattern (inversify.js)
-
-[doc/DependencyInjection.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/DependencyInjection.md)
-
 ## Supported Rules
 
 [doc/RulesLogic.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/RulesLogic.md)
@@ -21,3 +16,7 @@
 
 [doc/TxLogic.md](https://github.com/thisisarchimedes/Groot/blob/main/doc/TxLogic.md)
 
+# Troubleshooting
+
+## Looks like our local nodes block number is ahead of the real network
+You might be using our EC2 nodes as RPC url. These nodes auto generate 2 blocks per seconds
