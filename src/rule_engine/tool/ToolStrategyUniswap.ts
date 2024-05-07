@@ -27,7 +27,7 @@ export class ToolStrategyUniswap {
         this.uniswapV3StrategyABI,
         'pool',
     );
-    return ret as string; // TODO: FIXME
+    return String(ret);
   }
   public async upperTick(): Promise<number> {
     const ret = await this.blockchainReader.callViewFunction(
@@ -51,6 +51,7 @@ export class ToolStrategyUniswap {
         this.uniswapV3StrategyABI,
         'currentTick',
     );
+
     return Number(ret);
   }
   public async tickSpacing(): Promise<number> {

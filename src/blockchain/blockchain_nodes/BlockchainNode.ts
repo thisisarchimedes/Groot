@@ -2,7 +2,6 @@ import {ethers, Contract, Block} from 'ethers';
 import {Logger} from '../../service/logger/Logger';
 import {BlockchainNodeProxyInfo} from './BlockchainNodeProxyInfo';
 
-
 export class BlockchainNodeError extends Error {
   constructor(message: string) {
     super(message);
@@ -35,10 +34,14 @@ export abstract class BlockchainNode {
       return blockNumber;
     } catch (error) {
       if (error instanceof Error) {
-        this.logger.info(`${this.nodeName} cannot get block number: ${error.message}`);
+        this.logger.info(
+            `${this.nodeName} cannot get block number: ${error.message}`,
+        );
       }
       this.isNodeHealthy = false;
-      throw new BlockchainNodeError(error instanceof Error ? error.message : 'Unknown error');
+      throw new BlockchainNodeError(
+        error instanceof Error ? error.message : 'Unknown error',
+      );
     }
   }
 
@@ -52,10 +55,14 @@ export abstract class BlockchainNode {
       return block;
     } catch (error) {
       if (error instanceof Error) {
-        this.logger.info(`${this.nodeName} cannot get block number: ${error.message}`);
+        this.logger.info(
+            `${this.nodeName} cannot get block number: ${error.message}`,
+        );
       }
       this.isNodeHealthy = false;
-      throw new BlockchainNodeError(error instanceof Error ? error.message : 'Unknown error');
+      throw new BlockchainNodeError(
+        error instanceof Error ? error.message : 'Unknown error',
+      );
     }
   }
 
@@ -65,7 +72,11 @@ export abstract class BlockchainNode {
       functionName: string,
       params: unknown[] = [],
   ): Promise<unknown> {
-    const contract = new Contract(contractAddress, JSON.parse(abi), this.provider);
+    const contract = new Contract(
+        contractAddress,
+        JSON.parse(abi),
+        this.provider,
+    );
 
     try {
       const data = await contract[functionName](...params);
@@ -73,11 +84,15 @@ export abstract class BlockchainNode {
       return data;
     } catch (error) {
       if (error instanceof Error) {
-        this.logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error.message}`);
+        this.logger.warn(
+            `${this.nodeName} Cannot call view function ${functionName}: ${error.message}`,
+        );
         this.isNodeHealthy = false;
         throw new BlockchainNodeError(error.message);
       } else {
-        this.logger.info(`${this.nodeName} Cannot call view function ${functionName}: ${error}`);
+        this.logger.warn(
+            `${this.nodeName} Cannot call view function ${functionName}: ${error}`,
+        );
         this.isNodeHealthy = false;
         throw new BlockchainNodeError('Unknown error');
       }
@@ -97,24 +112,38 @@ export abstract class BlockchainNode {
     return this.nodeName;
   }
 
-  public async getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo> {
+  public async getProxyInfoForAddress(
+      proxyAddress: string,
+  ): Promise<BlockchainNodeProxyInfo> {
     const [eip1967Result, openzeppelinResult] = await Promise.all([
       this.getStorageAt(proxyAddress, ProxyStoragePosition.EIP1967),
       this.getStorageAt(proxyAddress, ProxyStoragePosition.OpenZeppelin),
     ]);
 
-    if (this.isInvalidImplementationAddress(eip1967Result) && this.isInvalidImplementationAddress(openzeppelinResult)) {
+    if (
+      this.isInvalidImplementationAddress(eip1967Result) &&
+      this.isInvalidImplementationAddress(openzeppelinResult)
+    ) {
       return BlockchainNodeProxyInfo.notProxy();
     } else if (this.isInvalidImplementationAddress(eip1967Result)) {
-      return BlockchainNodeProxyInfo.proxy(this.removeLeadingZeros(openzeppelinResult));
+      return BlockchainNodeProxyInfo.proxy(
+          this.removeLeadingZeros(openzeppelinResult),
+      );
     } else if (this.isInvalidImplementationAddress(openzeppelinResult)) {
-      return BlockchainNodeProxyInfo.proxy(this.removeLeadingZeros(eip1967Result));
+      return BlockchainNodeProxyInfo.proxy(
+          this.removeLeadingZeros(eip1967Result),
+      );
     } else {
-      return BlockchainNodeProxyInfo.proxy(this.removeLeadingZeros(eip1967Result));
+      return BlockchainNodeProxyInfo.proxy(
+          this.removeLeadingZeros(eip1967Result),
+      );
     }
   }
 
-  private async getStorageAt(address: string, position: string): Promise<string> {
+  private async getStorageAt(
+      address: string,
+      position: string,
+  ): Promise<string> {
     return await this.provider.getStorage(address, position);
   }
 
@@ -136,5 +165,5 @@ export abstract class BlockchainNode {
 enum ProxyStoragePosition {
   OpenZeppelin = '0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3',
   EIP1967 = '0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc',
-  InvalidImplementationAddress = '0x0000000000000000000000000000000000000000000000000000000000000000'
+  InvalidImplementationAddress = '0x0000000000000000000000000000000000000000000000000000000000000000',
 }

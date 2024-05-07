@@ -53,6 +53,8 @@ describe('Uniswap PSP Rule Acceptance', function() {
     ethNodeAltInterceptor = new EthNodeInterceptor('http://localhost:18545');
     ethNodeAltInterceptor.interceptCalls();
 
+    setInterceptVariables();
+
     const mockRules: RuleJSONConfigItem[] = [
       createUniswapRule(150, 50),
       createUniswapRule(50, 125),
@@ -123,8 +125,8 @@ describe('Uniswap PSP Rule Acceptance', function() {
       lowerTriggerThresholdPercentage: 130,
       upperTargetTickPercentage,
       lowerTargetTickPercentage,
-      strategyAddress: '0x1234',
-      slippagePercentage: BigInt(50),
+      strategyAddress: '0x69209d1bF6A6612d34D03D16a332154A3131212a',
+      slippagePercentage: 50,
       ttlSeconds: 300,
       executor: Executor.LEVERAGE,
       urgencyLevel: UrgencyLevel.LOW,
@@ -141,5 +143,56 @@ describe('Uniswap PSP Rule Acceptance', function() {
         resolve();
       }, 1000);
     });
+  }
+  function setInterceptVariables(): void {
+    ethNodeMainInterceptor.setEthCallResponse(
+        'currentTick',
+        '0x000000000000000000000000000000000000000000000000000000000003f9c8',
+    );
+    ethNodeAltInterceptor.setEthCallResponse(
+        'currentTick',
+        '0x000000000000000000000000000000000000000000000000000000000003f9c8',
+    );
+    ethNodeMainInterceptor.setEthCallResponse(
+        'upperTick',
+        '0x0000000000000000000000000000000000000000000000000000000000042978',
+    );
+    ethNodeAltInterceptor.setEthCallResponse(
+        'upperTick',
+        '0x0000000000000000000000000000000000000000000000000000000000042978',
+    );
+
+    ethNodeMainInterceptor.setEthCallResponse(
+        'lowerTick',
+        '0x000000000000000000000000000000000000000000000000000000000003c3fc',
+    );
+    ethNodeAltInterceptor.setEthCallResponse(
+        'lowerTick',
+        '0x000000000000000000000000000000000000000000000000000000000003c3fc',
+    );
+    ethNodeMainInterceptor.setEthCallResponse(
+        'pool',
+        '0x000000000000000000000000cbcdf9626bc03e24f779434178a73a0b4bad62ed',
+    );
+    ethNodeAltInterceptor.setEthCallResponse(
+        'pool',
+        '0x000000000000000000000000cbcdf9626bc03e24f779434178a73a0b4bad62ed',
+    );
+    ethNodeAltInterceptor.setEthCallResponse(
+        'tickSpacing',
+        '0x000000000000000000000000000000000000000000000000000000000000003c',
+    );
+    ethNodeMainInterceptor.setEthCallResponse(
+        'tickSpacing',
+        '0x000000000000000000000000000000000000000000000000000000000000003c',
+    );
+    ethNodeMainInterceptor.setEthCallResponse(
+        'getPosition',
+        '0x00000000000000000000000000000000000000000000000000000002380db72d000000000000000000000000000000000000000000000000000000000000256b0000000000000000000000000000000000000000000000000007a8c3e17358e4',
+    );
+    ethNodeAltInterceptor.setEthCallResponse(
+        'getPosition',
+        '0x00000000000000000000000000000000000000000000000000000002380db72d000000000000000000000000000000000000000000000000000000000000256b0000000000000000000000000000000000000000000000000007a8c3e17358e4',
+    );
   }
 });

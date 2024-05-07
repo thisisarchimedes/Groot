@@ -2,7 +2,12 @@ import 'reflect-metadata';
 import {expect} from 'chai';
 import * as dotenv from 'dotenv';
 import {LoggerAdapter} from './adapters/LoggerAdapter';
-import {Executor, RuleJSONConfigItem, TypeRule, UrgencyLevel} from '../../src/rule_engine/TypesRule';
+import {
+  Executor,
+  RuleJSONConfigItem,
+  TypeRule,
+  UrgencyLevel,
+} from '../../src/rule_engine/TypesRule';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import {RuleParamsUniswapPSPRebalance} from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
@@ -32,12 +37,24 @@ describe('Rule Factory Testings: Uniswap', function() {
     modulesParams.logger = new LoggerAdapter();
 
     // Starting nodes
-    modulesParams.mainNode = new BlockchainNodeUniswapAdapter(modulesParams, 'localNodeAlchemy');
-    modulesParams.altNode = new BlockchainNodeUniswapAdapter(modulesParams, 'localNodeInfura');
-    await Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
+    modulesParams.mainNode = new BlockchainNodeUniswapAdapter(
+        modulesParams,
+        'localNodeAlchemy',
+    );
+    modulesParams.altNode = new BlockchainNodeUniswapAdapter(
+        modulesParams,
+        'localNodeInfura',
+    );
+    await Promise.all([
+      modulesParams.mainNode.startNode(),
+      modulesParams.altNode.startNode(),
+    ]);
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
-    modulesParams.dbService = new DBService(modulesParams.logger, modulesParams.configService);
+    modulesParams.dbService = new DBService(
+        modulesParams.logger,
+        modulesParams.configService,
+    );
     modulesParams.leverageDataSource = {
       leverageDataSourceDB: new LeverageDataSourceDB(modulesParams),
     };
@@ -72,14 +89,7 @@ describe('Rule Factory Testings: Uniswap', function() {
     const amount0 = parseUnits('10', 8);
     const amount1 = parseUnits('10', 18);
 
-    setupMockResponses(
-        100,
-        200,
-        currentTick,
-        tickSpacing,
-        amount0,
-        amount1,
-    );
+    setupMockResponses(100, 200, currentTick, tickSpacing, amount0, amount1);
     const uniswapRule = createUniswapRule(
         upperTargetTickPercentage,
         lowerTargetTickPercentage,
@@ -99,7 +109,8 @@ describe('Rule Factory Testings: Uniswap', function() {
     );
     await rule?.evaluate();
 
-    expect((modulesParams.logger as LoggerAdapter).isExpectedLogLineInfoFound()).to.be.true;
+    expect((modulesParams.logger as LoggerAdapter).isExpectedLogLineInfoFound())
+        .to.be.true;
   });
 
   it('should calculate new upper and lower tick correctly when we are too close to lower tick', async function() {
@@ -110,14 +121,7 @@ describe('Rule Factory Testings: Uniswap', function() {
     const amount0 = parseUnits('10', 8);
     const amount1 = parseUnits('10', 18);
 
-    setupMockResponses(
-        100,
-        200,
-        currentTick,
-        tickSpacing,
-        amount0,
-        amount1,
-    );
+    setupMockResponses(100, 200, currentTick, tickSpacing, amount0, amount1);
     const uniswapRule = createUniswapRule(
         upperTargetTickPercentage,
         lowerTargetTickPercentage,
@@ -137,7 +141,8 @@ describe('Rule Factory Testings: Uniswap', function() {
     );
     await rule?.evaluate();
 
-    expect((modulesParams.logger as LoggerAdapter).isExpectedLogLineInfoFound()).to.be.true;
+    expect((modulesParams.logger as LoggerAdapter).isExpectedLogLineInfoFound())
+        .to.be.true;
   });
 
   it('should generate tx to update ticks', async function() {
@@ -148,14 +153,7 @@ describe('Rule Factory Testings: Uniswap', function() {
     const amount0 = parseUnits('10', 8);
     const amount1 = parseUnits('10', 18);
 
-    setupMockResponses(
-        100,
-        200,
-        currentTick,
-        tickSpacing,
-        amount0,
-        amount1,
-    );
+    setupMockResponses(100, 200, currentTick, tickSpacing, amount0, amount1);
     const uniswapRule = createUniswapRule(
         upperTargetTickPercentage,
         lowerTargetTickPercentage,
@@ -209,7 +207,7 @@ describe('Rule Factory Testings: Uniswap', function() {
       upperTargetTickPercentage,
       lowerTargetTickPercentage,
       strategyAddress: '0x1234',
-      slippagePercentage: BigInt(50),
+      slippagePercentage: 50,
       ttlSeconds: 300,
       executor: Executor.LEVERAGE,
       urgencyLevel: UrgencyLevel.LOW,
@@ -229,15 +227,21 @@ describe('Rule Factory Testings: Uniswap', function() {
       amount0 = BigInt(0),
       amount1 = BigInt(0),
   ) {
-    (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setLowerTickResponse(lowerTick);
-    (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setUpperTickResponse(upperTick);
-    (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setCurrentTickResponse(currentTick);
-    (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setTickSpacingResponse(tickSpacing);
-    (modulesParams.mainNode as BlockchainNodeUniswapAdapter).setCurrentPositionResponse(
-        BigInt(0),
-        amount0,
-        amount1,
-    );
+    (
+      modulesParams.mainNode as BlockchainNodeUniswapAdapter
+    ).setLowerTickResponse(lowerTick);
+    (
+      modulesParams.mainNode as BlockchainNodeUniswapAdapter
+    ).setUpperTickResponse(upperTick);
+    (
+      modulesParams.mainNode as BlockchainNodeUniswapAdapter
+    ).setCurrentTickResponse(currentTick);
+    (
+      modulesParams.mainNode as BlockchainNodeUniswapAdapter
+    ).setTickSpacingResponse(tickSpacing);
+    (
+      modulesParams.mainNode as BlockchainNodeUniswapAdapter
+    ).setCurrentPositionResponse(BigInt(0), amount0, amount1);
   }
 
   function calculateNewTick(
