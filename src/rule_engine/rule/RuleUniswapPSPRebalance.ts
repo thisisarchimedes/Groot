@@ -42,7 +42,6 @@ export class RuleUniswapPSPRebalance extends Rule {
     const newUpperTick = await this.calculateNewUpperTick();
     const newLowerTick = await this.calculateNewLowerTick();
     const minOutputAmounts = await this.calculateMinOOutAndMin1Out();
-    console.log('minOutputAmounts', minOutputAmounts);
     const tx: OutboundTransaction = {
       urgencyLevel: this.params.urgencyLevel,
       context: 'UniswapPSPRebalance',
