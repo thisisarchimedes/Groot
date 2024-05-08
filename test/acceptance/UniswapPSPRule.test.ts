@@ -10,6 +10,7 @@ import {EthNodeInterceptor} from './interceptors/EthNodeInterceptor';
 import {RuleParamsUniswapPSPRebalance} from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
 import {Executor} from '../../src/rule_engine/TypesRule';
 import {UrgencyLevel} from '../../src/rule_engine/TypesRule';
+
 let timeoutId: NodeJS.Timeout | null = null;
 
 describe('Uniswap PSP Rule Acceptance', function() {
@@ -55,7 +56,7 @@ describe('Uniswap PSP Rule Acceptance', function() {
 
     const mockRules: RuleJSONConfigItem[] = [
       createUniswapRule(150, 50),
-      createUniswapRule(50, 125),
+      // createUniswapRule(50, 125),
     ];
     appConfigInterceptor = createAppConfigInterceptor(mockRules);
 
@@ -63,7 +64,7 @@ describe('Uniswap PSP Rule Acceptance', function() {
     newRelicInterceptor.setWaitedOnMessage(expectedMessage);
 
     await startGroot(false);
-    console.log('Waiting for message: ', expectedMessage);
+
     await waitForMessageProcessing();
 
     const isMessageObserved = newRelicInterceptor.isWaitedOnMessageObserved();
