@@ -9,8 +9,8 @@ export interface UniswapStrategyPosition {
   amount1: bigint;
 }
 export interface RebalanceParams {
-  newUpperTick: bigint;
-  newLowerTick: bigint;
+  lowerTick: bigint;
+  upperTick: bigint;
   amount0OutMin: bigint;
   amount1OutMin: bigint;
 }
@@ -95,8 +95,8 @@ export class ToolStrategyUniswap {
         this.uniswapV3StrategyABI,
     );
     const rebalanceParams: RebalanceParams = {
-      newUpperTick: BigInt(newUpperTick),
-      newLowerTick: BigInt(newLowerTick),
+      upperTick: BigInt(newUpperTick),
+      lowerTick: BigInt(newLowerTick),
       amount0OutMin: amount0OutMin,
       amount1OutMin: amount1OutMin,
     };

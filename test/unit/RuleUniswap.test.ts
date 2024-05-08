@@ -179,16 +179,19 @@ describe('Rule Factory Testings: Uniswap', function() {
         lowerTargetTickPercentage,
         tickSpacing,
     );
-    const ABI = ['function rebalance(int24,int24,uint256,uint256)'];
+    const ABI = [
+      'function rebalance((int24 lowerTick,int24 upperTick,uint256 amount0OutMin,uint256 amount1OutMin))',
+    ];
     const iFace = new ethers.Interface(ABI);
     const amountOut0Min = amount0 - (amount0 * BigInt(50)) / BigInt(10000);
     const amountOut1Min = amount1 - (amount1 * BigInt(50)) / BigInt(10000);
-    const data = iFace.encodeFunctionData('rebalance', [
-      lowerTick,
-      upperTick,
-      amountOut0Min,
-      amountOut1Min,
-    ]);
+    const rebalanceParams = {
+      upperTick: BigInt(upperTick),
+      lowerTick: BigInt(lowerTick),
+      amount0OutMin: amountOut0Min,
+      amount1OutMin: amountOut1Min,
+    };
+    const data = iFace.encodeFunctionData('rebalance', [rebalanceParams]);
 
     expect(pendingTx.lowLevelUnsignedTransaction.data === data).to.be.true;
   });
