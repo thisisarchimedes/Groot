@@ -61,6 +61,13 @@ export class RuleUniswapPSPRebalance extends Rule {
       ttlSeconds: this.params.ttlSeconds,
     };
 
+    this.logger.info(`Rebalancing Uniswap PSP strategy ${this.strategyAddress} [
+      ${newUpperTick},
+      ${newLowerTick},
+      ${minOutputAmounts.minOut0Amount},
+      ${minOutputAmounts.minOut1Amount}
+    ]`);
+
     this.pushTransactionToRuleLocalQueue(tx);
   }
 
