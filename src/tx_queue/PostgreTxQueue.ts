@@ -50,30 +50,12 @@ class PostgreTxQueue implements ITxQueue {
       urgency: UrgencyLevel,
       ttlSeconds: number,
   ): Promise<void> {
-    try {
-      await this.dbService.getTransactionsClient().query('BEGIN');
-      const queryConfig: QueryConfig = {
-        text: 'CALL insert_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9)',
-        values: [
-          to,
-          executor,
-          context,
-          txHash,
-          identifier,
-          value,
-          data,
-          urgency,
-          ttlSeconds,
-        ],
-      };
+    const queryConfig: QueryConfig = {
+      text: 'CALL insert_transaction($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+      values: [to, executor, context, txHash, identifier, value, data, urgency, ttlSeconds],
+    };
 
-      await this.dbService.getTransactionsClient().query(queryConfig);
-      await this.dbService.getTransactionsClient().query('COMMIT');
-    } catch (err) {
-      console.log('error in insertTransaction', err);
-      await this.dbService.getTransactionsClient().query('ROLLBACK');
-      throw err;
-    }
+    await this.dbService.getTransactionsClient().query(queryConfig);
   }
 }
 
