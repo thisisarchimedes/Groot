@@ -12,7 +12,13 @@ CONFIG_FILE_NAME=$1
 echo "Deploying with configmap $CONFIG_FILE_NAME [$EKS_REGION ; $AWS_ACCESS_KEY_ID ; $AWS_SECRET_ACCESS_KEY ; $ALCHEMY_API_KEY ; $NEW_RELIC_API_KEY]"
 
 # Update kubeconfig
-aws eks update-kubeconfig --name groot-demo-app --region $EKS_REGION
+if [ "$CONFIG_FILE_NAME" == "configmap-demoapp.yaml" ]; then
+  echo "Deploy Demo App"
+  aws eks update-kubeconfig --name groot-demo-app --region $EKS_REGION
+elif [ "$CONFIG_FILE_NAME" == "configmap-stableapp.yaml" ]; then
+  echo "Deploy Stable App"
+  aws eks update-kubeconfig --name groot-stable-app --region $EKS_REGION
+fi
                     
 # Create the groot namespace if it doesn't exist
 kubectl apply -f scripts/k8s/eks/namespace.yaml --dry-run=client -o yaml | kubectl apply -f -

@@ -83,6 +83,7 @@ jobs:
 
       - name: Deploy to EKS (DemoApp)
         run: |
+          aws eks update-kubeconfig --name groot-demo-app --region ${{ vars.EKS_REGION }}
           ./scripts/k8s/eks/deploy_eks.sh configmap-demoapp.yaml
 
       - name: Wait for DemoApp deployment to complete
@@ -97,6 +98,7 @@ jobs:
     
       - name: Deploy to EKS (StableApp)
         run: |
+          aws eks update-kubeconfig --name groot-stable-app --region ${{ vars.EKS_REGION }}
           ./scripts/k8s/eks/deploy_eks.sh configmap-stableapp.yaml
           
       - name: List all commit SHAs involved in the push
