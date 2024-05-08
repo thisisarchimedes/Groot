@@ -8,6 +8,12 @@ export interface UniswapStrategyPosition {
   amount0: bigint;
   amount1: bigint;
 }
+export interface RebalanceParams {
+  newUpperTick: bigint;
+  newLowerTick: bigint;
+  amount0OutMin: bigint;
+  amount1OutMin: bigint;
+}
 export class ToolStrategyUniswap {
   private readonly strategyAddress: string;
   private readonly uniswapV3StrategyABI: string;
@@ -88,11 +94,14 @@ export class ToolStrategyUniswap {
         this.strategyAddress,
         this.uniswapV3StrategyABI,
     );
+    const rebalanceParams: RebalanceParams = {
+      newUpperTick: BigInt(newUpperTick),
+      newLowerTick: BigInt(newLowerTick),
+      amount0OutMin: amount0OutMin,
+      amount1OutMin: amount1OutMin,
+    };
     const tx = await strategyContract['rebalance'].populateTransaction(
-        newLowerTick,
-        newUpperTick,
-        amount0OutMin,
-        amount1OutMin,
+        rebalanceParams,
     );
     return {
       to: tx.to,
