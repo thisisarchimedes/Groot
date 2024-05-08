@@ -32,7 +32,7 @@ export class AbiFetcherEtherscan implements IAbiFetcher {
     if (response.data.status === '1') {
       return response.data.result;
     } else {
-      throw new Error(`Failed to fetch ABI: ${response.data.message}`);
+      throw new Error(`Failed to fetch ABI for address ${contractAddress}: ${response.data.message}`);
     }
   }
 }
