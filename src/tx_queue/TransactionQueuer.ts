@@ -24,7 +24,15 @@ export class TransactionQueuer {
         continue;
       }
       this.logger.info(`Queuing transaction: ${tx.context} [${tx.postEvalUniqueKey}]`);
-      await this.queue.addTransactionToQueue(tx);
+      try {
+        await this.queue.addTransactionToQueue(tx);
+      } catch (err: unknown) {
+        if ((err as Error).message.includes('already exists and is within TTL')) {
+          this.logger.info((err as Error).message);
+        } else {
+          this.logger.error((err as Error).message);
+        }
+      }
     }
   }
 
