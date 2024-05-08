@@ -111,7 +111,8 @@ export class RuleUniswapPSPRebalance extends Rule {
 
     return lowerTick;
   }
-  protected generateUniqueKey<T extends unknown[]>(..._args: T): string {
+
+  protected generateUniqueKey(): string {
     return `uniswap-psp-rebalance-${this.strategyAddress}`;
   }
   private async calculateMinOOutAndMin1Out(): Promise<MinOutputAmounts> {

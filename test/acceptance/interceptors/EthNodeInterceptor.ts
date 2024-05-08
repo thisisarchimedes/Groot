@@ -36,8 +36,8 @@ export class EthNodeInterceptor extends Interceptor {
           const requests = Array.isArray(requestBody) ?
           requestBody :
           [requestBody];
-
-          const responses = requests.map((request) => {
+          // eslint-disable-next-line
+        const responses = requests.map((request) => {
             if (request.method === 'eth_chainId') {
               return {jsonrpc: '2.0', id: request.id, result: '0x1'};
             } else if (request.method === 'eth_blockNumber') {
