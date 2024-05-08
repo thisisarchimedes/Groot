@@ -19,7 +19,7 @@ describe('Uniswap contract interface', function() {
   let toolStrategyUniswap: ToolStrategyUniswap;
 
   beforeEach(function() {
-    const apiKeyAlchemy = process.env.API_KEY_ALCHEMY;
+    const apiKeyAlchemy = process.env.ALCHEMY_API_KEY;
 
     alchemyRpc = new JsonRpcProvider(
         `https://eth-mainnet.alchemyapi.io/v2/${apiKeyAlchemy}`,
@@ -34,7 +34,7 @@ describe('Uniswap contract interface', function() {
     );
     const altNode = new BlockchainNodeRemoteRPC(
         new LoggerConsole(),
-        `https://mainnet.infura.io/v3/${process.env.API_KEY_INFURA}`,
+        `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
         'infuraNode',
     );
     uniswapStrategy = new Contract(

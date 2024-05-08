@@ -193,6 +193,51 @@ describe('Rule Factory Testings: Uniswap', function() {
     expect(pendingTx.lowLevelUnsignedTransaction.data === data).to.be.true;
   });
 
+  it('should generate rebalance unique key properly based on strategy address', async function() {
+    const currentTick = 110;
+    const upperTargetTickPercentage = 150;
+    const lowerTargetTickPercentage = 50;
+    const tickSpacing = 15;
+    const amount0 = parseUnits('10', 8);
+    const amount1 = parseUnits('10', 18);
+
+    setupMockResponses(100, 200, currentTick, tickSpacing, amount0, amount1);
+    let uniswapRule = createUniswapRule(
+        upperTargetTickPercentage,
+        lowerTargetTickPercentage,
+    );
+
+    const ruleFactory = createRuleFactory();
+    const rule = ruleFactory.createRule(uniswapRule);
+
+    await rule?.evaluate();
+    expect(rule?.getPendingTransactionCount()).to.be.eq(1);
+
+    let pendingTx =
+      rule?.popTransactionFromRuleLocalQueue() as OutboundTransaction;
+
+    expect(pendingTx.postEvalUniqueKey).to.be.eq(
+        'uniswap-psp-rebalance-0x69209d1bF6A6612d34D03D16a332154A3131212a',
+    );
+    uniswapRule = createUniswapRule(
+        upperTargetTickPercentage,
+        lowerTargetTickPercentage,
+        '0x69209d1bF6A6612d34D03D16a332154A3131213a',
+    );
+
+    const ruleFactoryTwo = createRuleFactory();
+    const ruleTwo = ruleFactoryTwo.createRule(uniswapRule);
+
+    await ruleTwo?.evaluate();
+    expect(ruleTwo?.getPendingTransactionCount()).to.be.eq(1);
+
+    pendingTx =
+      ruleTwo?.popTransactionFromRuleLocalQueue() as OutboundTransaction;
+    expect(pendingTx.postEvalUniqueKey).to.be.eq(
+        'uniswap-psp-rebalance-0x69209d1bF6A6612d34D03D16a332154A3131213a',
+    );
+  });
+
   function createRuleFactory(): FactoryRule {
     return new FactoryRule(modulesParams);
   }
@@ -200,13 +245,14 @@ describe('Rule Factory Testings: Uniswap', function() {
   function createUniswapRule(
       upperTargetTickPercentage = 150,
       lowerTargetTickPercentage = 50,
+      strategyAddress = '0x69209d1bF6A6612d34D03D16a332154A3131212a',
   ): RuleJSONConfigItem {
     const params: RuleParamsUniswapPSPRebalance = {
       upperTriggerThresholdPercentage: 70,
       lowerTriggerThresholdPercentage: 130,
       upperTargetTickPercentage,
       lowerTargetTickPercentage,
-      strategyAddress: '0x1234',
+      strategyAddress: strategyAddress,
       slippagePercentage: 50,
       ttlSeconds: 300,
       executor: Executor.LEVERAGE,

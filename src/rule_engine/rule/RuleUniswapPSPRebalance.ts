@@ -21,12 +21,16 @@ export interface MinOutputAmounts {
 
 export class RuleUniswapPSPRebalance extends Rule {
   private uniswapStrategy: ToolStrategyUniswap;
+  private strategyAddress: string;
   constructor(input: RuleConstructorInput) {
     super(input);
     this.uniswapStrategy = new ToolStrategyUniswap(
         (input.params as RuleParamsUniswapPSPRebalance).strategyAddress,
         input.blockchainReader,
     );
+    this.strategyAddress = (
+      input.params as RuleParamsUniswapPSPRebalance
+    ).strategyAddress;
   }
   public async evaluate(): Promise<void> {
     // call rebalance function based on the new params
@@ -46,12 +50,7 @@ export class RuleUniswapPSPRebalance extends Rule {
       urgencyLevel: this.params.urgencyLevel,
       context: 'UniswapPSPRebalance',
       executor: this.params.executor,
-      postEvalUniqueKey: this.generateUniqueKey(
-          newUpperTick,
-          newLowerTick,
-          minOutputAmounts.minOut0Amount,
-          minOutputAmounts.minOut1Amount,
-      ),
+      postEvalUniqueKey: this.generateUniqueKey(),
       lowLevelUnsignedTransaction:
         await this.uniswapStrategy.createRebalanceTransaction(
             newUpperTick,
@@ -112,8 +111,9 @@ export class RuleUniswapPSPRebalance extends Rule {
 
     return lowerTick;
   }
-  protected generateUniqueKey<T extends unknown[]>(...args: T): string {
-    return `uniswap-psp-rebalance-${args.join('-')}`;
+
+  protected generateUniqueKey(): string {
+    return `uniswap-psp-rebalance-${this.strategyAddress}`;
   }
   private async calculateMinOOutAndMin1Out(): Promise<MinOutputAmounts> {
     const position = await this.uniswapStrategy.getPosition();

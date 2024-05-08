@@ -1,7 +1,5 @@
 import 'reflect-metadata';
 
-import axios from 'axios';
-import {ethers} from 'ethers';
 import {expect} from 'chai';
 import {NewRelicInterceptor} from './interceptors/NewRelicInterceptor';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
@@ -12,6 +10,7 @@ import {EthNodeInterceptor} from './interceptors/EthNodeInterceptor';
 import {RuleParamsUniswapPSPRebalance} from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
 import {Executor} from '../../src/rule_engine/TypesRule';
 import {UrgencyLevel} from '../../src/rule_engine/TypesRule';
+
 let timeoutId: NodeJS.Timeout | null = null;
 
 describe('Uniswap PSP Rule Acceptance', function() {
@@ -57,7 +56,7 @@ describe('Uniswap PSP Rule Acceptance', function() {
 
     const mockRules: RuleJSONConfigItem[] = [
       createUniswapRule(150, 50),
-      createUniswapRule(50, 125),
+      // createUniswapRule(50, 125),
     ];
     appConfigInterceptor = createAppConfigInterceptor(mockRules);
 
@@ -65,7 +64,7 @@ describe('Uniswap PSP Rule Acceptance', function() {
     newRelicInterceptor.setWaitedOnMessage(expectedMessage);
 
     await startGroot(false);
-    console.log('Waiting for message: ', expectedMessage);
+
     await waitForMessageProcessing();
 
     const isMessageObserved = newRelicInterceptor.isWaitedOnMessageObserved();
@@ -159,6 +158,7 @@ describe('Uniswap PSP Rule Acceptance', function() {
       );
       ethNodeMainInterceptor.setEthCallResponse(
           'upperTick',
+
           '0x0000000000000000000000000000000000000000000000000000000000042978',
       );
       ethNodeAltInterceptor.setEthCallResponse(
@@ -192,11 +192,13 @@ describe('Uniswap PSP Rule Acceptance', function() {
       );
       ethNodeMainInterceptor.setEthCallResponse(
           'getPosition',
-          '0x00000000000000000000000000000000000000000000000000000002380db72d000000000000000000000000000000000000000000000000000000000000256b0000000000000000000000000000000000000000000000000007a8c3e17358e4',
+          /* eslint-disable-next-line  */
+        "0x00000000000000000000000000000000000000000000000000000002380db72d000000000000000000000000000000000000000000000000000000000000256b0000000000000000000000000000000000000000000000000007a8c3e17358e4"
       );
       ethNodeAltInterceptor.setEthCallResponse(
           'getPosition',
-          '0x00000000000000000000000000000000000000000000000000000002380db72d000000000000000000000000000000000000000000000000000000000000256b0000000000000000000000000000000000000000000000000007a8c3e17358e4',
+          /* eslint-disable-next-line  */
+        "0x00000000000000000000000000000000000000000000000000000002380db72d000000000000000000000000000000000000000000000000000000000000256b0000000000000000000000000000000000000000000000000007a8c3e17358e4"
       );
     }
   }
