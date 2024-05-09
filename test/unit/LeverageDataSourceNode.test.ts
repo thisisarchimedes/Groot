@@ -31,10 +31,10 @@ describe('LeverageDataSourceNode Tests', function() {
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
 
     (modulesParams.mainNode as BlockchainNodeAdapter).setProxyInfoForAddressResponse(
-        '0x71BFC64f13dF2373eD8AEdd2377B8f7238E0A9B6',
+        '0xDCb54f022D8fBeF4A686540848B75A22A35cF4Ce',
         {isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
     (modulesParams.altNode as BlockchainNodeAdapter).setProxyInfoForAddressResponse(
-        '0x71BFC64f13dF2373eD8AEdd2377B8f7238E0A9B6',
+        '0xDCb54f022D8fBeF4A686540848B75A22A35cF4Ce',
         {isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
 
     const abiStorage = new AbiStorageDynamoDB(modulesParams);
