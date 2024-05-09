@@ -10,6 +10,7 @@ import {EthNodeInterceptor} from './interceptors/EthNodeInterceptor';
 import {RuleParamsUniswapPSPRebalance} from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
 import {Executor} from '../../src/rule_engine/TypesRule';
 import {UrgencyLevel} from '../../src/rule_engine/TypesRule';
+import {PostgresDBInterceptor} from './interceptors/PostgresDBInterceptor';
 
 let timeoutId: NodeJS.Timeout | null = null;
 
@@ -21,6 +22,7 @@ describe('Uniswap PSP Rule Acceptance', function() {
   let appConfigInterceptor: AppConfigInterceptor | undefined;
   let ethNodeMainInterceptor: EthNodeInterceptor | undefined;
   let ethNodeAltInterceptor: EthNodeInterceptor | undefined;
+  let postgresInterceptor: PostgresDBInterceptor | undefined;
 
   beforeEach(async function() {
     const configService = createConfigService();
@@ -53,6 +55,9 @@ describe('Uniswap PSP Rule Acceptance', function() {
     ethNodeAltInterceptor.interceptCalls();
 
     setInterceptVariables();
+
+    postgresInterceptor = new PostgresDBInterceptor();
+    postgresInterceptor.setQueryAlwaysSuccessOnce();
 
     const mockRules: RuleJSONConfigItem[] = [
       createUniswapRule(150, 50),
