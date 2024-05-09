@@ -47,6 +47,7 @@ export class RuleLiquidatePositions extends Rule {
 
     // Query to get all live positions data
     const res = await this.leverageDataSource!.getLivePositions();
+    this.logger.info(`RuleLiquidatePositions: fetched ${res.length} live positions`);
 
     // Looping through the positions and preparing the semaphore with the liquidation process
     const promises = [];

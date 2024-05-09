@@ -45,16 +45,16 @@ describe('Liquidator Test', function() {
   it('Check liquidator answers', async function() {
     // Setup mocks
     (modulesParams.mainNode as BlockchainNodeLiquidationAdapter).setProxyInfoForAddressResponse(
-        '0x71BFC64f13dF2373eD8AEdd2377B8f7238E0A9B6',
+        '0xDCb54f022D8fBeF4A686540848B75A22A35cF4Ce',
         {isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
     (modulesParams.altNode as BlockchainNodeLiquidationAdapter).setProxyInfoForAddressResponse(
-        '0x71BFC64f13dF2373eD8AEdd2377B8f7238E0A9B6',
+        '0xDCb54f022D8fBeF4A686540848B75A22A35cF4Ce',
         {isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
     (modulesParams.mainNode as BlockchainNodeLiquidationAdapter).setProxyInfoForAddressResponse(
-        '0xaE251Cd1a1d8121876cA609141bA5C63C0889e42',
+        '0x27E5dE33b607CB5A0fDe5Ea7c6aAFb5d51aC98c8',
         {isProxy: true, implementationAddress: '0x293CC459Aec506932C7bA4Ba662649158fCFAb2F'});
     (modulesParams.altNode as BlockchainNodeLiquidationAdapter).setProxyInfoForAddressResponse(
-        '0xaE251Cd1a1d8121876cA609141bA5C63C0889e42',
+        '0x27E5dE33b607CB5A0fDe5Ea7c6aAFb5d51aC98c8',
         {isProxy: true, implementationAddress: '0x293CC459Aec506932C7bA4Ba662649158fCFAb2F'});
     (modulesParams.mainNode as BlockchainNodeLiquidationAdapter).setProxyInfoForAddressResponse(
         '0x7694Cd972Baa64018e5c6389740832e4C7f2Ce9a',

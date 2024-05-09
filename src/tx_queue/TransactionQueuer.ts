@@ -27,10 +27,10 @@ export class TransactionQueuer {
       try {
         await this.queue.addTransactionToQueue(tx);
       } catch (err: unknown) {
-        if ((err as Error).message.includes('already exists and is within TTL')) {
-          this.logger.info((err as Error).message);
+        if ((err as Error).toString().includes('already exists and is within TTL')) {
+          this.logger.info((err as Error).toString());
         } else {
-          this.logger.error((err as Error).message);
+          this.logger.error(JSON.stringify(err));
         }
       }
     }
