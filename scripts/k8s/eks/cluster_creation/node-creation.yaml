@@ -3,11 +3,13 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: groot-stable-app
-  region: us-west-2
+  name: groot-demo-app
+  region: us-east-1
+
+availabilityZones: ["us-east-1a", "us-east-1b"]
 
 managedNodeGroups:
-  - name: groot-stable-node-group-1
+  - name: groot-demo-node-group-1
     instanceType: r5.2xlarge
     desiredCapacity: 2
     minSize: 2

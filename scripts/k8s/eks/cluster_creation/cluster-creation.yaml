@@ -3,8 +3,8 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: groot-stable-app
-  region: us-west-2
+  name: groot-demo-app
+  region: us-east-1
   version: '1.29'
 
 cloudWatch:
