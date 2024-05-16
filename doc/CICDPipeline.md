@@ -43,9 +43,9 @@ eksctl create nodegroup --config-file=scripts/k8s/eks/cluster_creation/node-crea
 ```
 
 ### Current K8s clusters
-- Cluster (production): groot-stable-app (us-west-2)
-- Cluster (demo): groot-demo-app (us-west-2)
-- ECR Repo: groot (us-west-2)
+- Cluster (production): groot-stable-app (us-east-1)
+- Cluster (demo): groot-demo-app (us-east-1)
+- ECR Repo: groot (us-east-1)
 
 ## Getting Basic Cluster Information
 
@@ -55,11 +55,11 @@ Then, authenicate and make sure you can get the cluster information.
 
 ```bash
 # DemoApp
-aws eks update-kubeconfig --name groot-demo-app --region us-west-2
+aws eks update-kubeconfig --name groot-demo-app --region us-east-1
 ```
 ```bash
 # OR StableApp
-aws eks update-kubeconfig --name groot-stable-app --region us-west-2
+aws eks update-kubeconfig --name groot-stable-app --region us-east-1
 ```
 
 Get all pods
