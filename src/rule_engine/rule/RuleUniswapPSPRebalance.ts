@@ -22,6 +22,7 @@ export interface MinOutputAmounts {
 export class RuleUniswapPSPRebalance extends Rule {
   private uniswapStrategy: ToolStrategyUniswap;
   private strategyAddress: string;
+
   constructor(input: RuleConstructorInput) {
     super(input);
     this.uniswapStrategy = new ToolStrategyUniswap(
@@ -32,7 +33,10 @@ export class RuleUniswapPSPRebalance extends Rule {
       input.params as RuleParamsUniswapPSPRebalance
     ).strategyAddress;
   }
+
   public async evaluate(): Promise<void> {
+    this.logger.info('RuleUniswapPSPRebalance.evaluate() called');
+
     // call rebalance function based on the new params
     const isUpperTickThresholdNotPassed =
       await this.isCurrentTickBelowRebalanceUpperTickThreshold();
@@ -40,6 +44,7 @@ export class RuleUniswapPSPRebalance extends Rule {
       await this.isCurrentTickAboveRebalanceLowerTickThreshold();
 
     if (isUpperTickThresholdNotPassed && isLowerTickThresholdNotPassed) {
+      this.logger.info('RuleUniswapPSPRebalance: Tick is within the range');
       return;
     }
 
