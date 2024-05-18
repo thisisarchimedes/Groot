@@ -1,14 +1,25 @@
 # eksctl create cluster  -f scripts/k8s/eks/cluster_creation/cluster-creation.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
-
 metadata:
-  name: groot-demo-app
+  name: groot-stable-app
   region: us-east-1
   version: '1.29'
-
+vpc:
+  id: vpc-099806294f1333b0d
+  subnets:
+    private:
+      us-east-1a:
+        id: subnet-0162099e7fa33a19f
+      us-east-1b:
+        id: subnet-0395d0984fdf36b32
+      us-east-1c:
+        id: subnet-02730462251e846eb
+      us-east-1d:
+        id: subnet-00497d072290230c7
+      us-east-1f:
+        id: subnet-07fdd05668c9c6138
 cloudWatch:
   clusterLogging:
     enableTypes: ["audit", "authenticator", "controllerManager"]
     logRetentionInDays: 60
-
