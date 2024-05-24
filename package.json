@@ -38,7 +38,7 @@
   "dependencies": {
     "@aws-sdk/client-appconfig": "^3.525.0",
     "@aws-sdk/client-cloudwatch": "^3.529.1",
-    "@dotenvx/dotenvx": "^0.29.1",
+    "@dotenvx/dotenvx": "^0.37.1",
     "@ethersproject/abstract-provider": "^5.7.0",
     "@types/chai-as-promised": "^7.1.8",
     "@types/pg-pool": "^2.0.6",
