@@ -1,7 +1,9 @@
 import {Rule} from './Rule';
 import {RuleConstructorInput, RuleParams} from '../TypesRule';
 import {OutboundTransaction} from '../../blockchain/OutboundTransaction';
-import {ToolBalancerPSP} from '../tool/ToolBalancerPSP';
+import {ToolBalancerPSP} from '../tool/balancer/ToolBalancerPSP';
+import {ERC20Tool} from '../tool/contracts/ERC20';
+import {formatUnits} from 'ethers';
 
 /* eslint-disable max-len */
 export interface RuleParamsBalancerComposablePSPAdjust extends RuleParams {
@@ -21,6 +23,7 @@ export interface RuleParamsBalancerComposablePSPAdjust extends RuleParams {
 export class RuleBalancerComposablePSPAdjust extends Rule {
   private balancerStrategy: ToolBalancerPSP;
   private strategyAddress: string;
+  private erc20Tool: ERC20Tool;
 
   constructor(input: RuleConstructorInput) {
     super(input);
@@ -32,6 +35,7 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
     this.strategyAddress = (
       input.params as RuleParamsBalancerComposablePSPAdjust
     ).strategyAddress;
+    this.erc20Tool = new ERC20Tool(input.blockchainReader);
   }
 
   public async evaluate(): Promise<void> {
@@ -64,5 +68,38 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
 
   protected generateUniqueKey(): string {
     return `balancer-composable-psp-${this.strategyAddress}`;
+  }
+
+  private async isAdjustOutThresholdPassed(): Promise<boolean> {
+    const params = this.params as RuleParamsBalancerComposablePSPAdjust;
+    const underlyingTokenAddress =
+      await this.balancerStrategy.fetchUnderlyingTokenAddress();
+    const poolTokens = await this.balancerStrategy.fetchPoolTokens();
+    const poolAddress = await this.balancerStrategy.fetchPoolAddress();
+    const poolLpIndex = poolTokens.tokens.findIndex(
+        (token) => token === poolAddress,
+    );
+    const underlyingTokenIndex = poolTokens.tokens.findIndex(
+        (token) => token === underlyingTokenAddress,
+    );
+    poolTokens.balances[poolLpIndex] = BigInt(0);
+    const tokensDecimals = await Promise.all(
+        poolTokens.tokens.map((token) => this.erc20Tool.decimals(token)),
+    );
+    const poolTotalBalance = poolTokens.balances.reduce(
+        (acc, balance, index) =>
+          Number(formatUnits(balance, tokensDecimals[index])) + acc,
+        0,
+    );
+    const poolUnderlyingBalancePercentage =
+      (Number(
+          formatUnits(
+              poolTokens.balances[underlyingTokenIndex],
+              tokensDecimals[underlyingTokenIndex],
+          ),
+      ) /
+        poolTotalBalance) *
+      100;
+    return poolUnderlyingBalancePercentage > params.adjustOutThreshold;
   }
 }
