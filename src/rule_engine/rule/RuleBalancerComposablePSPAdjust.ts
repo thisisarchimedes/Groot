@@ -9,13 +9,13 @@ import {formatUnits} from 'ethers';
 export interface RuleParamsBalancerComposablePSPAdjust extends RuleParams {
   strategyAddress: string;
   adapterAddress: string;
-  adjustInThreshold: bigint;
-  adjustOutThreshold: bigint;
-  lpSlippage: number;
-  hoursNeedsPassSinceLastAdjustOut: number;
-  hoursNeedsPassSinceLastAdjustIn: number;
-  adjustOutUnderlyingSlippage: number;
-  maximumPoolOwnershipRatio: number;
+  adjustInThreshold: bigint; // Adjust in if strategy contract holds more asset than this threshold in underlying token amount and decimals
+  adjustOutThreshold: number; // Adjust out if underlying token amount in pool is less than this threshold
+  lpSlippage: number; // Slippage for adjust in
+  hoursNeedsPassSinceLastAdjustOut: number; // Hours needs to pass since last adjust out
+  hoursNeedsPassSinceLastAdjustIn: number; // Hours needs to pass since last adjust in
+  adjustOutUnderlyingSlippage: number; // Slippage for adjust out
+  maximumPoolOwnershipRatio: number; // Maximum amount of pool that we own
 }
 
 /* eslint-enable max-len */
@@ -48,6 +48,9 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
       (currentTimestamp - lastAdjustOut) / BigInt(60) >=
       params.hoursNeedsPassSinceLastAdjustOut
     ) {
+      const adjustOutThresholdPassed = await this.isAdjustOutThresholdPassed();
+      const maxPoolOwnershipRatioPassed =
+        await this.isMaxPoolOwnershipRatioPassed();
     }
 
     // if enough time has passed since last adjust in check if we need to adjust in
@@ -100,6 +103,42 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
       ) /
         poolTotalBalance) *
       100;
-    return poolUnderlyingBalancePercentage > params.adjustOutThreshold;
+    return poolUnderlyingBalancePercentage < params.adjustOutThreshold;
+  }
+
+  private async isMaxPoolOwnershipRatioPassed(): Promise<boolean> {
+    const params = this.params as RuleParamsBalancerComposablePSPAdjust;
+    const underlyingTokenAddress =
+      await this.balancerStrategy.fetchUnderlyingTokenAddress();
+    const poolTokens = await this.balancerStrategy.fetchPoolTokens();
+    const poolAddress = await this.balancerStrategy.fetchPoolAddress();
+    const poolLpIndex = poolTokens.tokens.findIndex(
+        (token) => token === poolAddress,
+    );
+    const underlyingTokenIndex = poolTokens.tokens.findIndex(
+        (token) => token === underlyingTokenAddress,
+    );
+    const adapterUnderlyingBalance =
+      await this.balancerStrategy.fetchAdapterUnderlyingBalance();
+    poolTokens.balances[poolLpIndex] = BigInt(0);
+    const tokensDecimals = await Promise.all(
+        poolTokens.tokens.map((token) => this.erc20Tool.decimals(token)),
+    );
+    const poolTotalBalance = poolTokens.balances.reduce(
+        (acc, balance, index) =>
+          Number(formatUnits(balance, tokensDecimals[index])) + acc,
+        0,
+    );
+    const poolOwnershipPercentage =
+      (Number(
+          formatUnits(
+              adapterUnderlyingBalance,
+              tokensDecimals[underlyingTokenIndex],
+          ),
+      ) /
+        poolTotalBalance) *
+      100;
+
+    return poolOwnershipPercentage > params.maximumPoolOwnershipRatio;
   }
 }

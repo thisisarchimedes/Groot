@@ -5,42 +5,43 @@ import {ConfigService} from '../service/config/ConfigService';
 import LeverageDataSource from './tool/data_source/LeverageDataSource';
 
 export enum TypeRule {
-    Invalid = 'invalid',
-    Dummy = 'dummy',
-    UniswapPSPRebalance = 'uniswapPSPRebalance',
-    ExpirePositions = 'expirePosition',
-    LiquidatePositions = 'liquidatePosition',
-    RuleBalanceCurvePoolWithVault = 'balanceCurvePoolWithVault'
+  Invalid = 'invalid',
+  Dummy = 'dummy',
+  UniswapPSPRebalance = 'uniswapPSPRebalance',
+  ExpirePositions = 'expirePosition',
+  LiquidatePositions = 'liquidatePosition',
+  RuleBalanceCurvePoolWithVault = 'balanceCurvePoolWithVault',
+  PSPBalancerComposableAdjust = 'PSPBalancerComposableAdjust',
 }
 
 export enum Executor {
-    PSP = 'PSP',
-    LEVERAGE = 'LEVERAGE'
+  PSP = 'PSP',
+  LEVERAGE = 'LEVERAGE',
 }
 
 export enum UrgencyLevel {
-    LOW = 'LOW',
-    HIGH = 'HIGH'
+  LOW = 'LOW',
+  HIGH = 'HIGH',
 }
 
 export interface RuleParams {
-    urgencyLevel: UrgencyLevel;
-    ttlSeconds: number;
-    executor: Executor;
+  urgencyLevel: UrgencyLevel;
+  ttlSeconds: number;
+  executor: Executor;
 }
 
 export interface RuleJSONConfigItem {
-    ruleType: TypeRule;
-    label: string;
-    params: RuleParams;
+  ruleType: TypeRule;
+  label: string;
+  params: RuleParams;
 }
 
 export interface RuleConstructorInput {
-    logger: Logger;
-    configService: ConfigService;
-    blockchainReader: BlockchainReader;
-    abiRepo: AbiRepo;
-    leverageDataSource?: LeverageDataSource;
-    ruleLabel: string;
-    params: RuleParams;
+  logger: Logger;
+  configService: ConfigService;
+  blockchainReader: BlockchainReader;
+  abiRepo: AbiRepo;
+  leverageDataSource?: LeverageDataSource;
+  ruleLabel: string;
+  params: RuleParams;
 }
