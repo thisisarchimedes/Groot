@@ -15,7 +15,7 @@ export class BlockchainNodeBalancerComposableAdapter extends BlockchainNodeAdapt
   pool = '0x1';
   underlyingToken = '0x1';
 
-  // eslint-disable-next-line require-await
+  // eslint-disable-next-line
   public override async callViewFunction(
       contractAddress: string,
       abi: string,

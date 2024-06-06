@@ -95,6 +95,27 @@ describe('Rule Factory Testings: Balancer Composable PSP', function() {
         .to.be.true;
   });
 
+  it('should check if ownership threshold passed', async function() {
+    const lastAdjustTime = BigInt(Math.floor(Date.now() / 1000 - 172800));
+    setupMockResponses(lastAdjustTime, lastAdjustTime, [
+      BigInt(0),
+      parseEther('50'),
+      parseEther('50'),
+    ]);
+    const balancerRule = createBalancerComposablePSPRule();
+
+    const ruleFactory = createRuleFactory();
+    const rule = ruleFactory.createRule(balancerRule);
+
+    (modulesParams.logger as LoggerAdapter).lookForInfoLogLineContaining(
+        `Max Pool Ownership Ratio Passed: ${true}`,
+    );
+    await rule?.evaluate();
+
+    expect((modulesParams.logger as LoggerAdapter).isExpectedLogLineInfoFound())
+        .to.be.true;
+  });
+
   function createRuleFactory(): FactoryRule {
     return new FactoryRule(modulesParams);
   }

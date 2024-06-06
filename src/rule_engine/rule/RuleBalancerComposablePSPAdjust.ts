@@ -54,6 +54,9 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
       );
       const maxPoolOwnershipRatioPassed =
         await this.isMaxPoolOwnershipRatioPassed();
+      this.logger.info(
+          `Max Pool Ownership Ratio Passed: ${maxPoolOwnershipRatioPassed}`,
+      );
     }
 
     // if enough time has passed since last adjust in check if we need to adjust in
