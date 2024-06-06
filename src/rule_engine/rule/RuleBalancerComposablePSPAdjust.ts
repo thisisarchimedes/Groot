@@ -40,7 +40,7 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
 
   public async evaluate(): Promise<void> {
     const params = this.params as RuleParamsBalancerComposablePSPAdjust;
-    const currentTimestamp = BigInt(Date.now() / 1000);
+    const currentTimestamp = BigInt(Math.floor(Date.now() / 1000));
     const lastAdjustIn = await this.balancerStrategy.lastAdjustInTimestamp();
     const lastAdjustOut = await this.balancerStrategy.lastAdjustOutTimestamp();
     // if enough time has passed since last adjust out check if we need to adjust out
@@ -49,6 +49,9 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
       params.hoursNeedsPassSinceLastAdjustOut
     ) {
       const adjustOutThresholdPassed = await this.isAdjustOutThresholdPassed();
+      this.logger.info(
+          `Adjust Out Threshold Passed: ${adjustOutThresholdPassed}`,
+      );
       const maxPoolOwnershipRatioPassed =
         await this.isMaxPoolOwnershipRatioPassed();
     }
@@ -89,11 +92,13 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
     const tokensDecimals = await Promise.all(
         poolTokens.tokens.map((token) => this.erc20Tool.decimals(token)),
     );
+
     const poolTotalBalance = poolTokens.balances.reduce(
         (acc, balance, index) =>
           Number(formatUnits(balance, tokensDecimals[index])) + acc,
         0,
     );
+
     const poolUnderlyingBalancePercentage =
       (Number(
           formatUnits(

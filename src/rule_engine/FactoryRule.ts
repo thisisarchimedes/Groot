@@ -1,6 +1,10 @@
 import 'reflect-metadata';
 
-import {RuleConstructorInput, RuleJSONConfigItem, TypeRule} from './TypesRule';
+import {
+  RuleConstructorInput,
+  RuleJSONConfigItem,
+  TypeRule,
+} from './TypesRule';
 import {Logger} from '../service/logger/Logger';
 import {Rule} from './rule/Rule';
 import {RuleDummy} from './rule/RuleDummy';
@@ -13,7 +17,7 @@ import LeverageDataSourceDB from './tool/data_source/LeverageDataSourceDB';
 import LeverageDataSourceNode from './tool/data_source/LeverageDataSourceNode';
 import {RuleExpirePositions} from './rule/RuleExpirePositions';
 import {ModulesParams} from '../types/ModulesParams';
-
+import {RuleBalancerComposablePSPAdjust} from './rule/RuleBalancerComposablePSPAdjust';
 
 export class FactoryRule {
   private leverageDataSourceDB: LeverageDataSourceDB;
@@ -21,10 +25,10 @@ export class FactoryRule {
 
   constructor(
       modulesParams: ModulesParams,
-     private logger: Logger = modulesParams.logger!,
-     private configService: ConfigServiceAWS = modulesParams.configService!,
-     private blockchainReader: BlockchainReader = modulesParams.blockchainReader!,
-     private abiRepo: AbiRepo = modulesParams.abiRepo!,
+    private logger: Logger = modulesParams.logger!,
+    private configService: ConfigServiceAWS = modulesParams.configService!,
+    private blockchainReader: BlockchainReader = modulesParams.blockchainReader!,
+    private abiRepo: AbiRepo = modulesParams.abiRepo!,
   ) {
     this.leverageDataSourceDB = new LeverageDataSourceDB(modulesParams);
     this.leverageDataSourceNode = new LeverageDataSourceNode(modulesParams);
@@ -50,6 +54,8 @@ export class FactoryRule {
           ...constractorInput,
           leverageDataSource: this.leverageDataSourceNode,
         });
+      case TypeRule.PSPBalancerComposableAdjust:
+        return new RuleBalancerComposablePSPAdjust(constractorInput);
       case TypeRule.ExpirePositions:
         return new RuleExpirePositions({
           ...constractorInput,

@@ -18,9 +18,9 @@ import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import DBService from '../../src/service/db/dbService';
 import LeverageDataSourceDB from '../../src/rule_engine/tool/data_source/LeverageDataSourceDB';
 import {ModulesParams} from '../../src/types/ModulesParams';
-import {ethers, parseUnits} from 'ethers';
+import {ethers, parseEther, parseUnits} from 'ethers';
 import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
-import {BlockchainNodeUniswapAdapter} from './adapters/BlockchainNodeUniswapAdapter';
+import {BlockchainNodeBalancerComposableAdapter} from './adapters/BlockchainNodeBalancerComposableAdapter';
 
 dotenv.config();
 
@@ -37,11 +37,11 @@ describe('Rule Factory Testings: Balancer Composable PSP', function() {
     modulesParams.logger = new LoggerAdapter();
 
     // Starting nodes
-    modulesParams.mainNode = new BlockchainNodeUniswapAdapter(
+    modulesParams.mainNode = new BlockchainNodeBalancerComposableAdapter(
         modulesParams,
         'localNodeAlchemy',
     );
-    modulesParams.altNode = new BlockchainNodeUniswapAdapter(
+    modulesParams.altNode = new BlockchainNodeBalancerComposableAdapter(
         modulesParams,
         'localNodeInfura',
     );
@@ -71,6 +71,28 @@ describe('Rule Factory Testings: Balancer Composable PSP', function() {
     const rule = ruleFactory.createRule(balancerRule);
 
     expect(rule).not.to.be.null;
+  });
+
+  it('should check if adjustout threshold passed', async function() {
+    // 2 days ago in secodns timestamp
+    const lastAdjustTime = BigInt(Math.floor(Date.now() / 1000 - 172800));
+    setupMockResponses(lastAdjustTime, lastAdjustTime, [
+      BigInt(0),
+      parseEther('50'),
+      parseEther('10'),
+    ]);
+    const balancerRule = createBalancerComposablePSPRule();
+
+    const ruleFactory = createRuleFactory();
+    const rule = ruleFactory.createRule(balancerRule);
+
+    (modulesParams.logger as LoggerAdapter).lookForInfoLogLineContaining(
+        `Adjust Out Threshold Passed: ${true}`,
+    );
+    await rule?.evaluate();
+
+    expect((modulesParams.logger as LoggerAdapter).isExpectedLogLineInfoFound())
+        .to.be.true;
   });
 
   function createRuleFactory(): FactoryRule {
@@ -107,5 +129,43 @@ describe('Rule Factory Testings: Balancer Composable PSP', function() {
       label: 'Balancer PSP rebalance - test',
       params,
     };
+  }
+
+  function setupMockResponses(
+      lastAdjustInTime: bigint,
+      lastAdjustOutTime: bigint,
+      balances: bigint[] = [BigInt(0), parseEther('100'), parseEther('100')],
+      underlyingBalance = parseEther('50'),
+      poolTokens: string[] = [
+        '0x596192bB6e41802428Ac943D2f1476C1Af25CC0E',
+        '0xbf5495Efe5DB9ce00f80364C8B423567e58d2110',
+        '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+      ],
+      lastChangeBlock: bigint = BigInt(0),
+      poolId = '0x596192bb6e41802428ac943d2f1476c1af25cc0e000000000000000000000659',
+      pool = '0x596192bb6e41802428ac943d2f1476c1af25cc0e',
+      underlyingToken = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+  ) {
+    (
+      modulesParams.mainNode as BlockchainNodeBalancerComposableAdapter
+    ).setLastAdjustInTimestampResponse(lastAdjustInTime);
+    (
+      modulesParams.mainNode as BlockchainNodeBalancerComposableAdapter
+    ).setLastAdjustOutTimestampResponse(lastAdjustOutTime);
+    (
+      modulesParams.mainNode as BlockchainNodeBalancerComposableAdapter
+    ).setPoolTokensResponse(poolTokens, balances, lastChangeBlock);
+    (
+      modulesParams.mainNode as BlockchainNodeBalancerComposableAdapter
+    ).setPoolIdResponse(poolId);
+    (
+      modulesParams.mainNode as BlockchainNodeBalancerComposableAdapter
+    ).setPoolResponse(pool);
+    (
+      modulesParams.mainNode as BlockchainNodeBalancerComposableAdapter
+    ).setUnderlyingTokenResponse(underlyingToken);
+    (
+      modulesParams.mainNode as BlockchainNodeBalancerComposableAdapter
+    ).setAdapterUnderlyingBalanceResponse(underlyingBalance);
   }
 });
