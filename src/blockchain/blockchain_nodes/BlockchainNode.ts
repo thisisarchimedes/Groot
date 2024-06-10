@@ -98,7 +98,29 @@ export abstract class BlockchainNode {
       }
     }
   }
+  public async staticCallViewFunction(
+      contractAddress: string,
+      abi: string,
+      functionName: string,
+      params: unknown[] = [],
+  ): Promise<unknown> {
+    const contract = new Contract(
+        contractAddress,
+        JSON.parse(abi),
+        this.provider,
+    );
 
+    try {
+      const data = await contract[functionName].staticCall(...params);
+      return data;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BlockchainNodeError(error.message);
+      } else {
+        throw new BlockchainNodeError('Unknown error');
+      }
+    }
+  }
   abstract startNode(): Promise<void>;
   abstract stopNode(): Promise<void>;
   abstract resetNode(externalProviderRpcUrl: string): Promise<void>;

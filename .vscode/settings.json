@@ -1,7 +1,8 @@
 {
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
+      "source.fixAll.eslint": "always"
     },
+    "editor.formatOnSave": false,
     "eslint.validate": [
       "javascript",
       "typescript"

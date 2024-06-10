@@ -11,6 +11,12 @@ type PoolTokens = {
   balances: bigint[];
   lastChangeBlock: bigint;
 };
+
+export type AdjustStruct = {
+  adapter: string;
+  lpAmount: bigint;
+  minOutAmount: bigint;
+};
 export class ToolBalancerPSP {
   private readonly strategyAddress: string;
   private readonly adapterAddress: string;
@@ -104,5 +110,30 @@ export class ToolBalancerPSP {
         'underlyingToken',
     );
     return String(result);
+  }
+  public async fetchMinimumPercentage(): Promise<bigint> {
+    const result = await this.blockchainReader.callViewFunction(
+        this.strategyAddress,
+        this.multiPoolStrategyABI,
+        'minimumPercentage',
+    );
+    return BigInt(result);
+  }
+
+  public createAdjustOutStruct(
+      adapterAddress: string,
+      lpAmount: bigint,
+      minOutAmount: bigint,
+  ): AdjustStruct {
+    const struct = {
+      adapter: adapterAddress,
+      lpAmount: lpAmount,
+      minOutAmount: minOutAmount,
+    };
+    return struct;
+  }
+
+  public async calculateMinimumLpAmountComposable(depositAmount:bigint) :Promise<bigint> {
+
   }
 }

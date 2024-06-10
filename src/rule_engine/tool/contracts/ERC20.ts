@@ -20,4 +20,14 @@ export class ERC20Tool {
     );
     return res;
   }
+
+  public async balanceOf(tokenAddress: string, owner: string): Promise<bigint> {
+    const res = await this.blockchainReader.callViewFunction(
+        tokenAddress,
+        this.ERC20ABI,
+        'balanceOf',
+        [owner],
+    );
+    return res;
+  }
 }
