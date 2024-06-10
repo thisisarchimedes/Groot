@@ -71,6 +71,8 @@ export abstract class BlockchainNode {
       abi: string,
       functionName: string,
       params: unknown[] = [],
+      isStaticCall = false,
+      overrides : Record<string, unknown> = {},
   ): Promise<unknown> {
     const contract = new Contract(
         contractAddress,
@@ -79,7 +81,13 @@ export abstract class BlockchainNode {
     );
 
     try {
-      const data = await contract[functionName](...params);
+      let data;
+      if (isStaticCall) {
+        data = await contract[functionName].staticCall(...params, {overrides});
+      } else {
+        data = await contract[functionName](...params);
+      }
+
       this.isNodeHealthy = true;
       return data;
     } catch (error) {
@@ -98,29 +106,7 @@ export abstract class BlockchainNode {
       }
     }
   }
-  public async staticCallViewFunction(
-      contractAddress: string,
-      abi: string,
-      functionName: string,
-      params: unknown[] = [],
-  ): Promise<unknown> {
-    const contract = new Contract(
-        contractAddress,
-        JSON.parse(abi),
-        this.provider,
-    );
 
-    try {
-      const data = await contract[functionName].staticCall(...params);
-      return data;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new BlockchainNodeError(error.message);
-      } else {
-        throw new BlockchainNodeError('Unknown error');
-      }
-    }
-  }
   abstract startNode(): Promise<void>;
   abstract stopNode(): Promise<void>;
   abstract resetNode(externalProviderRpcUrl: string): Promise<void>;

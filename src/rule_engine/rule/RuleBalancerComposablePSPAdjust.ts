@@ -47,6 +47,7 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
     const lastAdjustIn = await this.balancerStrategy.lastAdjustInTimestamp();
     const lastAdjustOut = await this.balancerStrategy.lastAdjustOutTimestamp();
     let adjustOut: AdjustStruct | undefined;
+    let adjustIn: AdjustStruct | undefined;
     // if enough time has passed since last adjust out check if we need to adjust out
     if (
       (currentTimestamp - lastAdjustOut) / BigInt(60) >=
@@ -61,15 +62,23 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
         params.hoursNeedsPassSinceLastAdjustIn &&
       adjustOut === undefined
     ) {
+      adjustIn = await this.adjustInCheck();
+    }
+    if (adjustIn === undefined && adjustOut === undefined) {
+      this.logger.info(`BalancerComposableAdjust: No need to adjust in or out for ${params.adapterAddress}`);
+      return;
     }
 
-    // this.logger.info(`Rebalancing Uniswap PSP strategy ${this.strategyAddress} [
-    //   ${newUpperTick},
-    //   ${newLowerTick},
-    //   ${minOutputAmounts.minOut0Amount},
-    //   ${minOutputAmounts.minOut1Amount}
-    // ]`);
-    // this.pushTransactionToRuleLocalQueue(tx);
+    const tx: OutboundTransaction = {
+      urgencyLevel: this.params.urgencyLevel,
+      context: 'BalancerComposablePspAdjust',
+      executor: this.params.executor,
+      postEvalUniqueKey: this.generateUniqueKey(),
+      lowLevelUnsignedTransaction:
+          await this.balancerStrategy.createAdjustTransaction(adjustIn, adjustOut),
+      ttlSeconds: this.params.ttlSeconds,
+    };
+    this.pushTransactionToRuleLocalQueue(tx);
   }
 
   protected generateUniqueKey(): string {
@@ -239,15 +248,31 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
     return adjustOutStruct;
   }
 
-  // private async createAdjustInData(): Promise<AdjustStruct> {
-  //   const params = this.params as RuleParamsBalancerComposablePSPAdjust;
-  //   const underlyingTokenAddress =
-  //     await this.balancerStrategy.fetchUnderlyingTokenAddress();
-  //   const strategyBalance = await this.erc20Tool.balanceOf(
-  //       underlyingTokenAddress,
-  //       this.strategyAddress,
-  //   );
-  // }
+  private async createAdjustInData(): Promise<AdjustStruct> {
+    const params = this.params as RuleParamsBalancerComposablePSPAdjust;
+    const underlyingTokenAddress =
+      await this.balancerStrategy.fetchUnderlyingTokenAddress();
+    const strategyBalance = await this.erc20Tool.balanceOf(
+        underlyingTokenAddress,
+        this.strategyAddress,
+    );
+    const minimumPercentage =
+      await this.balancerStrategy.fetchMinimumPercentage();
+    const strategyBalanceWithoutIdleAmount =
+      strategyBalance -
+      (strategyBalance * BigInt(minimumPercentage)) / BigInt(10000);
+    const minimumLpAmount = await this.balancerStrategy.calculateMinimumLpAmountComposable(
+        strategyBalanceWithoutIdleAmount,
+        params.lpSlippage,
+    );
+    const adjustInStruct : AdjustStruct = {
+      adapter: params.adapterAddress,
+      amount: strategyBalanceWithoutIdleAmount,
+      minReceive: minimumLpAmount,
+    };
+
+    return adjustInStruct;
+  }
 
   private async adjustOutCheck(): Promise<AdjustStruct | undefined> {
     const adjustOutThresholdPassed = await this.isAdjustOutThresholdPassed();
@@ -270,8 +295,11 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
     }
     return undefined;
   }
-  // private async adjustInCheck(): Promise<AdjustStruct | undefined> {
-  //   const adjustInThresholdPassed = await this.isAdjustInThresholdPassed();
-  //   this.logger.info(`Adjust In Threshold Passed: ${adjustInThresholdPassed}`);
-  // }
+  private async adjustInCheck(): Promise<AdjustStruct | undefined> {
+    const adjustInThresholdPassed = await this.isAdjustInThresholdPassed();
+    this.logger.info(`Adjust In Threshold Passed: ${adjustInThresholdPassed}`);
+    if (adjustInThresholdPassed) {
+      return await this.createAdjustInData();
+    }
+  }
 }

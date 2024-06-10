@@ -81,6 +81,7 @@ export class BlockchainReader {
     return this.findResponseFromNodeWithHighestBlockNumber(validNodeResponses);
   }
 
+
   public async getProxyInfoForAddress(
       proxyAddress: string,
   ): Promise<BlockchainNodeProxyInfo> {
@@ -147,10 +148,12 @@ export class BlockchainReader {
       abi: string,
       functionName: string,
       params: unknown[],
+      isStaticCall = false,
+      overrides: Record<string, unknown> = {},
   ): Promise<NodeResponse[]> {
     const functionCalls = this.nodes.map((node) =>
       node
-          .callViewFunction(contractAddress, abi, functionName, params)
+          .callViewFunction(contractAddress, abi, functionName, params, isStaticCall, overrides)
           .catch(() => null),
     );
     const blockNumbers = this.nodes.map((node) =>

@@ -7,7 +7,9 @@ export interface IBlockchainReader {
         contractAddress: string,
         abi: string,
         functionName: string,
-        params?: unknown[]
+        params?: unknown[],
+        isStaticCall? :boolean,
+        overrides?: Record<string, unknown>,
     ): Promise<unknown>;
     getProxyInfoForAddress(proxyAddress: string): Promise<BlockchainNodeProxyInfo>;
 }
