@@ -6,7 +6,6 @@ import {Rule} from './rule/Rule';
 import {RuleDummy} from './rule/RuleDummy';
 import {RuleUniswapPSPRebalance} from './rule/RuleUniswapPSPRebalance';
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
-import {AbiRepo} from './tool/abi_repository/AbiRepo';
 import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
 import {RuleLiquidatePositions} from './rule/RuleLiquidatePositions';
 import LeverageDataSourceDB from './tool/data_source/LeverageDataSourceDB';
@@ -24,7 +23,6 @@ export class FactoryRule {
      private logger: Logger = modulesParams.logger!,
      private configService: ConfigServiceAWS = modulesParams.configService!,
      private blockchainReader: BlockchainReader = modulesParams.blockchainReader!,
-     private abiRepo: AbiRepo = modulesParams.abiRepo!,
   ) {
     this.leverageDataSourceDB = new LeverageDataSourceDB(modulesParams);
     this.leverageDataSourceNode = new LeverageDataSourceNode(modulesParams);
@@ -35,7 +33,6 @@ export class FactoryRule {
       logger: this.logger,
       configService: this.configService,
       blockchainReader: this.blockchainReader,
-      abiRepo: this.abiRepo,
       ruleLabel: config.label,
       params: config.params,
     };

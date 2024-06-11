@@ -1,6 +1,5 @@
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
 import {Logger} from '../service/logger/Logger';
-import {AbiRepo} from './tool/abi_repository/AbiRepo';
 import {ConfigService} from '../service/config/ConfigService';
 import LeverageDataSource from './tool/data_source/LeverageDataSource';
 
@@ -39,7 +38,6 @@ export interface RuleConstructorInput {
     logger: Logger;
     configService: ConfigService;
     blockchainReader: BlockchainReader;
-    abiRepo: AbiRepo;
     leverageDataSource?: LeverageDataSource;
     ruleLabel: string;
     params: RuleParams;

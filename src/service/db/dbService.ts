@@ -1,4 +1,4 @@
-import {Client, ClientConfig, QueryConfig, QueryConfigValues, QueryResult} from 'pg';
+import {Client, ClientConfig, QueryConfig, QueryResult} from 'pg';
 import {Logger} from '../logger/Logger';
 import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 
@@ -76,10 +76,10 @@ export class LoggedClient extends Client {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async override query<R extends QueryResultRow = any, I = any[]>(
-      queryTextOrConfig: string | QueryConfig<I>,
-      values?: QueryConfigValues<I>,
-  ): Promise<QueryResult<R>> {
+  async query(
+      queryTextOrConfig: string | QueryConfig,
+      values?: unknown,
+  ): Promise<QueryResult> {
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

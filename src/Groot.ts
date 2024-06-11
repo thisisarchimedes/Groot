@@ -14,11 +14,8 @@ import {TransactionQueuer} from './tx_queue/TransactionQueuer';
 import PostgreTxQueue from './tx_queue/PostgreTxQueue';
 import DBService from './service/db/dbService';
 import {namespace} from './constants/constants';
-import {AbiRepo} from './rule_engine/tool/abi_repository/AbiRepo';
 import {BlockchainReader} from './blockchain/blockchain_reader/BlockchainReader';
 import {FactoryRule} from './rule_engine/FactoryRule';
-import {AbiStorageDynamoDB} from './rule_engine/tool/abi_repository/AbiStorageDynamoDB';
-import {AbiFetcherEtherscan} from './rule_engine/tool/abi_repository/AbiFetcherEtherscan';
 import {ModulesParams} from './types/ModulesParams';
 import LeverageDataSourceDB from './rule_engine/tool/data_source/LeverageDataSourceDB';
 import LeverageDataSourceNode from './rule_engine/tool/data_source/LeverageDataSourceNode';
@@ -45,8 +42,6 @@ export class Groot {
     this.modulesParams.blockchainReader = new BlockchainReader(
         this.modulesParams,
     );
-
-    this.initializeAbiRepo();
 
     this.initializeRuleEngine();
 
@@ -91,12 +86,6 @@ export class Groot {
           this.modulesParams,
       ),
     };
-  }
-
-  private initializeAbiRepo() {
-    const abiStorage = new AbiStorageDynamoDB(this.modulesParams);
-    const abiFetcher = new AbiFetcherEtherscan(this.modulesParams);
-    this.modulesParams.abiRepo = new AbiRepo(this.modulesParams, abiStorage, abiFetcher);
   }
 
   private initializeRuleEngine() {

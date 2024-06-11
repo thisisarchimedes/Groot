@@ -1,14 +1,13 @@
 import LeveragePosition, {PositionState} from '../../../types/LeveragePosition';
 import LeverageDataSource from './LeverageDataSource';
 import {BlockchainReader} from '../../../blockchain/blockchain_reader/BlockchainReader';
-import {IAbiRepo} from '../abi_repository/interfaces/IAbiRepo';
 import {ModulesParams} from '../../../types/ModulesParams';
+import POSITION_LEDGER_ABI from '../../../constants/abis/POSITION_LEDGER_ABI.json';
 
 const UNINITIALIZED_POSITIONS_THRESHOLD = 5;
 
 export default class LeverageDataSourceNode extends LeverageDataSource {
   private blockchainReader: BlockchainReader;
-  private abiRepo: IAbiRepo;
   private positionLedger:string;
 
   constructor(
@@ -17,7 +16,6 @@ export default class LeverageDataSourceNode extends LeverageDataSource {
   ) {
     super(modulesParams.logger!);
     this.blockchainReader = modulesParams.blockchainReader!;
-    this.abiRepo = modulesParams.abiRepo!;
     this.positionLedger = modulesParams.configService!.getLeverageContractInfo().positionLedger;
   }
 
@@ -26,7 +24,6 @@ export default class LeverageDataSourceNode extends LeverageDataSource {
   }
 
   async getLivePositions(): Promise<LeveragePosition[]> {
-    const positionLedgerAbi = await this.abiRepo.getAbiByAddress(this.positionLedger);
     // TODO: Pagination
     const positions: LeveragePosition[] = [];
     let uninitializedPositionsCount = 0;
@@ -38,7 +35,7 @@ export default class LeverageDataSourceNode extends LeverageDataSource {
 
       const position:LedgerEntry = await this.blockchainReader.callViewFunction(
           this.positionLedger,
-          positionLedgerAbi,
+          JSON.stringify(POSITION_LEDGER_ABI),
           'getPosition',
           [nftId],
       ) as LedgerEntry;

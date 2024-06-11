@@ -10,9 +10,6 @@ import {RuleParamsDummy} from '../../src/rule_engine/rule/RuleDummy';
 import {OutboundTransaction} from '../../src/blockchain/OutboundTransaction';
 import {RuleEngine} from '../../src/rule_engine/RuleEngine';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
-import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
-import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
-import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import DBService from '../../src/service/db/dbService';
 import {ModulesParams} from '../../src/types/ModulesParams';
@@ -37,10 +34,6 @@ describe('Rule Engine Testings', function() {
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
     modulesParams.dbService = new DBService(modulesParams.logger, modulesParams.configService);
-
-    const abiStorage = new AbiStorageAdapter();
-    const abiFetcher = new AbiFetcherAdapter();
-    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
     const ruleFactory = new FactoryRule(modulesParams);
     ruleEngine = new RuleEngine(modulesParams, ruleFactory);
