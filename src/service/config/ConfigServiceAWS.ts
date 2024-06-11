@@ -22,7 +22,6 @@ export class ConfigServiceAWS extends ConfigService {
       this.refreshNewRelicConfig(),
       this.refreshSleepTime(),
       this.refreshEtherscanAPIKey(),
-      this.refreshAbiStorageConfig(),
       this.refreshLeverageContractInfo(),
       this.refreshLeverageDBURL(),
       this.refreshTransactionsDatabaseURL(),
@@ -93,10 +92,6 @@ export class ConfigServiceAWS extends ConfigService {
 
   private async refreshEtherscanAPIKey(): Promise<void> {
     this.etherscanAPIKey = await this.appConfigClient.fetchConfigRawString('EtherscanApiKey');
-  }
-
-  private async refreshAbiStorageConfig(): Promise<void> {
-    this.AbiRepoDynamoDBTable = await this.appConfigClient.fetchConfigRawString('AbiRepoDynamoDBTable');
   }
 
   private async refreshTransactionsDatabaseURL(): Promise<void> {
