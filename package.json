@@ -3,6 +3,15 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "start": "yarn tsx src/EntryK8s.ts",
+    "test": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/unit/**/*.test.ts test/acceptance/**/*.test.ts",
+    "test:unit": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/unit/**/*.test.ts",
+    "test:acceptance": "mocha --import=tsx test/acceptance/**/*.test.ts",
+    "test:interface": "mocha --import=tsx test/interface/**/*.test.ts",
+    "test:all": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/**/*.test.ts",
+    "lint": "eslint --ext .ts,.tsx -c .eslintrc.cjs ."
+  },
   "devDependencies": {
     "@types/chai": "^4.3.12",
     "@types/dockerode": "^3.3.24",
@@ -26,14 +35,6 @@
     "pg-types": "^4.0.2",
     "tsx": "^4.15.2",
     "typescript": "^5.4.5"
-  },
-  "scripts": {
-    "test": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/unit/**/*.test.ts test/acceptance/**/*.test.ts",
-    "test:unit": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/unit/**/*.test.ts",
-    "test:acceptance": "mocha --import=tsx test/acceptance/**/*.test.ts",
-    "test:interface": "mocha --import=tsx test/interface/**/*.test.ts",
-    "test:all": "nyc --reporter=lcov --reporter=text mocha --import=tsx test/**/*.test.ts",
-    "lint": "eslint --ext .ts,.tsx -c .eslintrc.cjs ."
   },
   "dependencies": {
     "@aws-sdk/client-appconfig": "^3.525.0",

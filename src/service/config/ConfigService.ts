@@ -14,7 +14,6 @@ export abstract class ConfigService {
 
   protected sleepTimeMS: number = 0;
   protected etherscanAPIKey: string = '';
-  protected AbiRepoDynamoDBTable: string = '';
 
   protected leverageDbUrl: string = '';
 
@@ -63,10 +62,6 @@ export abstract class ConfigService {
 
   public getEtherscanAPIKey(): string {
     return this.etherscanAPIKey;
-  }
-
-  public getDynamoDBAbiRepoTable(): string {
-    return this.AbiRepoDynamoDBTable;
   }
 
   public getLeverageContractInfo(): LeverageContractAddresses {

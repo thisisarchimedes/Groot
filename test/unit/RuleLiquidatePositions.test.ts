@@ -1,9 +1,6 @@
 import {expect} from 'chai';
 import {LoggerConsole} from '../../src/service/logger/LoggerConsole';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
-import {AbiFetcherEtherscan} from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
-import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
-import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
 import {Executor, RuleJSONConfigItem, TypeRule, UrgencyLevel} from '../../src/rule_engine/TypesRule';
@@ -33,9 +30,6 @@ describe('Liquidator Test', function() {
     await Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
-    const abiStorage = new AbiStorageDynamoDB(modulesParams);
-    const abiFetcher = new AbiFetcherEtherscan(modulesParams);
-    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
     ruleFactory = new FactoryRule(modulesParams);
 
