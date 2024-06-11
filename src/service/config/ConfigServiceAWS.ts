@@ -22,7 +22,6 @@ export class ConfigServiceAWS extends ConfigService {
       this.refreshNewRelicConfig(),
       this.refreshSleepTime(),
       this.refreshEtherscanAPIKey(),
-      this.refreshAbiStorageConfig(),
       this.refreshLeverageContractInfo(),
       this.refreshLeverageDBURL(),
       this.refreshTransactionsDatabaseURL(),
