@@ -1,4 +1,4 @@
-import {Client, ClientConfig, QueryConfig, QueryConfigValues, QueryResult} from 'pg';
+import {Client, ClientConfig, QueryConfig, QueryResult} from 'pg';
 import {Logger} from '../logger/Logger';
 import {ConfigServiceAWS} from '../config/ConfigServiceAWS';
 
@@ -79,7 +79,7 @@ export class LoggedClient extends Client {
   async query(
       queryTextOrConfig: string | QueryConfig,
       values?: unknown,
-  ) {
+  ): Promise<QueryResult> {
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

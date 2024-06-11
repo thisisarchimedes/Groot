@@ -1,4 +1,4 @@
-import {QueryConfig, QueryConfigValues, QueryResult, QueryResultRow} from 'pg';
+import {QueryConfig, QueryResult} from 'pg';
 import {LoggedClient} from '../../../src/service/db/dbService';
 import {Logger} from '../../../src/service/logger/Logger';
 
@@ -20,10 +20,10 @@ export class PGClientAdapter extends LoggedClient {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public override query<R extends QueryResultRow = any, I = any[]>(
-      queryTextOrConfig: string | QueryConfig<I>,
-      values?: QueryConfigValues<I>,
-  ): Promise<QueryResult<R>> {
+  override query(
+      queryTextOrConfig: string | QueryConfig,
+      values?: unknown,
+  ): Promise<QueryResult> {
     this.lastExecutedQuery = queryTextOrConfig as string | QueryConfig | null;
     if (this.queryResponse) {
       return Promise.resolve(this.queryResponse);
