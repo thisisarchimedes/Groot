@@ -3,9 +3,8 @@ import {ethers} from 'ethers';
 import {Address} from '../../../types/LeverageContractAddresses';
 import {WBTC, WBTC_DECIMALS} from '../../../constants/addresses';
 import {IBlockchainReader} from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
+import {IAbiRepo} from '../abi_repository/interfaces/IAbiRepo';
 import {ConfigService} from '../../../service/config/ConfigService';
-import ERC20_ABI from '../../../constants/abis/ERC20_ABI.json';
-import MULTIPOOL_STRATEGY_ABI from '../../../constants/abis/MULTI_POOL_STRATEGY_ABI.json';
 
 export default class UniSwapPayloadBuilder {
   private readonly uniSwap: UniSwap;
@@ -13,6 +12,7 @@ export default class UniSwapPayloadBuilder {
   constructor(
       configService: ConfigService,
       private readonly blockchainReader: IBlockchainReader,
+      private readonly abiRepo: IAbiRepo,
   ) {
     this.uniSwap = new UniSwap(configService.getMainRPCURL());
   }
@@ -32,7 +32,7 @@ export default class UniSwapPayloadBuilder {
     // console.log('Building payload for:', nftId); // Debug
     const strategyAsset = await this.blockchainReader.callViewFunction( // Optimization: can get from DB
         strategy,
-        JSON.stringify(MULTIPOOL_STRATEGY_ABI),
+        await this.abiRepo.getAbiByAddress(strategy),
         'asset',
         [],
     ) as Address;
@@ -43,7 +43,7 @@ export default class UniSwapPayloadBuilder {
 
     const assetDecimals = await this.blockchainReader.callViewFunction( // Optimization: can get from DB
         strategyAsset,
-        JSON.stringify(ERC20_ABI),
+        await this.abiRepo.getAbiByAddress(strategyAsset),
         'decimals',
         [],
     ) as bigint;
@@ -75,7 +75,7 @@ export default class UniSwapPayloadBuilder {
     // console.log('Building payload for:', nftId); // Debug
     const strategyAsset = await this.blockchainReader.callViewFunction( // Optimization: can get from DB
         strategy,
-        JSON.stringify(MULTIPOOL_STRATEGY_ABI),
+        await this.abiRepo.getAbiByAddress(strategy),
         'asset',
         [],
     ) as Address;
@@ -86,14 +86,14 @@ export default class UniSwapPayloadBuilder {
 
     const assetDecimals = await this.blockchainReader.callViewFunction( // Optimization: can get from DB
         strategyAsset,
-        JSON.stringify(ERC20_ABI),
+        await this.abiRepo.getAbiByAddress(strategyAsset),
         'decimals',
         [],
     ) as bigint;
 
     const minimumExpectedAssets = await this.blockchainReader.callViewFunction( // Must query live
         strategy,
-        JSON.stringify(MULTIPOOL_STRATEGY_ABI),
+        await this.abiRepo.getAbiByAddress(strategy),
         'convertToAssets',
         [strategyShares],
     ) as bigint;

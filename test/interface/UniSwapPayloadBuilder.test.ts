@@ -7,6 +7,9 @@ import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {LoggerConsole} from '../../src/service/logger/LoggerConsole';
 import {BlockchainNodeLocal} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import {AbiFetcherEtherscan} from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
+import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 
 const WETH = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 const WETH_DECIMALS = 18;
@@ -46,9 +49,14 @@ describe('UniSwap', function() {
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
 
+    const abiStorage = new AbiStorageDynamoDB(modulesParams);
+    const abiFetcher = new AbiFetcherEtherscan(modulesParams);
+    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
+
     uniSwapPayloadBuilder = new UniSwapPayloadBuilder(
         modulesParams.configService,
         modulesParams.blockchainReader,
+        modulesParams.abiRepo,
     );
   });
 

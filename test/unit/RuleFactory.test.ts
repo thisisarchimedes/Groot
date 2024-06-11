@@ -6,7 +6,10 @@ import {RuleJSONConfigItem, TypeRule} from '../../src/rule_engine/TypesRule';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import {RuleParamsDummy} from '../../src/rule_engine/rule/RuleDummy';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
+import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
+import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import DBService from '../../src/service/db/dbService';
 import {ModulesParams} from '../../src/types/ModulesParams';
 import LeverageDataSourceDB from '../../src/rule_engine/tool/data_source/LeverageDataSourceDB';
@@ -35,6 +38,10 @@ describe('Rule Factory Testings', function() {
     modulesParams.leverageDataSource = {
       leverageDataSourceDB: new LeverageDataSourceDB(modulesParams),
     };
+
+    const abiStorage = new AbiStorageAdapter();
+    const abiFetcher = new AbiFetcherAdapter();
+    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
     ruleFactory = new FactoryRule(modulesParams);
   });
