@@ -95,10 +95,6 @@ export class ConfigServiceAWS extends ConfigService {
     this.etherscanAPIKey = await this.appConfigClient.fetchConfigRawString('EtherscanApiKey');
   }
 
-  private async refreshAbiStorageConfig(): Promise<void> {
-    this.AbiRepoDynamoDBTable = await this.appConfigClient.fetchConfigRawString('AbiRepoDynamoDBTable');
-  }
-
   private async refreshTransactionsDatabaseURL(): Promise<void> {
     this.transactionsDatabaseURL = await this.appConfigClient.fetchConfigRawString('TransactionsDatabaseURL');
   }

@@ -30,7 +30,7 @@ export class RuleLiquidatePositions extends Rule {
     }
 
     super(input);
-    this.uniSwapPayloadBuilder = new UniSwapPayloadBuilder(input.configService, this.blockchainReader, this.abiRepo);
+    this.uniSwapPayloadBuilder = new UniSwapPayloadBuilder(input.configService, this.blockchainReader);
   }
 
   public async evaluate(): Promise<void> {

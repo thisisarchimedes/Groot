@@ -48,10 +48,4 @@ describe('Config Service Test', function() {
     expect(res).to.not.be.undefined;
     expect(res.length).to.be.greaterThan(3);
   });
-
-  it('should get ABI repo DynamoDB key from AWS', function() {
-    const res: string = configService.getDynamoDBAbiRepoTable();
-    expect(res).to.not.be.undefined;
-    expect(res.length).to.be.greaterThan(3);
-  });
 });

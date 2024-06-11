@@ -3,7 +3,6 @@ import {ethers} from 'ethers';
 import {Address} from '../../../types/LeverageContractAddresses';
 import {WBTC, WBTC_DECIMALS} from '../../../constants/addresses';
 import {IBlockchainReader} from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
-import {IAbiRepo} from '../abi_repository/interfaces/IAbiRepo';
 import {ConfigService} from '../../../service/config/ConfigService';
 import ERC20_ABI from '../../../constants/abis/ERC20_ABI.json';
 import MULTIPOOL_STRATEGY_ABI from '../../../constants/abis/MULTI_POOL_STRATEGY_ABI.json';
@@ -14,7 +13,6 @@ export default class UniSwapPayloadBuilder {
   constructor(
       configService: ConfigService,
       private readonly blockchainReader: IBlockchainReader,
-      private readonly abiRepo: IAbiRepo,
   ) {
     this.uniSwap = new UniSwap(configService.getMainRPCURL());
   }
