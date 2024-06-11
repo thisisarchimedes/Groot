@@ -4,6 +4,9 @@ import {describe, it, beforeEach} from 'mocha';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import LeverageDataSourceNode from '../../src/rule_engine/tool/data_source/LeverageDataSourceNode';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
+import {AbiFetcherEtherscan} from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import {LoggerConsole} from '../../src/service/logger/LoggerConsole';
 import {BlockchainNodeLocal} from '../../src/blockchain/blockchain_nodes/BlockchainNodeLocal';
 import 'dotenv/config';
@@ -39,6 +42,9 @@ describe('LeverageDataSource Tests', function() {
     await Promise.all([modulesParams.mainNode.startNode(), modulesParams.altNode.startNode()]);
 
     modulesParams.blockchainReader = new BlockchainReader(modulesParams);
+    const abiStorage = new AbiStorageDynamoDB(modulesParams);
+    const abiFetcher = new AbiFetcherEtherscan(modulesParams);
+    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
     modulesParams.leverageDataSource = {
       leverageDataSourceNode: new LeverageDataSourceNode(modulesParams),

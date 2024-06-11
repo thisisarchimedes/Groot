@@ -1,6 +1,7 @@
 import {BlockchainNode} from '../blockchain/blockchain_nodes/BlockchainNode';
 import {BlockchainReader} from '../blockchain/blockchain_reader/BlockchainReader';
 import {RuleEngine} from '../rule_engine/RuleEngine';
+import {AbiRepo} from '../rule_engine/tool/abi_repository/AbiRepo';
 import LeverageDataSourceDB from '../rule_engine/tool/data_source/LeverageDataSourceDB';
 import LeverageDataSourceNode from '../rule_engine/tool/data_source/LeverageDataSourceNode';
 import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
@@ -27,6 +28,7 @@ export interface ModulesParams {
   ruleEngine?: RuleEngine;
   transactionsQueuer?: TransactionQueuer;
   blockchainReader?: BlockchainReader;
+  abiRepo?: AbiRepo;
   leverageDataSource?: LeverageDataSources;
 }
 

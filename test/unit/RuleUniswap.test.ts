@@ -9,9 +9,12 @@ import {
   UrgencyLevel,
 } from '../../src/rule_engine/TypesRule';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
 import {RuleParamsUniswapPSPRebalance} from '../../src/rule_engine/rule/RuleUniswapPSPRebalance';
 import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {FactoryRule} from '../../src/rule_engine/FactoryRule';
+import {AbiStorageAdapter} from './adapters/AbiStorageAdapter';
+import {AbiFetcherAdapter} from './adapters/AbiFetcherAdapter';
 import DBService from '../../src/service/db/dbService';
 import LeverageDataSourceDB from '../../src/rule_engine/tool/data_source/LeverageDataSourceDB';
 import {ModulesParams} from '../../src/types/ModulesParams';
@@ -55,6 +58,10 @@ describe('Rule Factory Testings: Uniswap', function() {
     modulesParams.leverageDataSource = {
       leverageDataSourceDB: new LeverageDataSourceDB(modulesParams),
     };
+
+    const abiStorage = new AbiStorageAdapter();
+    const abiFetcher = new AbiFetcherAdapter();
+    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
     ruleFactory = new FactoryRule(modulesParams);
   });

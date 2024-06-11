@@ -6,6 +6,9 @@ import {ConfigServiceAWS} from '../../src/service/config/ConfigServiceAWS';
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {BlockchainNodeAdapter} from './adapters/BlockchainNodeAdapter';
 import LeverageDataSourceNode, {LedgerEntry} from '../../src/rule_engine/tool/data_source/LeverageDataSourceNode';
+import {AbiRepo} from '../../src/rule_engine/tool/abi_repository/AbiRepo';
+import {AbiFetcherEtherscan} from '../../src/rule_engine/tool/abi_repository/AbiFetcherEtherscan';
+import {AbiStorageDynamoDB} from '../../src/rule_engine/tool/abi_repository/AbiStorageDynamoDB';
 import LeveragePosition, {PositionState} from '../../src/types/LeveragePosition';
 import {ModulesParams} from '../../src/types/ModulesParams';
 
@@ -33,6 +36,10 @@ describe('LeverageDataSourceNode Tests', function() {
     (modulesParams.altNode as BlockchainNodeAdapter).setProxyInfoForAddressResponse(
         '0xDCb54f022D8fBeF4A686540848B75A22A35cF4Ce',
         {isProxy: true, implementationAddress: '0x2e8d2f9b031b58ff07c4b84a33eee86b978974cc'});
+
+    const abiStorage = new AbiStorageDynamoDB(modulesParams);
+    const abiFetcher = new AbiFetcherEtherscan(modulesParams);
+    modulesParams.abiRepo = new AbiRepo(modulesParams, abiStorage, abiFetcher);
 
     modulesParams.leverageDataSource = {
       leverageDataSourceNode: new LeverageDataSourceNode(modulesParams),

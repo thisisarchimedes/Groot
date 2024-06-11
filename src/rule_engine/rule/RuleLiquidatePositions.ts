@@ -6,7 +6,6 @@ import LeveragePosition from '../../types/LeveragePosition';
 import {Contract} from 'ethers';
 import {Address} from '../../types/LeverageContractAddresses';
 import UniSwapPayloadBuilder from '../tool/uni_swap/UniSwapPayloadBuilder';
-import POSITION_LIQUIDATOR_ABI from '../../constants/abis/POSITION_LIQUIDATOR.json';
 
 const MAX_CONCURRENCY = 20;
 
@@ -30,7 +29,7 @@ export class RuleLiquidatePositions extends Rule {
     }
 
     super(input);
-    this.uniSwapPayloadBuilder = new UniSwapPayloadBuilder(input.configService, this.blockchainReader);
+    this.uniSwapPayloadBuilder = new UniSwapPayloadBuilder(input.configService, this.blockchainReader, this.abiRepo);
   }
 
   public async evaluate(): Promise<void> {
@@ -43,7 +42,7 @@ export class RuleLiquidatePositions extends Rule {
 
     this.positionLiquidator = new Contract(
         this.configService.getLeverageContractInfo().positionLiquidator,
-        JSON.stringify(POSITION_LIQUIDATOR_ABI),
+        await this.abiRepo.getAbiByAddress(this.configService.getLeverageContractInfo().positionLiquidator),
     );
 
     // Query to get all live positions data
