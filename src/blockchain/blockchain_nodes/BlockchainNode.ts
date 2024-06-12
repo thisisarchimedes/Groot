@@ -83,7 +83,7 @@ export abstract class BlockchainNode {
     try {
       let data;
       if (isStaticCall) {
-        data = await contract[functionName].staticCall(...params, {overrides});
+        data = await contract[functionName].staticCall(...params, overrides);
       } else {
         data = await contract[functionName](...params);
       }

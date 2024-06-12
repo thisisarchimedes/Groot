@@ -8,6 +8,15 @@ const FUNCTION_SELECTORS = {
   tickSpacing: '0xd0c93a7c',
   pool: '0x16f0115b',
   getPosition: '0x7398ab18',
+  lastAdjustIn: '0xd716290d',
+  lastAdjustOut: '0xa6ce945e',
+  underlyingBalance: '0x59356c5c',
+  underlyingToken: '0x2495a599',
+  poolId: '0x3e0dc34e',
+  getPoolTokens: '0xf94d4668',
+  decimals: '0x313ce567',
+  balanceOf: '0x70a08231',
+  minPercentage: '0x0266782e',
 };
 export class EthNodeInterceptor extends Interceptor {
   private readonly mockRpcUrl: string;
@@ -51,6 +60,8 @@ export class EthNodeInterceptor extends Interceptor {
               };
             } else if (request.method === 'eth_call') {
               let result = '0x';
+              console.log(request);
+              console.log(request.params[0].data.slice(0, 10));
               switch (request.params[0].data.slice(0, 10)) {
                 case FUNCTION_SELECTORS.currentTick:
                   result = this.ethCallResponse.currentTick;
@@ -69,6 +80,33 @@ export class EthNodeInterceptor extends Interceptor {
                   break;
                 case FUNCTION_SELECTORS.tickSpacing:
                   result = this.ethCallResponse.tickSpacing;
+                  break;
+                case FUNCTION_SELECTORS.lastAdjustIn:
+                  result = this.ethCallResponse.lastAdjustIn;
+                  break;
+                case FUNCTION_SELECTORS.lastAdjustOut:
+                  result = this.ethCallResponse.lastAdjustOut;
+                  break;
+                case FUNCTION_SELECTORS.underlyingBalance:
+                  result = this.ethCallResponse.underlyingBalance;
+                  break;
+                case FUNCTION_SELECTORS.underlyingToken:
+                  result = this.ethCallResponse.underlyingToken;
+                  break;
+                case FUNCTION_SELECTORS.poolId:
+                  result = this.ethCallResponse.poolId;
+                  break;
+                case FUNCTION_SELECTORS.getPoolTokens:
+                  result = this.ethCallResponse.getPoolTokens;
+                  break;
+                case FUNCTION_SELECTORS.decimals:
+                  result = this.ethCallResponse.decimals;
+                  break;
+                case FUNCTION_SELECTORS.balanceOf:
+                  result = this.ethCallResponse.balanceOf;
+                  break;
+                case FUNCTION_SELECTORS.minPercentage:
+                  result = this.ethCallResponse.minPercentage;
                   break;
                 default:
                   break;

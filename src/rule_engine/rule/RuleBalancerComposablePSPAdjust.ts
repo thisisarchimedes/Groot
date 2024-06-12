@@ -12,9 +12,9 @@ import {formatUnits, parseUnits} from 'ethers';
 export interface RuleParamsBalancerComposablePSPAdjust extends RuleParams {
   strategyAddress: string;
   adapterAddress: string;
-  adjustInThreshold: bigint; // Adjust in if strategy contract holds more asset than this threshold in underlying token amount and decimals
+  adjustInThreshold: number; // Adjust in if strategy contract holds more asset than this threshold in underlying token amount and decimals
   adjustOutThreshold: number; // Adjust out if underlying token amount in pool is less than this threshold
-  lpSlippage: number; // Slippage for adjust in
+  lpSlippage: number; // Slippage for adjust in 10000 = 100%
   hoursNeedsPassSinceLastAdjustOut: number; // Hours needs to pass since last adjust out
   hoursNeedsPassSinceLastAdjustIn: number; // Hours needs to pass since last adjust in
   adjustOutUnderlyingSlippage: number; // Slippage for adjust out
@@ -89,6 +89,8 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
     const params = this.params as RuleParamsBalancerComposablePSPAdjust;
     const underlyingTokenAddress =
       await this.balancerStrategy.fetchUnderlyingTokenAddress();
+    const underlyingTokenDecimals =
+      await this.erc20Tool.decimals(underlyingTokenAddress);
     const strategyBalance = await this.erc20Tool.balanceOf(
         underlyingTokenAddress,
         this.strategyAddress,
@@ -114,7 +116,7 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
     ) {
       return false;
     }
-    return strategyBalanceWithoutIdleAmount > params.adjustInThreshold;
+    return strategyBalanceWithoutIdleAmount > parseUnits(params.adjustInThreshold.toString(), underlyingTokenDecimals);
   }
 
   private async isAdjustOutThresholdPassed(
@@ -182,11 +184,12 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
     );
     let adapterUnderlyingBalance =
       await this.balancerStrategy.fetchAdapterUnderlyingBalance();
-    poolTokens.balances[poolLpIndex] = BigInt(0);
+    const poolTokensBalances = [...poolTokens.balances];
+    poolTokensBalances[poolLpIndex] = BigInt(0);
     const tokensDecimals = await Promise.all(
         poolTokens.tokens.map((token) => this.erc20Tool.decimals(token)),
     );
-    let poolTotalBalance = poolTokens.balances.reduce(
+    let poolTotalBalance = poolTokensBalances.reduce(
         (acc, balance, index) =>
           Number(formatUnits(balance, tokensDecimals[index])) + acc,
         0,
@@ -263,7 +266,7 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
       (strategyBalance * BigInt(minimumPercentage)) / BigInt(10000);
     const minimumLpAmount = await this.balancerStrategy.calculateMinimumLpAmountComposable(
         strategyBalanceWithoutIdleAmount,
-        params.lpSlippage,
+        BigInt(params.lpSlippage),
     );
     const adjustInStruct : AdjustStruct = {
       adapter: params.adapterAddress,

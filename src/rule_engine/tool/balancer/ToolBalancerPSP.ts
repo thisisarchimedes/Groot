@@ -1,11 +1,12 @@
 import MULTI_POOL_STRATEGY_ABI from '../../../constants/abis/MULTI_POOL_STRATEGY_ABI.json';
-import {Contract, hexlify, toBeHex, zeroPadValue} from 'ethers';
+import {Contract, toBeHex, zeroPadValue} from 'ethers';
 import {RawTransactionData} from '../../../blockchain/OutboundTransaction';
 import {IBlockchainReader} from '../../../blockchain/blockchain_reader/interfaces/IBlockchainReader';
 import {BALANCER_VAULT, STORAGE_SLOTS_OF_BALANCE} from '../../../constants/addresses';
 import BALANCER_VAULT_ABI from '../../../constants/abis/BALANCER_VAULT_ABI.json';
 import AURA_ADAPTER_BASE_ABI from '../../../constants/abis/AURA_ADAPTER_BASE_ABI.json';
 import {solidityPackedKeccak256} from 'ethers';
+import axios from 'axios';
 type PoolTokens = {
   tokens: string[];
   balances: bigint[];
@@ -115,7 +116,7 @@ export class ToolBalancerPSP {
     const result = await this.blockchainReader.callViewFunction(
         this.strategyAddress,
         this.multiPoolStrategyABI,
-        'minimumPercentage',
+        'minPercentage',
     );
     return BigInt(result);
   }
@@ -133,27 +134,31 @@ export class ToolBalancerPSP {
     return struct;
   }
 
-  public async calculateMinimumLpAmountComposable(depositAmount:bigint, slippage:number) :Promise<bigint> {
-    const underLyingToken = await this.fetchUnderlyingTokenAddress();
-    const storageSlotOfBalance = STORAGE_SLOTS_OF_BALANCE[underLyingToken as keyof typeof STORAGE_SLOTS_OF_BALANCE];
+  public async calculateMinimumLpAmountComposable(depositAmount:bigint, slippage:bigint) :Promise<bigint> {
+    const underlyingToken = await this.fetchUnderlyingTokenAddress();
+    const storageSlotOfBalance = STORAGE_SLOTS_OF_BALANCE[underlyingToken as keyof typeof STORAGE_SLOTS_OF_BALANCE];
+
     const storageKey = this.calculateStorageKey(BigInt(storageSlotOfBalance), this.adapterAddress, false);
+
     const poolToken = await this.fetchPoolAddress();
     const poolId = await this.getPoolId();
+    const hexDepositAmount = zeroPadValue(toBeHex(depositAmount), 32);
 
-    const overrides = {
-      [this.adapterAddress]:
-      {
-        [storageKey]: zeroPadValue(toBeHex(depositAmount), 32),
-      },
-    };
+    // const overrides = {
+    //   'from': this.adapterAddress,
+    //   [underlyingToken]:
+    //   {
+    //     storage: {[storageKey]: hexDepositAmount},
+    //   },
+    // };
 
     const swapStruct = {
       poolId,
       kind: 0,
-      assetIn: underLyingToken,
+      assetIn: underlyingToken,
       assetOut: poolToken,
       amount: depositAmount,
-      userData: hexlify('0'),
+      userData: '0x',
     };
 
     const fundStruct = {
@@ -164,16 +169,60 @@ export class ToolBalancerPSP {
     };
     // deadline is timestamp in seconds
     const deadline = Math.floor(Date.now() / 1000) + 1000;
-
-    const result = await this.blockchainReader.callViewFunction(
+    const vaultContract = new Contract(
         BALANCER_VAULT,
         this.balancerVaultABI,
-        'swap',
-        [swapStruct, fundStruct, 0, deadline],
-        true, overrides,
     );
+    const tx = await vaultContract['swap'].populateTransaction(
+        swapStruct,
+        fundStruct,
+        0,
+        deadline,
+    );
+    // TODO change this logic back to node rather than tenderly
+    const options = {
+      method: 'POST',
+      url: 'https://api.tenderly.co/api/v1/account/ArchimedesFinance/project/cicd/simulate',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Access-Key': 'WZKCU6PUBonvgiGqfJagMr0btOqKzXOq',
+      },
+      data: {
+        network_id: '1',
+        from: this.adapterAddress,
+        to: BALANCER_VAULT,
+        input: tx.data,
+        value: '0',
+        save: true,
+        save_if_fails: true,
+        simulation_type: 'quick',
+        state_objects: {
+          [underlyingToken]: {
+            storage: {[storageKey]: hexDepositAmount}},
+        },
+      },
+    };
+    let lpOutAmount = BigInt(0);
+    try {
+      const {data} = await axios.request(options);
+      lpOutAmount = BigInt(data.transaction.transaction_info.call_trace.output);
+    } catch (error) {
+      console.error(error);
+    }
 
-    return BigInt(0);
+    // const result = await this.blockchainReader.callViewFunction(
+    //     BALANCER_VAULT,
+    //     this.balancerVaultABI,
+    //     'swap',
+    //     [swapStruct, fundStruct, 0, deadline],
+    //     true, overrides,
+    // );
+    // console.log('result', result);
+    if (lpOutAmount === BigInt(0)) {
+      return BigInt(0);
+    }
+    return lpOutAmount - (lpOutAmount * slippage / BigInt(10000));
   }
 
   public async createAdjustTransaction(

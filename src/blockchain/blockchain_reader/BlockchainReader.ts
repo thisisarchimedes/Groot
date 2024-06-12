@@ -66,6 +66,8 @@ export class BlockchainReader {
       abi: string,
       functionName: string,
       params: unknown[] = [],
+      isStaticCall = false,
+      overrides: Record<string, unknown> = {},
   ): Promise<unknown> {
     await this.init();
     const nodeResponses = await this.fetchNodeResponses(
@@ -73,6 +75,8 @@ export class BlockchainReader {
         abi,
         functionName,
         params,
+        isStaticCall,
+        overrides,
     );
 
     const validNodeResponses = this.extractValidNodeResponses(nodeResponses);

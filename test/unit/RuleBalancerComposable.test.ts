@@ -116,14 +116,15 @@ describe('Rule Factory Testings: Balancer Composable PSP', function() {
         .to.be.true;
   });
 
+
   function createRuleFactory(): FactoryRule {
     return new FactoryRule(modulesParams);
   }
 
   function createBalancerComposablePSPRule(
-      adjustInThreshold = BigInt(20000000000000),
+      adjustInThreshold = 2,
       adjustOutThreshold = 35,
-      lpSlippage = 20,
+      lpSlippage = 2,
       hoursNeedsPassSinceLastAdjustOut = 24,
       hoursNeedsPassSinceLastAdjustIn = 24,
       adjustOutUnderlyingSlippage = 1,

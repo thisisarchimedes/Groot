@@ -5,14 +5,15 @@ import {ToolBalancerPSP} from '../../src/rule_engine/tool/balancer/ToolBalancerP
 import {BlockchainReader} from '../../src/blockchain/blockchain_reader/BlockchainReader';
 import {BlockchainNodeRemoteRPC} from '../../src/blockchain/blockchain_nodes/BlockchainNodeRemoteRPC';
 import {LoggerConsole} from '../../src/service/logger/LoggerConsole';
+import {parseEther} from 'ethers';
 dotenv.config();
 
 describe('Balancer Stratgy interface', function() {
   // eslint-disable-next-line no-invalid-this
   this.timeout(12000);
 
-  const balancerStrategyAddress = '0x2C7E5F0C63e74F7e962eb9a6feE1fFe03e6bD531';
-  const balancerAdapterAddress = '0xacf3335bD7CCdE10EE4BBfB50129562E7789af9D';
+  const balancerStrategyAddress = '0x4f4c4D838c1bd66A1d19f599CA9e6C6c2F6104d2';
+  const balancerAdapterAddress = '0x30C2C954F734f061C0fF254E310E8c93F7497a5B';
 
   let blockchainReader: BlockchainReader;
   let toolBalancerPSP: ToolBalancerPSP;
@@ -86,5 +87,10 @@ describe('Balancer Stratgy interface', function() {
     const underlyingTokenAddress =
       await toolBalancerPSP.fetchUnderlyingTokenAddress();
     expect(underlyingTokenAddress).to.be.a('string');
+  });
+
+  it('should fetch minimum lp token amount', async function() {
+    const minLpTokenAmount = await toolBalancerPSP.calculateMinimumLpAmountComposable(parseEther('0.1'), BigInt(20));
+    expect(minLpTokenAmount).to.be.a('bigint');
   });
 });
