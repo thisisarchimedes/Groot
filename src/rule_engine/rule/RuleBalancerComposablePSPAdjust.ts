@@ -108,11 +108,12 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
     ) {
       return false;
     }
+    const maxOwnershipResult =await this.isMaxPoolOwnershipRatioPassed(
+        true,
+        strategyBalanceWithoutIdleAmount,
+    );
     if (
-      await this.isMaxPoolOwnershipRatioPassed(
-          true,
-          strategyBalanceWithoutIdleAmount,
-      )
+      maxOwnershipResult[0]
     ) {
       return false;
     }
@@ -285,7 +286,7 @@ export class RuleBalancerComposablePSPAdjust extends Rule {
     const maxPoolOwnershipRatioPassed =
       await this.isMaxPoolOwnershipRatioPassed();
     this.logger.info(
-        `Max Pool Ownership Ratio Passed: ${maxPoolOwnershipRatioPassed}`,
+        `Max Pool Ownership Ratio Passed: ${maxPoolOwnershipRatioPassed[0]}`,
     );
     if (adjustOutThresholdPassed) {
       return await this.createAdjustOutData();

@@ -210,7 +210,6 @@ export class ToolBalancerPSP {
     } catch (error) {
       console.error(error);
     }
-
     // const result = await this.blockchainReader.callViewFunction(
     //     BALANCER_VAULT,
     //     this.balancerVaultABI,

@@ -116,6 +116,29 @@ describe('Rule Factory Testings: Balancer Composable PSP', function() {
         .to.be.true;
   });
 
+  it('should check if adjustin threshold passed', async function() {
+    const lastAdjustTime = BigInt(Math.floor(Date.now() / 1000 - 172800));
+    setupMockResponses(lastAdjustTime, lastAdjustTime, [
+      BigInt(0),
+      parseEther('50'),
+      parseEther('50'),
+    ], parseEther('1'));
+
+    const balancerRule = createBalancerComposablePSPRule();
+
+    const ruleFactory = createRuleFactory();
+    const rule = ruleFactory.createRule(balancerRule);
+
+
+    (modulesParams.logger as LoggerAdapter).lookForInfoLogLineContaining(
+        `Adjust In Threshold Passed: ${true}`,
+    );
+    await rule?.evaluate();
+
+    expect((modulesParams.logger as LoggerAdapter).isExpectedLogLineInfoFound())
+        .to.be.true;
+  });
+
 
   function createRuleFactory(): FactoryRule {
     return new FactoryRule(modulesParams);
@@ -124,13 +147,13 @@ describe('Rule Factory Testings: Balancer Composable PSP', function() {
   function createBalancerComposablePSPRule(
       adjustInThreshold = 2,
       adjustOutThreshold = 35,
-      lpSlippage = 2,
+      lpSlippage = 20,
       hoursNeedsPassSinceLastAdjustOut = 24,
       hoursNeedsPassSinceLastAdjustIn = 24,
       adjustOutUnderlyingSlippage = 1,
       maximumPoolOwnershipRatio = 20,
       strategyAddress = '0x69209d1bF6A6612d34D03D16a332154A3131212a',
-      adapterAddress = '0x0d6b5a54f940bf3d52e438cab785981aaefdf40c',
+      adapterAddress = '0x30C2C954F734f061C0fF254E310E8c93F7497a5B',
   ): RuleJSONConfigItem {
     const params: RuleParamsBalancerComposablePSPAdjust = {
       strategyAddress,
@@ -167,6 +190,7 @@ describe('Rule Factory Testings: Balancer Composable PSP', function() {
       poolId = '0x596192bb6e41802428ac943d2f1476c1af25cc0e000000000000000000000659',
       pool = '0x596192bb6e41802428ac943d2f1476c1af25cc0e',
       underlyingToken = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+      strategyBalance = parseEther('10'),
   ) {
     (
       modulesParams.mainNode as BlockchainNodeBalancerComposableAdapter
@@ -189,5 +213,8 @@ describe('Rule Factory Testings: Balancer Composable PSP', function() {
     (
       modulesParams.mainNode as BlockchainNodeBalancerComposableAdapter
     ).setAdapterUnderlyingBalanceResponse(underlyingBalance);
+    (
+      modulesParams.mainNode as BlockchainNodeBalancerComposableAdapter
+    ).setStrategyBalanceResponse(strategyBalance);
   }
 });

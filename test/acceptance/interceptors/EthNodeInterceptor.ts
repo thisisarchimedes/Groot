@@ -60,8 +60,6 @@ export class EthNodeInterceptor extends Interceptor {
               };
             } else if (request.method === 'eth_call') {
               let result = '0x';
-              console.log(request);
-              console.log(request.params[0].data.slice(0, 10));
               switch (request.params[0].data.slice(0, 10)) {
                 case FUNCTION_SELECTORS.currentTick:
                   result = this.ethCallResponse.currentTick;

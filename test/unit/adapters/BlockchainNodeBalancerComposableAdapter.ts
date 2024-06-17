@@ -14,6 +14,7 @@ export class BlockchainNodeBalancerComposableAdapter extends BlockchainNodeAdapt
   adapterLpBalance = BigInt(0);
   pool = '0x1';
   underlyingToken = '0x1';
+  strategyBalance =BigInt(0);
 
   // eslint-disable-next-line
   public override async callViewFunction(
@@ -44,6 +45,10 @@ export class BlockchainNodeBalancerComposableAdapter extends BlockchainNodeAdapt
         return this.underlyingToken;
       case 'decimals':
         return 18;
+      case 'balanceOf':
+        return this.strategyBalance;
+      case 'minPercentage':
+        return 500;
     }
     this.isNodeHealthy = true;
     return this.currentReadResponse;
@@ -76,6 +81,9 @@ export class BlockchainNodeBalancerComposableAdapter extends BlockchainNodeAdapt
   }
   public setUnderlyingTokenResponse(token: string): void {
     this.underlyingToken = token;
+  }
+  public setStrategyBalanceResponse(balance: bigint): void {
+    this.strategyBalance = balance;
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
