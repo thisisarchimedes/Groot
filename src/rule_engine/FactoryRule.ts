@@ -10,7 +10,6 @@ import {ConfigServiceAWS} from '../service/config/ConfigServiceAWS';
 import {RuleLiquidatePositions} from './rule/RuleLiquidatePositions';
 import LeverageDataSourceDB from './tool/data_source/LeverageDataSourceDB';
 import LeverageDataSourceNode from './tool/data_source/LeverageDataSourceNode';
-import {RuleExpirePositions} from './rule/RuleExpirePositions';
 import {ModulesParams} from '../types/ModulesParams';
 
 
@@ -48,10 +47,11 @@ export class FactoryRule {
           leverageDataSource: this.leverageDataSourceNode,
         });
       case TypeRule.ExpirePositions:
-        return new RuleExpirePositions({
-          ...constractorInput,
-          leverageDataSource: this.leverageDataSourceDB,
-        });
+        // return new RuleExpirePositions({
+        //   ...constractorInput,
+        //   leverageDataSource: this.leverageDataSourceDB,
+        // });
+        return null;
       default:
         this.logger.warn(`Unsupported rule type: ${config.ruleType}`);
         return null;
